@@ -1,12 +1,8 @@
 import * as React from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
-import type { SidebarContext, SidebarProviderProps } from "./types"
+import type { SidebarContext as SidebarContextType, SidebarProviderProps } from "./types"
 
-const SIDEBAR_COOKIE_NAME = "sidebar:state"
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_KEYBOARD_SHORTCUT = "b"
-
-export const SidebarContext = React.createContext<SidebarContext | null>(null)
+export const SidebarContext = React.createContext<SidebarContextType | null>(null)
 
 export function useSidebar() {
   const context = React.useContext(SidebarContext)
@@ -35,7 +31,7 @@ export function SidebarProvider({
       } else {
         _setOpen(openState)
       }
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+      document.cookie = `sidebar:state=${openState}; path=/; max-age=${60 * 60 * 24 * 7}`
     },
     [setOpenProp, open]
   )
@@ -49,7 +45,7 @@ export function SidebarProvider({
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
-        event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
+        event.key === "b" &&
         (event.metaKey || event.ctrlKey)
       ) {
         event.preventDefault()
@@ -63,7 +59,7 @@ export function SidebarProvider({
 
   const state = open ? "expanded" : "collapsed"
 
-  const contextValue = React.useMemo<SidebarContext>(
+  const contextValue = React.useMemo<SidebarContextType>(
     () => ({
       state,
       open,

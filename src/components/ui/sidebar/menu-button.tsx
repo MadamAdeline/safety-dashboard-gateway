@@ -2,6 +2,8 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva } from "class-variance-authority"
 import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { useSidebar } from "./context"
 import type { SidebarMenuButtonProps } from "./types"
 
 export const sidebarMenuButtonVariants = cva(
@@ -47,8 +49,9 @@ export const SidebarMenuButton = React.forwardRef<
     ref
   ) => {
     const Comp = asChild ? Slot : "button"
+    const { isMobile, state } = useSidebar()
 
-    return (
+    const button = (
       <Comp
         ref={ref}
         data-sidebar="menu-button"
@@ -57,6 +60,28 @@ export const SidebarMenuButton = React.forwardRef<
         className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
         {...props}
       />
+    )
+
+    if (!tooltip) {
+      return button
+    }
+
+    if (typeof tooltip === "string") {
+      tooltip = {
+        children: tooltip,
+      }
+    }
+
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipContent
+          side="right"
+          align="center"
+          hidden={state !== "collapsed" || isMobile}
+          {...tooltip}
+        />
+      </Tooltip>
     )
   }
 )
