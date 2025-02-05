@@ -107,9 +107,7 @@ export function SDSList({ data, filters }: SDSListProps) {
                 <TableCell>{item.expiryDate}</TableCell>
                 <TableCell>{item.dgClass}</TableCell>
                 <TableCell>
-                  <Badge
-                    variant={item.status === "ACTIVE" ? "success" : "destructive"}
-                  >
+                  <Badge variant={item.status === "ACTIVE" ? "default" : "destructive"}>
                     {item.status}
                   </Badge>
                 </TableCell>
@@ -139,14 +137,23 @@ export function SDSList({ data, filters }: SDSListProps) {
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setCurrentPage((p) => Math.max(1, p - 1));
+                }}
+                aria-disabled={currentPage === 1}
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <PaginationItem key={page}>
                 <PaginationLink
-                  onClick={() => setCurrentPage(page)}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPage(page);
+                  }}
                   isActive={currentPage === page}
                 >
                   {page}
@@ -155,8 +162,13 @@ export function SDSList({ data, filters }: SDSListProps) {
             ))}
             <PaginationItem>
               <PaginationNext
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setCurrentPage((p) => Math.min(totalPages, p + 1));
+                }}
+                aria-disabled={currentPage === totalPages}
+                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
           </PaginationContent>
