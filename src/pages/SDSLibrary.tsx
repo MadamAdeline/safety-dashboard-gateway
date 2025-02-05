@@ -80,7 +80,7 @@ export default function SDSLibrary() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-4">
+      <div className="space-y-4 max-w-full">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Global SDS Library</h1>
           <Button 

@@ -44,7 +44,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6">
+      <div className="max-w-full">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">
             {initialData ? "Edit Safety Data Sheet" : "New Safety Data Sheet"}
