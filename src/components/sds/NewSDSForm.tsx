@@ -20,13 +20,13 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import type { SDS } from "@/types/sds";
 
 // Sample suppliers data - in a real app this would come from an API
@@ -162,8 +162,8 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
                               <CommandItem
                                 key={s.value}
                                 value={s.label}
-                                onSelect={(currentValue) => {
-                                  setSupplier(currentValue === supplier ? "" : currentValue);
+                                onSelect={() => {
+                                  setSupplier(s.label);
                                   setOpen(false);
                                 }}
                               >
