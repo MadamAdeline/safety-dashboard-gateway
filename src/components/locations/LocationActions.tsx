@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Filter, RotateCw, FileDown } from "lucide-react";
+import { Filter, Download, RefreshCw } from "lucide-react";
 
 interface LocationActionsProps {
   onToggleFilters: () => void;
@@ -13,27 +13,27 @@ export function LocationActions({ onToggleFilters, onExport, onRefresh }: Locati
     <div className="flex items-center gap-2">
       <Button
         variant="outline"
-        size="icon"
         onClick={onToggleFilters}
-        className="h-9 w-9"
+        className="gap-2"
       >
         <Filter className="h-4 w-4" />
+        Filters
       </Button>
       <Button
         variant="outline"
-        size="icon"
         onClick={onExport}
-        className="h-9 w-9"
+        className="gap-2"
       >
-        <FileDown className="h-4 w-4" />
+        <Download className="h-4 w-4" />
+        Export
       </Button>
       <Button
         variant="outline"
-        size="icon"
         onClick={onRefresh}
-        className="h-9 w-9"
+        className="gap-2"
       >
-        <RotateCw className="h-4 w-4" />
+        <RefreshCw className="h-4 w-4" />
+        Refresh
       </Button>
     </div>
   );
