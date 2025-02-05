@@ -69,7 +69,7 @@ const Index = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <InfoCard
           title="Training Resources: Understanding Safety Data Sheets"
-          image="/lovable-uploads/a3570a4c-d3d9-40e2-a578-04aeb8cf5268.png"
+          image="/lovable-uploads/42ffeef5-3205-4f73-a4c5-91997cf05956.png"
           link="https://www.safeworkaustralia.gov.au/sites/default/files/2021-11/understanding_sds_fact_sheet.pdf"
         />
         <InfoCard
