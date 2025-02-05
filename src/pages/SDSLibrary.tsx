@@ -3,7 +3,8 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { SDSList } from "@/components/sds/SDSList";
 import { SDSFilters } from "@/components/sds/SDSFilters";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Search, Filter, Download, RefreshCw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import type { SDS, SDSFilters as SDSFiltersType } from "@/types/sds";
 
@@ -43,6 +44,7 @@ export default function SDSLibrary() {
     isDG: null
   });
   
+  const [showFilters, setShowFilters] = useState(false);
   const { toast } = useToast();
 
   const handleExport = () => {
@@ -52,23 +54,63 @@ export default function SDSLibrary() {
     });
   };
 
+  const handleRefresh = () => {
+    toast({
+      title: "Refreshing Data",
+      description: "Updating the SDS list..."
+    });
+    // Add actual refresh logic here
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">SDS Library</h1>
-          <div className="space-x-2">
-            <Button onClick={handleExport} variant="outline">
-              Export to Excel
-            </Button>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              New SDS
-            </Button>
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
+            <div className="flex-1 max-w-md relative">
+              <Input
+                placeholder="Search products..."
+                value={filters.search}
+                onChange={(e) =>
+                  setFilters({ ...filters, search: e.target.value })
+                }
+                className="pl-10"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                className="gap-2"
+              >
+                <Filter className="h-4 w-4" />
+                Filters
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleExport}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Export
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleRefresh}
+                className="gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Refresh
+              </Button>
+            </div>
           </div>
+          
+          {showFilters && (
+            <SDSFilters filters={filters} onFiltersChange={setFilters} />
+          )}
         </div>
         
-        <SDSFilters filters={filters} onFiltersChange={setFilters} />
         <SDSList data={sampleData} filters={filters} />
       </div>
     </DashboardLayout>
