@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Filter, Download, RefreshCw, Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { NewSDSForm } from "@/components/sds/NewSDSForm";
+import { GlobalSDSSearchDialog } from "@/components/sds/GlobalSDSSearchDialog";
 import type { SDS, SDSFilters as SDSFiltersType } from "@/types/sds";
 
 // Sample data for demonstration
@@ -47,6 +48,7 @@ export default function SDSLibrary() {
   
   const [showFilters, setShowFilters] = useState(false);
   const [showNewSDS, setShowNewSDS] = useState(false);
+  const [showGlobalSearch, setShowGlobalSearch] = useState(false);
   const [selectedSDS, setSelectedSDS] = useState<SDS | null>(null);
   const { toast } = useToast();
 
@@ -82,13 +84,22 @@ export default function SDSLibrary() {
     <DashboardLayout>
       <div className="space-y-4 max-w-full">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Global SDS Library</h1>
-          <Button 
-            onClick={() => setShowNewSDS(true)}
-            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-          >
-            <Plus className="mr-2 h-4 w-4" /> New SDS
-          </Button>
+          <h1 className="text-2xl font-bold">SDS Library</h1>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => setShowGlobalSearch(true)}
+              variant="outline"
+              className="gap-2"
+            >
+              <Plus className="h-4 w-4" /> SDS From Global Library
+            </Button>
+            <Button 
+              onClick={() => setShowNewSDS(true)}
+              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+            >
+              <Plus className="mr-2 h-4 w-4" /> New SDS
+            </Button>
+          </div>
         </div>
         
         <div className="flex flex-col space-y-4">
@@ -141,6 +152,11 @@ export default function SDSLibrary() {
           data={sampleData} 
           filters={filters} 
           onEdit={handleEdit}
+        />
+
+        <GlobalSDSSearchDialog 
+          open={showGlobalSearch} 
+          onOpenChange={setShowGlobalSearch}
         />
       </div>
     </DashboardLayout>
