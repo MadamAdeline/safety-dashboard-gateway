@@ -15,6 +15,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { SDS } from "@/types/sds";
 import { SDSRequestDialog } from "./SDSRequestDialog";
+import { SDSSearch } from "@/components/sds/SDSSearch";
 
 // Sample data for demonstration
 const sampleSearchResults: SDS[] = [
@@ -146,6 +147,7 @@ export function GlobalSDSSearchDialog({
                       ...searchFields,
                       productName: e.target.value
                     })}
+                    placeholder="Search SDS Library..."
                   />
                 </div>
                 
@@ -158,6 +160,7 @@ export function GlobalSDSSearchDialog({
                       ...searchFields,
                       productCode: e.target.value
                     })}
+                    placeholder="Search SDS Library..."
                   />
                 </div>
                 
@@ -170,6 +173,7 @@ export function GlobalSDSSearchDialog({
                       ...searchFields,
                       supplier: e.target.value
                     })}
+                    placeholder="Search SDS Library..."
                   />
                 </div>
                 
@@ -182,6 +186,7 @@ export function GlobalSDSSearchDialog({
                       ...searchFields,
                       unNumber: e.target.value
                     })}
+                    placeholder="Search SDS Library..."
                   />
                 </div>
               </div>

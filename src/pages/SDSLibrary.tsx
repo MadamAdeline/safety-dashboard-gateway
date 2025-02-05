@@ -3,15 +3,15 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { SDSList } from "@/components/sds/SDSList";
 import { SDSFilters } from "@/components/sds/SDSFilters";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, Filter, Download, RefreshCw, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { NewSDSForm } from "@/components/sds/NewSDSForm";
 import { GlobalSDSSearchDialog } from "@/components/sds/GlobalSDSSearchDialog";
+import { SDSSearch } from "@/components/sds/SDSSearch";
+import { SDSActions } from "@/components/sds/SDSActions";
 import type { SDS, SDSFilters as SDSFiltersType } from "@/types/sds";
 import { SDSRequestDialog } from "@/components/sds/SDSRequestDialog";
 
-// Update the sample data
 const sampleData: SDS[] = [
   {
     productName: "Acetone (AUSCHEM)",
@@ -102,7 +102,6 @@ export default function SDSLibrary() {
   };
 
   const handleSDSSelect = (selectedSDS: SDS[]) => {
-    // Logic to add selected SDS to local library
     console.log("Selected SDS:", selectedSDS);
     toast({
       title: "Success",
@@ -137,43 +136,15 @@ export default function SDSLibrary() {
         
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-            <div className="flex-1 max-w-md relative">
-              <Input
-                placeholder="Search products..."
-                value={filters.search}
-                onChange={(e) =>
-                  setFilters({ ...filters, search: e.target.value })
-                }
-                className="pl-10"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowFilters(!showFilters)}
-                className="gap-2"
-              >
-                <Filter className="h-4 w-4" />
-                Filters
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleExport}
-                className="gap-2"
-              >
-                <Download className="h-4 w-4" />
-                Export
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleRefresh}
-                className="gap-2"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Refresh
-              </Button>
-            </div>
+            <SDSSearch 
+              value={filters.search}
+              onChange={(value) => setFilters({ ...filters, search: value })}
+            />
+            <SDSActions 
+              onToggleFilters={() => setShowFilters(!showFilters)}
+              onExport={handleExport}
+              onRefresh={handleRefresh}
+            />
           </div>
           
           {showFilters && (
