@@ -8,6 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Upload, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { SDS } from "@/types/sds";
 
 interface NewSDSFormProps {
@@ -18,12 +24,14 @@ interface NewSDSFormProps {
 export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   const [isDG, setIsDG] = useState(initialData?.isDG ?? false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [status, setStatus] = useState(initialData?.status ?? 'ACTIVE');
   const { toast } = useToast();
 
   useEffect(() => {
     if (initialData) {
       setIsDG(initialData.isDG);
-      // Set other form fields based on initialData
+      setStatus(initialData.status);
     }
   }, [initialData]);
 
@@ -31,6 +39,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
+      setShowUploadDialog(false);
       console.log("File uploaded:", file.name);
     }
   };
@@ -40,6 +49,10 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       title: "Success",
       description: "SDS Record has been updated"
     });
+  };
+
+  const openSDSInNewTab = () => {
+    window.open("/lovable-uploads/efad172c-780d-4fdb-ba96-baa5719330bc.png", '_blank');
   };
 
   return (
@@ -65,9 +78,8 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-6">
             <Tabs defaultValue="product-details" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="product-details">Product Details</TabsTrigger>
-                <TabsTrigger value="hazards">Hazards and Controls</TabsTrigger>
                 <TabsTrigger value="version">Version History</TabsTrigger>
               </TabsList>
 
@@ -100,6 +112,18 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
                       placeholder="Enter supplier name" 
                       defaultValue={initialData?.supplier}
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="status">Status *</Label>
+                    <Select value={status} onValueChange={setStatus}>
+                      <SelectTrigger id="status">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ACTIVE">Active</SelectItem>
+                        <SelectItem value="INACTIVE">Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -180,19 +204,34 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
                 </div>
               </TabsContent>
 
-              <TabsContent value="hazards">
-                <Card className="p-4">
-                  <p className="text-sm text-muted-foreground">
-                    Hazards and Controls information will be added here
-                  </p>
-                </Card>
-              </TabsContent>
-
               <TabsContent value="version">
                 <Card className="p-4">
-                  <p className="text-sm text-muted-foreground">
-                    Version History information will be added here
-                  </p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2">Date</th>
+                          <th className="text-left py-2">User</th>
+                          <th className="text-left py-2">SDS File</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b">
+                          <td className="py-2">2024-03-15</td>
+                          <td>John Doe</td>
+                          <td>
+                            <Button 
+                              variant="link" 
+                              className="p-0 h-auto text-blue-600 hover:text-blue-800"
+                              onClick={openSDSInNewTab}
+                            >
+                              View SDS
+                            </Button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </Card>
               </TabsContent>
             </Tabs>
@@ -200,21 +239,14 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
 
           <div className="space-y-4">
             <div className="flex justify-end">
-              <input
-                type="file"
-                id="sdsUpload"
-                className="hidden"
-                accept=".pdf"
-                onChange={handleFileUpload}
-              />
-              <label htmlFor="sdsUpload">
-                <Button variant="outline" className="cursor-pointer" asChild>
-                  <span>
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload SDS
-                  </span>
-                </Button>
-              </label>
+              <Button 
+                variant="outline" 
+                className="cursor-pointer"
+                onClick={() => setShowUploadDialog(true)}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                Upload SDS
+              </Button>
             </div>
 
             <div className="border rounded-lg p-4 bg-white">
@@ -230,6 +262,37 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
           </div>
         </div>
       </div>
+
+      <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Upload SDS Documents</DialogTitle>
+          </DialogHeader>
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <Upload className="h-10 w-10 text-gray-400" />
+              <div className="text-center">
+                <p className="text-sm text-gray-600">
+                  Click to upload or drag and drop
+                </p>
+                <p className="text-xs text-gray-500">PDF files only</p>
+              </div>
+              <input
+                type="file"
+                id="sdsUpload"
+                className="hidden"
+                accept=".pdf"
+                onChange={handleFileUpload}
+              />
+              <label htmlFor="sdsUpload">
+                <Button variant="secondary" className="cursor-pointer">
+                  Choose file
+                </Button>
+              </label>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
