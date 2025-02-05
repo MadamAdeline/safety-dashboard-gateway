@@ -10,11 +10,12 @@ interface LocationNodeProps {
   location: Location;
   level: number;
   onEdit: (location: Location) => void;
+  data: Location[];
 }
 
-const LocationNode = ({ location, level, onEdit }: LocationNodeProps) => {
+const LocationNode = ({ location, level, onEdit, data }: LocationNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const children = sampleData.filter(l => l.parentLocation === location.name);
+  const children = data.filter(l => l.parentLocation === location.name);
   
   const getIcon = (type: string) => {
     switch (type) {
@@ -84,6 +85,7 @@ const LocationNode = ({ location, level, onEdit }: LocationNodeProps) => {
               location={child} 
               level={level + 1} 
               onEdit={onEdit}
+              data={data}
             />
           ))}
         </div>
@@ -109,6 +111,7 @@ export function LocationHierarchy({ data, onEdit }: LocationHierarchyProps) {
           location={location} 
           level={0}
           onEdit={onEdit}
+          data={data}
         />
       ))}
     </div>
