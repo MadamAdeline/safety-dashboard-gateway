@@ -88,7 +88,7 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
                     <SelectValue placeholder="Select parent location" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     <SelectItem value="Victoria">Victoria</SelectItem>
                     <SelectItem value="Northern District">Northern District</SelectItem>
                     <SelectItem value="Melbourne High School">Melbourne High School</SelectItem>
@@ -126,3 +126,4 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     </DashboardLayout>
   );
 }
+

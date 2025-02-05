@@ -63,7 +63,7 @@ export function LocationFilters({ filters, onFiltersChange }: LocationFiltersPro
             onValueChange={(value: string) =>
               onFiltersChange({
                 ...filters,
-                parentLocation: value || null,
+                parentLocation: value === "none" ? null : value,
               })
             }
           >
@@ -71,7 +71,7 @@ export function LocationFilters({ filters, onFiltersChange }: LocationFiltersPro
               <SelectValue placeholder="Select parent location" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any</SelectItem>
+              <SelectItem value="none">Any</SelectItem>
               <SelectItem value="Victoria">Victoria</SelectItem>
               <SelectItem value="Northern District">Northern District</SelectItem>
               <SelectItem value="Melbourne High School">Melbourne High School</SelectItem>
@@ -82,3 +82,4 @@ export function LocationFilters({ filters, onFiltersChange }: LocationFiltersPro
     </div>
   );
 }
+
