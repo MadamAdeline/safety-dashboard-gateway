@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SDSLibrary from "./pages/SDSLibrary";
 import { NewSDSForm } from "./components/sds/NewSDSForm";
+import ComplianceDashboard from "./pages/ComplianceDashboard";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/sds-library" element={<SDSLibrary />} />
           <Route path="/sds-library/new" element={<NewSDSForm onClose={() => window.history.back()} />} />
+          <Route path="/compliance" element={<ComplianceDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
