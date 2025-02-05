@@ -79,7 +79,7 @@ const Index = () => {
         />
         <InfoCard
           title="Chemical Management Policy and Procedures"
-          image="/lovable-uploads/a3570a4c-d3d9-40e2-a578-04aeb8cf5268.png"
+          image="/lovable-uploads/f225c5bc-284e-4810-baf5-47efe7e77623.png"
           link="https://www2.education.vic.gov.au/pal/chemical-management/policy"
         />
       </div>
