@@ -65,6 +65,7 @@ export default function SDSLibrary() {
   return (
     <DashboardLayout>
       <div className="space-y-4">
+        <h1 className="text-2xl font-bold mb-6">SDS Library</h1>
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
             <div className="flex-1 max-w-md relative">
