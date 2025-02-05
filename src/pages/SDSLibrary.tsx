@@ -47,6 +47,7 @@ export default function SDSLibrary() {
   
   const [showFilters, setShowFilters] = useState(false);
   const [showNewSDS, setShowNewSDS] = useState(false);
+  const [selectedSDS, setSelectedSDS] = useState<SDS | null>(null);
   const { toast } = useToast();
 
   const handleExport = () => {
@@ -63,8 +64,18 @@ export default function SDSLibrary() {
     });
   };
 
+  const handleEdit = (sds: SDS) => {
+    setSelectedSDS(sds);
+    setShowNewSDS(true);
+  };
+
+  const handleClose = () => {
+    setShowNewSDS(false);
+    setSelectedSDS(null);
+  };
+
   if (showNewSDS) {
-    return <NewSDSForm onClose={() => setShowNewSDS(false)} />;
+    return <NewSDSForm onClose={handleClose} initialData={selectedSDS} />;
   }
 
   return (
@@ -126,7 +137,11 @@ export default function SDSLibrary() {
           )}
         </div>
         
-        <SDSList data={sampleData} filters={filters} />
+        <SDSList 
+          data={sampleData} 
+          filters={filters} 
+          onEdit={handleEdit}
+        />
       </div>
     </DashboardLayout>
   );

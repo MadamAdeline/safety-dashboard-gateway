@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,15 +8,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Upload, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import type { SDS } from "@/types/sds";
 
 interface NewSDSFormProps {
   onClose: () => void;
+  initialData?: SDS | null;
 }
 
-export function NewSDSForm({ onClose }: NewSDSFormProps) {
-  const [isDG, setIsDG] = useState(false);
+export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
+  const [isDG, setIsDG] = useState(initialData?.isDG ?? false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (initialData) {
+      setIsDG(initialData.isDG);
+      // Set other form fields based on initialData
+    }
+  }, [initialData]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -29,7 +38,7 @@ export function NewSDSForm({ onClose }: NewSDSFormProps) {
   const handleSave = () => {
     toast({
       title: "Success",
-      description: "SDS Record has been updated",
+      description: "SDS Record has been updated"
     });
   };
 
@@ -37,7 +46,9 @@ export function NewSDSForm({ onClose }: NewSDSFormProps) {
     <DashboardLayout>
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">New Safety Data Sheet</h1>
+          <h1 className="text-2xl font-bold">
+            {initialData ? "Edit Safety Data Sheet" : "New Safety Data Sheet"}
+          </h1>
           <div className="flex gap-2">
             <Button variant="outline" onClick={onClose}>
               Cancel
@@ -64,7 +75,11 @@ export function NewSDSForm({ onClose }: NewSDSFormProps) {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="productName">Product Name *</Label>
-                    <Input id="productName" placeholder="Enter product name" />
+                    <Input 
+                      id="productName" 
+                      placeholder="Enter product name" 
+                      defaultValue={initialData?.productName}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="otherNames">Other Product Names</Label>
@@ -72,11 +87,19 @@ export function NewSDSForm({ onClose }: NewSDSFormProps) {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="sdsCode">SDS Product Code *</Label>
-                    <Input id="sdsCode" placeholder="Enter SDS code" />
+                    <Input 
+                      id="sdsCode" 
+                      placeholder="Enter SDS code" 
+                      defaultValue={initialData?.productId}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="supplier">Supplier Name *</Label>
-                    <Input id="supplier" placeholder="Enter supplier name" />
+                    <Input 
+                      id="supplier" 
+                      placeholder="Enter supplier name" 
+                      defaultValue={initialData?.supplier}
+                    />
                   </div>
                 </div>
 
@@ -87,7 +110,11 @@ export function NewSDSForm({ onClose }: NewSDSFormProps) {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="issueDate">Issue Date *</Label>
-                    <Input id="issueDate" type="date" />
+                    <Input 
+                      id="issueDate" 
+                      type="date" 
+                      defaultValue={initialData?.issueDate}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="revisionDate">Revision Date *</Label>
@@ -95,7 +122,11 @@ export function NewSDSForm({ onClose }: NewSDSFormProps) {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="expiryDate">Expiry Date *</Label>
-                    <Input id="expiryDate" type="date" />
+                    <Input 
+                      id="expiryDate" 
+                      type="date" 
+                      defaultValue={initialData?.expiryDate}
+                    />
                   </div>
                   <div className="space-y-2 col-span-2">
                     <Label>Is this shipment considered as Dangerous Goods? *</Label>
@@ -120,7 +151,7 @@ export function NewSDSForm({ onClose }: NewSDSFormProps) {
                     <>
                       <div className="space-y-2">
                         <Label htmlFor="dgClass">DG Class *</Label>
-                        <Select>
+                        <Select defaultValue={initialData?.dgClass?.toString()}>
                           <SelectTrigger id="dgClass">
                             <SelectValue placeholder="Select DG Class" />
                           </SelectTrigger>

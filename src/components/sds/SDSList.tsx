@@ -24,9 +24,10 @@ import { useState } from "react";
 interface SDSListProps {
   data: SDS[];
   filters: SDSFilters;
+  onEdit: (sds: SDS) => void;
 }
 
-export function SDSList({ data, filters }: SDSListProps) {
+export function SDSList({ data, filters, onEdit }: SDSListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -130,6 +131,7 @@ export function SDSList({ data, filters }: SDSListProps) {
                       variant="ghost" 
                       size="icon"
                       className="hover:bg-dgxprt-hover text-dgxprt-navy"
+                      onClick={() => onEdit(item)}
                     >
                       <Edit2 className="h-4 w-4" />
                     </Button>
