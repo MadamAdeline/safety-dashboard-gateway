@@ -1,0 +1,109 @@
+
+import { useState } from "react";
+import { DashboardLayout } from "@/components/DashboardLayout";
+import { ProductList } from "@/components/products/ProductList";
+import { ProductFilters } from "@/components/products/ProductFilters";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { ProductSearch } from "@/components/products/ProductSearch";
+import { ProductActions } from "@/components/products/ProductActions";
+import type { Product, ProductFilters as ProductFiltersType } from "@/types/product";
+
+const sampleData: Product[] = [
+  {
+    id: "1",
+    name: "Acetone",
+    code: "ACE20L",
+    isDG: true,
+    dgClass: 3,
+    packGroup: "II",
+    unNumber: "1090",
+    supplier: "AUSTRALIAN CHEMICAL REAGENTS",
+    status: "ACTIVE",
+  },
+  {
+    id: "2",
+    name: "Methanol",
+    code: "MET10L",
+    isDG: true,
+    dgClass: 3,
+    packGroup: "II",
+    unNumber: "1230",
+    supplier: "SIGMA ALDRICH",
+    status: "ACTIVE",
+  }
+];
+
+export default function Products() {
+  const [filters, setFilters] = useState<ProductFiltersType>({
+    search: "",
+    supplier: [],
+    status: [],
+    dgClass: [],
+    isDG: null
+  });
+  
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { toast } = useToast();
+
+  const handleExport = () => {
+    toast({
+      title: "Export Started",
+      description: "Your product data is being exported to Excel..."
+    });
+  };
+
+  const handleRefresh = () => {
+    toast({
+      title: "Refreshing Data",
+      description: "Updating the products list..."
+    });
+  };
+
+  const handleEdit = (product: Product) => {
+    setSelectedProduct(product);
+    // TODO: Implement edit functionality
+  };
+
+  return (
+    <DashboardLayout>
+      <div className="space-y-4 max-w-full">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">Products</h1>
+          <Button 
+            onClick={() => {}} 
+            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+          >
+            <Plus className="mr-2 h-4 w-4" /> New Product
+          </Button>
+        </div>
+        
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
+            <ProductSearch 
+              value={filters.search}
+              onChange={(value) => setFilters({ ...filters, search: value })}
+            />
+            <ProductActions 
+              onToggleFilters={() => setShowFilters(!showFilters)}
+              onExport={handleExport}
+              onRefresh={handleRefresh}
+            />
+          </div>
+          
+          {showFilters && (
+            <ProductFilters filters={filters} onFiltersChange={setFilters} />
+          )}
+        </div>
+        
+        <ProductList 
+          data={sampleData} 
+          filters={filters} 
+          onEdit={handleEdit}
+        />
+      </div>
+    </DashboardLayout>
+  );
+}

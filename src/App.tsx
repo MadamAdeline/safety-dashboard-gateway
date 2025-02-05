@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SDSLibrary from "./pages/SDSLibrary";
+import Products from "./pages/Products";
 import { NewSDSForm } from "./components/sds/NewSDSForm";
 import ComplianceDashboard from "./pages/ComplianceDashboard";
 import Locations from "./pages/Locations";
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/sds-library/new" element={<NewSDSForm onClose={() => window.history.back()} />} />
           <Route path="/compliance" element={<ComplianceDashboard />} />
           <Route path="/locations" element={<Locations />} />
+          <Route path="/products" element={<Products />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
