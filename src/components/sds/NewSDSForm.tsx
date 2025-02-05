@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -14,7 +14,28 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 import type { SDS } from "@/types/sds";
+
+// Sample suppliers data - in a real app this would come from an API
+const suppliers = [
+  { value: "supplier1", label: "AUSTRALIAN CHEMICAL REAGENTS" },
+  { value: "supplier2", label: "SIGMA ALDRICH" },
+  { value: "supplier3", label: "MERCK" },
+  { value: "supplier4", label: "THERMO FISHER" },
+];
 
 interface NewSDSFormProps {
   onClose: () => void;
@@ -25,13 +46,16 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   const [isDG, setIsDG] = useState(initialData?.isDG ?? false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
-  const [status, setStatus] = useState(initialData?.status ?? 'ACTIVE');
+  const [status, setStatus] = useState<"ACTIVE" | "INACTIVE">(initialData?.status ?? 'ACTIVE');
+  const [open, setOpen] = useState(false);
+  const [supplier, setSupplier] = useState(initialData?.supplier ?? "");
   const { toast } = useToast();
 
   useEffect(() => {
     if (initialData) {
       setIsDG(initialData.isDG);
       setStatus(initialData.status);
+      setSupplier(initialData.supplier);
     }
   }, [initialData]);
 
@@ -79,23 +103,23 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
           <div className="space-y-6">
             <Tabs defaultValue="product-details" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="product-details">Product Details</TabsTrigger>
+                <TabsTrigger value="product-details">SDS Details</TabsTrigger>
                 <TabsTrigger value="version">Version History</TabsTrigger>
               </TabsList>
 
               <TabsContent value="product-details" className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="productName">Product Name *</Label>
+                    <Label htmlFor="productName">SDS Product Name *</Label>
                     <Input 
                       id="productName" 
-                      placeholder="Enter product name" 
+                      placeholder="Enter SDS product name" 
                       defaultValue={initialData?.productName}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="otherNames">Other Product Names</Label>
-                    <Input id="otherNames" placeholder="Enter other product names" />
+                    <Label htmlFor="otherNames">Other SDS Product Names</Label>
+                    <Input id="otherNames" placeholder="Enter other SDS product names" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="sdsCode">SDS Product Code *</Label>
@@ -107,15 +131,63 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="supplier">Supplier Name *</Label>
-                    <Input 
-                      id="supplier" 
-                      placeholder="Enter supplier name" 
-                      defaultValue={initialData?.supplier}
-                    />
+                    <Popover open={open} onOpenChange={setOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={open}
+                          className="w-full justify-between"
+                        >
+                          {supplier
+                            ? suppliers.find((s) => s.label === supplier)?.label
+                            : "Select supplier..."}
+                          <X
+                            className={cn(
+                              "ml-2 h-4 w-4 shrink-0 opacity-50",
+                              !supplier && "hidden"
+                            )}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSupplier("");
+                            }}
+                          />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                        <Command>
+                          <CommandInput placeholder="Search suppliers..." />
+                          <CommandEmpty>No supplier found.</CommandEmpty>
+                          <CommandGroup>
+                            {suppliers.map((s) => (
+                              <CommandItem
+                                key={s.value}
+                                value={s.label}
+                                onSelect={(currentValue) => {
+                                  setSupplier(currentValue === supplier ? "" : currentValue);
+                                  setOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    supplier === s.label ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {s.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="status">Status *</Label>
-                    <Select value={status} onValueChange={setStatus}>
+                    <Select 
+                      value={status} 
+                      onValueChange={(value: "ACTIVE" | "INACTIVE") => setStatus(value)}
+                    >
                       <SelectTrigger id="status">
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
