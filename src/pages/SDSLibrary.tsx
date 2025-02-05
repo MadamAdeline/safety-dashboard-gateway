@@ -5,10 +5,10 @@ import { SDSFilters } from "@/components/sds/SDSFilters";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import type { SDSFilters as SDSFiltersType } from "@/types/sds";
+import type { SDS, SDSFilters as SDSFiltersType } from "@/types/sds";
 
 // Sample data for demonstration
-const sampleData = [
+const sampleData: SDS[] = [
   {
     productName: "Acetone (AUSCHEM)",
     productId: "ACE20L",
@@ -17,7 +17,7 @@ const sampleData = [
     issueDate: "2023-12-01",
     expiryDate: "2028-12-01",
     dgClass: 3,
-    status: "ACTIVE"
+    status: "ACTIVE" as const
   },
   {
     productName: "Methanol",
@@ -27,7 +27,7 @@ const sampleData = [
     issueDate: "2023-11-15",
     expiryDate: "2028-11-15",
     dgClass: 3,
-    status: "ACTIVE"
+    status: "ACTIVE" as const
   }
 ];
 
