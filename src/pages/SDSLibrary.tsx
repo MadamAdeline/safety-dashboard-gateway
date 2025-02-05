@@ -5,10 +5,10 @@ import { SDSFilters } from "@/components/sds/SDSFilters";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import type { SDS, SDSFilters as SDSFiltersType } from "@/types/sds";
+import type { SDSFilters as SDSFiltersType } from "@/types/sds";
 
-// Sample data based on the image
-const sampleData: SDS[] = [
+// Sample data for demonstration
+const sampleData = [
   {
     productName: "Acetone (AUSCHEM)",
     productId: "ACE20L",
@@ -19,7 +19,16 @@ const sampleData: SDS[] = [
     dgClass: 3,
     status: "ACTIVE"
   },
-  // ... Add more sample data from the image
+  {
+    productName: "Methanol",
+    productId: "MET10L",
+    isDG: true,
+    supplier: "SIGMA ALDRICH",
+    issueDate: "2023-11-15",
+    expiryDate: "2028-11-15",
+    dgClass: 3,
+    status: "ACTIVE"
+  }
 ];
 
 export default function SDSLibrary() {
@@ -37,7 +46,6 @@ export default function SDSLibrary() {
   const { toast } = useToast();
 
   const handleExport = () => {
-    // TODO: Implement Excel export
     toast({
       title: "Export Started",
       description: "Your SDS data is being exported to Excel..."
