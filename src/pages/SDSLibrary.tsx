@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Filter, Download, RefreshCw, Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NewSDSForm } from "@/components/sds/NewSDSForm";
 import type { SDS, SDSFilters as SDSFiltersType } from "@/types/sds";
 
@@ -63,6 +62,10 @@ export default function SDSLibrary() {
       description: "Updating the SDS list..."
     });
   };
+
+  if (showNewSDS) {
+    return <NewSDSForm onClose={() => setShowNewSDS(false)} />;
+  }
 
   return (
     <DashboardLayout>
@@ -124,15 +127,6 @@ export default function SDSLibrary() {
         </div>
         
         <SDSList data={sampleData} filters={filters} />
-
-        <Dialog open={showNewSDS} onOpenChange={setShowNewSDS}>
-          <DialogContent className="max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>Safety Data Sheet</DialogTitle>
-            </DialogHeader>
-            <NewSDSForm onClose={() => setShowNewSDS(false)} />
-          </DialogContent>
-        </Dialog>
       </div>
     </DashboardLayout>
   );
