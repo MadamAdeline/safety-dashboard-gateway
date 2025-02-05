@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { Upload, X, Check } from "lucide-react";
+import { Upload, X, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -14,19 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 import type { SDS } from "@/types/sds";
 
 // Sample suppliers data - in a real app this would come from an API
@@ -47,7 +34,6 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [status, setStatus] = useState<"ACTIVE" | "INACTIVE">(initialData?.status ?? 'ACTIVE');
-  const [open, setOpen] = useState(false);
   const [supplier, setSupplier] = useState(initialData?.supplier ?? "");
   const { toast } = useToast();
 
@@ -131,56 +117,28 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="supplier">Supplier Name *</Label>
-                    <Popover open={open} onOpenChange={setOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={open}
-                          className="w-full justify-between"
-                        >
-                          {supplier
-                            ? suppliers.find((s) => s.label === supplier)?.label
-                            : "Select supplier..."}
-                          {supplier && (
-                            <X
-                              className="ml-2 h-4 w-4 shrink-0 opacity-50"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSupplier("");
-                              }}
-                            />
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                        <Command>
-                          <CommandInput placeholder="Search suppliers..." />
-                          <CommandEmpty>No supplier found.</CommandEmpty>
-                          <CommandGroup>
-                            {suppliers.map((s) => (
-                              <CommandItem
-                                key={s.value}
-                                value={s.label}
-                                onSelect={() => {
-                                  setSupplier(s.label);
-                                  setOpen(false);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    supplier === s.label ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {s.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
+                    <div className="flex gap-2">
+                      <Select 
+                        value={supplier} 
+                        onValueChange={setSupplier}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select supplier" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {suppliers.map((s) => (
+                            <SelectItem key={s.value} value={s.label}>
+                              {s.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button variant="outline" size="icon">
+                        <Search className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="status">Status *</Label>
                     <Select 
