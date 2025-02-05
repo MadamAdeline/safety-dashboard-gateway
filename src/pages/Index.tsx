@@ -74,7 +74,7 @@ const Index = () => {
         />
         <InfoCard
           title="Training Resources: Essential Knowledge for DG Compliance"
-          image="/lovable-uploads/a3570a4c-d3d9-40e2-a578-04aeb8cf5268.png"
+          image="/lovable-uploads/41619ac3-41d9-492c-b5e8-2bfcafdce8da.png"
           link="https://dgtrainer.com.au/2023/12/05/what-every-business-needs-to-know-about-managing-dangerous-goods-2/"
         />
         <InfoCard
