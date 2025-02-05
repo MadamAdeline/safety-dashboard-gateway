@@ -142,16 +142,15 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
                           {supplier
                             ? suppliers.find((s) => s.label === supplier)?.label
                             : "Select supplier..."}
-                          <X
-                            className={cn(
-                              "ml-2 h-4 w-4 shrink-0 opacity-50",
-                              !supplier && "hidden"
-                            )}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSupplier("");
-                            }}
-                          />
+                          {supplier && (
+                            <X
+                              className="ml-2 h-4 w-4 shrink-0 opacity-50"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSupplier("");
+                              }}
+                            />
+                          )}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
