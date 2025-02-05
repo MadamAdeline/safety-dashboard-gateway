@@ -1,5 +1,18 @@
 import { Link } from "react-router-dom"
-import { LogOut, Settings, Building2, Users2, FileText, Package, AlertTriangle } from "lucide-react"
+import { 
+  Home, 
+  ClipboardList, 
+  AlertTriangle, 
+  Trash2, 
+  LineChart,
+  Settings,
+  FileText,
+  Package,
+  MapPin,
+  Building2,
+  Users,
+  Database
+} from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -8,16 +21,39 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
 
-const adminItems = [
+const mainMenuItems = [
   {
-    label: "Companies",
-    path: "/companies",
-    icon: Building2,
+    label: "Home",
+    path: "/",
+    icon: Home,
   },
   {
-    label: "Users",
-    path: "/users",
-    icon: Users2,
+    label: "Site Registers",
+    path: "/site-registers",
+    icon: ClipboardList,
+  },
+  {
+    label: "Risk Assessments",
+    path: "/risk-assessments",
+    icon: AlertTriangle,
+  },
+  {
+    label: "Waste Tracking",
+    path: "/waste-tracking",
+    icon: Trash2,
+  },
+  {
+    label: "Compliance Dashboard",
+    path: "/compliance",
+    icon: LineChart,
+  },
+]
+
+const adminItems = [
+  {
+    label: "SDS Library",
+    path: "/sds-library",
+    icon: FileText,
   },
   {
     label: "Products",
@@ -25,14 +61,24 @@ const adminItems = [
     icon: Package,
   },
   {
-    label: "Safety Data Sheets",
-    path: "/sds",
-    icon: FileText,
+    label: "Locations",
+    path: "/locations",
+    icon: MapPin,
   },
   {
-    label: "Expired SDS",
-    path: "/expired-sds",
-    icon: AlertTriangle,
+    label: "Suppliers",
+    path: "/suppliers",
+    icon: Building2,
+  },
+  {
+    label: "Users & Roles",
+    path: "/users",
+    icon: Users,
+  },
+  {
+    label: "Master Data",
+    path: "/master-data",
+    icon: Database,
   },
 ]
 
@@ -48,6 +94,20 @@ export function AppSidebar() {
       </div>
       <SidebarContent className="overflow-y-auto">
         <SidebarGroup>
+          {mainMenuItems.map((item) => (
+            <SidebarMenuItem key={item.label}>
+              <SidebarMenuButton asChild>
+                <Link 
+                  to={item.path} 
+                  className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar aria-[current=page]:bg-dgxprt-selected"
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+
           <SidebarMenuItem>
             <SidebarMenuButton className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar">
               <Settings className="h-4 w-4" />
@@ -71,16 +131,6 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarGroup>
       </SidebarContent>
-
-      <div className="mt-auto p-4">
-        <Link 
-          to="/logout" 
-          className="flex items-center gap-2 px-4 py-2 text-sm text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar rounded-md"
-        >
-          <LogOut className="h-4 w-4" />
-          <span>Logout</span>
-        </Link>
-      </div>
     </Sidebar>
   )
 }
