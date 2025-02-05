@@ -18,7 +18,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   const [isDG, setIsDG] = useState(initialData?.isDG ?? false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
-  const [status, setStatus] = useState<"ACTIVE" | "INACTIVE">(initialData?.status ?? 'ACTIVE');
+  const [status, setStatus] = useState<"ACTIVE" | "INACTIVE" | "REQUESTED">(initialData?.status ?? 'ACTIVE');
   const [supplier, setSupplier] = useState(initialData?.supplier ?? "");
   const { toast } = useToast();
 

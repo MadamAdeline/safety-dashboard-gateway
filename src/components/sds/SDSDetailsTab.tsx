@@ -9,8 +9,8 @@ interface SDSDetailsTabProps {
   initialData?: SDS | null;
   isDG: boolean;
   setIsDG: (value: boolean) => void;
-  status: "ACTIVE" | "INACTIVE";
-  setStatus: (value: "ACTIVE" | "INACTIVE") => void;
+  status: "ACTIVE" | "INACTIVE" | "REQUESTED";
+  setStatus: (value: "ACTIVE" | "INACTIVE" | "REQUESTED") => void;
   supplier: string;
   setSupplier: (value: string) => void;
 }
@@ -33,7 +33,7 @@ export function SDSDetailsTab({
   setSupplier 
 }: SDSDetailsTabProps) {
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
-  const isRequested = status === "INACTIVE" && isGlobalLibrary;
+  const isRequested = status === "REQUESTED" && isGlobalLibrary;
 
   return (
     <div className="space-y-4">
@@ -97,21 +97,22 @@ export function SDSDetailsTab({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="status">Status *</Label>
-          <Select 
-            value={status} 
-            onValueChange={(value: "ACTIVE" | "INACTIVE") => setStatus(value)}
-          >
-            <SelectTrigger id="status">
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ACTIVE">Active</SelectItem>
-              <SelectItem value="INACTIVE">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="status">Status *</Label>
+        <Select 
+          value={status} 
+          onValueChange={(value: "ACTIVE" | "INACTIVE" | "REQUESTED") => setStatus(value)}
+        >
+          <SelectTrigger id="status">
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ACTIVE">Active</SelectItem>
+            <SelectItem value="INACTIVE">Inactive</SelectItem>
+            <SelectItem value="REQUESTED">Requested</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
         <div className="space-y-2">
           <Label htmlFor="sdsSource">SDS Source</Label>
