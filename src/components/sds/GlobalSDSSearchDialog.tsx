@@ -14,12 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { SDS } from "@/types/sds";
-
-interface GlobalSDSSearchDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSDSSelect: (selectedSDS: SDS[]) => void;
-}
+import { SDSRequestDialog } from "./SDSRequestDialog";
 
 // Sample data for demonstration
 const sampleSearchResults: SDS[] = [
@@ -45,6 +40,12 @@ const sampleSearchResults: SDS[] = [
   }
 ];
 
+interface GlobalSDSSearchDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSDSSelect: (selectedSDS: SDS[]) => void;
+}
+
 export function GlobalSDSSearchDialog({
   open,
   onOpenChange,
@@ -60,6 +61,7 @@ export function GlobalSDSSearchDialog({
   const [searchResults, setSearchResults] = useState<SDS[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast();
+  const [showRequestDialog, setShowRequestDialog] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -221,7 +223,13 @@ export function GlobalSDSSearchDialog({
                 ))}
               </TableBody>
             </Table>
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex justify-between">
+              <Button 
+                onClick={() => setShowRequestDialog(true)}
+                variant="outline"
+              >
+                Request SDS from DGXprt
+              </Button>
               <Button 
                 onClick={handleAddToLibrary}
                 disabled={selectedItems.length === 0}
@@ -233,6 +241,10 @@ export function GlobalSDSSearchDialog({
           </div>
         )}
       </DialogContent>
+      <SDSRequestDialog 
+        open={showRequestDialog} 
+        onOpenChange={setShowRequestDialog}
+      />
     </Dialog>
   );
 }

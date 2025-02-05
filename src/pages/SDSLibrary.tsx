@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { NewSDSForm } from "@/components/sds/NewSDSForm";
 import { GlobalSDSSearchDialog } from "@/components/sds/GlobalSDSSearchDialog";
 import type { SDS, SDSFilters as SDSFiltersType } from "@/types/sds";
+import { SDSRequestDialog } from "@/components/sds/SDSRequestDialog";
 
 // Sample data for demonstration
 const sampleData: SDS[] = [
@@ -44,6 +45,16 @@ const sampleData: SDS[] = [
     dgClass: 3,
     status: "ACTIVE" as const,
     sdsSource: "Global Library"
+  },
+  {
+    productName: "BRODIFACOUM PASTE",
+    productId: "Unknown",
+    isDG: false,
+    supplier: "Dulux Australia",
+    issueDate: "",
+    expiryDate: "",
+    status: "INACTIVE",
+    sdsSource: "Global Library"
   }
 ];
 
@@ -62,6 +73,7 @@ export default function SDSLibrary() {
   const [showFilters, setShowFilters] = useState(false);
   const [showNewSDS, setShowNewSDS] = useState(false);
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
+  const [showRequestDialog, setShowRequestDialog] = useState(false);
   const [selectedSDS, setSelectedSDS] = useState<SDS | null>(null);
   const { toast } = useToast();
 
@@ -179,6 +191,11 @@ export default function SDSLibrary() {
           open={showGlobalSearch} 
           onOpenChange={setShowGlobalSearch}
           onSDSSelect={handleSDSSelect}
+        />
+        
+        <SDSRequestDialog 
+          open={showRequestDialog} 
+          onOpenChange={setShowRequestDialog}
         />
       </div>
     </DashboardLayout>

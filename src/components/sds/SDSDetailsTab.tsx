@@ -33,9 +33,15 @@ export function SDSDetailsTab({
   setSupplier 
 }: SDSDetailsTabProps) {
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
+  const isRequested = status === "INACTIVE" && isGlobalLibrary;
 
   return (
     <div className="space-y-4">
+      {isRequested && (
+        <div className="p-4 bg-red-50 text-red-700 rounded-md mb-4">
+          SDS has been requested from DGXprt. You will be notified when it is added
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="productName">SDS Product Name *</Label>
