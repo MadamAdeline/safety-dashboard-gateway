@@ -22,6 +22,9 @@ export default {
         dgxprt: {
           navy: "#0A0B42",
           purple: "#9747FF",
+          sidebar: "#14162D",
+          hover: "#F1F0FB",
+          selected: "#895AB7",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
