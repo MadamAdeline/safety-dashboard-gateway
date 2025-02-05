@@ -38,7 +38,7 @@ const adminItems = [
 
 export function AppSidebar() {
   return (
-    <Sidebar className="border-r border-gray-200 bg-dgxprt-sidebar overflow-hidden">
+    <Sidebar className="border-r border-gray-200 bg-dgxprt-sidebar">
       <div className="flex justify-center p-6">
         <img 
           src="/lovable-uploads/6601a49f-3b97-4eb4-a178-d1ae4eea2557.png" 

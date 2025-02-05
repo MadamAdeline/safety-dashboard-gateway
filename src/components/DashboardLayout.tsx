@@ -3,7 +3,7 @@ import { AppSidebar } from "./AppSidebar";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider defaultOpen={true} open={true}>
+    <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full">
         <AppSidebar />
         <main className="flex-1 overflow-y-auto bg-gray-50">
