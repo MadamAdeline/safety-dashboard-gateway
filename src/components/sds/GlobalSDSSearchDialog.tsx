@@ -33,7 +33,16 @@ const sampleSearchResults: SDS[] = [
     status: "ACTIVE",
     sdsSource: "Global Library"
   },
-  // Add more sample data as needed
+  {
+    productName: "BP Butane",
+    productId: "0000002705",
+    supplier: "BP Australia Pty Ltd",
+    expiryDate: "2026-04-21",
+    isDG: true,
+    issueDate: "2021-04-21",
+    status: "ACTIVE",
+    sdsSource: "Global Library"
+  }
 ];
 
 export function GlobalSDSSearchDialog({

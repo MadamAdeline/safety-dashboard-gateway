@@ -85,7 +85,10 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
             </Tabs>
           </div>
 
-          <SDSPreview onUploadClick={() => setShowUploadDialog(true)} />
+          <SDSPreview 
+            onUploadClick={() => setShowUploadDialog(true)} 
+            initialData={initialData}
+          />
         </div>
       </div>
 
