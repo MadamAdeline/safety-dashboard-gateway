@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SDSLibrary from "./pages/SDSLibrary";
+import { NewSDSForm } from "./components/sds/NewSDSForm";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/sds-library" element={<SDSLibrary />} />
+          <Route path="/sds-library/new" element={<NewSDSForm onClose={() => window.history.back()} />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
