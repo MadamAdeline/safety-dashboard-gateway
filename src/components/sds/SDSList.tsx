@@ -76,8 +76,8 @@ export function SDSList({ data, filters, onEdit }: SDSListProps) {
                   onCheckedChange={toggleSelectAll}
                 />
               </TableHead>
-              <TableHead className="text-dgxprt-navy font-semibold">Product Name</TableHead>
-              <TableHead className="text-dgxprt-navy font-semibold">Product ID</TableHead>
+              <TableHead className="text-dgxprt-navy font-semibold">SDS Product Name</TableHead>
+              <TableHead className="text-dgxprt-navy font-semibold">SDS Product Code</TableHead>
               <TableHead className="text-dgxprt-navy font-semibold">DG</TableHead>
               <TableHead className="text-dgxprt-navy font-semibold">Supplier</TableHead>
               <TableHead className="text-dgxprt-navy font-semibold">Issue Date</TableHead>

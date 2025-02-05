@@ -97,22 +97,23 @@ export function SDSDetailsTab({
           </div>
         </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="status">Status *</Label>
-        <Select 
-          value={status} 
-          onValueChange={(value: "ACTIVE" | "INACTIVE" | "REQUESTED") => setStatus(value)}
-        >
-          <SelectTrigger id="status">
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ACTIVE">Active</SelectItem>
-            <SelectItem value="INACTIVE">Inactive</SelectItem>
-            <SelectItem value="REQUESTED">Requested</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+        <div className="space-y-2">
+          <Label htmlFor="status">Status *</Label>
+          <Select 
+            value={status} 
+            onValueChange={(value: "ACTIVE" | "INACTIVE" | "REQUESTED") => setStatus(value)}
+            disabled={status === "REQUESTED"}
+          >
+            <SelectTrigger id="status" className={status === "REQUESTED" ? "bg-gray-100" : ""}>
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ACTIVE">Active</SelectItem>
+              <SelectItem value="INACTIVE">Inactive</SelectItem>
+              <SelectItem value="REQUESTED">Requested</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         <div className="space-y-2">
           <Label htmlFor="sdsSource">SDS Source</Label>
