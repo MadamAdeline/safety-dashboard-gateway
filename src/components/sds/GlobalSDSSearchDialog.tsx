@@ -226,7 +226,7 @@ export function GlobalSDSSearchDialog({
             <div className="mt-4 flex justify-between">
               <Button 
                 onClick={() => setShowRequestDialog(true)}
-                variant="outline"
+                className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 text-white"
               >
                 Request SDS from DGXprt
               </Button>

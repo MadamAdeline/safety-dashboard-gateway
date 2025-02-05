@@ -120,6 +120,8 @@ export function SDSList({ data, filters, onEdit }: SDSListProps) {
                     className={
                       item.status === "ACTIVE" 
                         ? "bg-green-100 text-green-800" 
+                        : item.status === "REQUESTED"
+                        ? "bg-amber-100 text-amber-800"
                         : "bg-red-100 text-red-800"
                     }
                   >

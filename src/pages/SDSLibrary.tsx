@@ -11,7 +11,7 @@ import { GlobalSDSSearchDialog } from "@/components/sds/GlobalSDSSearchDialog";
 import type { SDS, SDSFilters as SDSFiltersType } from "@/types/sds";
 import { SDSRequestDialog } from "@/components/sds/SDSRequestDialog";
 
-// Sample data for demonstration
+// Update the sample data
 const sampleData: SDS[] = [
   {
     productName: "Acetone (AUSCHEM)",
@@ -53,7 +53,7 @@ const sampleData: SDS[] = [
     supplier: "Dulux Australia",
     issueDate: "",
     expiryDate: "",
-    status: "INACTIVE",
+    status: "REQUESTED",
     sdsSource: "Global Library"
   }
 ];

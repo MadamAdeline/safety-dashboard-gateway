@@ -6,7 +6,7 @@ export interface SDS {
   issueDate: string;
   expiryDate: string;
   dgClass?: number;
-  status: 'ACTIVE' | 'INACTIVE';
+  status: 'ACTIVE' | 'INACTIVE' | 'REQUESTED';
   sdsSource: 'Customer' | 'Global Library';
 }
 
