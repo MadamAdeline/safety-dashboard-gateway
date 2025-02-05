@@ -20,6 +20,7 @@ const suppliers = [
   { value: "supplier2", label: "SIGMA ALDRICH" },
   { value: "supplier3", label: "MERCK" },
   { value: "supplier4", label: "THERMO FISHER" },
+  { value: "supplier5", label: "BP Australia Pty Ltd" },
 ];
 
 export function SDSDetailsTab({ 
@@ -31,6 +32,8 @@ export function SDSDetailsTab({
   supplier,
   setSupplier 
 }: SDSDetailsTabProps) {
+  const isGlobalLibrary = initialData?.sdsSource === "Global Library";
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -40,11 +43,18 @@ export function SDSDetailsTab({
             id="productName" 
             placeholder="Enter SDS product name" 
             defaultValue={initialData?.productName}
+            readOnly={isGlobalLibrary}
+            className={isGlobalLibrary ? "bg-gray-100" : ""}
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="otherNames">Other SDS Product Names</Label>
-          <Input id="otherNames" placeholder="Enter other SDS product names" />
+          <Input 
+            id="otherNames" 
+            placeholder="Enter other SDS product names" 
+            readOnly={isGlobalLibrary}
+            className={isGlobalLibrary ? "bg-gray-100" : ""}
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="sdsCode">SDS Product Code *</Label>
@@ -52,6 +62,8 @@ export function SDSDetailsTab({
             id="sdsCode" 
             placeholder="Enter SDS code" 
             defaultValue={initialData?.productId}
+            readOnly={isGlobalLibrary}
+            className={isGlobalLibrary ? "bg-gray-100" : ""}
           />
         </div>
         <div className="space-y-2">
@@ -60,8 +72,9 @@ export function SDSDetailsTab({
             <Select 
               value={supplier} 
               onValueChange={setSupplier}
+              disabled={isGlobalLibrary}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className={`w-full ${isGlobalLibrary ? "bg-gray-100" : ""}`}>
                 <SelectValue placeholder="Select supplier" />
               </SelectTrigger>
               <SelectContent>
@@ -72,7 +85,7 @@ export function SDSDetailsTab({
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" disabled={isGlobalLibrary}>
               <Search className="h-4 w-4" />
             </Button>
           </div>
@@ -93,12 +106,27 @@ export function SDSDetailsTab({
             </SelectContent>
           </Select>
         </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="sdsSource">SDS Source</Label>
+          <Input 
+            id="sdsSource" 
+            value={initialData?.sdsSource ?? "Customer"} 
+            readOnly 
+            className="bg-gray-100"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="emergency">Emergency Phone</Label>
-          <Input id="emergency" placeholder="Enter emergency contact" />
+          <Input 
+            id="emergency" 
+            placeholder="Enter emergency contact" 
+            readOnly={isGlobalLibrary}
+            className={isGlobalLibrary ? "bg-gray-100" : ""}
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="issueDate">Issue Date *</Label>
@@ -106,11 +134,18 @@ export function SDSDetailsTab({
             id="issueDate" 
             type="date" 
             defaultValue={initialData?.issueDate}
+            readOnly={isGlobalLibrary}
+            className={isGlobalLibrary ? "bg-gray-100" : ""}
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="revisionDate">Revision Date *</Label>
-          <Input id="revisionDate" type="date" />
+          <Input 
+            id="revisionDate" 
+            type="date"
+            readOnly={isGlobalLibrary}
+            className={isGlobalLibrary ? "bg-gray-100" : ""}
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="expiryDate">Expiry Date *</Label>
@@ -118,6 +153,8 @@ export function SDSDetailsTab({
             id="expiryDate" 
             type="date" 
             defaultValue={initialData?.expiryDate}
+            readOnly={isGlobalLibrary}
+            className={isGlobalLibrary ? "bg-gray-100" : ""}
           />
         </div>
         <div className="space-y-2 col-span-2">
@@ -126,14 +163,18 @@ export function SDSDetailsTab({
             <Button
               type="button"
               variant={isDG ? "default" : "outline"}
-              onClick={() => setIsDG(true)}
+              onClick={() => !isGlobalLibrary && setIsDG(true)}
+              disabled={isGlobalLibrary}
+              className={isGlobalLibrary ? "opacity-50" : ""}
             >
               Yes
             </Button>
             <Button
               type="button"
               variant={!isDG ? "default" : "outline"}
-              onClick={() => setIsDG(false)}
+              onClick={() => !isGlobalLibrary && setIsDG(false)}
+              disabled={isGlobalLibrary}
+              className={isGlobalLibrary ? "opacity-50" : ""}
             >
               No
             </Button>
@@ -143,8 +184,8 @@ export function SDSDetailsTab({
           <>
             <div className="space-y-2">
               <Label htmlFor="dgClass">DG Class *</Label>
-              <Select defaultValue={initialData?.dgClass?.toString()}>
-                <SelectTrigger id="dgClass">
+              <Select defaultValue={initialData?.dgClass?.toString()} disabled={isGlobalLibrary}>
+                <SelectTrigger id="dgClass" className={isGlobalLibrary ? "bg-gray-100" : ""}>
                   <SelectValue placeholder="Select DG Class" />
                 </SelectTrigger>
                 <SelectContent>
@@ -156,8 +197,8 @@ export function SDSDetailsTab({
             </div>
             <div className="space-y-2">
               <Label htmlFor="dgSubDivision">DG Sub Division *</Label>
-              <Select>
-                <SelectTrigger id="dgSubDivision">
+              <Select disabled={isGlobalLibrary}>
+                <SelectTrigger id="dgSubDivision" className={isGlobalLibrary ? "bg-gray-100" : ""}>
                   <SelectValue placeholder="Select Sub Division" />
                 </SelectTrigger>
                 <SelectContent>

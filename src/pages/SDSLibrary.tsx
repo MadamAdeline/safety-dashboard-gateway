@@ -33,6 +33,17 @@ const sampleData: SDS[] = [
     dgClass: 3,
     status: "ACTIVE" as const,
     sdsSource: "Customer"
+  },
+  {
+    productName: "BP Butane",
+    productId: "0000002705",
+    isDG: true,
+    supplier: "BP Australia Pty Ltd",
+    issueDate: "2021-04-21",
+    expiryDate: "2026-04-21",
+    dgClass: 3,
+    status: "ACTIVE" as const,
+    sdsSource: "Global Library"
   }
 ];
 
