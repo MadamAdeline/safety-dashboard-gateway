@@ -81,15 +81,15 @@ const Index = () => {
         <MetricCard
           title="Safety Data Sheets"
           value="58"
-          action={() => navigate("/sds/new")}
+          action={() => navigate("/sds-library/new")}
           actionLabel="+ Add New SDS"
-          secondaryAction={() => navigate("/sds")}
+          secondaryAction={() => navigate("/sds-library")}
           secondaryActionLabel="View All SDS's"
         />
         <MetricCard
           title="Expired SDS"
           value="3"
-          action={() => navigate("/sds?filter=expired")}
+          action={() => navigate("/sds-library?filter=expired")}
           actionLabel="View Expired SDS's"
         />
       </div>
