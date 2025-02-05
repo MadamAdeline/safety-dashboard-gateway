@@ -84,6 +84,7 @@ export function SDSList({ data, filters, onEdit }: SDSListProps) {
               <TableHead className="text-dgxprt-navy font-semibold">Expiry Date</TableHead>
               <TableHead className="text-dgxprt-navy font-semibold">DG Class</TableHead>
               <TableHead className="text-dgxprt-navy font-semibold">Status</TableHead>
+              <TableHead className="text-dgxprt-navy font-semibold">Source</TableHead>
               <TableHead className="w-24 text-dgxprt-navy font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -123,6 +124,18 @@ export function SDSList({ data, filters, onEdit }: SDSListProps) {
                     }
                   >
                     {item.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge 
+                    variant="secondary"
+                    className={
+                      item.sdsSource === "Global Library" 
+                        ? "bg-blue-100 text-blue-800" 
+                        : "bg-gray-100 text-gray-800"
+                    }
+                  >
+                    {item.sdsSource}
                   </Badge>
                 </TableCell>
                 <TableCell>

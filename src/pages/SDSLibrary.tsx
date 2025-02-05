@@ -20,7 +20,8 @@ const sampleData: SDS[] = [
     issueDate: "2023-12-01",
     expiryDate: "2028-12-01",
     dgClass: 3,
-    status: "ACTIVE" as const
+    status: "ACTIVE" as const,
+    sdsSource: "Customer"
   },
   {
     productName: "Methanol",
@@ -30,7 +31,8 @@ const sampleData: SDS[] = [
     issueDate: "2023-11-15",
     expiryDate: "2028-11-15",
     dgClass: 3,
-    status: "ACTIVE" as const
+    status: "ACTIVE" as const,
+    sdsSource: "Customer"
   }
 ];
 
@@ -76,6 +78,15 @@ export default function SDSLibrary() {
     setSelectedSDS(null);
   };
 
+  const handleSDSSelect = (selectedSDS: SDS[]) => {
+    // Logic to add selected SDS to local library
+    console.log("Selected SDS:", selectedSDS);
+    toast({
+      title: "Success",
+      description: `${selectedSDS.length} SDS(s) have been added to your library.`,
+    });
+  };
+
   if (showNewSDS) {
     return <NewSDSForm onClose={handleClose} initialData={selectedSDS} />;
   }
@@ -88,10 +99,9 @@ export default function SDSLibrary() {
           <div className="flex gap-2">
             <Button 
               onClick={() => setShowGlobalSearch(true)}
-              variant="outline"
-              className="gap-2"
+              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 text-white"
             >
-              <Plus className="h-4 w-4" /> SDS From Global Library
+              <Plus className="mr-2 h-4 w-4" /> SDS From Global Library
             </Button>
             <Button 
               onClick={() => setShowNewSDS(true)}
@@ -157,6 +167,7 @@ export default function SDSLibrary() {
         <GlobalSDSSearchDialog 
           open={showGlobalSearch} 
           onOpenChange={setShowGlobalSearch}
+          onSDSSelect={handleSDSSelect}
         />
       </div>
     </DashboardLayout>

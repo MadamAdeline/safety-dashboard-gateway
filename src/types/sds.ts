@@ -7,6 +7,7 @@ export interface SDS {
   expiryDate: string;
   dgClass?: number;
   status: 'ACTIVE' | 'INACTIVE';
+  sdsSource: 'Customer' | 'Global Library';
 }
 
 export interface SDSFilters {

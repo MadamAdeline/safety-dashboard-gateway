@@ -10,15 +10,36 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/components/ui/use-toast";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import type { SDS } from "@/types/sds";
 
 interface GlobalSDSSearchDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSDSSelect: (selectedSDS: SDS[]) => void;
 }
+
+// Sample data for demonstration
+const sampleSearchResults: SDS[] = [
+  {
+    productName: "Sample Product 1",
+    productId: "SP001",
+    supplier: "Supplier A",
+    expiryDate: "2025-12-31",
+    isDG: true,
+    issueDate: "2023-01-01",
+    status: "ACTIVE",
+    sdsSource: "Global Library"
+  },
+  // Add more sample data as needed
+];
 
 export function GlobalSDSSearchDialog({
   open,
   onOpenChange,
+  onSDSSelect,
 }: GlobalSDSSearchDialogProps) {
   const [chatInput, setChatInput] = useState("");
   const [searchFields, setSearchFields] = useState({
@@ -27,22 +48,41 @@ export function GlobalSDSSearchDialog({
     supplier: "",
     unNumber: "",
   });
+  const [searchResults, setSearchResults] = useState<SDS[]>([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const { toast } = useToast();
 
-  const handleChatSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Chat search:", chatInput);
-    // Implementation for chat search will be added later
+    console.log("Searching...");
+    setSearchResults(sampleSearchResults);
   };
 
-  const handleFieldSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Field search:", searchFields);
-    // Implementation for field search will be added later
+  const handleAddToLibrary = () => {
+    const selectedSDS = searchResults.filter(sds => 
+      selectedItems.includes(sds.productId)
+    );
+    
+    onSDSSelect(selectedSDS);
+    toast({
+      title: "Success",
+      description: `${selectedItems.length} SDS(s) have been added to your library.`,
+    });
+    onOpenChange(false);
+    setSelectedItems([]);
+  };
+
+  const toggleSelectItem = (productId: string) => {
+    setSelectedItems(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>
           <DialogTitle>Search Global SDS Library</DialogTitle>
         </DialogHeader>
@@ -54,7 +94,7 @@ export function GlobalSDSSearchDialog({
           </TabsList>
           
           <TabsContent value="chat">
-            <form onSubmit={handleChatSearch} className="space-y-4">
+            <form onSubmit={handleSearch} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="chat-input">
                   Describe the SDS you're looking for in detail:
@@ -69,7 +109,6 @@ export function GlobalSDSSearchDialog({
                       - UN numbers if known
                       - Any other relevant details
                     </p>
-                    {/* Chat messages will be displayed here */}
                   </div>
                 </ScrollArea>
                 <textarea
@@ -85,7 +124,7 @@ export function GlobalSDSSearchDialog({
           </TabsContent>
           
           <TabsContent value="fields">
-            <form onSubmit={handleFieldSearch} className="space-y-4">
+            <form onSubmit={handleSearch} className="space-y-4">
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="product-name">Product Name</Label>
@@ -139,6 +178,51 @@ export function GlobalSDSSearchDialog({
             </form>
           </TabsContent>
         </Tabs>
+
+        {searchResults.length > 0 && (
+          <div className="mt-6">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">Select</TableHead>
+                  <TableHead>Product Name</TableHead>
+                  <TableHead>Product Code</TableHead>
+                  <TableHead>Supplier</TableHead>
+                  <TableHead>Expiry Date</TableHead>
+                  <TableHead>View</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {searchResults.map((sds) => (
+                  <TableRow key={sds.productId}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedItems.includes(sds.productId)}
+                        onCheckedChange={() => toggleSelectItem(sds.productId)}
+                      />
+                    </TableCell>
+                    <TableCell>{sds.productName}</TableCell>
+                    <TableCell>{sds.productId}</TableCell>
+                    <TableCell>{sds.supplier}</TableCell>
+                    <TableCell>{sds.expiryDate}</TableCell>
+                    <TableCell>
+                      <Button variant="link">View SDS</Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <div className="mt-4 flex justify-end">
+              <Button 
+                onClick={handleAddToLibrary}
+                disabled={selectedItems.length === 0}
+                className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+              >
+                Add Selected to Library
+              </Button>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
