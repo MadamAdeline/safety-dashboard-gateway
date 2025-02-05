@@ -6,7 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { Upload } from "lucide-react";
+import { Upload, X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface NewSDSFormProps {
   onClose: () => void;
@@ -15,6 +16,7 @@ interface NewSDSFormProps {
 export function NewSDSForm({ onClose }: NewSDSFormProps) {
   const [isDG, setIsDG] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const { toast } = useToast();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -24,14 +26,29 @@ export function NewSDSForm({ onClose }: NewSDSFormProps) {
     }
   };
 
+  const handleSave = () => {
+    toast({
+      title: "Success",
+      description: "SDS Record has been updated",
+    });
+  };
+
   return (
     <DashboardLayout>
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">New Safety Data Sheet</h1>
-          <Button variant="outline" onClick={onClose}>
-            Back to Library
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button className="bg-dgxprt-purple hover:bg-dgxprt-purple/90" onClick={handleSave}>
+              Save
+            </Button>
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-6">
@@ -44,41 +61,22 @@ export function NewSDSForm({ onClose }: NewSDSFormProps) {
               </TabsList>
 
               <TabsContent value="product-details" className="space-y-4">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1 grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="productName">Product Name *</Label>
-                      <Input id="productName" placeholder="Enter product name" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="otherNames">Other Product Names</Label>
-                      <Input id="otherNames" placeholder="Enter other product names" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="sdsCode">SDS Product Code *</Label>
-                      <Input id="sdsCode" placeholder="Enter SDS code" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="supplier">Supplier Name *</Label>
-                      <Input id="supplier" placeholder="Enter supplier name" />
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="productName">Product Name *</Label>
+                    <Input id="productName" placeholder="Enter product name" />
                   </div>
-                  <div className="ml-4">
-                    <input
-                      type="file"
-                      id="sdsUpload"
-                      className="hidden"
-                      accept=".pdf"
-                      onChange={handleFileUpload}
-                    />
-                    <label htmlFor="sdsUpload">
-                      <Button variant="outline" className="cursor-pointer" asChild>
-                        <span>
-                          <Upload className="mr-2 h-4 w-4" />
-                          Upload SDS
-                        </span>
-                      </Button>
-                    </label>
+                  <div className="space-y-2">
+                    <Label htmlFor="otherNames">Other Product Names</Label>
+                    <Input id="otherNames" placeholder="Enter other product names" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="sdsCode">SDS Product Code *</Label>
+                    <Input id="sdsCode" placeholder="Enter SDS code" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="supplier">Supplier Name *</Label>
+                    <Input id="supplier" placeholder="Enter supplier name" />
                   </div>
                 </div>
 
@@ -167,25 +165,36 @@ export function NewSDSForm({ onClose }: NewSDSFormProps) {
                 </Card>
               </TabsContent>
             </Tabs>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button className="bg-dgxprt-purple hover:bg-dgxprt-purple/90">
-                Save
-              </Button>
-            </div>
           </div>
 
-          <div className="border rounded-lg p-4 bg-white">
-            <h2 className="text-lg font-semibold mb-4">PDF Preview</h2>
-            <div className="aspect-[1/1.4] bg-gray-100 rounded-lg overflow-hidden">
-              <img 
-                src="/lovable-uploads/efad172c-780d-4fdb-ba96-baa5719330bc.png" 
-                alt="SDS Preview"
-                className="w-full h-full object-contain"
+          <div className="space-y-4">
+            <div className="flex justify-end">
+              <input
+                type="file"
+                id="sdsUpload"
+                className="hidden"
+                accept=".pdf"
+                onChange={handleFileUpload}
               />
+              <label htmlFor="sdsUpload">
+                <Button variant="outline" className="cursor-pointer" asChild>
+                  <span>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload SDS
+                  </span>
+                </Button>
+              </label>
+            </div>
+
+            <div className="border rounded-lg p-4 bg-white">
+              <h2 className="text-lg font-semibold mb-4">PDF Preview</h2>
+              <div className="aspect-[1/1.4] bg-gray-100 rounded-lg overflow-hidden">
+                <img 
+                  src="/lovable-uploads/efad172c-780d-4fdb-ba96-baa5719330bc.png" 
+                  alt="SDS Preview"
+                  className="w-full h-full object-contain"
+                />
+              </div>
             </div>
           </div>
         </div>
