@@ -29,7 +29,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
   const [locationTypes, setLocationTypes] = useState<Array<{ id: string; label: string }>>([]);
   const itemsPerPage = 10;
 
-  const { locations, isLoading, createLocation, deleteLocation } = useLocations();
+  const { locations, isLoading, createLocation, deleteLocation, refetch } = useLocations();
   const { toast } = useToast();
 
   // Fetch location types from master_data
@@ -136,6 +136,30 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
     }
   };
 
+  const handleRefresh = async () => {
+    // Clear filters
+    onFiltersChange({
+      search: "",
+      status: [],
+      type: [],
+      parentLocation: null
+    });
+    
+    // Reset pagination
+    setCurrentPage(1);
+    
+    // Clear selection
+    setSelectedItems([]);
+    
+    // Refetch data
+    await refetch();
+    
+    toast({
+      title: "Refreshed",
+      description: "Location list has been refreshed and filters cleared",
+    });
+  };
+
   const filteredData = locations.map(item => ({
     ...item,
     coordinates: typeof item.coordinates === 'string' 
@@ -191,12 +215,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
         <LocationActions 
           onToggleFilters={() => setShowFilters(!showFilters)}
           onExport={() => {}} 
-          onRefresh={() => {
-            toast({
-              title: "Refreshed",
-              description: "Location list has been refreshed",
-            });
-          }}
+          onRefresh={handleRefresh}
           filteredData={filteredData}
         />
       </div>
