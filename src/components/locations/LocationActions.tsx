@@ -4,15 +4,50 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Papa from 'papaparse';
 import type { Location, LocationType } from "@/types/location";
+import * as XLSX from 'xlsx';
 
 interface LocationActionsProps {
   onToggleFilters: () => void;
   onExport: () => void;
   onRefresh: () => void;
+  filteredData?: Location[];
 }
 
-export function LocationActions({ onToggleFilters, onExport, onRefresh }: LocationActionsProps) {
+export function LocationActions({ onToggleFilters, onExport, onRefresh, filteredData }: LocationActionsProps) {
   const { toast } = useToast();
+
+  const handleExport = () => {
+    if (!filteredData || filteredData.length === 0) {
+      toast({
+        title: "No data to export",
+        description: "There are no locations matching your current filters",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Transform the data for export
+    const exportData = filteredData.map(location => ({
+      'Location Name': location.name,
+      'Type': location.master_data?.label || 'Unknown',
+      'Parent Location': location.parent_location_id || '-',
+      'Status': location.status_lookup?.status_name || (location.status_id === 1 ? 'Active' : 'Inactive'),
+      'Coordinates': location.coordinates ? JSON.stringify(location.coordinates) : '-'
+    }));
+
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Locations");
+
+    // Generate and download file
+    XLSX.writeFile(wb, `locations_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+    toast({
+      title: "Export Successful",
+      description: "Your locations data has been exported to Excel"
+    });
+  };
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -141,7 +176,7 @@ export function LocationActions({ onToggleFilters, onExport, onRefresh }: Locati
       </Button>
       <Button
         variant="outline"
-        onClick={onExport}
+        onClick={handleExport}
         className="gap-2"
       >
         <Download className="h-4 w-4" />

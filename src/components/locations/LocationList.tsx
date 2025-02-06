@@ -24,6 +24,8 @@ import type { Location, LocationFilters, LocationType, LocationStatus } from "@/
 import { useState } from "react";
 import { useLocations } from "@/hooks/use-locations";
 import { useToast } from "@/components/ui/use-toast";
+import { LocationSearch } from "@/components/locations/LocationSearch";
+import { LocationActions } from "@/components/locations/LocationActions";
 
 interface LocationListProps {
   filters: LocationFilters;
@@ -284,6 +286,19 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
+        <LocationSearch 
+          value={filters.search}
+          onChange={(value) => setFilters({ ...filters, search: value })}
+        />
+        <LocationActions 
+          onToggleFilters={() => setShowFilters(!showFilters)}
+          onExport={handleExport}
+          onRefresh={handleRefresh}
+          filteredData={filteredData}
+        />
+      </div>
+
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <Table>
           <TableHeader>
