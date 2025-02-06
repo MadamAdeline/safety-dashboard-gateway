@@ -11,33 +11,33 @@ import { LocationMap } from "./LocationMap";
 import { useLocations } from "@/hooks/use-locations";
 import { supabase } from "@/integrations/supabase/client";
 
-interface ParentLocationOption {
-  id: string;
-  name: string;
-  master_data: {
-    label: string;
-  };
-}
-
 interface LocationFormProps {
   onClose: () => void;
   initialData?: Location | null;
 }
 
 export function LocationForm({ onClose, initialData }: LocationFormProps) {
-  const [name, setName] = useState(initialData?.name ?? "");
-  const [type, setType] = useState<LocationType>((initialData?.master_data?.label as LocationType) ?? "Region");
-  const [typeId, setTypeId] = useState<string>(initialData?.type_id ?? "");
-  const [parentLocation, setParentLocation] = useState(initialData?.parent_location_id ?? "none");
-  const [status, setStatus] = useState<LocationStatus>(initialData?.status_id === 1 ? "ACTIVE" : "INACTIVE");
-  const [coordinates, setCoordinates] = useState(initialData?.coordinates ?? { lat: -37.8136, lng: 144.9631 });
-  const [availableLocations, setAvailableLocations] = useState<ParentLocationOption[]>([]);
-  
+  const [formData, setFormData] = useState({
+    name: initialData?.name ?? "",
+    type: (initialData?.master_data?.label as LocationType) ?? "Region",
+    typeId: initialData?.type_id ?? "",
+    parentLocationId: initialData?.parent_location_id ?? "none",
+    status: initialData?.status_id === 1 ? "ACTIVE" as LocationStatus : "INACTIVE" as LocationStatus,
+    coordinates: initialData?.coordinates ?? { lat: -37.8136, lng: 144.9631 }
+  });
+
+  const [availableLocations, setAvailableLocations] = useState<Array<{
+    id: string;
+    name: string;
+    master_data: { label: string };
+  }>>([]);
+
   const { createLocation, updateLocation } = useLocations();
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchLocations = async () => {
+      console.log('Fetching available locations...');
       const { data, error } = await supabase
         .from('locations')
         .select('id, name, master_data!inner(label)')
@@ -48,9 +48,8 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
         return;
       }
 
-      if (data) {
-        setAvailableLocations(data);
-      }
+      console.log('Available locations fetched:', data);
+      setAvailableLocations(data || []);
     };
 
     fetchLocations();
@@ -58,11 +57,12 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
 
   useEffect(() => {
     const fetchTypeId = async () => {
+      console.log('Fetching type ID for:', formData.type);
       const { data, error } = await supabase
         .from('master_data')
         .select('id')
         .eq('category', 'LOCATION_TYPE')
-        .eq('label', type)
+        .eq('label', formData.type)
         .single();
 
       if (error) {
@@ -70,33 +70,41 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
         return;
       }
 
+      console.log('Type ID fetched:', data);
       if (data) {
-        setTypeId(data.id);
+        setFormData(prev => ({ ...prev, typeId: data.id }));
       }
     };
 
     fetchTypeId();
-  }, [type]);
+  }, [formData.type]);
 
   const handleSave = async () => {
+    console.log('Saving location with data:', formData);
     try {
       const locationData = {
-        name,
-        type_id: typeId,
-        parent_location_id: parentLocation === "none" ? null : parentLocation,
-        status_id: status === 'ACTIVE' ? 1 : 2,
-        coordinates,
+        name: formData.name,
+        type_id: formData.typeId,
+        parent_location_id: formData.parentLocationId === "none" ? null : formData.parentLocationId,
+        status_id: formData.status === 'ACTIVE' ? 1 : 2,
+        coordinates: formData.coordinates,
       };
 
       if (initialData?.id) {
+        console.log('Updating existing location:', initialData.id);
         await updateLocation.mutateAsync({
           id: initialData.id,
           ...locationData,
         });
       } else {
+        console.log('Creating new location');
         await createLocation.mutateAsync(locationData);
       }
 
+      toast({
+        title: "Success",
+        description: `Location ${initialData ? 'updated' : 'created'} successfully`,
+      });
       onClose();
     } catch (error) {
       console.error('Error saving location:', error);
@@ -131,22 +139,27 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-6">
-            <div className="grid gap-4">
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="name">Location Name *</Label>
                 <Input
                   id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Enter location name"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="type">Location Type *</Label>
-                <Select value={type} onValueChange={(value: LocationType) => setType(value)}>
+                <Select 
+                  value={formData.type} 
+                  onValueChange={(value: LocationType) => 
+                    setFormData(prev => ({ ...prev, type: value }))
+                  }
+                >
                   <SelectTrigger id="type">
                     <SelectValue placeholder="Select location type" />
                   </SelectTrigger>
@@ -161,7 +174,12 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="parentLocation">Parent Location</Label>
-                <Select value={parentLocation} onValueChange={setParentLocation}>
+                <Select 
+                  value={formData.parentLocationId}
+                  onValueChange={(value) => 
+                    setFormData(prev => ({ ...prev, parentLocationId: value }))
+                  }
+                >
                   <SelectTrigger id="parentLocation">
                     <SelectValue placeholder="Select parent location" />
                   </SelectTrigger>
@@ -179,8 +197,10 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
               <div className="space-y-2">
                 <Label htmlFor="status">Status *</Label>
                 <Select 
-                  value={status} 
-                  onValueChange={(value: LocationStatus) => setStatus(value)}
+                  value={formData.status}
+                  onValueChange={(value: LocationStatus) => 
+                    setFormData(prev => ({ ...prev, status: value }))
+                  }
                 >
                   <SelectTrigger id="status">
                     <SelectValue placeholder="Select status" />
@@ -192,14 +212,16 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
                 </Select>
               </div>
             </div>
-          </div>
 
-          <div className="space-y-4">
-            <Label>GPS Location *</Label>
-            <LocationMap 
-              coordinates={coordinates}
-              onCoordinatesChange={setCoordinates}
-            />
+            <div className="space-y-4">
+              <Label>GPS Location *</Label>
+              <LocationMap 
+                coordinates={formData.coordinates}
+                onCoordinatesChange={(coords) => 
+                  setFormData(prev => ({ ...prev, coordinates: coords }))
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
