@@ -4,9 +4,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
 import type { SDS } from "@/types/sds";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { useSDSSelection } from "./SDSSelectionContext";
+import { useSDSDelete } from "@/hooks/use-sds-delete";
 
 interface SDSTableRowProps {
   item: SDS;
@@ -15,65 +14,8 @@ interface SDSTableRowProps {
 }
 
 export function SDSTableRow({ item, onEdit, onDelete }: SDSTableRowProps) {
-  const { toast } = useToast();
   const { selectedItems, toggleSelectItem } = useSDSSelection();
-
-  const handleDelete = async () => {
-    try {
-      console.log('Deleting SDS:', item);
-
-      if (item.currentFilePath) {
-        console.log('Deleting file from storage:', item.currentFilePath);
-        const { error: storageError } = await supabase.storage
-          .from('sds_documents')
-          .remove([item.currentFilePath]);
-
-        if (storageError) {
-          console.error('Error deleting file:', storageError);
-          throw storageError;
-        }
-      }
-
-      console.log('Deleting version records for SDS:', item.id);
-      const { error: versionsError } = await supabase
-        .from('sds_versions')
-        .delete()
-        .eq('sds_id', item.id);
-
-      if (versionsError) {
-        console.error('Error deleting versions:', versionsError);
-        throw versionsError;
-      }
-
-      console.log('Deleting SDS record:', item.id);
-      const { error: sdsError } = await supabase
-        .from('sds')
-        .delete()
-        .eq('id', item.id);
-
-      if (sdsError) {
-        console.error('Error deleting SDS:', sdsError);
-        throw sdsError;
-      }
-
-      toast({
-        title: "SDS Deleted",
-        description: `${item.productName} has been successfully deleted.`
-      });
-
-      if (onDelete) {
-        onDelete(item);
-      }
-
-    } catch (error) {
-      console.error('Delete operation failed:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete SDS. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
+  const { handleDelete } = useSDSDelete(onDelete);
 
   return (
     <TableRow className="hover:bg-[#F1F0FB] transition-colors">
@@ -137,7 +79,7 @@ export function SDSTableRow({ item, onEdit, onDelete }: SDSTableRowProps) {
             variant="ghost" 
             size="icon"
             className="hover:bg-red-100 text-red-600"
-            onClick={handleDelete}
+            onClick={() => handleDelete(item)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
