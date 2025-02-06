@@ -45,7 +45,7 @@ export function useSDSList() {
         dgSubDivisionId: item.dg_subdivision_id,
         dgSubDivision: item.dg_subdivision,
         status: item.status?.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
-        sdsSource: 'Customer' as const,
+        sdsSource: item.source || 'Customer',
         source: item.source,
         currentFilePath: item.current_file_path,
         currentFileName: item.current_file_name,
