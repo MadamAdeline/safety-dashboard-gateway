@@ -20,8 +20,19 @@ export async function getSuppliers() {
       throw error;
     }
 
-    console.log('Successfully fetched suppliers:', data);
-    return data;
+    // Transform the data to match our frontend Supplier type
+    const transformedData: Supplier[] = data.map(item => ({
+      id: item.id,
+      name: item.supplier_name,
+      contactPerson: item.contact_person,
+      email: item.email,
+      phone: item.phone_number || '',
+      address: item.address,
+      status: item.status_id === 1 ? 'ACTIVE' : 'INACTIVE',
+    }));
+
+    console.log('Successfully fetched suppliers:', transformedData);
+    return transformedData;
   } catch (error) {
     console.error('Failed to fetch suppliers:', error);
     throw error;
@@ -55,8 +66,19 @@ export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
       throw error;
     }
 
-    console.log('Successfully created supplier:', data);
-    return data;
+    // Transform the response data to match our frontend Supplier type
+    const transformedData: Supplier = {
+      id: data.id,
+      name: data.supplier_name,
+      contactPerson: data.contact_person,
+      email: data.email,
+      phone: data.phone_number || '',
+      address: data.address,
+      status: data.status_id === 1 ? 'ACTIVE' : 'INACTIVE',
+    };
+
+    console.log('Successfully created supplier:', transformedData);
+    return transformedData;
   } catch (error) {
     console.error('Failed to create supplier:', error);
     throw error;
@@ -91,8 +113,19 @@ export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
       throw error;
     }
 
-    console.log('Successfully updated supplier:', data);
-    return data;
+    // Transform the response data to match our frontend Supplier type
+    const transformedData: Supplier = {
+      id: data.id,
+      name: data.supplier_name,
+      contactPerson: data.contact_person,
+      email: data.email,
+      phone: data.phone_number || '',
+      address: data.address,
+      status: data.status_id === 1 ? 'ACTIVE' : 'INACTIVE',
+    };
+
+    console.log('Successfully updated supplier:', transformedData);
+    return transformedData;
   } catch (error) {
     console.error('Failed to update supplier:', error);
     throw error;
