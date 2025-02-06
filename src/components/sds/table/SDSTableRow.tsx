@@ -18,9 +18,6 @@ export function SDSTableRow({ item, onEdit, onDelete }: SDSTableRowProps) {
   const { selectedItems, toggleSelectItem } = useSDSSelection();
   const { handleDelete } = useSDSDelete(onDelete);
 
-  // Determine the source based on status
-  const sdsSource = item.status === "REQUESTED" ? "Global Library" : "Customer";
-
   return (
     <TableRow className="hover:bg-[#F1F0FB] transition-colors">
       <TableCell>
@@ -61,12 +58,12 @@ export function SDSTableRow({ item, onEdit, onDelete }: SDSTableRowProps) {
         <Badge 
           variant="secondary"
           className={
-            sdsSource === "Global Library" 
+            item.sdsSource === "Global Library" 
               ? "bg-blue-100 text-blue-800" 
               : "bg-gray-100 text-gray-800"
           }
         >
-          {sdsSource}
+          {item.sdsSource}
         </Badge>
       </TableCell>
       <TableCell>
