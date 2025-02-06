@@ -121,6 +121,12 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
           currentFileName: fileData.fileName,
           currentFileSize: fileData.fileSize,
           currentContentType: fileData.contentType
+        }),
+        ...(!fileData && initialData && {
+          currentFilePath: initialData.currentFilePath,
+          currentFileName: initialData.currentFileName,
+          currentFileSize: initialData.currentFileSize,
+          currentContentType: initialData.currentContentType
         })
       };
 
