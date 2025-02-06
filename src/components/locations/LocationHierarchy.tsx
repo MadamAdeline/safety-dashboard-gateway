@@ -1,3 +1,4 @@
+
 import { ChevronDown, ChevronRight, Edit2, Building2, MapPin, Navigation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -132,10 +133,11 @@ export function LocationHierarchy({ onEdit }: LocationHierarchyProps) {
     );
   }
 
+  // Ensure all locations have the full_path property
   const locationsWithPath = locations.map(location => ({
     ...location,
     full_path: location.full_path || null
-  }));
+  })) as Location[];
 
   return (
     <div className="bg-white rounded-lg shadow p-4">

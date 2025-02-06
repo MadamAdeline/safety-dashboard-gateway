@@ -78,6 +78,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
       getParentLocationName(location),
       location.status_lookup?.status_name || getLocationStatus(location),
       location.coordinates ? JSON.stringify(location.coordinates) : '',
+      location.full_path || ''
     ];
 
     return fieldsToSearch.some(field => 
