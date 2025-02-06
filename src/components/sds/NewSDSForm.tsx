@@ -54,13 +54,16 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       setShowUploadDialog(false);
       console.log("File selected:", file.name);
 
-      if (extractedData) {
-        console.log("Extracted data:", extractedData);
+      // Only apply extracted data if it's a new record and fields are blank
+      if (!initialData && extractedData && !formData.productName && !formData.productId) {
+        console.log("New record with blank fields - applying extracted data:", extractedData);
         setIsDG(true);
         setFormData(prev => ({
           ...prev,
           ...extractedData
         }));
+      } else {
+        console.log("Skipping data extraction - existing record or fields not blank");
       }
     }
   };
