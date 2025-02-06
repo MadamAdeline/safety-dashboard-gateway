@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Dialog,
@@ -133,7 +132,31 @@ export function GlobalSDSSearchDialog({
       isDG: true,
       issueDate: "2023-01-01",
       status: "ACTIVE",
-      sdsSource: "Global Library"
+      sdsSource: null,
+      source: null,
+      currentFilePath: null,
+      currentFileName: null,
+      currentFileSize: null,
+      currentContentType: null,
+      dgClassId: null,
+      dgClass: null,
+      subsidiaryDgClassId: null,
+      subsidiaryDgClass: null,
+      packingGroupId: null,
+      packingGroup: null,
+      dgSubDivisionId: null,
+      dgSubDivision: null,
+      unNumber: null,
+      unProperShippingName: null,
+      hazchemCode: null,
+      otherNames: null,
+      emergencyPhone: null,
+      revisionDate: null,
+      requestSupplierName: null,
+      requestSupplierDetails: null,
+      requestInformation: null,
+      requestDate: null,
+      requestedBy: null
     },
     {
       id: "2345-6789-0123-4567",
@@ -145,7 +168,31 @@ export function GlobalSDSSearchDialog({
       isDG: true,
       issueDate: "2021-04-21",
       status: "ACTIVE",
-      sdsSource: "Global Library"
+      sdsSource: null,
+      source: null,
+      currentFilePath: null,
+      currentFileName: null,
+      currentFileSize: null,
+      currentContentType: null,
+      dgClassId: null,
+      dgClass: null,
+      subsidiaryDgClassId: null,
+      subsidiaryDgClass: null,
+      packingGroupId: null,
+      packingGroup: null,
+      dgSubDivisionId: null,
+      dgSubDivision: null,
+      unNumber: null,
+      unProperShippingName: null,
+      hazchemCode: null,
+      otherNames: null,
+      emergencyPhone: null,
+      revisionDate: null,
+      requestSupplierName: null,
+      requestSupplierDetails: null,
+      requestInformation: null,
+      requestDate: null,
+      requestedBy: null
     }
   ];
 
@@ -311,4 +358,3 @@ export function GlobalSDSSearchDialog({
     </Dialog>
   );
 }
-
