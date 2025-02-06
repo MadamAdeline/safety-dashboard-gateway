@@ -23,6 +23,11 @@ export async function createSDS(data: {
   dgSubDivisionId?: string | null;
   otherNames?: string;
   emergencyPhone?: string;
+  requestSupplierName?: string;
+  requestSupplierDetails?: string;
+  requestInformation?: string;
+  requestDate?: string;
+  requestedBy?: string;
 }) {
   console.log("Creating SDS with data:", data);
   
@@ -47,7 +52,12 @@ export async function createSDS(data: {
     dg_class_id: data.dgClassId || null,
     subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
     packing_group_id: data.packingGroupId || null,
-    dg_subdivision_id: data.dgSubDivisionId || null
+    dg_subdivision_id: data.dgSubDivisionId || null,
+    request_supplier_name: data.requestSupplierName || null,
+    request_supplier_details: data.requestSupplierDetails || null,
+    request_information: data.requestInformation || null,
+    request_date: data.requestDate || null,
+    requested_by: data.requestedBy || null
   };
 
   console.log("Formatted data for Supabase:", formattedData);
@@ -97,6 +107,11 @@ export async function updateSDS(id: string, data: {
   dgSubDivisionId?: string | null;
   otherNames?: string;
   emergencyPhone?: string;
+  requestSupplierName?: string;
+  requestSupplierDetails?: string;
+  requestInformation?: string;
+  requestDate?: string;
+  requestedBy?: string;
 }) {
   console.log("Updating SDS with ID:", id, "and data:", data);
   
@@ -121,7 +136,12 @@ export async function updateSDS(id: string, data: {
     dg_class_id: data.dgClassId || null,
     subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
     packing_group_id: data.packingGroupId || null,
-    dg_subdivision_id: data.dgSubDivisionId || null
+    dg_subdivision_id: data.dgSubDivisionId || null,
+    request_supplier_name: data.requestSupplierName || null,
+    request_supplier_details: data.requestSupplierDetails || null,
+    request_information: data.requestInformation || null,
+    request_date: data.requestDate || null,
+    requested_by: data.requestedBy || null
   };
 
   console.log("Formatted data for Supabase:", formattedData);
