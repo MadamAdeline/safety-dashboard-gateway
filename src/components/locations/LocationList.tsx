@@ -2,7 +2,7 @@ import { Table, TableBody } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Plus, Check, X } from "lucide-react";
 import type { Location, LocationFilters } from "@/types/location";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocations } from "@/hooks/use-locations";
 import { useToast } from "@/hooks/use-toast";
 import { LocationSearch } from "@/components/locations/LocationSearch";
@@ -13,6 +13,7 @@ import { LocationPagination } from "./table/LocationPagination";
 import { LocationForm } from "./LocationForm";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LocationListProps {
   filters: LocationFilters;
@@ -25,10 +26,33 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const [newLocation, setNewLocation] = useState<Partial<Location> | null>(null);
+  const [locationTypes, setLocationTypes] = useState<Array<{ id: string; label: string }>>([]);
   const itemsPerPage = 10;
 
   const { locations, isLoading, createLocation, deleteLocation } = useLocations();
   const { toast } = useToast();
+
+  // Fetch location types from master_data
+  useEffect(() => {
+    const fetchLocationTypes = async () => {
+      console.log('Fetching location types from master_data...');
+      const { data, error } = await supabase
+        .from('master_data')
+        .select('id, label')
+        .eq('category', 'LOCATION_TYPE')
+        .eq('status', 'ACTIVE');
+
+      if (error) {
+        console.error('Error fetching location types:', error);
+        return;
+      }
+
+      console.log('Location types fetched:', data);
+      setLocationTypes(data || []);
+    };
+
+    fetchLocationTypes();
+  }, []);
 
   const getLocationTypeLabel = (location: Location): string => {
     return location.master_data?.label || "Unknown";
@@ -185,6 +209,18 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
             hasData={paginatedData.length > 0}
           />
           <TableBody>
+            {paginatedData.map((item) => (
+              <LocationTableRow
+                key={item.id}
+                location={item}
+                isSelected={selectedItems.includes(item.id)}
+                onToggleSelect={toggleSelectItem}
+                onEdit={onEdit}
+                onDelete={handleDelete}
+                getLocationTypeLabel={getLocationTypeLabel}
+                getParentLocationName={getParentLocationName}
+              />
+            ))}
             {newLocation && (
               <tr className="border-b hover:bg-[#F1F0FB] transition-colors">
                 <td className="p-4"></td>
@@ -205,9 +241,9 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {locations.map((loc) => (
-                        <SelectItem key={loc.type_id} value={loc.type_id}>
-                          {getLocationTypeLabel(loc)}
+                      {locationTypes.map((type) => (
+                        <SelectItem key={type.id} value={type.id}>
+                          {type.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -257,18 +293,6 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
                 </td>
               </tr>
             )}
-            {paginatedData.map((item) => (
-              <LocationTableRow
-                key={item.id}
-                location={item}
-                isSelected={selectedItems.includes(item.id)}
-                onToggleSelect={toggleSelectItem}
-                onEdit={onEdit}
-                onDelete={handleDelete}
-                getLocationTypeLabel={getLocationTypeLabel}
-                getParentLocationName={getParentLocationName}
-              />
-            ))}
           </TableBody>
         </Table>
       </div>
