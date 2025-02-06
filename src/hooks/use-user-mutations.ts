@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
@@ -11,6 +12,8 @@ interface UserData {
   active: UserStatus;
   password?: string;
   role_id?: string;
+  manager_id?: string | null;
+  location_id?: string | null;
 }
 
 export function useUserMutations(onSuccess: () => void) {
@@ -31,6 +34,8 @@ export function useUserMutations(onSuccess: () => void) {
           phone_number: data.phone_number,
           active: data.active,
           password: data.password,
+          manager_id: data.manager_id,
+          location_id: data.location_id
         })
         .select()
         .single();
@@ -79,11 +84,15 @@ export function useUserMutations(onSuccess: () => void) {
         email: data.email,
         phone_number: data.phone_number,
         active: data.active,
+        manager_id: data.manager_id,
+        location_id: data.location_id
       };
       
       if (data.password) {
         updateData.password = data.password;
       }
+
+      console.log('Final update data:', updateData);
 
       // Update user
       const { error: userError } = await supabase
