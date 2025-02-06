@@ -29,6 +29,7 @@ interface SDSDetailsTabProps {
 }
 
 export function SDSDetailsTab(props: SDSDetailsTabProps) {
+  console.log("SDSDetailsTab - Initial Data:", props.initialData);
   const isGlobalLibrary = props.initialData?.sdsSource === "Global Library";
   const isRequested = props.status === "REQUESTED" && isGlobalLibrary;
 

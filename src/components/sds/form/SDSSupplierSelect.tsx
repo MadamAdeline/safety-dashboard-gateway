@@ -8,6 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 export function SDSSupplierSelect() {
   const { supplier, setSupplier, initialData } = useSDSForm();
+  console.log("SDSSupplierSelect - Initial supplier:", supplier);
+  console.log("SDSSupplierSelect - Initial data:", initialData);
+  
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
 
   const { data: suppliers = [] } = useQuery({
