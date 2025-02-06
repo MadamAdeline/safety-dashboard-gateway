@@ -1,28 +1,31 @@
-import {
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useSDSSelection } from "./SDSSelectionContext";
+import type { SDS } from "@/types/sds";
 
 interface SDSTableHeaderProps {
-  onSelectAll: () => void;
-  isAllSelected: boolean;
+  paginatedData: SDS[];
   hasData: boolean;
 }
 
-export function SDSTableHeader({ onSelectAll, isAllSelected, hasData }: SDSTableHeaderProps) {
+export function SDSTableHeader({ paginatedData, hasData }: SDSTableHeaderProps) {
+  const { selectedItems, toggleSelectAll } = useSDSSelection();
+
   return (
     <TableHeader>
       <TableRow className="bg-[#F1F0FB] border-b border-gray-200">
         <TableHead className="w-12">
           <Checkbox
-            checked={hasData && isAllSelected}
-            onCheckedChange={onSelectAll}
+            checked={
+              hasData &&
+              selectedItems.length === paginatedData.length
+            }
+            onCheckedChange={() => toggleSelectAll(paginatedData.map(item => item.id))}
+            disabled={!hasData}
           />
         </TableHead>
-        <TableHead className="text-dgxprt-navy font-semibold">SDS Product Name</TableHead>
-        <TableHead className="text-dgxprt-navy font-semibold">SDS Product Code</TableHead>
+        <TableHead className="text-dgxprt-navy font-semibold">Product Name</TableHead>
+        <TableHead className="text-dgxprt-navy font-semibold">Product Code</TableHead>
         <TableHead className="text-dgxprt-navy font-semibold">DG</TableHead>
         <TableHead className="text-dgxprt-navy font-semibold">Supplier</TableHead>
         <TableHead className="text-dgxprt-navy font-semibold">Issue Date</TableHead>

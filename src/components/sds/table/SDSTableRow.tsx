@@ -6,23 +6,22 @@ import { Edit2, Trash2 } from "lucide-react";
 import type { SDS } from "@/types/sds";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useSDSSelection } from "./SDSSelectionContext";
 
 interface SDSTableRowProps {
   item: SDS;
-  isSelected: boolean;
-  onToggleSelect: (id: string) => void;
   onEdit: (sds: SDS) => void;
   onDelete?: (sds: SDS) => void;
 }
 
-export function SDSTableRow({ item, isSelected, onToggleSelect, onEdit, onDelete }: SDSTableRowProps) {
+export function SDSTableRow({ item, onEdit, onDelete }: SDSTableRowProps) {
   const { toast } = useToast();
+  const { selectedItems, toggleSelectItem } = useSDSSelection();
 
   const handleDelete = async () => {
     try {
       console.log('Deleting SDS:', item);
 
-      // First, delete the file from storage if it exists
       if (item.currentFilePath) {
         console.log('Deleting file from storage:', item.currentFilePath);
         const { error: storageError } = await supabase.storage
@@ -35,7 +34,6 @@ export function SDSTableRow({ item, isSelected, onToggleSelect, onEdit, onDelete
         }
       }
 
-      // Delete all version records
       console.log('Deleting version records for SDS:', item.id);
       const { error: versionsError } = await supabase
         .from('sds_versions')
@@ -47,7 +45,6 @@ export function SDSTableRow({ item, isSelected, onToggleSelect, onEdit, onDelete
         throw versionsError;
       }
 
-      // Finally, delete the SDS record
       console.log('Deleting SDS record:', item.id);
       const { error: sdsError } = await supabase
         .from('sds')
@@ -82,8 +79,8 @@ export function SDSTableRow({ item, isSelected, onToggleSelect, onEdit, onDelete
     <TableRow className="hover:bg-[#F1F0FB] transition-colors">
       <TableCell>
         <Checkbox
-          checked={isSelected}
-          onCheckedChange={() => onToggleSelect(item.productId)}
+          checked={selectedItems.includes(item.id)}
+          onCheckedChange={() => toggleSelectItem(item.id)}
         />
       </TableCell>
       <TableCell className="font-medium text-dgxprt-navy">{item.productName}</TableCell>

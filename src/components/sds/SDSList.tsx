@@ -7,7 +7,7 @@ import { useState } from "react";
 import { SDSTableHeader } from "./table/SDSTableHeader";
 import { SDSTableRow } from "./table/SDSTableRow";
 import { SDSPagination } from "./table/SDSPagination";
-import * as XLSX from 'xlsx';
+import { SDSSelectionProvider } from "./table/SDSSelectionContext";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface SDSListProps {
@@ -39,22 +39,6 @@ export function SDSList({ data, filters, onEdit }: SDSListProps) {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
-  const toggleSelectAll = () => {
-    if (selectedItems.length === paginatedData.length) {
-      setSelectedItems([]);
-    } else {
-      setSelectedItems(paginatedData.map((item) => item.productId));
-    }
-  };
-
-  const toggleSelectItem = (productId: string) => {
-    setSelectedItems((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
-    );
-  };
-
   const handleDelete = () => {
     queryClient.invalidateQueries({ queryKey: ['sds'] });
   };
@@ -62,25 +46,27 @@ export function SDSList({ data, filters, onEdit }: SDSListProps) {
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <Table>
-          <SDSTableHeader
-            onSelectAll={toggleSelectAll}
-            isAllSelected={paginatedData.length > 0 && selectedItems.length === paginatedData.length}
-            hasData={paginatedData.length > 0}
-          />
-          <TableBody>
-            {paginatedData.map((item) => (
-              <SDSTableRow
-                key={item.productId}
-                item={item}
-                isSelected={selectedItems.includes(item.productId)}
-                onToggleSelect={toggleSelectItem}
-                onEdit={onEdit}
-                onDelete={handleDelete}
-              />
-            ))}
-          </TableBody>
-        </Table>
+        <SDSSelectionProvider
+          selectedItems={selectedItems}
+          onSelectionChange={setSelectedItems}
+        >
+          <Table>
+            <SDSTableHeader
+              paginatedData={paginatedData}
+              hasData={paginatedData.length > 0}
+            />
+            <TableBody>
+              {paginatedData.map((item) => (
+                <SDSTableRow
+                  key={item.id}
+                  item={item}
+                  onEdit={onEdit}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </SDSSelectionProvider>
       </div>
 
       <SDSPagination
