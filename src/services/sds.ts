@@ -63,6 +63,7 @@ export async function createSDS(data: {
     throw error;
   }
 
+  console.log("Successfully created SDS:", result);
   return result;
 }
 
@@ -129,6 +130,7 @@ export async function updateSDS(id: string, data: {
     throw error;
   }
 
+  console.log("Successfully updated SDS:", result);
   return result;
 }
 

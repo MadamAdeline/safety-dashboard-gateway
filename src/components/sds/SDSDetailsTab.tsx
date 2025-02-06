@@ -9,30 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { addYears, format } from "date-fns";
 
-interface SDSDetailsTabProps {
-  initialData?: SDS | null;
-  isDG: boolean;
-  setIsDG: (value: boolean) => void;
-  status: "ACTIVE" | "INACTIVE" | "REQUESTED";
-  setStatus: (value: "ACTIVE" | "INACTIVE" | "REQUESTED") => void;
-  supplier: string;
-  setSupplier: (value: string) => void;
-  formData: {
-    productName: string;
-    productId: string;
-    issueDate: string;
-    expiryDate: string;
-    dgClass?: number;
-    unNumber?: string;
-    unProperShippingName?: string;
-    packingGroup?: string;
-    hazchemCode?: string;
-    subsidiaryDgClass?: string;
-    dgSubDivision?: string;
-  };
-  setFormData: (value: any) => void;
-}
-
 export function SDSDetailsTab({ 
   initialData, 
   isDG, 
@@ -44,6 +20,14 @@ export function SDSDetailsTab({
   formData,
   setFormData
 }: SDSDetailsTabProps) {
+  console.log("SDSDetailsTab - Received props:", {
+    initialData,
+    isDG,
+    status,
+    supplier,
+    formData
+  });
+
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
   const isRequested = status === "REQUESTED" && isGlobalLibrary;
 
@@ -62,6 +46,7 @@ export function SDSDetailsTab({
         throw error;
       }
 
+      console.log('Retrieved suppliers:', data);
       return data.map(supplier => ({
         id: supplier.id,
         name: supplier.supplier_name
@@ -86,17 +71,18 @@ export function SDSDetailsTab({
         throw error;
       }
 
+      console.log('Retrieved master data:', data);
       return data;
     }
   });
 
-  // Filter master data by category
   const dgClasses = masterData.filter(item => item.category === 'DG_CLASS');
   const packingGroups = masterData.filter(item => item.category === 'PACKING_GROUP');
   const dgSubDivisions = masterData.filter(item => item.category === 'DG_SUBDIVISION');
 
   useEffect(() => {
     if (formData.issueDate) {
+      console.log("Calculating expiry date from issue date:", formData.issueDate);
       const issueDate = new Date(formData.issueDate);
       const expiryDate = addYears(issueDate, 5);
       setFormData(prev => ({
@@ -107,16 +93,18 @@ export function SDSDetailsTab({
   }, [formData.issueDate, setFormData]);
 
   useEffect(() => {
-    // Set initial supplier when editing
     if (initialData?.supplier) {
+      console.log("Setting initial supplier:", initialData.supplier);
       const foundSupplier = suppliers.find(s => s.name === initialData.supplier);
       if (foundSupplier) {
+        console.log("Found matching supplier:", foundSupplier);
         setSupplier(foundSupplier.id);
       }
     }
   }, [initialData, suppliers, setSupplier]);
 
   const handleInputChange = (field: string, value: string | number) => {
+    console.log("Input change:", field, value);
     setFormData((prev: any) => ({
       ...prev,
       [field]: value

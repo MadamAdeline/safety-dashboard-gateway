@@ -17,6 +17,8 @@ interface NewSDSFormProps {
 }
 
 export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
+  console.log("NewSDSForm - Initial Data:", initialData);
+
   const [isDG, setIsDG] = useState(initialData?.isDG ?? false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
@@ -38,11 +40,17 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     unProperShippingName: initialData?.unProperShippingName ?? "",
     hazchemCode: initialData?.hazchemCode ?? ""
   });
+
+  console.log("NewSDSForm - Current Form Data:", formData);
+  console.log("NewSDSForm - isDG:", isDG);
+  console.log("NewSDSForm - supplier:", supplier);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   useEffect(() => {
     if (initialData) {
+      console.log("NewSDSForm - Setting initial data:", initialData);
       setIsDG(initialData.isDG);
       setStatus(initialData.status);
       setFormData({
@@ -106,6 +114,8 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     try {
       console.log("Starting SDS save process");
       console.log("Form data being saved:", formData);
+      console.log("isDG status:", isDG);
+      console.log("Selected supplier:", supplier);
       
       if (!supplier) {
         toast({
@@ -118,6 +128,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
 
       let fileData = null;
       if (selectedFile) {
+        console.log("Uploading file:", selectedFile.name);
         fileData = await uploadSDSFile(selectedFile);
         console.log("File uploaded successfully:", fileData);
       }
@@ -154,12 +165,14 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       console.log("Saving SDS data:", sdsData);
 
       if (initialData?.id) {
+        console.log("Updating existing SDS with ID:", initialData.id);
         await updateSDS(initialData.id, sdsData);
         toast({
           title: "Success",
           description: "SDS Record has been updated"
         });
       } else {
+        console.log("Creating new SDS record");
         await createSDS(sdsData);
         toast({
           title: "Success",
