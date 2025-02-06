@@ -19,6 +19,7 @@ export async function createSDS(data: {
   packingGroup?: string;
   hazchemCode?: string;
   subsidiaryDgClass?: string;
+  dgSubDivision?: string;
 }) {
   console.log("Creating SDS with data:", data);
   
@@ -48,7 +49,8 @@ export async function createSDS(data: {
       un_proper_shipping_name: data.unProperShippingName,
       packing_group: data.packingGroup,
       hazchem_code: data.hazchemCode,
-      subsidiary_dg_class: data.subsidiaryDgClass
+      subsidiary_dg_class: data.subsidiaryDgClass,
+      dg_subdivision: data.dgSubDivision
     })
     .select()
     .single();

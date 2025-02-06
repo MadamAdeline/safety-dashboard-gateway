@@ -284,7 +284,7 @@ export function SDSDetailsTab({
             <div className="space-y-2">
               <Label htmlFor="dgClass">DG Class *</Label>
               <Select 
-                value={formData.dgClass?.toString()} 
+                value={formData.dgClass?.toString() || ""} 
                 onValueChange={(value) => handleInputChange('dgClass', parseInt(value))}
                 disabled={isGlobalLibrary}
               >
@@ -304,7 +304,7 @@ export function SDSDetailsTab({
             <div className="space-y-2">
               <Label htmlFor="subsidiaryDgClass">Subsidiary DG Class</Label>
               <Select 
-                value={formData.subsidiaryDgClass} 
+                value={formData.subsidiaryDgClass || ""} 
                 onValueChange={(value) => handleInputChange('subsidiaryDgClass', value)}
                 disabled={isGlobalLibrary}
               >
@@ -324,7 +324,7 @@ export function SDSDetailsTab({
             <div className="space-y-2">
               <Label htmlFor="packingGroup">Packing Group</Label>
               <Select 
-                value={formData.packingGroup} 
+                value={formData.packingGroup || ""} 
                 onValueChange={(value) => handleInputChange('packingGroup', value)}
                 disabled={isGlobalLibrary}
               >
@@ -344,7 +344,7 @@ export function SDSDetailsTab({
             <div className="space-y-2">
               <Label htmlFor="dgSubDivision">DG Sub Division</Label>
               <Select 
-                value={formData.dgSubDivision} 
+                value={formData.dgSubDivision || ""} 
                 onValueChange={(value) => handleInputChange('dgSubDivision', value)}
                 disabled={isGlobalLibrary}
               >
