@@ -25,9 +25,10 @@ interface SupplierListProps {
   data: Supplier[];
   filters: SupplierFilters;
   onEdit: (supplier: Supplier) => void;
+  isLoading?: boolean;
 }
 
-export function SupplierList({ data, filters, onEdit }: SupplierListProps) {
+export function SupplierList({ data, filters, onEdit, isLoading }: SupplierListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -61,6 +62,14 @@ export function SupplierList({ data, filters, onEdit }: SupplierListProps) {
         : [...prev, id]
     );
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-lg shadow p-8 flex items-center justify-center">
+        <div className="text-gray-500">Loading suppliers...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

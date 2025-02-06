@@ -9,27 +9,8 @@ import { SupplierSearch } from "@/components/suppliers/SupplierSearch";
 import { SupplierActions } from "@/components/suppliers/SupplierActions";
 import { SupplierForm } from "@/components/suppliers/SupplierForm";
 import type { Supplier, SupplierFilters as SupplierFiltersType } from "@/types/supplier";
-
-const sampleData: Supplier[] = [
-  {
-    id: "1",
-    name: "AUSTRALIAN CHEMICAL REAGENTS",
-    contactPerson: "John Smith",
-    email: "john.smith@auschem.com",
-    phone: "+61 3 9123 4567",
-    address: "123 Chemical Lane, Melbourne VIC 3000",
-    status: "ACTIVE",
-  },
-  {
-    id: "2",
-    name: "SIGMA ALDRICH",
-    contactPerson: "Jane Doe",
-    email: "jane.doe@sigmaaldrich.com",
-    phone: "+61 2 8765 4321",
-    address: "456 Science Street, Sydney NSW 2000",
-    status: "ACTIVE",
-  },
-];
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getSuppliers } from "@/services/suppliers";
 
 export default function Suppliers() {
   const [filters, setFilters] = useState<SupplierFiltersType>({
@@ -41,6 +22,12 @@ export default function Suppliers() {
   const [showForm, setShowForm] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: suppliers = [], isLoading } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: getSuppliers,
+  });
 
   const handleExport = () => {
     toast({
@@ -50,6 +37,7 @@ export default function Suppliers() {
   };
 
   const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['suppliers'] });
     toast({
       title: "Refreshing Data",
       description: "Updating the suppliers list..."
@@ -102,9 +90,10 @@ export default function Suppliers() {
         </div>
         
         <SupplierList 
-          data={sampleData} 
+          data={suppliers} 
           filters={filters} 
           onEdit={handleEdit}
+          isLoading={isLoading}
         />
       </div>
     </DashboardLayout>

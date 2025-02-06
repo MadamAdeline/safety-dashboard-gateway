@@ -13,6 +13,8 @@ import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Supplier } from "@/types/supplier";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createSupplier, updateSupplier } from "@/services/suppliers";
 
 interface SupplierFormProps {
   onClose: () => void;
@@ -30,14 +32,57 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
       status: "ACTIVE",
     }
   );
+  
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const createMutation = useMutation({
+    mutationFn: createSupplier,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['suppliers'] });
+      toast({
+        title: "Success",
+        description: "Supplier has been created successfully"
+      });
+      onClose();
+    },
+    onError: (error) => {
+      console.error('Error creating supplier:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create supplier",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Supplier> }) => 
+      updateSupplier(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['suppliers'] });
+      toast({
+        title: "Success",
+        description: "Supplier has been updated successfully"
+      });
+      onClose();
+    },
+    onError: (error) => {
+      console.error('Error updating supplier:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update supplier",
+        variant: "destructive"
+      });
+    }
+  });
 
   const handleSave = () => {
-    toast({
-      title: "Success",
-      description: "Supplier has been saved successfully"
-    });
-    onClose();
+    if (initialData?.id) {
+      updateMutation.mutate({ id: initialData.id, data: formData });
+    } else {
+      createMutation.mutate(formData as Omit<Supplier, 'id'>);
+    }
   };
 
   return (
@@ -54,8 +99,9 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
             <Button 
               className="bg-dgxprt-purple hover:bg-dgxprt-purple/90" 
               onClick={handleSave}
+              disabled={createMutation.isPending || updateMutation.isPending}
             >
-              Save
+              {createMutation.isPending || updateMutation.isPending ? "Saving..." : "Save"}
             </Button>
             <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="h-4 w-4" />
