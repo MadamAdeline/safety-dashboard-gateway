@@ -42,8 +42,8 @@ export default function SDSLibrary() {
         .from('sds')
         .select(`
           *,
-          suppliers (supplier_name),
-          status:status_lookup (status_name),
+          suppliers!fk_supplier (supplier_name),
+          status:status_lookup!fk_status (status_name),
           dg_class:master_data!sds_dg_class_id_fkey (label),
           subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
           packing_group:master_data!sds_packing_group_id_fkey (label),
