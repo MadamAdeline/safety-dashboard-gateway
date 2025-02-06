@@ -96,7 +96,8 @@ export default function SDSLibrary() {
     }
   });
 
-  const handleEx({
+  const handleExport = () => {
+    toast({
       title: "Export Started",
       description: "Your SDS data is being exported to Excel..."
     });
