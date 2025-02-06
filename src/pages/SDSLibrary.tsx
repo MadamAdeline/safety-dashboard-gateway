@@ -85,13 +85,18 @@ export default function SDSLibrary() {
         hazchemCode: item.hazchem_code,
         otherNames: item.other_names,
         emergencyPhone: item.emergency_phone,
-        revisionDate: item.revision_date
+        revisionDate: item.revision_date,
+        // Add missing request-related fields
+        requestSupplierName: item.request_supplier_name,
+        requestSupplierDetails: item.request_supplier_details,
+        requestInformation: item.request_information,
+        requestDate: item.request_date,
+        requestedBy: item.requested_by
       }));
     }
   });
 
-  const handleExport = () => {
-    toast({
+  const handleEx({
       title: "Export Started",
       description: "Your SDS data is being exported to Excel..."
     });
@@ -106,6 +111,7 @@ export default function SDSLibrary() {
   };
 
   const handleEdit = (sds: SDS) => {
+    console.log("Editing SDS with data:", sds);
     setSelectedSDS(sds);
     setShowNewSDS(true);
   };
