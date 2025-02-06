@@ -20,13 +20,17 @@ export const supabase = createClient<Database>(
   }
 );
 
-// Test the connection
-supabase.from('suppliers')
+// Test the connection with proper Promise typing
+void supabase.from('suppliers')
   .select('count', { count: 'exact', head: true })
-  .then(() => console.log('3. Test query successful - Connection verified'))
+  .then(() => {
+    console.log('3. Test query successful - Connection verified');
+    return Promise.resolve();
+  })
   .catch(err => {
     console.error('3. Connection test failed:', err.message);
     console.error('Full error:', err);
+    return Promise.reject(err);
   });
 
 export const isSupabaseConfigured = () => {
