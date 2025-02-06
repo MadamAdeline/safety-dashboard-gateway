@@ -18,6 +18,7 @@ import Users from "./pages/Users";
 import SiteRegisters from "./pages/SiteRegisters";
 import RiskAssessments from "./pages/RiskAssessments";
 import WasteTracking from "./pages/WasteTracking";
+import { ComingSoon } from "./components/ComingSoon";
 
 const queryClient = new QueryClient({
   defaultOptions: {
