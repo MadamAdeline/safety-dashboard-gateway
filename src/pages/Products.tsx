@@ -75,47 +75,40 @@ export default function Products() {
       console.log('Raw products data:', data);
 
       // Transform the data to match the Product type
-      const transformedData = data.map(item => {
-        // Map status_id to "ACTIVE" or "INACTIVE"
-        const statusMap: Record<number, "ACTIVE" | "INACTIVE"> = {
-          1: "ACTIVE",
-          2: "INACTIVE"
-        };
-
-        return {
-          id: item.id,
-          name: item.product_name,
-          code: item.product_code,
-          brandName: item.brand_name,
-          unit: item.unit,
-          unitSize: item.unit_size,
-          description: item.description,
-          productSet: item.product_set,
-          aerosol: item.aerosol,
-          cryogenicFluid: item.cryogenic_fluid,
-          otherNames: item.other_names,
-          uses: item.uses,
-          status: statusMap[item.product_status_id] || "INACTIVE",
-          approvalStatusId: item.approval_status_id,
-          sdsId: item.sds_id,
-          sds: item.sds ? {
-            id: item.sds.id,
-            isDG: item.sds.is_dg,
-            dgClass: item.sds.dg_class_id ? {
-              id: item.sds.dg_class_id.id,
-              label: item.sds.dg_class_id.label
-            } : undefined,
-            supplier: item.sds.suppliers ? {
-              id: item.sds.suppliers.id,
-              supplier_name: item.sds.suppliers.supplier_name
-            } : undefined,
-            packingGroup: item.sds.packing_group_id ? {
-              id: item.sds.packing_group_id.id,
-              label: item.sds.packing_group_id.label
-            } : undefined
+      const transformedData = data.map(item => ({
+        id: item.id,
+        name: item.product_name,
+        code: item.product_code,
+        brandName: item.brand_name,
+        unit: item.unit,
+        unitSize: item.unit_size,
+        description: item.description,
+        productSet: item.product_set,
+        aerosol: item.aerosol,
+        cryogenicFluid: item.cryogenic_fluid,
+        otherNames: item.other_names,
+        uses: item.uses,
+        status: item.product_status_id === 12 ? "ACTIVE" : "INACTIVE",
+        approvalStatusId: item.approval_status_id,
+        productStatusId: item.product_status_id,
+        sdsId: item.sds_id,
+        sds: item.sds ? {
+          id: item.sds.id,
+          isDG: item.sds.is_dg,
+          dgClass: item.sds.dg_class_id ? {
+            id: item.sds.dg_class_id.id,
+            label: item.sds.dg_class_id.label
+          } : undefined,
+          supplier: item.sds.suppliers ? {
+            id: item.sds.suppliers.id,
+            supplier_name: item.sds.suppliers.supplier_name
+          } : undefined,
+          packingGroup: item.sds.packing_group_id ? {
+            id: item.sds.packing_group_id.id,
+            label: item.sds.packing_group_id.label
           } : undefined
-        };
-      });
+        } : undefined
+      }));
 
       console.log('Transformed products data:', transformedData);
       return transformedData;

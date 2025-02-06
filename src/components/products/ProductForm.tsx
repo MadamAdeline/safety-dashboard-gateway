@@ -33,7 +33,7 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
     otherNames: initialData?.otherNames ?? "",
     uses: initialData?.uses ?? "",
     approvalStatusId: initialData?.approvalStatusId ?? null,
-    productStatusId: initialData?.productStatusId ?? null,
+    productStatusId: initialData?.productStatusId ?? 12, // Default to ACTIVE (12)
     sdsId: initialData?.sdsId ?? null
   });
 
