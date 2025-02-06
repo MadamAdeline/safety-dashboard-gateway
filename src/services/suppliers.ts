@@ -1,4 +1,4 @@
-import { getSupabaseClient } from '@/lib/supabase';
+import { getSupabaseClient } from '@/integrations/supabase/client';
 import type { Supplier } from '@/types/supplier';
 
 export async function getSuppliers() {
@@ -29,7 +29,7 @@ export async function getSuppliers() {
 }
 
 export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
-  console.log('Creating supplier:', supplier);
+  console.log('Creating supplier with data:', supplier);
   try {
     const supabase = getSupabaseClient();
     if (!supabase) {
@@ -51,11 +51,11 @@ export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
       .single();
 
     if (error) {
-      console.error('Error creating supplier:', error);
+      console.error('Supabase error creating supplier:', error);
       throw error;
     }
 
-    console.log('Created supplier:', data);
+    console.log('Successfully created supplier:', data);
     return data;
   } catch (error) {
     console.error('Failed to create supplier:', error);
@@ -91,7 +91,7 @@ export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
       throw error;
     }
 
-    console.log('Updated supplier:', data);
+    console.log('Successfully updated supplier:', data);
     return data;
   } catch (error) {
     console.error('Failed to update supplier:', error);
