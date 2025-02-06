@@ -41,7 +41,8 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     hazchemCode: initialData?.hazchemCode ?? "",
     dgClass: initialData?.dgClass ?? "",
     subsidiaryDgClass: initialData?.subsidiaryDgClass ?? "",
-    packingGroup: initialData?.packingGroup ?? ""
+    packingGroup: initialData?.packingGroup ?? "",
+    dgSubDivision: initialData?.dgSubDivision ?? ""
   });
 
   console.log("NewSDSForm - Current Form Data:", formData);
@@ -73,7 +74,8 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         hazchemCode: initialData.hazchemCode ?? "",
         dgClass: initialData.dgClass ?? "",
         subsidiaryDgClass: initialData.subsidiaryDgClass ?? "",
-        packingGroup: initialData.packingGroup ?? ""
+        packingGroup: initialData.packingGroup ?? "",
+        dgSubDivision: initialData.dgSubDivision ?? ""
       });
     }
   }, [initialData]);
@@ -159,9 +161,6 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         unNumber: isDG ? formData.unNumber || null : null,
         unProperShippingName: isDG ? formData.unProperShippingName || null : null,
         hazchemCode: isDG ? formData.hazchemCode || null : null,
-        dgClass: isDG ? formData.dgClass || null : null,
-        subsidiaryDgClass: isDG ? formData.subsidiaryDgClass || null : null,
-        packingGroup: isDG ? formData.packingGroup || null : null,
         statusId,
         ...(fileData && {
           currentFilePath: fileData.filePath,
