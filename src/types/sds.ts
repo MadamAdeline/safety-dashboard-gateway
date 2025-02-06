@@ -8,43 +8,44 @@ export interface SDS {
   supplierId: string;
   issueDate: string;
   expiryDate: string;
+  dgClassId: string;
+  dgClass: {
+    id: string;
+    label: string;
+  };
+  subsidiaryDgClassId: string;
+  subsidiaryDgClass: {
+    id: string;
+    label: string;
+  };
+  packingGroupId: string;
+  packingGroup: {
+    id: string;
+    label: string;
+  };
+  dgSubDivisionId: string;
+  dgSubDivision: {
+    id: string;
+    label: string;
+  };
   status: 'ACTIVE' | 'INACTIVE' | 'REQUESTED';
   sdsSource: string;
-  currentFilePath?: string;
-  currentFileName?: string;
-  currentFileSize?: number;
-  currentContentType?: string;
-  unNumber?: string;
-  unProperShippingName?: string;
-  hazchemCode?: string;
-  dgClassId?: string;
-  dgClass?: {
-    id: string;
-    label: string;
-  };
-  subsidiaryDgClassId?: string;
-  subsidiaryDgClass?: {
-    id: string;
-    label: string;
-  };
-  packingGroupId?: string;
-  packingGroup?: {
-    id: string;
-    label: string;
-  };
-  dgSubDivisionId?: string;
-  dgSubDivision?: {
-    id: string;
-    label: string;
-  };
-  otherNames?: string;
-  emergencyPhone?: string;
-  revisionDate?: string;
-  requestSupplierName?: string;
-  requestSupplierDetails?: string;
-  requestInformation?: string;
-  requestDate?: string;
-  requestedBy?: string;
+  source: string;
+  currentFilePath: string;
+  currentFileName: string;
+  currentFileSize: number;
+  currentContentType: string;
+  unNumber: string;
+  unProperShippingName: string;
+  hazchemCode: string;
+  otherNames: string;
+  emergencyPhone: string;
+  revisionDate: string;
+  requestSupplierName: string;
+  requestSupplierDetails: string;
+  requestInformation: string;
+  requestDate: string;
+  requestedBy: string;
 }
 
 export interface SDSFilters {
