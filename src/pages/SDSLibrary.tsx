@@ -107,6 +107,20 @@ export default function SDSLibrary() {
     return <NewSDSForm onClose={handleClose} initialData={selectedSDS} />;
   }
 
+  // Filter the data based on search criteria
+  const filteredData = sdsData.filter((item) => {
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      return (
+        item.productName.toLowerCase().includes(searchTerm) ||
+        item.productId.toLowerCase().includes(searchTerm) ||
+        item.supplier.toLowerCase().includes(searchTerm) ||
+        item.status.toLowerCase().includes(searchTerm)
+      );
+    }
+    return true;
+  });
+
   return (
     <DashboardLayout>
       <div className="space-y-4 max-w-full">
@@ -138,6 +152,7 @@ export default function SDSLibrary() {
               onToggleFilters={() => setShowFilters(!showFilters)}
               onExport={handleExport}
               onRefresh={handleRefresh}
+              data={filteredData}
             />
           </div>
           
