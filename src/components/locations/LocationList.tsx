@@ -42,7 +42,12 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
     return location.status_id === 1 ? "ACTIVE" : "INACTIVE";
   };
 
-  const filteredData = locations.filter((item) => {
+  const filteredData = locations.map(item => ({
+    ...item,
+    coordinates: typeof item.coordinates === 'string' 
+      ? JSON.parse(item.coordinates)
+      : item.coordinates
+  })).filter((item) => {
     if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) {
       return false;
     }
