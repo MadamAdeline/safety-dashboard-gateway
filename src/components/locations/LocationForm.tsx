@@ -21,7 +21,7 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     name: initialData?.name ?? "",
     type: (initialData?.master_data?.label as LocationType) ?? "Region",
     typeId: initialData?.type_id ?? "",
-    parentLocationId: initialData?.parent_location_id ?? "none",
+    parentLocationId: initialData?.parent_location_id ?? null,
     status: initialData?.status_id === 1 ? "ACTIVE" as LocationStatus : "INACTIVE" as LocationStatus,
     coordinates: initialData?.coordinates ?? { lat: -37.8136, lng: 144.9631 }
   });
@@ -32,8 +32,33 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     master_data: { label: string };
   }>>([]);
 
+  const [locationTypes, setLocationTypes] = useState<LocationType[]>([]);
+
   const { createLocation, updateLocation } = useLocations();
   const { toast } = useToast();
+
+  // Fetch location types from master_data
+  useEffect(() => {
+    const fetchLocationTypes = async () => {
+      console.log('Fetching location types from master_data...');
+      const { data, error } = await supabase
+        .from('master_data')
+        .select('label')
+        .eq('category', 'LOCATION_TYPE')
+        .eq('status', 'ACTIVE');
+
+      if (error) {
+        console.error('Error fetching location types:', error);
+        return;
+      }
+
+      const types = data.map(item => item.label as LocationType);
+      console.log('Location types fetched:', types);
+      setLocationTypes(types);
+    };
+
+    fetchLocationTypes();
+  }, []);
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -164,10 +189,9 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
                     <SelectValue placeholder="Select location type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Region">Region</SelectItem>
-                    <SelectItem value="District">District</SelectItem>
-                    <SelectItem value="School">School</SelectItem>
-                    <SelectItem value="Detailed Location">Detailed Location</SelectItem>
+                    {locationTypes.map((type) => (
+                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -175,9 +199,9 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
               <div className="space-y-2">
                 <Label htmlFor="parentLocation">Parent Location</Label>
                 <Select 
-                  value={formData.parentLocationId}
+                  value={formData.parentLocationId ?? "none"}
                   onValueChange={(value) => 
-                    setFormData(prev => ({ ...prev, parentLocationId: value }))
+                    setFormData(prev => ({ ...prev, parentLocationId: value === "none" ? null : value }))
                   }
                 >
                   <SelectTrigger id="parentLocation">
