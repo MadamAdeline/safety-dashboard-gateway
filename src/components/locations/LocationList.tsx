@@ -30,16 +30,18 @@ import { LocationActions } from "@/components/locations/LocationActions";
 interface LocationListProps {
   filters: LocationFilters;
   onEdit: (location: Location) => void;
+  onFiltersChange: (filters: LocationFilters) => void;
 }
 
 interface EditableLocation extends Partial<Location> {
   isNew?: boolean;
 }
 
-export function LocationList({ filters, onEdit }: LocationListProps) {
+export function LocationList({ filters, onEdit, onFiltersChange }: LocationListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingLocation, setEditingLocation] = useState<EditableLocation | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
   const itemsPerPage = 10;
 
   const { locations, isLoading, deleteLocation, createLocation, updateLocation } = useLocations();
@@ -289,12 +291,17 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
       <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
         <LocationSearch 
           value={filters.search}
-          onChange={(value) => setFilters({ ...filters, search: value })}
+          onChange={(value) => onFiltersChange({ ...filters, search: value })}
         />
         <LocationActions 
           onToggleFilters={() => setShowFilters(!showFilters)}
-          onExport={handleExport}
-          onRefresh={handleRefresh}
+          onExport={() => {}} // This is now handled within LocationActions
+          onRefresh={() => {
+            toast({
+              title: "Refreshed",
+              description: "Location list has been refreshed",
+            });
+          }}
           filteredData={filteredData}
         />
       </div>

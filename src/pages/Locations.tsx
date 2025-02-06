@@ -6,9 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Plus, Network } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { LocationForm } from "@/components/locations/LocationForm";
-import { LocationSearch } from "@/components/locations/LocationSearch";
-import { LocationActions } from "@/components/locations/LocationActions";
-import { LocationHierarchy } from "@/components/locations/LocationHierarchy";
 import type { Location, LocationFilters as LocationFiltersType } from "@/types/location";
 
 export default function Locations() {
@@ -19,25 +16,10 @@ export default function Locations() {
     parentLocation: null
   });
   
-  const [showFilters, setShowFilters] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'hierarchy'>('list');
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const { toast } = useToast();
-
-  const handleExport = () => {
-    toast({
-      title: "Export Started",
-      description: "Your location data is being exported to Excel..."
-    });
-  };
-
-  const handleRefresh = () => {
-    toast({
-      title: "Refreshing Data",
-      description: "Updating the locations list..."
-    });
-  };
 
   const handleEdit = (location: Location) => {
     setSelectedLocation(location);
@@ -76,27 +58,10 @@ export default function Locations() {
           </div>
         </div>
         
-        <div className="flex flex-col space-y-4">
-          <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-            <LocationSearch 
-              value={filters.search}
-              onChange={(value) => setFilters({ ...filters, search: value })}
-            />
-            <LocationActions 
-              onToggleFilters={() => setShowFilters(!showFilters)}
-              onExport={handleExport}
-              onRefresh={handleRefresh}
-            />
-          </div>
-          
-          {showFilters && (
-            <LocationFilters filters={filters} onFiltersChange={setFilters} />
-          )}
-        </div>
-        
         {viewMode === 'list' ? (
           <LocationList 
-            filters={filters} 
+            filters={filters}
+            onFiltersChange={setFilters}
             onEdit={handleEdit}
           />
         ) : (
