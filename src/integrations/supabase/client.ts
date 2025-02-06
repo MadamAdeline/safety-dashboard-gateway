@@ -5,7 +5,31 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://xhdvjkgasmsaqmchfsjq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZHZqa2dhc21zYXFtY2hmc2pxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg4MTI1MDcsImV4cCI6MjA1NDM4ODUwN30.hWnhkJLTGgAX4GarYQqlloSlAfpgwaI1LdajqTjsYAo";
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
+console.log('Initializing Supabase client with:');
+console.log('URL:', SUPABASE_URL);
+console.log('Key exists:', !!SUPABASE_PUBLISHABLE_KEY);
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+try {
+  // Create the Supabase client
+  const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
+    }
+  });
+
+  // Test the connection
+  supabase.auth.getSession().then(({ data, error }) => {
+    if (error) {
+      console.error('Supabase connection error:', error);
+    } else {
+      console.log('Supabase connection successful');
+    }
+  });
+
+  export { supabase };
+} catch (error) {
+  console.error('Failed to initialize Supabase client:', error);
+  throw error;
+}

@@ -5,10 +5,15 @@ export async function getSuppliers() {
   console.log('Fetching suppliers from Supabase');
   try {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      console.error('Supabase client not initialized');
+      throw new Error('Supabase client not initialized');
+    }
+
     const { data, error } = await supabase
       .from('suppliers')
       .select('*')
-      .order('name', { ascending: true });
+      .order('supplier_name', { ascending: true });
 
     if (error) {
       console.error('Error fetching suppliers:', error);
@@ -27,9 +32,21 @@ export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
   console.log('Creating supplier:', supplier);
   try {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      console.error('Supabase client not initialized');
+      throw new Error('Supabase client not initialized');
+    }
+
     const { data, error } = await supabase
       .from('suppliers')
-      .insert([supplier])
+      .insert([{
+        supplier_name: supplier.name,
+        contact_person: supplier.contactPerson,
+        email: supplier.email,
+        phone_number: supplier.phone,
+        address: supplier.address,
+        status_id: supplier.status === 'ACTIVE' ? 1 : 2
+      }])
       .select()
       .single();
 
@@ -50,9 +67,21 @@ export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
   console.log('Updating supplier:', id, supplier);
   try {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      console.error('Supabase client not initialized');
+      throw new Error('Supabase client not initialized');
+    }
+
     const { data, error } = await supabase
       .from('suppliers')
-      .update(supplier)
+      .update({
+        supplier_name: supplier.name,
+        contact_person: supplier.contactPerson,
+        email: supplier.email,
+        phone_number: supplier.phone,
+        address: supplier.address,
+        status_id: supplier.status === 'ACTIVE' ? 1 : 2
+      })
       .eq('id', id)
       .select()
       .single();
@@ -74,6 +103,11 @@ export async function deleteSupplier(id: string) {
   console.log('Deleting supplier:', id);
   try {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      console.error('Supabase client not initialized');
+      throw new Error('Supabase client not initialized');
+    }
+
     const { error } = await supabase
       .from('suppliers')
       .delete()
