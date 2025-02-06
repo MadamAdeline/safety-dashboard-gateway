@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,7 @@ import Products from "./pages/Products";
 import { NewSDSForm } from "./components/sds/NewSDSForm";
 import ComplianceDashboard from "./pages/ComplianceDashboard";
 import Locations from "./pages/Locations";
+import Suppliers from "./pages/Suppliers";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +27,7 @@ const App = () => (
           <Route path="/compliance" element={<ComplianceDashboard />} />
           <Route path="/locations" element={<Locations />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/suppliers" element={<Suppliers />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
