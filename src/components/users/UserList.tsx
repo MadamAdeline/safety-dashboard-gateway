@@ -20,10 +20,6 @@ type UserWithRelations = Omit<User, 'manager'> & {
       role_name: string;
     };
   }[];
-  manager: {
-    first_name: string;
-    last_name: string;
-  } | null;
   location?: {
     name: string;
   } | null;
@@ -45,10 +41,6 @@ export function UserList({ onEdit }: UserListProps) {
             roles (
               role_name
             )
-          ),
-          manager:users!manager_id (
-            first_name,
-            last_name
           ),
           location:locations (
             name
@@ -77,7 +69,6 @@ export function UserList({ onEdit }: UserListProps) {
             <TableHead className="text-dgxprt-navy font-semibold">Name</TableHead>
             <TableHead className="text-dgxprt-navy font-semibold">Email</TableHead>
             <TableHead className="text-dgxprt-navy font-semibold">Role</TableHead>
-            <TableHead className="text-dgxprt-navy font-semibold">Manager</TableHead>
             <TableHead className="text-dgxprt-navy font-semibold">Location</TableHead>
             <TableHead className="text-dgxprt-navy font-semibold">Status</TableHead>
             <TableHead className="w-24 text-dgxprt-navy font-semibold">Actions</TableHead>
@@ -99,9 +90,6 @@ export function UserList({ onEdit }: UserListProps) {
                     {userRole.roles.role_name}
                   </Badge>
                 ))}
-              </TableCell>
-              <TableCell>
-                {user.manager && `${user.manager.first_name} ${user.manager.last_name}`}
               </TableCell>
               <TableCell>
                 {user.location?.name}
