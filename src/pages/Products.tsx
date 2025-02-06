@@ -33,7 +33,20 @@ export default function Products() {
       const { data, error } = await supabase
         .from('products')
         .select(`
-          *,
+          id,
+          name:product_name,
+          code:product_code,
+          brandName:brand_name,
+          unit,
+          unitSize:unit_size,
+          description,
+          productSet:product_set,
+          aerosol,
+          cryogenicFluid:cryogenic_fluid,
+          otherNames:other_names,
+          uses,
+          status:product_status_id,
+          approvalStatusId:approval_status_id,
           sds:sds_id (
             id,
             isDG:is_dg,
