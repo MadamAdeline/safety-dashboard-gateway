@@ -90,6 +90,19 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     }
   };
 
+  const handleOpenSDS = () => {
+    // If there's a file path in initialData, we can open it
+    if (initialData?.currentFilePath) {
+      window.open(initialData.currentFilePath, '_blank');
+    } else {
+      toast({
+        title: "No SDS File",
+        description: "There is no SDS file available to view.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleSave = async () => {
     try {
       console.log("Starting SDS save process");
@@ -197,7 +210,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
               </TabsContent>
 
               <TabsContent value="version">
-                <SDSVersionTab />
+                <SDSVersionTab onOpenSDS={handleOpenSDS} />
               </TabsContent>
             </Tabs>
           </div>
