@@ -1,6 +1,9 @@
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { SDSSearch } from "@/components/sds/SDSSearch";
 import { SDSPreview } from "@/components/sds/SDSPreview";
+import { NewSDSForm } from "@/components/sds/NewSDSForm";
 import type { SDS } from "@/types/sds";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +16,7 @@ interface ProductSDSTabProps {
 
 export function ProductSDSTab({ sdsId, onSDSSelect }: ProductSDSTabProps) {
   const [initialSDS, setInitialSDS] = useState<SDS | null>(null);
+  const [showNewSDS, setShowNewSDS] = useState(false);
 
   useEffect(() => {
     const fetchInitialSDS = async () => {
@@ -71,17 +75,89 @@ export function ProductSDSTab({ sdsId, onSDSSelect }: ProductSDSTabProps) {
     fetchInitialSDS();
   }, [sdsId]);
 
+  const handleNewSDSClose = () => {
+    setShowNewSDS(false);
+    // Refresh the SDS data after closing the form
+    if (sdsId) {
+      const fetchInitialSDS = async () => {
+        const { data, error } = await supabase
+          .from('sds')
+          .select(`
+            *,
+            suppliers!fk_supplier (supplier_name),
+            dg_class:master_data!sds_dg_class_id_fkey (label),
+            dg_subdivision:master_data!sds_dg_subdivision_id_fkey (label),
+            packing_group:master_data!sds_packing_group_id_fkey (label)
+          `)
+          .eq('id', sdsId)
+          .single();
+
+        if (error) {
+          console.error('Error refreshing SDS data:', error);
+          return;
+        }
+
+        if (data) {
+          console.log('Refreshed SDS data:', data);
+          const formattedSDS: SDS = {
+            id: data.id,
+            productName: data.product_name,
+            productId: data.product_id,
+            isDG: data.is_dg,
+            supplier: data.suppliers?.supplier_name || 'Unknown',
+            supplierId: data.supplier_id,
+            issueDate: data.issue_date,
+            expiryDate: data.expiry_date,
+            status: data.status_id === 1 ? 'ACTIVE' : 'INACTIVE',
+            sdsSource: 'Customer',
+            currentFilePath: data.current_file_path,
+            currentFileName: data.current_file_name,
+            dgClass: data.dg_class ? {
+              id: data.dg_class_id,
+              label: data.dg_class.label
+            } : undefined,
+            dgSubDivision: data.dg_subdivision ? {
+              id: data.dg_subdivision_id,
+              label: data.dg_subdivision.label
+            } : undefined,
+            packingGroup: data.packing_group ? {
+              id: data.packing_group_id,
+              label: data.packing_group.label
+            } : undefined
+          };
+          setInitialSDS(formattedSDS);
+        }
+      };
+
+      fetchInitialSDS();
+    }
+  };
+
+  if (showNewSDS) {
+    return <NewSDSForm onClose={handleNewSDSClose} />;
+  }
+
   return (
     <div className="space-y-6 w-full">
       <div className="space-y-4">
         <Label>Associated SDS</Label>
-        <SDSSearch
-          selectedSdsId={sdsId}
-          initialSDS={initialSDS}
-          onSDSSelect={onSDSSelect}
-          className="w-full"
-          activeOnly={true}
-        />
+        <div className="flex gap-2">
+          <SDSSearch
+            selectedSdsId={sdsId}
+            initialSDS={initialSDS}
+            onSDSSelect={onSDSSelect}
+            className="w-full"
+            activeOnly={true}
+          />
+          {!sdsId && (
+            <Button
+              onClick={() => setShowNewSDS(true)}
+              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 text-white"
+            >
+              <Plus className="mr-2 h-4 w-4" /> New SDS
+            </Button>
+          )}
+        </div>
       </div>
 
       {initialSDS && (
