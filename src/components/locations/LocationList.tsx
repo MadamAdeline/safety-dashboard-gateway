@@ -24,7 +24,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
   const [showFilters, setShowFilters] = useState(false);
   const itemsPerPage = 10;
 
-  const { locations, isLoading, deleteLocation, createLocation, updateLocation } = useLocations();
+  const { locations, isLoading, deleteLocation } = useLocations();
   const { toast } = useToast();
 
   const getLocationTypeLabel = (location: Location): string => {
@@ -173,7 +173,12 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
           
           <div className="flex gap-2">
             <Button
-              onClick={() => setEditingLocation({ isNew: true })}
+              onClick={() => {
+                const newLocation: Partial<Location> = {
+                  isNew: true
+                };
+                setEditingLocation(newLocation);
+              }}
               className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
             >
               <Plus className="h-4 w-4 mr-2" />

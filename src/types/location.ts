@@ -19,6 +19,7 @@ export interface Location {
     id: number;
     status_name: string;
   };
+  isNew?: boolean;
 }
 
 export interface LocationFilters {
