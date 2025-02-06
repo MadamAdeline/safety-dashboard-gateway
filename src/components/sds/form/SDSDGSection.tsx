@@ -12,7 +12,15 @@ export function SDSDGSection() {
     setIsDG, 
     formData, 
     setFormData,
-    initialData 
+    initialData,
+    dgClassId,
+    setDgClassId,
+    subsidiaryDgClassId,
+    setSubsidiaryDgClassId,
+    packingGroupId,
+    setPackingGroupId,
+    dgSubDivisionId,
+    setDgSubDivisionId
   } = useSDSForm();
   
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
@@ -108,8 +116,8 @@ export function SDSDGSection() {
         <div className="space-y-2">
           <Label htmlFor="dgClass">DG Class *</Label>
           <Select 
-            value={formData.dgClass?.toString() || ""} 
-            onValueChange={(value) => handleInputChange('dgClass', value)}
+            value={dgClassId || ""} 
+            onValueChange={(value) => setDgClassId(value)}
             disabled={isGlobalLibrary}
           >
             <SelectTrigger id="dgClass" className={isGlobalLibrary ? "bg-gray-100" : ""}>
@@ -117,7 +125,7 @@ export function SDSDGSection() {
             </SelectTrigger>
             <SelectContent>
               {dgClasses.map((dgClass) => (
-                <SelectItem key={dgClass.id} value={dgClass.label}>
+                <SelectItem key={dgClass.id} value={dgClass.id}>
                   {dgClass.label}
                 </SelectItem>
               ))}
@@ -128,8 +136,8 @@ export function SDSDGSection() {
         <div className="space-y-2">
           <Label htmlFor="subsidiaryDgClass">Subsidiary DG Class</Label>
           <Select 
-            value={formData.subsidiaryDgClass || ""} 
-            onValueChange={(value) => handleInputChange('subsidiaryDgClass', value)}
+            value={subsidiaryDgClassId || ""} 
+            onValueChange={(value) => setSubsidiaryDgClassId(value)}
             disabled={isGlobalLibrary}
           >
             <SelectTrigger id="subsidiaryDgClass" className={isGlobalLibrary ? "bg-gray-100" : ""}>
@@ -137,7 +145,7 @@ export function SDSDGSection() {
             </SelectTrigger>
             <SelectContent>
               {dgClasses.map((dgClass) => (
-                <SelectItem key={dgClass.id} value={dgClass.label}>
+                <SelectItem key={dgClass.id} value={dgClass.id}>
                   {dgClass.label}
                 </SelectItem>
               ))}
@@ -148,8 +156,8 @@ export function SDSDGSection() {
         <div className="space-y-2">
           <Label htmlFor="packingGroup">Packing Group</Label>
           <Select 
-            value={formData.packingGroup || ""} 
-            onValueChange={(value) => handleInputChange('packingGroup', value)}
+            value={packingGroupId || ""} 
+            onValueChange={(value) => setPackingGroupId(value)}
             disabled={isGlobalLibrary}
           >
             <SelectTrigger id="packingGroup" className={isGlobalLibrary ? "bg-gray-100" : ""}>
@@ -157,7 +165,7 @@ export function SDSDGSection() {
             </SelectTrigger>
             <SelectContent>
               {packingGroups.map((group) => (
-                <SelectItem key={group.id} value={group.label}>
+                <SelectItem key={group.id} value={group.id}>
                   {group.label}
                 </SelectItem>
               ))}
@@ -168,8 +176,8 @@ export function SDSDGSection() {
         <div className="space-y-2">
           <Label htmlFor="dgSubDivision">DG Sub Division</Label>
           <Select 
-            value={formData.dgSubDivision || ""} 
-            onValueChange={(value) => handleInputChange('dgSubDivision', value)}
+            value={dgSubDivisionId || ""} 
+            onValueChange={(value) => setDgSubDivisionId(value)}
             disabled={isGlobalLibrary}
           >
             <SelectTrigger id="dgSubDivision" className={isGlobalLibrary ? "bg-gray-100" : ""}>
@@ -177,7 +185,7 @@ export function SDSDGSection() {
             </SelectTrigger>
             <SelectContent>
               {dgSubDivisions.map((subdivision) => (
-                <SelectItem key={subdivision.id} value={subdivision.label}>
+                <SelectItem key={subdivision.id} value={subdivision.id}>
                   {subdivision.label}
                 </SelectItem>
               ))}
