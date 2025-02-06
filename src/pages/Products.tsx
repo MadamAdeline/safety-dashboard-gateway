@@ -56,7 +56,7 @@ export default function Products() {
               id,
               label
             ),
-            supplier_id (
+            suppliers!fk_supplier (
               id,
               supplier_name
             ),
@@ -105,9 +105,9 @@ export default function Products() {
               id: item.sds.dg_class_id.id,
               label: item.sds.dg_class_id.label
             } : undefined,
-            supplier: item.sds.supplier_id ? {
-              id: item.sds.supplier_id.id,
-              supplier_name: item.sds.supplier_id.supplier_name
+            supplier: item.sds.suppliers ? {
+              id: item.sds.suppliers.id,
+              supplier_name: item.sds.suppliers.supplier_name
             } : undefined,
             packingGroup: item.sds.packing_group_id ? {
               id: item.sds.packing_group_id.id,
