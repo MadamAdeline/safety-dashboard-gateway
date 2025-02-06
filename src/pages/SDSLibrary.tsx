@@ -11,52 +11,8 @@ import { SDSSearch } from "@/components/sds/SDSSearch";
 import { SDSActions } from "@/components/sds/SDSActions";
 import type { SDS, SDSFilters as SDSFiltersType } from "@/types/sds";
 import { SDSRequestDialog } from "@/components/sds/SDSRequestDialog";
-
-const sampleData: SDS[] = [
-  {
-    productName: "Acetone (AUSCHEM)",
-    productId: "ACE20L",
-    isDG: true,
-    supplier: "AUSTRALIAN CHEMICAL REAGENTS",
-    issueDate: "2023-12-01",
-    expiryDate: "2028-12-01",
-    dgClass: 3,
-    status: "ACTIVE" as const,
-    sdsSource: "Customer"
-  },
-  {
-    productName: "Methanol",
-    productId: "MET10L",
-    isDG: true,
-    supplier: "SIGMA ALDRICH",
-    issueDate: "2023-11-15",
-    expiryDate: "2028-11-15",
-    dgClass: 3,
-    status: "ACTIVE" as const,
-    sdsSource: "Customer"
-  },
-  {
-    productName: "BP Butane",
-    productId: "0000002705",
-    isDG: true,
-    supplier: "BP Australia Pty Ltd",
-    issueDate: "2021-04-21",
-    expiryDate: "2026-04-21",
-    dgClass: 3,
-    status: "ACTIVE" as const,
-    sdsSource: "Global Library"
-  },
-  {
-    productName: "BRODIFACOUM PASTE",
-    productId: "Unknown",
-    isDG: false,
-    supplier: "Dulux Australia",
-    issueDate: "",
-    expiryDate: "",
-    status: "REQUESTED",
-    sdsSource: "Global Library"
-  }
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function SDSLibrary() {
   const [filters, setFilters] = useState<SDSFiltersType>({
@@ -76,6 +32,37 @@ export default function SDSLibrary() {
   const [showRequestDialog, setShowRequestDialog] = useState(false);
   const [selectedSDS, setSelectedSDS] = useState<SDS | null>(null);
   const { toast } = useToast();
+
+  const { data: sdsData = [], isLoading } = useQuery({
+    queryKey: ['sds'],
+    queryFn: async () => {
+      console.log('Fetching SDS data from Supabase');
+      const { data, error } = await supabase
+        .from('sds')
+        .select(`
+          *,
+          suppliers:supplier_id (supplier_name),
+          status:status_id (status_name)
+        `);
+
+      if (error) {
+        console.error('Error fetching SDS:', error);
+        throw error;
+      }
+
+      return data.map(item => ({
+        productName: item.product_name,
+        productId: item.product_id,
+        isDG: item.is_dg,
+        supplier: item.suppliers.supplier_name,
+        issueDate: item.issue_date,
+        expiryDate: item.expiry_date,
+        dgClass: item.dg_class,
+        status: item.status.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
+        sdsSource: 'Customer' as const
+      }));
+    }
+  });
 
   const handleExport = () => {
     toast({
@@ -153,9 +140,10 @@ export default function SDSLibrary() {
         </div>
         
         <SDSList 
-          data={sampleData} 
+          data={sdsData} 
           filters={filters} 
           onEdit={handleEdit}
+          isLoading={isLoading}
         />
 
         <GlobalSDSSearchDialog 

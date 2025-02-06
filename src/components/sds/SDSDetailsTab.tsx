@@ -4,6 +4,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import type { SDS } from "@/types/sds";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SDSDetailsTabProps {
   initialData?: SDS | null;
@@ -23,14 +25,6 @@ interface SDSDetailsTabProps {
   setFormData: (value: any) => void;
 }
 
-const suppliers = [
-  { value: "supplier1", label: "AUSTRALIAN CHEMICAL REAGENTS" },
-  { value: "supplier2", label: "SIGMA ALDRICH" },
-  { value: "supplier3", label: "MERCK" },
-  { value: "supplier4", label: "THERMO FISHER" },
-  { value: "supplier5", label: "BP Australia Pty Ltd" },
-];
-
 export function SDSDetailsTab({ 
   initialData, 
   isDG, 
@@ -44,6 +38,26 @@ export function SDSDetailsTab({
 }: SDSDetailsTabProps) {
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
   const isRequested = status === "REQUESTED" && isGlobalLibrary;
+
+  const { data: suppliers = [] } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('suppliers')
+        .select('*')
+        .eq('status_id', 1); // Only active suppliers
+
+      if (error) {
+        console.error('Error fetching suppliers:', error);
+        throw error;
+      }
+
+      return data.map(supplier => ({
+        id: supplier.id,
+        name: supplier.supplier_name
+      }));
+    }
+  });
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData((prev: any) => ({
@@ -104,8 +118,8 @@ export function SDSDetailsTab({
               </SelectTrigger>
               <SelectContent>
                 {suppliers.map((s) => (
-                  <SelectItem key={s.value} value={s.label}>
-                    {s.label}
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.name}
                   </SelectItem>
                 ))}
               </SelectContent>
