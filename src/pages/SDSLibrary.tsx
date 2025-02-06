@@ -52,6 +52,7 @@ export default function SDSLibrary() {
       }
 
       return data.map(item => ({
+        id: item.id,
         productName: item.product_name,
         productId: item.product_id,
         isDG: item.is_dg,

@@ -20,6 +20,7 @@ import { SDSSearch } from "@/components/sds/SDSSearch";
 // Sample data for demonstration
 const sampleSearchResults: SDS[] = [
   {
+    id: "1234-5678-9012-3456",
     productName: "Sample Product 1",
     productId: "SP001",
     supplier: "Supplier A",
@@ -30,6 +31,7 @@ const sampleSearchResults: SDS[] = [
     sdsSource: "Global Library"
   },
   {
+    id: "2345-6789-0123-4567",
     productName: "BP Butane",
     productId: "0000002705",
     supplier: "BP Australia Pty Ltd",
