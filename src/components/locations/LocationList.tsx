@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
-import type { Location, LocationFilters, LocationType, LocationStatus } from "@/types/location";
+import type { Location, LocationFilters } from "@/types/location";
 import { useState } from "react";
 import { useLocations } from "@/hooks/use-locations";
 
@@ -34,11 +34,11 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
 
   const { locations, isLoading, deleteLocation } = useLocations();
 
-  const getLocationType = (location: Location): LocationType => {
-    return location.master_data?.label as LocationType || "Region";
+  const getLocationTypeLabel = (location: Location): string => {
+    return location.master_data?.label || "Unknown";
   };
 
-  const getLocationStatus = (location: Location): LocationStatus => {
+  const getLocationStatus = (location: Location): "ACTIVE" | "INACTIVE" => {
     return location.status_id === 1 ? "ACTIVE" : "INACTIVE";
   };
 
@@ -46,7 +46,7 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
     if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) {
       return false;
     }
-    if (filters.type.length > 0 && !filters.type.includes(getLocationType(item))) {
+    if (filters.type.length > 0 && !filters.type.includes(getLocationTypeLabel(item) as any)) {
       return false;
     }
     if (filters.status.length > 0 && !filters.status.includes(getLocationStatus(item))) {

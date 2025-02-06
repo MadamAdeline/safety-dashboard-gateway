@@ -16,34 +16,50 @@ const sampleData: Location[] = [
   {
     id: "1",
     name: "Victoria",
-    type: "Region",
-    parentLocation: "",
-    status: "ACTIVE",
-    coordinates: { lat: -37.8136, lng: 144.9631 }
+    type_id: "6014a0ff-4e10-4966-9db0-3fdc74e96341", // Region type ID
+    parent_location_id: null,
+    status_id: 1,
+    coordinates: { lat: -37.8136, lng: 144.9631 },
+    master_data: {
+      id: "6014a0ff-4e10-4966-9db0-3fdc74e96341",
+      label: "Region"
+    }
   },
   {
     id: "2",
     name: "Northern District",
-    type: "District",
-    parentLocation: "Victoria",
-    status: "ACTIVE",
-    coordinates: { lat: -36.7596, lng: 144.2786 }
+    type_id: "305168a7-7907-47d3-b68b-fd66c859f594", // District type ID
+    parent_location_id: "1",
+    status_id: 1,
+    coordinates: { lat: -36.7596, lng: 144.2786 },
+    master_data: {
+      id: "305168a7-7907-47d3-b68b-fd66c859f594",
+      label: "District"
+    }
   },
   {
     id: "3",
     name: "Melbourne High School",
-    type: "School",
-    parentLocation: "Northern District",
-    status: "ACTIVE",
-    coordinates: { lat: -37.8359, lng: 144.9853 }
+    type_id: "1199de06-ef3c-4b62-84ca-056e154e0454", // School type ID
+    parent_location_id: "2",
+    status_id: 1,
+    coordinates: { lat: -37.8359, lng: 144.9853 },
+    master_data: {
+      id: "1199de06-ef3c-4b62-84ca-056e154e0454",
+      label: "School"
+    }
   },
   {
     id: "4",
     name: "Science Lab 101",
-    type: "Detailed Location",
-    parentLocation: "Melbourne High School",
-    status: "INACTIVE",
-    coordinates: { lat: -37.8359, lng: 144.9853 }
+    type_id: "139b2cb1-abeb-4c6c-a28d-adab466a4d14", // Detailed Location type ID
+    parent_location_id: "3",
+    status_id: 2,
+    coordinates: { lat: -37.8359, lng: 144.9853 },
+    master_data: {
+      id: "139b2cb1-abeb-4c6c-a28d-adab466a4d14",
+      label: "Detailed Location"
+    }
   }
 ];
 
