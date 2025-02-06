@@ -4,7 +4,7 @@ const supabaseUrl = 'https://xhdvjkgasmsaqmchfsjq.supabase.co';
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseKey) {
-  console.error('Supabase anon key is not set. Please add it through the project settings.');
+  console.error('Please add your Supabase anon key in the project settings with name VITE_SUPABASE_ANON_KEY');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey || '', {
