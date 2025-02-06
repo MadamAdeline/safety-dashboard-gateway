@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProductList } from "@/components/products/ProductList";
 import { ProductFilters } from "@/components/products/ProductFilters";
@@ -87,7 +87,7 @@ export default function Products() {
         cryogenicFluid: item.cryogenic_fluid,
         otherNames: item.other_names,
         uses: item.uses,
-        status: item.product_status_id === 12 ? "ACTIVE" : "INACTIVE",
+        status: item.product_status_id === 12 ? "ACTIVE" : "INACTIVE" as "ACTIVE" | "INACTIVE",
         approvalStatusId: item.approval_status_id,
         productStatusId: item.product_status_id,
         sdsId: item.sds_id,
@@ -107,7 +107,7 @@ export default function Products() {
             label: item.sds.packing_group_id.label
           } : undefined
         } : undefined
-      }));
+      })) as Product[];
     }
   });
 
