@@ -176,6 +176,27 @@ export type Database = {
           },
         ]
       }
+      roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       sds: {
         Row: {
           created_at: string | null
@@ -442,6 +463,89 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          role_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          role_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          role_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          active: Database["public"]["Enums"]["user_status"] | null
+          created_at: string | null
+          email: string
+          first_name: string
+          id: string
+          last_login_date: string | null
+          last_name: string
+          manager_id: string | null
+          password: string
+          phone_number: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          active?: Database["public"]["Enums"]["user_status"] | null
+          created_at?: string | null
+          email: string
+          first_name: string
+          id?: string
+          last_login_date?: string | null
+          last_name: string
+          manager_id?: string | null
+          password: string
+          phone_number?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          active?: Database["public"]["Enums"]["user_status"] | null
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          id?: string
+          last_login_date?: string | null
+          last_name?: string
+          manager_id?: string | null
+          password?: string
+          phone_number?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -450,7 +554,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_status: "active" | "inactive"
     }
     CompositeTypes: {
       [_ in never]: never
