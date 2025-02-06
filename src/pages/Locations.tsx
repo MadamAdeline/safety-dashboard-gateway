@@ -101,7 +101,6 @@ export default function Locations() {
           />
         ) : (
           <LocationHierarchy
-            data={[]}
             onEdit={handleEdit}
           />
         )}

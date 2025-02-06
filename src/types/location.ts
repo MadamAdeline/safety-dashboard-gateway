@@ -10,7 +10,7 @@ export interface Location {
   coordinates: {
     lat: number;
     lng: number;
-  };
+  } | null;
   master_data?: {
     id: string;
     label: string;
