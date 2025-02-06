@@ -2,12 +2,27 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { SDS } from "@/types/sds";
 
-export function useSDSList() {
+export function useActiveSDSList() {
   return useQuery({
-    queryKey: ['sds'],
+    queryKey: ['active-sds'],
     queryFn: async () => {
-      console.log('Fetching all SDS data from Supabase');
+      console.log('Fetching ACTIVE SDS data from Supabase');
       
+      // First, get the correct status ID for ACTIVE SDS_Library
+      const { data: statusData, error: statusError } = await supabase
+        .from('status_lookup')
+        .select('id')
+        .eq('category', 'SDS_Library')
+        .eq('status_name', 'ACTIVE')
+        .single();
+
+      if (statusError) {
+        console.error('Error fetching status ID:', statusError);
+        throw statusError;
+      }
+
+      console.log('Retrieved ACTIVE status ID:', statusData.id);
+
       const { data, error } = await supabase
         .from('sds')
         .select(`
@@ -18,14 +33,15 @@ export function useSDSList() {
           subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (id, label),
           packing_group:master_data!sds_packing_group_id_fkey (id, label),
           dg_subdivision:master_data!sds_dg_subdivision_id_fkey (id, label)
-        `);
+        `)
+        .eq('status_id', statusData.id);
 
       if (error) {
         console.error('Error fetching SDS:', error);
         throw error;
       }
 
-      console.log('Retrieved SDS data:', data);
+      console.log('Retrieved ACTIVE SDS data:', data);
 
       return data.map(item => ({
         id: item.id,
