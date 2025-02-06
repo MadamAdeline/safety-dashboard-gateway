@@ -169,26 +169,47 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
     }
   };
 
-  const filteredData = locations.map(item => ({
-    ...item,
-    coordinates: typeof item.coordinates === 'string' 
-      ? JSON.parse(item.coordinates)
-      : item.coordinates
-  })).filter((item) => {
-    if (!searchInLocation(item, filters.search)) {
-      return false;
-    }
-    if (filters.type.length > 0 && !filters.type.includes(getLocationTypeLabel(item) as any)) {
-      return false;
-    }
-    if (filters.status.length > 0 && !filters.status.includes(getLocationStatus(item))) {
-      return false;
-    }
-    if (filters.parentLocation && item.parent_location_id !== filters.parentLocation) {
-      return false;
-    }
-    return true;
-  });
+  const sortLocations = (locations: Location[]) => {
+    return [...locations].sort((a, b) => {
+      // First, sort by name
+      const nameComparison = a.name.localeCompare(b.name);
+      if (nameComparison !== 0) return nameComparison;
+
+      // Then, sort by parent location name
+      const parentA = getParentLocationName(a);
+      const parentB = getParentLocationName(b);
+      const parentComparison = parentA.localeCompare(parentB);
+      if (parentComparison !== 0) return parentComparison;
+
+      // Finally, sort by type
+      const typeA = getLocationTypeLabel(a);
+      const typeB = getLocationTypeLabel(b);
+      return typeA.localeCompare(typeB);
+    });
+  };
+
+  const filteredData = sortLocations(
+    locations.map(item => ({
+      ...item,
+      coordinates: typeof item.coordinates === 'string' 
+        ? JSON.parse(item.coordinates)
+        : item.coordinates
+    })).filter((item) => {
+      if (!searchInLocation(item, filters.search)) {
+        return false;
+      }
+      if (filters.type.length > 0 && !filters.type.includes(getLocationTypeLabel(item) as any)) {
+        return false;
+      }
+      if (filters.status.length > 0 && !filters.status.includes(getLocationStatus(item))) {
+        return false;
+      }
+      if (filters.parentLocation && item.parent_location_id !== filters.parentLocation) {
+        return false;
+      }
+      return true;
+    })
+  );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
