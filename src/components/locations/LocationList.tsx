@@ -1,3 +1,4 @@
+
 import { Table, TableBody } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Plus, Check, X } from "lucide-react";
@@ -5,15 +6,14 @@ import type { Location, LocationFilters } from "@/types/location";
 import { useState, useEffect } from "react";
 import { useLocations } from "@/hooks/use-locations";
 import { useToast } from "@/hooks/use-toast";
-import { LocationSearch } from "@/components/locations/LocationSearch";
 import { LocationActions } from "@/components/locations/LocationActions";
 import { LocationTableHeader } from "./table/LocationTableHeader";
 import { LocationTableRow } from "./table/LocationTableRow";
 import { LocationPagination } from "./table/LocationPagination";
-import { LocationForm } from "./LocationForm";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { Search } from "lucide-react";
 
 interface LocationListProps {
   filters: LocationFilters;
@@ -27,6 +27,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
   const [showFilters, setShowFilters] = useState(false);
   const [newLocation, setNewLocation] = useState<Partial<Location> | null>(null);
   const [locationTypes, setLocationTypes] = useState<Array<{ id: string; label: string }>>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
 
   const { locations, isLoading, createLocation, deleteLocation, refetch } = useLocations();
@@ -138,13 +139,14 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
 
   const handleRefresh = async () => {
     try {
-      // Clear filters
+      // Reset filters
       onFiltersChange({
         search: "",
         status: [],
         type: [],
         parentLocation: null
       });
+      setSearchTerm("");
       
       // Reset pagination
       setCurrentPage(1);
@@ -171,17 +173,14 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
 
   const sortLocations = (locations: Location[]) => {
     return [...locations].sort((a, b) => {
-      // First, sort by name
       const nameComparison = a.name.localeCompare(b.name);
       if (nameComparison !== 0) return nameComparison;
 
-      // Then, sort by parent location name
       const parentA = getParentLocationName(a);
       const parentB = getParentLocationName(b);
       const parentComparison = parentA.localeCompare(parentB);
       if (parentComparison !== 0) return parentComparison;
 
-      // Finally, sort by type
       const typeA = getLocationTypeLabel(a);
       const typeB = getLocationTypeLabel(b);
       return typeA.localeCompare(typeB);
@@ -190,32 +189,29 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
 
   const filteredData = sortLocations(
     locations.filter((item) => {
-      let matchesSearch = true;
-      let matchesType = true;
-      let matchesStatus = true;
-      let matchesParent = true;
+      let matchesFilter = true;
 
-      // Only apply search if there is a search term
-      if (filters.search) {
-        matchesSearch = searchInLocation(item, filters.search);
+      // Apply text search if there's a search term
+      if (searchTerm) {
+        matchesFilter = searchInLocation(item, searchTerm);
       }
 
-      // Only apply type filter if types are selected
+      // Apply type filter if types are selected
       if (filters.type.length > 0) {
-        matchesType = filters.type.includes(getLocationTypeLabel(item) as any);
+        matchesFilter = matchesFilter && filters.type.includes(getLocationTypeLabel(item) as any);
       }
 
-      // Only apply status filter if statuses are selected
+      // Apply status filter if statuses are selected
       if (filters.status.length > 0) {
-        matchesStatus = filters.status.includes(getLocationStatus(item));
+        matchesFilter = matchesFilter && filters.status.includes(getLocationStatus(item));
       }
 
-      // Only apply parent filter if parent is selected
+      // Apply parent filter if parent is selected
       if (filters.parentLocation) {
-        matchesParent = item.parent_location_id === filters.parentLocation;
+        matchesFilter = matchesFilter && item.parent_location_id === filters.parentLocation;
       }
 
-      return matchesSearch && matchesType && matchesStatus && matchesParent;
+      return matchesFilter;
     })
   );
 
@@ -239,15 +235,6 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
     );
   };
 
-  const handleSearchChange = (location: Location | null) => {
-    console.log('Search changed:', location);
-    // Clear search if location is null
-    onFiltersChange({
-      ...filters,
-      search: location ? location.name : ''
-    });
-  };
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -255,12 +242,16 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-        <LocationSearch 
-          selectedLocationId={null}
-          initialLocation={null}
-          onLocationSelect={handleSearchChange}
-          className="w-full"
-        />
+        <div className="relative flex-1 max-w-md">
+          <Input
+            type="text"
+            placeholder="Search locations..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        </div>
         <LocationActions 
           onToggleFilters={() => setShowFilters(!showFilters)}
           onExport={() => {}} 
