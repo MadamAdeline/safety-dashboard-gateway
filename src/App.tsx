@@ -12,6 +12,7 @@ import { NewSDSForm } from "./components/sds/NewSDSForm";
 import ComplianceDashboard from "./pages/ComplianceDashboard";
 import Locations from "./pages/Locations";
 import Suppliers from "./pages/Suppliers";
+import MasterData from "./pages/MasterData";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/locations" element={<Locations />} />
             <Route path="/products" element={<Products />} />
             <Route path="/suppliers" element={<Suppliers />} />
+            <Route path="/master-data" element={<MasterData />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
