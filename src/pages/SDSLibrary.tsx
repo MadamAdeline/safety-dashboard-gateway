@@ -34,7 +34,7 @@ export default function SDSLibrary() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: sdsData = [] } = useQuery({
+  const { data: sdsData = [], isLoading } = useQuery({
     queryKey: ['sds'],
     queryFn: async () => {
       console.log('Fetching SDS data from Supabase');
@@ -60,7 +60,11 @@ export default function SDSLibrary() {
         expiryDate: item.expiry_date,
         dgClass: item.dg_class,
         status: item.status?.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
-        sdsSource: 'Customer' as const
+        sdsSource: 'Customer' as const,
+        currentFilePath: item.current_file_path,
+        currentFileName: item.current_file_name,
+        currentFileSize: item.current_file_size,
+        currentContentType: item.current_content_type
       }));
     }
   });

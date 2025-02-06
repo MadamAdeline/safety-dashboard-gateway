@@ -8,6 +8,10 @@ export interface SDS {
   dgClass?: number;
   status: 'ACTIVE' | 'INACTIVE' | 'REQUESTED';
   sdsSource: 'Customer' | 'Global Library';
+  currentFilePath?: string;
+  currentFileName?: string;
+  currentFileSize?: number;
+  currentContentType?: string;
 }
 
 export interface SDSFilters {
