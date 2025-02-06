@@ -9,53 +9,8 @@ import { ProductSearch } from "@/components/products/ProductSearch";
 import { ProductActions } from "@/components/products/ProductActions";
 import { ProductForm } from "@/components/products/ProductForm";
 import type { Product, ProductFilters as ProductFiltersType } from "@/types/product";
-
-const sampleData: Product[] = [
-  {
-    id: "1",
-    name: "Acetone",
-    code: "ACE20L",
-    status: "ACTIVE",
-    sds: {
-      id: "sds1",
-      isDG: true,
-      dgClass: {
-        id: "class3",
-        label: "Class 3"
-      },
-      supplier: {
-        id: "sup1",
-        supplier_name: "AUSTRALIAN CHEMICAL REAGENTS"
-      },
-      packingGroup: {
-        id: "pg2",
-        label: "II"
-      }
-    }
-  },
-  {
-    id: "2",
-    name: "Methanol",
-    code: "MET10L",
-    status: "ACTIVE",
-    sds: {
-      id: "sds2",
-      isDG: true,
-      dgClass: {
-        id: "class3",
-        label: "Class 3"
-      },
-      supplier: {
-        id: "sup2",
-        supplier_name: "SIGMA ALDRICH"
-      },
-      packingGroup: {
-        id: "pg2",
-        label: "II"
-      }
-    }
-  }
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
 export default function Products() {
   const [filters, setFilters] = useState<ProductFiltersType>({
@@ -70,6 +25,43 @@ export default function Products() {
   const [showForm, setShowForm] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { toast } = useToast();
+
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: async () => {
+      console.log('Fetching products from Supabase...');
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          sds:sds_id (
+            id,
+            isDG:is_dg,
+            dgClass:dg_class_id (
+              id,
+              label
+            ),
+            supplier:supplier_id (
+              id,
+              supplier_name
+            ),
+            packingGroup:packing_group_id (
+              id,
+              label
+            )
+          )
+        `)
+        .order('product_name');
+
+      if (error) {
+        console.error('Error fetching products:', error);
+        throw error;
+      }
+
+      console.log('Products fetched:', data);
+      return data as Product[];
+    }
+  });
 
   const handleExport = () => {
     toast({
@@ -89,6 +81,14 @@ export default function Products() {
     setSelectedProduct(product);
     setShowForm(true);
   };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div>Loading products...</div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -133,7 +133,7 @@ export default function Products() {
             )}
             
             <ProductList 
-              data={sampleData} 
+              data={products} 
               filters={filters} 
               onEdit={handleEdit}
             />
