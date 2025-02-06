@@ -61,6 +61,7 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
           parent_location_id,
           status_id,
           coordinates,
+          full_path,
           master_data (id, label),
           status_lookup (id, status_name)
         `)
@@ -178,6 +179,15 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
           initialLocation={currentLocation}
           onLocationSelect={handleLocationSelect}
         />
+        {currentLocation?.full_path && (
+          <div className="mt-1">
+            <Input
+              value={currentLocation.full_path}
+              readOnly
+              className="bg-gray-50 text-sm text-gray-600 break-words"
+            />
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -198,3 +208,4 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
     </div>
   );
 }
+
