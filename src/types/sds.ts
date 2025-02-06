@@ -17,9 +17,25 @@ export interface SDS {
   unProperShippingName?: string;
   hazchemCode?: string;
   dgClassId?: string;
+  dgClass?: {
+    id: string;
+    label: string;
+  };
   subsidiaryDgClassId?: string;
+  subsidiaryDgClass?: {
+    id: string;
+    label: string;
+  };
   packingGroupId?: string;
+  packingGroup?: {
+    id: string;
+    label: string;
+  };
   dgSubDivisionId?: string;
+  dgSubDivision?: {
+    id: string;
+    label: string;
+  };
   otherNames?: string;
   emergencyPhone?: string;
   revisionDate?: string;
