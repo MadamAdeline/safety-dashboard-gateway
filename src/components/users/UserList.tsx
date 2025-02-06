@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Edit2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { supabaseAdmin } from "@/integrations/supabase/service-role-client";
+import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@/types/user";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -38,8 +38,7 @@ export function UserList({ onEdit }: UserListProps) {
     queryFn: async () => {
       console.log('Fetching users from Supabase...');
       try {
-        // Get additional user data from the users table
-        const { data: usersData, error: usersError } = await supabaseAdmin
+        const { data: usersData, error: usersError } = await supabase
           .from('users')
           .select(`
             *,
