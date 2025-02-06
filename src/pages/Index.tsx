@@ -99,11 +99,11 @@ const Index = () => {
   const { data: expiredSDSCount, isLoading: isLoadingExpiredSDS } = useQuery({
     queryKey: ['expiredSDSCount'],
     queryFn: async () => {
-      const today = new Date().toISOString();
+      const today = new Date().toISOString().split('T')[0]; // Get only the date part in YYYY-MM-DD format
       const { count, error } = await supabase
         .from('sds')
         .select('*', { count: 'exact', head: true })
-        .lt('expiry_date', today);
+        .lte('expiry_date', today); // Changed to less than or equal to (lte)
       
       if (error) throw error;
       return count || 0;
