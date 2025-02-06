@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Role } from "@/types/user";
+import type { Role, UserStatus } from "@/types/user";
 
 interface UserFormFieldsProps {
   formData: {
@@ -15,7 +15,7 @@ interface UserFormFieldsProps {
     last_name: string;
     email: string;
     phone_number: string;
-    active: string;
+    active: UserStatus;
     role_id: string;
     password: string;
   };
@@ -98,7 +98,7 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
         <Label>Status</Label>
         <Select
           value={formData.active}
-          onValueChange={(value) => onChange("active", value)}
+          onValueChange={(value: UserStatus) => onChange("active", value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select status" />

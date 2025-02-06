@@ -1,13 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
+import type { UserStatus } from "@/types/user";
 
 interface UserData {
   first_name: string;
   last_name: string;
   email: string;
   phone_number: string;
-  active: string;
+  active: UserStatus;
   password?: string;
   role_id?: string;
 }
@@ -23,14 +24,14 @@ export function useUserMutations(onSuccess: () => void) {
       // Create user
       const { data: userData, error: userError } = await supabase
         .from('users')
-        .insert([{
+        .insert({
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,
           phone_number: data.phone_number,
           active: data.active,
           password: data.password,
-        }])
+        })
         .select()
         .single();
 
@@ -40,10 +41,10 @@ export function useUserMutations(onSuccess: () => void) {
       if (data.role_id) {
         const { error: roleError } = await supabase
           .from('user_roles')
-          .insert([{
+          .insert({
             user_id: userData.id,
             role_id: data.role_id,
-          }]);
+          });
 
         if (roleError) throw roleError;
       }
@@ -105,10 +106,10 @@ export function useUserMutations(onSuccess: () => void) {
         // Add new role
         const { error: roleError } = await supabase
           .from('user_roles')
-          .insert([{
+          .insert({
             user_id: id,
             role_id: data.role_id,
-          }]);
+          });
 
         if (roleError) throw roleError;
       }
