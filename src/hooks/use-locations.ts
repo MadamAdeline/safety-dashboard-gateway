@@ -38,12 +38,43 @@ export const useLocations = () => {
     },
   });
 
+  // Query to get the ACTIVE status ID
+  const { data: activeStatusId } = useQuery({
+    queryKey: ['locationActiveStatusId'],
+    queryFn: async () => {
+      console.log('Fetching active status ID for locations...');
+      const { data, error } = await supabase
+        .from('status_lookup')
+        .select('id')
+        .eq('category', 'LOCATION')
+        .eq('status_name', 'ACTIVE')
+        .single();
+
+      if (error) {
+        console.error('Error fetching active status ID:', error);
+        throw error;
+      }
+
+      console.log('Active status ID fetched:', data.id);
+      return data.id;
+    },
+  });
+
   const createLocation = useMutation({
     mutationFn: async (newLocation: Omit<Location, 'id'>) => {
-      console.log('Creating new location:', newLocation);
+      if (!activeStatusId) {
+        throw new Error('Status ID not available');
+      }
+
+      const locationData = {
+        ...newLocation,
+        status_id: activeStatusId // Use the fetched active status ID
+      };
+
+      console.log('Creating new location:', locationData);
       const { data, error } = await supabase
         .from('locations')
-        .insert([newLocation])
+        .insert([locationData])
         .select()
         .single();
 
