@@ -70,31 +70,56 @@ export function SDSDetailsTab(props: SDSDetailsTabProps) {
         <SDSDatesSection />
 
         {isRequested && props.initialData && (
-          <>
-            <div className="space-y-4 border-t pt-4">
-              <h3 className="font-medium">Request Details</h3>
-              
+          <div className="space-y-4 border-t pt-4">
+            <h3 className="font-medium">Request Details</h3>
+            
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Request Date</Label>
-                <Input value={props.initialData.requestDate || ''} readOnly className="bg-gray-100" />
+                <Input 
+                  value={props.initialData.requestDate || ''} 
+                  readOnly 
+                  className="bg-gray-100" 
+                />
               </div>
 
               <div className="space-y-2">
-                <Label>Requested Supplier Name</Label>
-                <Input value={props.initialData.requestSupplierName || ''} readOnly className="bg-gray-100" />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Other Supplier Details</Label>
-                <Textarea value={props.initialData.requestSupplierDetails || ''} readOnly className="bg-gray-100" />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Request Information</Label>
-                <Textarea value={props.initialData.requestInformation || ''} readOnly className="bg-gray-100" />
+                <Label>Requested By</Label>
+                <Input 
+                  value={props.initialData.requestedBy || ''} 
+                  readOnly 
+                  className="bg-gray-100" 
+                />
               </div>
             </div>
-          </>
+
+            <div className="space-y-2">
+              <Label>Requested Supplier Name</Label>
+              <Input 
+                value={props.initialData.requestSupplierName || ''} 
+                readOnly 
+                className="bg-gray-100" 
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Other Supplier Details</Label>
+              <Textarea 
+                value={props.initialData.requestSupplierDetails || ''} 
+                readOnly 
+                className="bg-gray-100 min-h-[100px]" 
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Request Information</Label>
+              <Textarea 
+                value={props.initialData.requestInformation || ''} 
+                readOnly 
+                className="bg-gray-100 min-h-[100px]" 
+              />
+            </div>
+          </div>
         )}
 
         {!isRequested && <SDSDGSection />}
