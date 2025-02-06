@@ -38,17 +38,28 @@ export const useLocations = () => {
       console.log('Locations fetched:', data);
       
       // Transform the data to match our Location type
-      const transformedData: Location[] = (data || []).map(location => ({
-        ...location,
-        coordinates: location.coordinates ? {
-          lat: parseFloat(location.coordinates.lat) || 0,
-          lng: parseFloat(location.coordinates.lng) || 0
-        } : null,
-        parent_location_id: location.parent_location_id || null,
-        full_path: location.full_path || null,
-        master_data: location.master_data || undefined,
-        status_lookup: location.status_lookup || undefined
-      }));
+      const transformedData: Location[] = (data || []).map(location => {
+        // Handle coordinates parsing
+        let parsedCoordinates = null;
+        if (location.coordinates && typeof location.coordinates === 'object') {
+          const coords = location.coordinates as { lat?: number | string, lng?: number | string };
+          if (coords.lat !== undefined && coords.lng !== undefined) {
+            parsedCoordinates = {
+              lat: typeof coords.lat === 'string' ? parseFloat(coords.lat) : coords.lat,
+              lng: typeof coords.lng === 'string' ? parseFloat(coords.lng) : coords.lng
+            };
+          }
+        }
+
+        return {
+          ...location,
+          coordinates: parsedCoordinates,
+          parent_location_id: location.parent_location_id || null,
+          full_path: location.full_path || null,
+          master_data: location.master_data || undefined,
+          status_lookup: location.status_lookup || undefined
+        };
+      });
 
       return transformedData;
     },
