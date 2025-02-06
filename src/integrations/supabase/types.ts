@@ -9,6 +9,122 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      sds: {
+        Row: {
+          created_at: string | null
+          dg_class: number | null
+          expiry_date: string | null
+          id: string
+          is_dg: boolean | null
+          issue_date: string | null
+          product_id: string
+          product_name: string
+          status_id: number
+          supplier_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          dg_class?: number | null
+          expiry_date?: string | null
+          id?: string
+          is_dg?: boolean | null
+          issue_date?: string | null
+          product_id: string
+          product_name: string
+          status_id: number
+          supplier_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          dg_class?: number | null
+          expiry_date?: string | null
+          id?: string
+          is_dg?: boolean | null
+          issue_date?: string | null
+          product_id?: string
+          product_name?: string
+          status_id?: number
+          supplier_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_status"
+            columns: ["status_id"]
+            isOneToOne: false
+            referencedRelation: "status_lookup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_supplier"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sds_status_id_fkey"
+            columns: ["status_id"]
+            isOneToOne: false
+            referencedRelation: "status_lookup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sds_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sds_versions: {
+        Row: {
+          file_path: string
+          id: string
+          notes: string | null
+          sds_id: string
+          uploaded_at: string | null
+          uploaded_by: string | null
+          version_number: number
+        }
+        Insert: {
+          file_path: string
+          id?: string
+          notes?: string | null
+          sds_id: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+          version_number: number
+        }
+        Update: {
+          file_path?: string
+          id?: string
+          notes?: string | null
+          sds_id?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_sds"
+            columns: ["sds_id"]
+            isOneToOne: false
+            referencedRelation: "sds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sds_versions_sds_id_fkey"
+            columns: ["sds_id"]
+            isOneToOne: false
+            referencedRelation: "sds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       status_lookup: {
         Row: {
           category: string
