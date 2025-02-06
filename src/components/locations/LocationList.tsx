@@ -48,15 +48,34 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
     return parentLocation ? parentLocation.name : "-";
   };
 
+  const searchInLocation = (location: Location, searchTerm: string): boolean => {
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    const fieldsToSearch = [
+      location.name,
+      getLocationTypeLabel(location),
+      getParentLocationName(location),
+      location.status_lookup?.status_name || getLocationStatus(location),
+      location.coordinates ? JSON.stringify(location.coordinates) : '',
+    ];
+
+    return fieldsToSearch.some(field => 
+      field.toLowerCase().includes(searchLower)
+    );
+  };
+
   const filteredData = locations.map(item => ({
     ...item,
     coordinates: typeof item.coordinates === 'string' 
       ? JSON.parse(item.coordinates)
       : item.coordinates
   })).filter((item) => {
-    if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) {
+    // Search across all fields
+    if (!searchInLocation(item, filters.search)) {
       return false;
     }
+    // Other filters
     if (filters.type.length > 0 && !filters.type.includes(getLocationTypeLabel(item) as any)) {
       return false;
     }
