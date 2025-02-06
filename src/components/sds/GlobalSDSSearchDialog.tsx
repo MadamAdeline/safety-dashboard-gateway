@@ -120,14 +120,14 @@ export function GlobalSDSSearchDialog({
     onOpenChange(false);
   };
 
-  // Sample data for demonstration
+  // Sample data for demonstration with proper UUID format
   const sampleSearchResults: SDS[] = [
     {
       id: "1234-5678-9012-3456",
       productName: "Sample Product 1",
       productId: "SP001",
       supplier: "Supplier A",
-      supplierId: "supplier-a-uuid",
+      supplierId: "123e4567-e89b-12d3-a456-426614174000", // Valid UUID format
       expiryDate: "2025-12-31",
       isDG: true,
       issueDate: "2023-01-01",
@@ -139,7 +139,7 @@ export function GlobalSDSSearchDialog({
       productName: "BP Butane",
       productId: "0000002705",
       supplier: "BP Australia Pty Ltd",
-      supplierId: "bp-australia-uuid",
+      supplierId: "123e4567-e89b-12d3-a456-426614174001", // Valid UUID format
       expiryDate: "2026-04-21",
       isDG: true,
       issueDate: "2021-04-21",
