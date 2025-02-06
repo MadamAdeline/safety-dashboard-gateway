@@ -130,14 +130,14 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
       <div className="space-y-2">
         <Label>Manager</Label>
         <Select
-          value={formData.manager_id || ""}
-          onValueChange={(value) => onChange("manager_id", value)}
+          value={formData.manager_id || "none"}
+          onValueChange={(value) => onChange("manager_id", value === "none" ? "" : value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select manager" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">No Manager</SelectItem>
+            <SelectItem value="none">No Manager</SelectItem>
             {managers?.map((manager) => (
               <SelectItem key={manager.id} value={manager.id}>
                 {manager.first_name} {manager.last_name}
@@ -150,14 +150,14 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
       <div className="space-y-2">
         <Label>Location</Label>
         <Select
-          value={formData.location_id || ""}
-          onValueChange={(value) => onChange("location_id", value)}
+          value={formData.location_id || "none"}
+          onValueChange={(value) => onChange("location_id", value === "none" ? "" : value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select location" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">No Location</SelectItem>
+            <SelectItem value="none">No Location</SelectItem>
             {locations?.map((location) => (
               <SelectItem key={location.id} value={location.id}>
                 {location.name}
