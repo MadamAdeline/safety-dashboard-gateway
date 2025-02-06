@@ -2,6 +2,8 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const MetricCard = ({ 
   title, 
@@ -9,7 +11,8 @@ const MetricCard = ({
   action, 
   actionLabel,
   secondaryAction,
-  secondaryActionLabel 
+  secondaryActionLabel,
+  isLoading
 }: { 
   title: string; 
   value: string; 
@@ -17,6 +20,7 @@ const MetricCard = ({
   actionLabel: string;
   secondaryAction?: () => void;
   secondaryActionLabel?: string;
+  isLoading?: boolean;
 }) => {
   console.log(`Rendering MetricCard for ${title}`);
   
@@ -25,7 +29,9 @@ const MetricCard = ({
       <div className="bg-[#00005B] rounded-t-md -mx-6 -mt-6 p-4 mb-4">
         <h3 className="text-lg font-bold text-white text-center">{title}</h3>
       </div>
-      <p className="text-4xl font-bold text-dgxprt-navy mb-4 text-center">{value}</p>
+      <p className="text-4xl font-bold text-dgxprt-navy mb-4 text-center">
+        {isLoading ? "..." : value}
+      </p>
       <button
         onClick={action}
         className="w-full py-2 text-center rounded-md bg-dgxprt-purple text-white hover:bg-opacity-90 mb-2"
@@ -65,6 +71,44 @@ const InfoCard = ({ title, image, link }: { title: string; image: string; link: 
 const Index = () => {
   console.log("Rendering Index page");
   const navigate = useNavigate();
+
+  const { data: productsCount, isLoading: isLoadingProducts } = useQuery({
+    queryKey: ['productsCount'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true });
+      
+      if (error) throw error;
+      return count || 0;
+    }
+  });
+
+  const { data: sdsCount, isLoading: isLoadingSDS } = useQuery({
+    queryKey: ['sdsCount'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('sds')
+        .select('*', { count: 'exact', head: true });
+      
+      if (error) throw error;
+      return count || 0;
+    }
+  });
+
+  const { data: expiredSDSCount, isLoading: isLoadingExpiredSDS } = useQuery({
+    queryKey: ['expiredSDSCount'],
+    queryFn: async () => {
+      const today = new Date().toISOString();
+      const { count, error } = await supabase
+        .from('sds')
+        .select('*', { count: 'exact', head: true })
+        .lt('expiry_date', today);
+      
+      if (error) throw error;
+      return count || 0;
+    }
+  });
   
   return (
     <DashboardLayout>
@@ -73,25 +117,28 @@ const Index = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         <MetricCard
           title="Products"
-          value="110"
+          value={String(productsCount || 0)}
           action={() => navigate("/products", { state: { showForm: true } })}
           actionLabel="+ Add New Product"
           secondaryAction={() => navigate("/products")}
           secondaryActionLabel="View All Products"
+          isLoading={isLoadingProducts}
         />
         <MetricCard
           title="Safety Data Sheets"
-          value="58"
+          value={String(sdsCount || 0)}
           action={() => navigate("/sds-library/new")}
           actionLabel="+ Add New SDS"
           secondaryAction={() => navigate("/sds-library")}
           secondaryActionLabel="View All SDS's"
+          isLoading={isLoadingSDS}
         />
         <MetricCard
           title="Expired SDS"
-          value="3"
+          value={String(expiredSDSCount || 0)}
           action={() => navigate("/sds-library?filter=expired")}
           actionLabel="View Expired SDS's"
+          isLoading={isLoadingExpiredSDS}
         />
       </div>
 
