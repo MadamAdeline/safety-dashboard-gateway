@@ -31,6 +31,7 @@ export function LocationSearch({
         .select(`
           id,
           name,
+          full_path,
           type_id,
           parent_location_id,
           status_id,
@@ -72,22 +73,15 @@ export function LocationSearch({
     setIsDropdownOpen(true);
   };
 
-  const getParentLocationName = (location: Location): string => {
-    if (!location.parent_location_id) return "-";
-    const parentLocation = locations?.find(loc => loc.id === location.parent_location_id);
-    console.log('Finding parent for location:', location.name, 'Parent:', parentLocation?.name);
-    return parentLocation ? parentLocation.name : "-";
-  };
-
   const filteredLocations = locations?.filter(location => {
     if (!searchTerm) return true;
     
     const searchLower = searchTerm.toLowerCase();
+    const fullPathMatch = location.full_path?.toLowerCase().includes(searchLower);
     const nameMatch = location.name.toLowerCase().includes(searchLower);
-    const parentMatch = getParentLocationName(location).toLowerCase().includes(searchLower);
     
-    console.log('Filtering location:', location.name, 'Name match:', nameMatch, 'Parent match:', parentMatch);
-    return nameMatch || parentMatch;
+    console.log('Filtering location:', location.name, 'Name match:', nameMatch, 'Full path match:', fullPathMatch);
+    return nameMatch || fullPathMatch;
   });
 
   console.log('Rendered LocationSearch with:', {
@@ -126,7 +120,7 @@ export function LocationSearch({
               >
                 <div className="font-medium">{location.name || 'Unnamed Location'}</div>
                 <div className="text-sm text-gray-500">
-                  Parent: {getParentLocationName(location)}
+                  {location.full_path}
                 </div>
               </div>
             ))}
@@ -141,3 +135,4 @@ export function LocationSearch({
     </div>
   );
 }
+

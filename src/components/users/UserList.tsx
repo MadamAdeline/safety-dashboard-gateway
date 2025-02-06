@@ -23,6 +23,7 @@ type UserWithRelations = Omit<User, 'manager'> & {
   }[];
   location?: {
     name: string;
+    full_path: string;
   } | null;
 };
 
@@ -47,7 +48,8 @@ export function UserList({ onEdit }: UserListProps) {
               )
             ),
             location:locations (
-              name
+              name,
+              full_path
             )
           `);
         
@@ -117,7 +119,7 @@ export function UserList({ onEdit }: UserListProps) {
                 ))}
               </TableCell>
               <TableCell>
-                {user.location?.name}
+                {user.location?.full_path || '-'}
               </TableCell>
               <TableCell>
                 <Badge 
@@ -148,3 +150,4 @@ export function UserList({ onEdit }: UserListProps) {
     </div>
   );
 }
+

@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           coordinates: Json | null
           created_at: string | null
+          full_path: string | null
           id: string
           name: string
           parent_location_id: string | null
@@ -23,6 +24,7 @@ export type Database = {
         Insert: {
           coordinates?: Json | null
           created_at?: string | null
+          full_path?: string | null
           id?: string
           name: string
           parent_location_id?: string | null
@@ -33,6 +35,7 @@ export type Database = {
         Update: {
           coordinates?: Json | null
           created_at?: string | null
+          full_path?: string | null
           id?: string
           name?: string
           parent_location_id?: string | null
