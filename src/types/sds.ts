@@ -10,7 +10,6 @@ export interface SDS {
   expiryDate: string;
   status: 'ACTIVE' | 'INACTIVE' | 'REQUESTED';
   sdsSource: string;
-  source?: string;
   currentFilePath?: string;
   currentFileName?: string;
   currentFileSize?: number;
