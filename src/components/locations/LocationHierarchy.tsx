@@ -133,21 +133,15 @@ export function LocationHierarchy({ onEdit }: LocationHierarchyProps) {
     );
   }
 
-  // Ensure all locations have the full_path property
-  const locationsWithPath = locations.map(location => ({
-    ...location,
-    full_path: location.full_path || null
-  })) as Location[];
-
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <h2 className="text-lg font-semibold mb-4">Location Hierarchy</h2>
       <LocationNode 
         key={parentLocation.id} 
-        location={{ ...parentLocation, full_path: parentLocation.full_path || null }}
+        location={parentLocation}
         level={0}
         onEdit={onEdit}
-        data={locationsWithPath}
+        data={locations}
       />
     </div>
   );
