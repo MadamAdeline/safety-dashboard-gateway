@@ -174,7 +174,18 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
           
           <div className="flex gap-2">
             <Button
-              onClick={() => onEdit({ isNew: true } as Location)}
+              onClick={() => {
+                const newLocation = {
+                  id: '',
+                  name: '',
+                  type_id: '',
+                  parent_location_id: null,
+                  status_id: 1,
+                  coordinates: { lat: -37.8136, lng: 144.9631 },
+                  isNew: true
+                } as Location;
+                setEditingLocation(newLocation);
+              }}
               className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -191,6 +202,13 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
           />
         </div>
       </div>
+
+      {editingLocation && (
+        <LocationForm
+          initialData={editingLocation}
+          onClose={() => setEditingLocation(null)}
+        />
+      )}
     </div>
   );
 }
