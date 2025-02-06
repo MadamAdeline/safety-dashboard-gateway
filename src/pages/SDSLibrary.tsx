@@ -44,10 +44,10 @@ export default function SDSLibrary() {
           *,
           suppliers!fk_supplier (supplier_name),
           status:status_lookup!fk_status (status_name),
-          dg_class:master_data!sds_dg_class_id_fkey (label),
-          subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
-          packing_group:master_data!sds_packing_group_id_fkey (label),
-          dg_subdivision:master_data!sds_dg_subdivision_id_fkey (label)
+          dg_class:master_data!sds_dg_class_id_fkey (id, label),
+          subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (id, label),
+          packing_group:master_data!sds_packing_group_id_fkey (id, label),
+          dg_subdivision:master_data!sds_dg_subdivision_id_fkey (id, label)
         `);
 
       if (error) {
@@ -63,13 +63,17 @@ export default function SDSLibrary() {
         productId: item.product_id,
         isDG: item.is_dg,
         supplier: item.suppliers?.supplier_name || 'Unknown',
-        supplierId: item.supplier_id, // Add this line to include supplier_id
+        supplierId: item.supplier_id,
         issueDate: item.issue_date,
         expiryDate: item.expiry_date,
         dgClassId: item.dg_class_id,
+        dgClass: item.dg_class,
         subsidiaryDgClassId: item.subsidiary_dg_class_id,
+        subsidiaryDgClass: item.subsidiary_dg_class,
         packingGroupId: item.packing_group_id,
+        packingGroup: item.packing_group,
         dgSubDivisionId: item.dg_subdivision_id,
+        dgSubDivision: item.dg_subdivision,
         status: item.status?.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
         sdsSource: 'Customer' as const,
         currentFilePath: item.current_file_path,
