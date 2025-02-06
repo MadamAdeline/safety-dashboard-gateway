@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useSDSList } from "@/hooks/use-sds-list";
@@ -6,14 +6,22 @@ import type { SDS } from "@/types/sds";
 
 interface SDSSearchProps {
   selectedSdsId?: string | null;
+  initialSDS?: SDS | null;
   onSDSSelect: (sds: SDS | SDS[]) => void;
   className?: string;
 }
 
-export function SDSSearch({ selectedSdsId, onSDSSelect, className }: SDSSearchProps) {
+export function SDSSearch({ selectedSdsId, initialSDS, onSDSSelect, className }: SDSSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { data: sdsList } = useSDSList();
+
+  useEffect(() => {
+    if (initialSDS) {
+      console.log('Setting initial search term from SDS:', initialSDS.productName);
+      setSearchTerm(initialSDS.productName);
+    }
+  }, [initialSDS]);
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
