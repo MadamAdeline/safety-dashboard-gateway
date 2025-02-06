@@ -48,6 +48,7 @@ const App = () => (
             <Route path="/site-registers" element={<SiteRegisters />} />
             <Route path="/risk-assessments" element={<RiskAssessments />} />
             <Route path="/waste-tracking" element={<WasteTracking />} />
+            <Route path="/logout" element={<ComingSoon feature="Logout" />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
