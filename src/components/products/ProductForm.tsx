@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,57 +22,56 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
   const [formData, setFormData] = useState({
     name: initialData?.name ?? "",
     code: initialData?.code ?? "",
-    brandName: "",
-    unit: "Litre (L)",
-    unitSize: 0,
-    description: "",
-    productSet: false,
-    aerosol: false,
-    cryogenicFluid: false,
-    otherNames: "",
-    uses: "",
-    approvalStatusId: null as number | null,
-    productStatusId: null as number | null,
+    brandName: initialData?.brandName ?? "",
+    unit: initialData?.unit ?? "Litre (L)",
+    unitSize: initialData?.unitSize ?? 0,
+    description: initialData?.description ?? "",
+    productSet: initialData?.productSet ?? false,
+    aerosol: initialData?.aerosol ?? false,
+    cryogenicFluid: initialData?.cryogenicFluid ?? false,
+    otherNames: initialData?.otherNames ?? "",
+    uses: initialData?.uses ?? "",
+    approvalStatusId: initialData?.approvalStatusId ?? null,
+    productStatusId: initialData?.productStatusId ?? null,
     sdsId: initialData?.sdsId ?? null
   });
 
-  const [statusMap, setStatusMap] = useState<{ [key: string]: number }>({});
+  const [statusOptions, setStatusOptions] = useState<{ id: number; name: string; category: string }[]>([]);
   const { toast } = useToast();
 
-  // Fetch status IDs on component mount
-  useState(() => {
-    const fetchStatusIds = async () => {
-      const { data: approvalData, error: approvalError } = await supabase
-        .from('status_lookup')
-        .select('id, status_name')
-        .eq('category', 'PRODUCT_APPROVAL');
+  // Fetch status options on component mount
+  useEffect(() => {
+    const fetchStatusOptions = async () => {
+      console.log('Fetching status options...');
+      try {
+        const { data, error } = await supabase
+          .from('status_lookup')
+          .select('id, status_name, category')
+          .in('category', ['PRODUCT_APPROVAL', 'PRODUCT_STATUS']);
 
-      const { data: productStatusData, error: productStatusError } = await supabase
-        .from('status_lookup')
-        .select('id, status_name')
-        .eq('category', 'PRODUCT_STATUS');
+        if (error) {
+          console.error('Error fetching status options:', error);
+          throw error;
+        }
 
-      if (approvalError || productStatusError) {
-        console.error('Error fetching status IDs:', { approvalError, productStatusError });
-        return;
+        console.log('Fetched status options:', data);
+        setStatusOptions(data.map(item => ({
+          id: item.id,
+          name: item.status_name,
+          category: item.category
+        })));
+      } catch (error) {
+        console.error('Failed to fetch status options:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load status options",
+          variant: "destructive",
+        });
       }
-
-      const statusMapping = {
-        ...approvalData?.reduce((acc, curr) => ({
-          ...acc,
-          [`APPROVAL_${curr.status_name.toUpperCase()}`]: curr.id
-        }), {}),
-        ...productStatusData?.reduce((acc, curr) => ({
-          ...acc,
-          [`PRODUCT_${curr.status_name.toUpperCase()}`]: curr.id
-        }), {})
-      };
-
-      setStatusMap(statusMapping);
     };
 
-    fetchStatusIds();
-  }, []);
+    fetchStatusOptions();
+  }, [toast]);
 
   const handleSave = async () => {
     try {
@@ -122,6 +121,9 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
       });
     }
   };
+
+  const approvalStatusOptions = statusOptions.filter(option => option.category === 'PRODUCT_APPROVAL');
+  const productStatusOptions = statusOptions.filter(option => option.category === 'PRODUCT_STATUS');
 
   return (
     <DashboardLayout>
@@ -286,9 +288,11 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">Approved</SelectItem>
-                        <SelectItem value="2">Pending</SelectItem>
-                        <SelectItem value="3">Rejected</SelectItem>
+                        {approvalStatusOptions.map(option => (
+                          <SelectItem key={option.id} value={option.id.toString()}>
+                            {option.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -303,8 +307,11 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">Active</SelectItem>
-                        <SelectItem value="2">Inactive</SelectItem>
+                        {productStatusOptions.map(option => (
+                          <SelectItem key={option.id} value={option.id.toString()}>
+                            {option.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -316,8 +323,8 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
               <div className="space-y-4">
                 <Label>Associated SDS</Label>
                 <SDSSearch
-                  onSelect={(sds) => setFormData(prev => ({ ...prev, sdsId: sds.id }))}
                   selectedSdsId={formData.sdsId}
+                  onSDSSelect={(sds) => setFormData(prev => ({ ...prev, sdsId: sds.id }))}
                 />
               </div>
             </TabsContent>
