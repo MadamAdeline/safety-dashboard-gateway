@@ -30,6 +30,12 @@ export default function Products() {
     queryKey: ['products'],
     queryFn: async () => {
       console.log('Fetching products from Supabase...');
+      
+      if (!supabase) {
+        console.error('Supabase client is not initialized');
+        throw new Error('Supabase client is not initialized');
+      }
+
       const { data, error } = await supabase
         .from('products')
         .select(`
@@ -72,7 +78,8 @@ export default function Products() {
 
       console.log('Products fetched:', data);
       return data as Product[];
-    }
+    },
+    retry: 1
   });
 
   useEffect(() => {
