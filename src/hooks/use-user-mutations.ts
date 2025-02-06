@@ -24,10 +24,25 @@ export function useUserMutations(onSuccess: () => void) {
     mutationFn: async (data: UserData) => {
       console.log('Creating user with data:', data);
       
-      // Create user
-      const { data: userData, error: userError } = await supabase
+      // Create user with service role client
+      const { data: userData, error: userError } = await supabase.auth.admin
+        .createUser({
+          email: data.email,
+          password: data.password,
+          email_confirm: true,
+          user_metadata: {
+            first_name: data.first_name,
+            last_name: data.last_name
+          }
+        });
+
+      if (userError) throw userError;
+
+      // Create user profile with service role client
+      const { data: profileData, error: profileError } = await supabase
         .from('users')
         .insert({
+          id: userData.user.id,
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,
@@ -40,21 +55,21 @@ export function useUserMutations(onSuccess: () => void) {
         .select()
         .single();
 
-      if (userError) throw userError;
+      if (profileError) throw profileError;
 
       // Assign role if provided
       if (data.role_id) {
         const { error: roleError } = await supabase
           .from('user_roles')
           .insert({
-            user_id: userData.id,
+            user_id: profileData.id,
             role_id: data.role_id,
           });
 
         if (roleError) throw roleError;
       }
 
-      return userData;
+      return profileData;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -94,7 +109,7 @@ export function useUserMutations(onSuccess: () => void) {
 
       console.log('Final update data:', updateData);
 
-      // Update user
+      // Update user profile with service role client
       const { error: userError } = await supabase
         .from('users')
         .update(updateData)
