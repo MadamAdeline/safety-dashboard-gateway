@@ -9,6 +9,7 @@ import { SDSVersionTab } from "./SDSVersionTab";
 import { SDSPreview } from "./SDSPreview";
 import { SDSUploadDialog } from "./SDSUploadDialog";
 import { createSDS, uploadSDSFile, getStatusId } from "@/services/sds";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface NewSDSFormProps {
   onClose: () => void;
@@ -29,6 +30,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     dgClass: initialData?.dgClass
   });
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (initialData) {
@@ -58,22 +60,19 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     try {
       console.log("Starting SDS save process");
       
-      // Upload file if selected
       let fileData = null;
       if (selectedFile) {
         fileData = await uploadSDSFile(selectedFile);
         console.log("File uploaded successfully:", fileData);
       }
 
-      // Get status ID
       const statusId = await getStatusId(status);
       console.log("Retrieved status ID:", statusId);
 
-      // Create SDS record
       await createSDS({
         productName: formData.productName,
         productId: formData.productId,
-        supplierId: "839e6e40-4d9c-465e-91e3-9d1dff58af21", // TODO: Get from supplier selection
+        supplierId: supplier, // Use the selected supplier ID directly
         isDG,
         issueDate: formData.issueDate,
         expiryDate: formData.expiryDate,
@@ -92,6 +91,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         description: "SDS Record has been saved"
       });
 
+      queryClient.invalidateQueries({ queryKey: ['sds'] });
       onClose();
     } catch (error) {
       console.error("Error saving SDS:", error);

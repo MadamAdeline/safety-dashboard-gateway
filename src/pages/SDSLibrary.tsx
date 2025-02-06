@@ -11,7 +11,7 @@ import { SDSSearch } from "@/components/sds/SDSSearch";
 import { SDSActions } from "@/components/sds/SDSActions";
 import type { SDS, SDSFilters as SDSFiltersType } from "@/types/sds";
 import { SDSRequestDialog } from "@/components/sds/SDSRequestDialog";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function SDSLibrary() {
@@ -32,8 +32,9 @@ export default function SDSLibrary() {
   const [showRequestDialog, setShowRequestDialog] = useState(false);
   const [selectedSDS, setSelectedSDS] = useState<SDS | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const { data: sdsData = [], isLoading } = useQuery({
+  const { data: sdsData = [] } = useQuery({
     queryKey: ['sds'],
     queryFn: async () => {
       console.log('Fetching SDS data from Supabase');
@@ -72,6 +73,7 @@ export default function SDSLibrary() {
   };
 
   const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['sds'] });
     toast({
       title: "Refreshing Data",
       description: "Updating the SDS list..."
@@ -86,6 +88,7 @@ export default function SDSLibrary() {
   const handleClose = () => {
     setShowNewSDS(false);
     setSelectedSDS(null);
+    queryClient.invalidateQueries({ queryKey: ['sds'] });
   };
 
   const handleSDSSelect = (selectedSDS: SDS[]) => {

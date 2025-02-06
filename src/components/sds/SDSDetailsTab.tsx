@@ -6,6 +6,8 @@ import { Search } from "lucide-react";
 import type { SDS } from "@/types/sds";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { addYears, format } from "date-fns";
 
 interface SDSDetailsTabProps {
   initialData?: SDS | null;
@@ -45,7 +47,7 @@ export function SDSDetailsTab({
       const { data, error } = await supabase
         .from('suppliers')
         .select('*')
-        .eq('status_id', 1); // Only active suppliers
+        .eq('status_id', 1);
 
       if (error) {
         console.error('Error fetching suppliers:', error);
@@ -58,6 +60,17 @@ export function SDSDetailsTab({
       }));
     }
   });
+
+  useEffect(() => {
+    if (formData.issueDate) {
+      const issueDate = new Date(formData.issueDate);
+      const expiryDate = addYears(issueDate, 5);
+      setFormData(prev => ({
+        ...prev,
+        expiryDate: format(expiryDate, 'yyyy-MM-dd')
+      }));
+    }
+  }, [formData.issueDate, setFormData]);
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData((prev: any) => ({
