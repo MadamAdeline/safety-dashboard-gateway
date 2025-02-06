@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
@@ -19,6 +20,7 @@ export const useLocations = () => {
           parent_location_id,
           status_id,
           coordinates,
+          full_path,
           master_data (id, label),
           status_lookup (id, status_name)
         `);
@@ -34,7 +36,21 @@ export const useLocations = () => {
       }
 
       console.log('Locations fetched:', data);
-      return data || [];
+      
+      // Transform the data to match our Location type
+      const transformedData: Location[] = (data || []).map(location => ({
+        ...location,
+        coordinates: location.coordinates ? {
+          lat: parseFloat(location.coordinates.lat) || 0,
+          lng: parseFloat(location.coordinates.lng) || 0
+        } : null,
+        parent_location_id: location.parent_location_id || null,
+        full_path: location.full_path || null,
+        master_data: location.master_data || undefined,
+        status_lookup: location.status_lookup || undefined
+      }));
+
+      return transformedData;
     },
   });
 
@@ -68,7 +84,11 @@ export const useLocations = () => {
 
       const locationData = {
         ...newLocation,
-        status_id: activeStatusId
+        status_id: activeStatusId,
+        coordinates: newLocation.coordinates ? {
+          lat: newLocation.coordinates.lat,
+          lng: newLocation.coordinates.lng
+        } : null
       };
 
       console.log('Creating new location:', locationData);
@@ -102,10 +122,18 @@ export const useLocations = () => {
 
   const updateLocation = useMutation({
     mutationFn: async (location: Location) => {
-      console.log('Updating location:', location);
+      const locationData = {
+        ...location,
+        coordinates: location.coordinates ? {
+          lat: location.coordinates.lat,
+          lng: location.coordinates.lng
+        } : null
+      };
+
+      console.log('Updating location:', locationData);
       const { data, error } = await supabase
         .from('locations')
-        .update(location)
+        .update(locationData)
         .eq('id', location.id)
         .select()
         .single();
