@@ -13,6 +13,7 @@ import ComplianceDashboard from "./pages/ComplianceDashboard";
 import Locations from "./pages/Locations";
 import Suppliers from "./pages/Suppliers";
 import MasterData from "./pages/MasterData";
+import Users from "./pages/Users";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/products" element={<Products />} />
             <Route path="/suppliers" element={<Suppliers />} />
             <Route path="/master-data" element={<MasterData />} />
+            <Route path="/users" element={<Users />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
