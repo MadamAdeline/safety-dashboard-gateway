@@ -111,13 +111,14 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
       <div className="space-y-2">
         <Label>Role</Label>
         <Select
-          value={formData.role_id}
-          onValueChange={(value) => onChange("role_id", value)}
+          value={formData.role_id || "unassigned"}
+          onValueChange={(value) => onChange("role_id", value === "unassigned" ? "" : value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select role" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="unassigned">Unassigned</SelectItem>
             {roles?.map((role) => (
               <SelectItem key={role.id} value={role.id}>
                 {role.role_name}
@@ -130,14 +131,14 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
       <div className="space-y-2">
         <Label>Manager</Label>
         <Select
-          value={formData.manager_id || "none"}
-          onValueChange={(value) => onChange("manager_id", value === "none" ? "" : value)}
+          value={formData.manager_id || "unassigned"}
+          onValueChange={(value) => onChange("manager_id", value === "unassigned" ? "" : value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select manager" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">No Manager</SelectItem>
+            <SelectItem value="unassigned">No Manager</SelectItem>
             {managers?.map((manager) => (
               <SelectItem key={manager.id} value={manager.id}>
                 {manager.first_name} {manager.last_name}
@@ -150,14 +151,14 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
       <div className="space-y-2">
         <Label>Location</Label>
         <Select
-          value={formData.location_id || "none"}
-          onValueChange={(value) => onChange("location_id", value === "none" ? "" : value)}
+          value={formData.location_id || "unassigned"}
+          onValueChange={(value) => onChange("location_id", value === "unassigned" ? "" : value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select location" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">No Location</SelectItem>
+            <SelectItem value="unassigned">No Location</SelectItem>
             {locations?.map((location) => (
               <SelectItem key={location.id} value={location.id}>
                 {location.name}
