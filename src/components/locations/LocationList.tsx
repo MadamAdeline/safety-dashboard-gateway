@@ -1,3 +1,4 @@
+
 import { Table, TableBody } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Plus, Check, X } from "lucide-react";
@@ -73,7 +74,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
     
     const searchLower = searchTerm.toLowerCase();
     const fieldsToSearch = [
-      location.name,
+      location.name || '',
       getLocationTypeLabel(location),
       getParentLocationName(location),
       location.status_lookup?.status_name || getLocationStatus(location),
@@ -189,24 +190,32 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
   };
 
   const filteredData = sortLocations(
-    locations.map(item => ({
-      ...item,
-      coordinates: typeof item.coordinates === 'string' 
-        ? JSON.parse(item.coordinates)
-        : item.coordinates
-    })).filter((item) => {
-      if (!searchInLocation(item, filters.search)) {
+    locations.filter((item) => {
+      // Always include the item if no filters are active
+      if (!filters.search && filters.type.length === 0 && filters.status.length === 0 && !filters.parentLocation) {
+        return true;
+      }
+
+      // Apply search filter
+      if (filters.search && !searchInLocation(item, filters.search)) {
         return false;
       }
+
+      // Apply type filter
       if (filters.type.length > 0 && !filters.type.includes(getLocationTypeLabel(item) as any)) {
         return false;
       }
+
+      // Apply status filter
       if (filters.status.length > 0 && !filters.status.includes(getLocationStatus(item))) {
         return false;
       }
+
+      // Apply parent location filter
       if (filters.parentLocation && item.parent_location_id !== filters.parentLocation) {
         return false;
       }
+
       return true;
     })
   );
@@ -235,7 +244,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
     console.log('Search changed:', location);
     onFiltersChange({
       ...filters,
-      search: location.name
+      search: location.name || ''
     });
   };
 
