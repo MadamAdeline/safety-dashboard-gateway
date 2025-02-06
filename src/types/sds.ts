@@ -9,7 +9,7 @@ export interface SDS {
   issueDate: string;
   expiryDate: string;
   status: 'ACTIVE' | 'INACTIVE' | 'REQUESTED';
-  sdsSource: 'Customer' | 'Global Library';
+  sdsSource: string;
   source?: string;
   currentFilePath?: string;
   currentFileName?: string;
