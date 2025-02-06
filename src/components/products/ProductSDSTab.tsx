@@ -134,7 +134,11 @@ export function ProductSDSTab({ sdsId, onSDSSelect }: ProductSDSTabProps) {
   };
 
   if (showNewSDS) {
-    return <NewSDSForm onClose={handleNewSDSClose} />;
+    return (
+      <div className="w-full -mx-6">
+        <NewSDSForm onClose={handleNewSDSClose} />
+      </div>
+    );
   }
 
   return (
