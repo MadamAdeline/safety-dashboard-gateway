@@ -9,6 +9,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { addYears, format } from "date-fns";
 
+interface SDSDetailsTabProps {
+  initialData?: SDS | null;
+  isDG: boolean;
+  setIsDG: (value: boolean) => void;
+  status: "ACTIVE" | "INACTIVE" | "REQUESTED";
+  setStatus: (value: "ACTIVE" | "INACTIVE" | "REQUESTED") => void;
+  supplier: string;
+  setSupplier: (value: string) => void;
+  formData: any;
+  setFormData: (value: any) => void;
+}
+
 export function SDSDetailsTab({ 
   initialData, 
   isDG, 
@@ -135,6 +147,8 @@ export function SDSDetailsTab({
           <Input 
             id="otherNames" 
             placeholder="Enter other SDS product names" 
+            value={formData.otherNames}
+            onChange={(e) => handleInputChange('otherNames', e.target.value)}
             readOnly={isGlobalLibrary}
             className={isGlobalLibrary ? "bg-gray-100" : ""}
           />
@@ -208,6 +222,8 @@ export function SDSDetailsTab({
           <Input 
             id="emergency" 
             placeholder="Enter emergency contact" 
+            value={formData.emergencyPhone}
+            onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
             readOnly={isGlobalLibrary}
             className={isGlobalLibrary ? "bg-gray-100" : ""}
           />
@@ -228,6 +244,8 @@ export function SDSDetailsTab({
           <Input 
             id="revisionDate" 
             type="date"
+            value={formData.revisionDate}
+            onChange={(e) => handleInputChange('revisionDate', e.target.value)}
             readOnly={isGlobalLibrary}
             className={isGlobalLibrary ? "bg-gray-100" : ""}
           />

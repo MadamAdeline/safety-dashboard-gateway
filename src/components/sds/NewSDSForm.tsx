@@ -38,7 +38,10 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     dgSubDivisionId: initialData?.dgSubDivisionId ?? "",
     unNumber: initialData?.unNumber ?? "",
     unProperShippingName: initialData?.unProperShippingName ?? "",
-    hazchemCode: initialData?.hazchemCode ?? ""
+    hazchemCode: initialData?.hazchemCode ?? "",
+    dgClass: initialData?.dgClass ?? "",
+    subsidiaryDgClass: initialData?.subsidiaryDgClass ?? "",
+    packingGroup: initialData?.packingGroup ?? ""
   });
 
   console.log("NewSDSForm - Current Form Data:", formData);
@@ -67,7 +70,10 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         dgSubDivisionId: initialData.dgSubDivisionId ?? "",
         unNumber: initialData.unNumber ?? "",
         unProperShippingName: initialData.unProperShippingName ?? "",
-        hazchemCode: initialData.hazchemCode ?? ""
+        hazchemCode: initialData.hazchemCode ?? "",
+        dgClass: initialData.dgClass ?? "",
+        subsidiaryDgClass: initialData.subsidiaryDgClass ?? "",
+        packingGroup: initialData.packingGroup ?? ""
       });
     }
   }, [initialData]);
@@ -146,13 +152,16 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         issueDate: formData.issueDate,
         revisionDate: formData.revisionDate || null,
         expiryDate: formData.expiryDate,
-        dgClassId: isDG ? formData.dgClassId : null,
-        subsidiaryDgClassId: isDG ? formData.subsidiaryDgClassId : null,
-        packingGroupId: isDG ? formData.packingGroupId : null,
-        dgSubDivisionId: isDG ? formData.dgSubDivisionId : null,
-        unNumber: isDG ? formData.unNumber : null,
-        unProperShippingName: isDG ? formData.unProperShippingName : null,
-        hazchemCode: isDG ? formData.hazchemCode : null,
+        dgClassId: isDG ? formData.dgClassId || null : null,
+        subsidiaryDgClassId: isDG ? formData.subsidiaryDgClassId || null : null,
+        packingGroupId: isDG ? formData.packingGroupId || null : null,
+        dgSubDivisionId: isDG ? formData.dgSubDivisionId || null : null,
+        unNumber: isDG ? formData.unNumber || null : null,
+        unProperShippingName: isDG ? formData.unProperShippingName || null : null,
+        hazchemCode: isDG ? formData.hazchemCode || null : null,
+        dgClass: isDG ? formData.dgClass || null : null,
+        subsidiaryDgClass: isDG ? formData.subsidiaryDgClass || null : null,
+        packingGroup: isDG ? formData.packingGroup || null : null,
         statusId,
         ...(fileData && {
           currentFilePath: fileData.filePath,

@@ -23,6 +23,9 @@ export async function createSDS(data: {
   dgSubDivisionId?: string | null;
   otherNames?: string;
   emergencyPhone?: string;
+  dgClass?: number | null;
+  subsidiaryDgClass?: string | null;
+  packingGroup?: string | null;
 }) {
   console.log("Creating SDS with data:", data);
   
@@ -44,6 +47,9 @@ export async function createSDS(data: {
     un_number: data.unNumber || null,
     un_proper_shipping_name: data.unProperShippingName || null,
     hazchem_code: data.hazchemCode || null,
+    dg_class: data.dgClass || null,
+    subsidiary_dg_class: data.subsidiaryDgClass || null,
+    packing_group: data.packingGroup || null,
     dg_class_id: data.dgClassId || null,
     subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
     packing_group_id: data.packingGroupId || null,
@@ -89,6 +95,9 @@ export async function updateSDS(id: string, data: {
   dgSubDivisionId?: string | null;
   otherNames?: string;
   emergencyPhone?: string;
+  dgClass?: number | null;
+  subsidiaryDgClass?: string | null;
+  packingGroup?: string | null;
 }) {
   console.log("Updating SDS with ID:", id, "and data:", data);
   
@@ -110,6 +119,9 @@ export async function updateSDS(id: string, data: {
     un_number: data.unNumber || null,
     un_proper_shipping_name: data.unProperShippingName || null,
     hazchem_code: data.hazchemCode || null,
+    dg_class: data.dgClass || null,
+    subsidiary_dg_class: data.subsidiaryDgClass || null,
+    packing_group: data.packingGroup || null,
     dg_class_id: data.dgClassId || null,
     subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
     packing_group_id: data.packingGroupId || null,
