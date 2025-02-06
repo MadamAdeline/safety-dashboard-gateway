@@ -5,9 +5,10 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseKey) {
   console.error('VITE_SUPABASE_ANON_KEY is not set in environment variables');
+  throw new Error('VITE_SUPABASE_ANON_KEY is required');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey || '');
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Helper function to check if Supabase is properly configured
 export const isSupabaseConfigured = () => {
