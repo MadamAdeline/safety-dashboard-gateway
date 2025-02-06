@@ -1,3 +1,4 @@
+
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -73,9 +74,9 @@ const Index = () => {
         <MetricCard
           title="Products"
           value="110"
-          action={() => console.log("Add product clicked")}
+          action={() => navigate("/products", { state: { showForm: true } })}
           actionLabel="+ Add New Product"
-          secondaryAction={() => console.log("View all products clicked")}
+          secondaryAction={() => navigate("/products")}
           secondaryActionLabel="View All Products"
         />
         <MetricCard
