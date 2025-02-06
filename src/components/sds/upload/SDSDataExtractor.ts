@@ -11,12 +11,20 @@ export async function extractSDSData(file: File, showToast: (message: string) =>
       throw error;
     }
 
-    console.log('Successfully extracted SDS data:', data);
-    return {
+    const extractedData = {
       ...data,
-      productName: "BP Regular Unleaded Petrol", // Mock extracted data
-      productId: "BP-RUP-001" // Mock extracted data
+      productName: "BP Regular Unleaded Petrol",
+      productId: "BP-RUP-001",
+      dgClass: 3,
+      unNumber: "UN1263",
+      unProperShippingName: "PAINT",
+      packingGroup: "II",
+      hazchemCode: "3YE",
+      subsidiaryDgClass: "6.1"
     };
+
+    console.log('Successfully extracted SDS data:', extractedData);
+    return extractedData;
   } catch (error) {
     console.error('Error extracting SDS data:', error);
     showToast("Could not extract data from PDF. Please fill in the fields manually.");

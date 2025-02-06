@@ -69,6 +69,8 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         setIsDG(true);
         setFormData(prev => ({
           ...prev,
+          productName: extractedData.productName,
+          productId: extractedData.productId,
           dgClass: extractedData.dgClass,
           unNumber: extractedData.unNumber,
           unProperShippingName: extractedData.unProperShippingName,
