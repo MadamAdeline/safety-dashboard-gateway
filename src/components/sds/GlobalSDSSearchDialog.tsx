@@ -67,6 +67,7 @@ export function GlobalSDSSearchDialog({
             issue_date: sds.issueDate,
             expiry_date: sds.expiryDate,
             status_id: 3, // Active status
+            source: 'Global Library',
             dg_class_id: sds.dgClassId,
             subsidiary_dg_class_id: sds.subsidiaryDgClassId,
             packing_group_id: sds.packingGroupId,

@@ -123,6 +123,9 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       const statusId = await getStatusId(status);
       console.log("Retrieved status ID:", statusId);
 
+      // Determine the source based on status
+      const source = status === "REQUESTED" ? "Global Library" : "Customer";
+
       const sdsData = {
         productName: formData.productName,
         productId: formData.productId,
@@ -141,6 +144,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         unProperShippingName: isDG ? formData.unProperShippingName || null : null,
         hazchemCode: isDG ? formData.hazchemCode || null : null,
         statusId,
+        source,
         requestSupplierName: formData.requestSupplierName || null,
         requestSupplierDetails: formData.requestSupplierDetails || null,
         requestInformation: formData.requestInformation || null,
