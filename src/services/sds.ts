@@ -27,41 +27,32 @@ export async function createSDS(data: {
   console.log("Creating SDS with data:", data);
   
   const formattedData = {
-    ...data,
+    product_name: data.productName,
+    product_id: data.productId,
+    other_names: data.otherNames,
+    emergency_phone: data.emergencyPhone,
+    supplier_id: data.supplierId,
+    is_dg: data.isDG,
     issue_date: data.issueDate || null,
     revision_date: data.revisionDate || null,
     expiry_date: data.expiryDate || null,
+    status_id: data.statusId,
+    current_file_path: data.currentFilePath,
+    current_file_name: data.currentFileName,
+    current_file_size: data.currentFileSize,
+    current_content_type: data.currentContentType,
+    un_number: data.unNumber,
+    un_proper_shipping_name: data.unProperShippingName,
+    hazchem_code: data.hazchemCode,
     dg_class_id: data.dgClassId || null,
     subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
     packing_group_id: data.packingGroupId || null,
     dg_subdivision_id: data.dgSubDivisionId || null
   };
-  
+
   const { data: result, error } = await supabase
     .from('sds')
-    .insert({
-      product_name: data.productName,
-      product_id: data.productId,
-      other_names: data.otherNames,
-      emergency_phone: data.emergencyPhone,
-      supplier_id: data.supplierId,
-      is_dg: data.isDG,
-      issue_date: formattedData.issue_date,
-      revision_date: formattedData.revision_date,
-      expiry_date: formattedData.expiry_date,
-      status_id: data.statusId,
-      current_file_path: data.currentFilePath,
-      current_file_name: data.currentFileName,
-      current_file_size: data.currentFileSize,
-      current_content_type: data.currentContentType,
-      un_number: data.unNumber,
-      un_proper_shipping_name: data.unProperShippingName,
-      hazchem_code: data.hazchemCode,
-      dg_class_id: formattedData.dg_class_id,
-      subsidiary_dg_class_id: formattedData.subsidiary_dg_class_id,
-      packing_group_id: formattedData.packing_group_id,
-      dg_subdivision_id: formattedData.dg_subdivision_id
-    })
+    .insert(formattedData)
     .select()
     .single();
 
@@ -99,10 +90,23 @@ export async function updateSDS(id: string, data: {
   console.log("Updating SDS with ID:", id, "and data:", data);
   
   const formattedData = {
-    ...data,
+    product_name: data.productName,
+    product_id: data.productId,
+    other_names: data.otherNames,
+    emergency_phone: data.emergencyPhone,
+    supplier_id: data.supplierId,
+    is_dg: data.isDG,
     issue_date: data.issueDate || null,
     revision_date: data.revisionDate || null,
     expiry_date: data.expiryDate || null,
+    status_id: data.statusId,
+    current_file_path: data.currentFilePath,
+    current_file_name: data.currentFileName,
+    current_file_size: data.currentFileSize,
+    current_content_type: data.currentContentType,
+    un_number: data.unNumber,
+    un_proper_shipping_name: data.unProperShippingName,
+    hazchem_code: data.hazchemCode,
     dg_class_id: data.dgClassId || null,
     subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
     packing_group_id: data.packingGroupId || null,
@@ -111,29 +115,7 @@ export async function updateSDS(id: string, data: {
 
   const { data: result, error } = await supabase
     .from('sds')
-    .update({
-      product_name: data.productName,
-      product_id: data.productId,
-      other_names: data.otherNames,
-      emergency_phone: data.emergencyPhone,
-      supplier_id: data.supplierId,
-      is_dg: data.isDG,
-      issue_date: formattedData.issue_date,
-      revision_date: formattedData.revision_date,
-      expiry_date: formattedData.expiry_date,
-      status_id: data.statusId,
-      current_file_path: data.currentFilePath,
-      current_file_name: data.currentFileName,
-      current_file_size: data.currentFileSize,
-      current_content_type: data.currentContentType,
-      un_number: data.unNumber,
-      un_proper_shipping_name: data.unProperShippingName,
-      hazchem_code: data.hazchemCode,
-      dg_class_id: formattedData.dg_class_id,
-      subsidiary_dg_class_id: formattedData.subsidiary_dg_class_id,
-      packing_group_id: formattedData.packing_group_id,
-      dg_subdivision_id: formattedData.dg_subdivision_id
-    })
+    .update(formattedData)
     .eq('id', id)
     .select()
     .single();
