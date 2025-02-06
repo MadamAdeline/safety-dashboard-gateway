@@ -6,7 +6,7 @@ export function useSDSList() {
   return useQuery({
     queryKey: ['sds'],
     queryFn: async () => {
-      console.log('Fetching SDS data from Supabase');
+      console.log('Fetching ACTIVE SDS data from Supabase');
       const { data, error } = await supabase
         .from('sds')
         .select(`
@@ -17,14 +17,15 @@ export function useSDSList() {
           subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (id, label),
           packing_group:master_data!sds_packing_group_id_fkey (id, label),
           dg_subdivision:master_data!sds_dg_subdivision_id_fkey (id, label)
-        `);
+        `)
+        .eq('status_id', 1); // Filter for ACTIVE status (status_id = 1)
 
       if (error) {
         console.error('Error fetching SDS:', error);
         throw error;
       }
 
-      console.log('Retrieved SDS data:', data);
+      console.log('Retrieved ACTIVE SDS data:', data);
 
       return data.map(item => ({
         id: item.id,
