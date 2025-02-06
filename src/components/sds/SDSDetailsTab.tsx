@@ -178,6 +178,16 @@ export function SDSDetailsTab({
         </div>
 
         <div className="space-y-2">
+          <Label htmlFor="source">Source</Label>
+          <Input 
+            id="source" 
+            value={isGlobalLibrary ? "Global Library" : "Customer"}
+            readOnly
+            className="bg-gray-100"
+          />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="emergency">Emergency Phone</Label>
           <Input 
             id="emergency" 
@@ -261,62 +271,64 @@ export function SDSDetailsTab({
               </Select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="unNumber">UN Number</Label>
-                <Input 
-                  id="unNumber"
-                  value={formData.unNumber}
-                  onChange={(e) => handleInputChange('unNumber', e.target.value)}
-                  placeholder="Enter UN Number"
-                  disabled={isGlobalLibrary}
-                  className={isGlobalLibrary ? "bg-gray-100" : ""}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="unProperShippingName">UN Proper Shipping Name</Label>
-                <Input 
-                  id="unProperShippingName"
-                  value={formData.unProperShippingName}
-                  onChange={(e) => handleInputChange('unProperShippingName', e.target.value)}
-                  placeholder="Enter Proper Shipping Name"
-                  disabled={isGlobalLibrary}
-                  className={isGlobalLibrary ? "bg-gray-100" : ""}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="packingGroup">Packing Group</Label>
-                <Input 
-                  id="packingGroup"
-                  value={formData.packingGroup}
-                  onChange={(e) => handleInputChange('packingGroup', e.target.value)}
-                  placeholder="Enter Packing Group"
-                  disabled={isGlobalLibrary}
-                  className={isGlobalLibrary ? "bg-gray-100" : ""}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="hazchemCode">HAZCHEM Code</Label>
-                <Input 
-                  id="hazchemCode"
-                  value={formData.hazchemCode}
-                  onChange={(e) => handleInputChange('hazchemCode', e.target.value)}
-                  placeholder="Enter HAZCHEM Code"
-                  disabled={isGlobalLibrary}
-                  className={isGlobalLibrary ? "bg-gray-100" : ""}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="subsidiaryDgClass">Subsidiary DG Class</Label>
-                <Input 
-                  id="subsidiaryDgClass"
-                  value={formData.subsidiaryDgClass}
-                  onChange={(e) => handleInputChange('subsidiaryDgClass', e.target.value)}
-                  placeholder="Enter Subsidiary DG Class"
-                  disabled={isGlobalLibrary}
-                  className={isGlobalLibrary ? "bg-gray-100" : ""}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="subsidiaryDgClass">Subsidiary DG Class</Label>
+              <Input 
+                id="subsidiaryDgClass"
+                value={formData.subsidiaryDgClass}
+                onChange={(e) => handleInputChange('subsidiaryDgClass', e.target.value)}
+                placeholder="Enter Subsidiary DG Class"
+                disabled={isGlobalLibrary}
+                className={isGlobalLibrary ? "bg-gray-100" : ""}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="unNumber">UN Number</Label>
+              <Input 
+                id="unNumber"
+                value={formData.unNumber}
+                onChange={(e) => handleInputChange('unNumber', e.target.value)}
+                placeholder="Enter UN Number"
+                disabled={isGlobalLibrary}
+                className={isGlobalLibrary ? "bg-gray-100" : ""}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="unProperShippingName">UN Proper Shipping Name</Label>
+              <Input 
+                id="unProperShippingName"
+                value={formData.unProperShippingName}
+                onChange={(e) => handleInputChange('unProperShippingName', e.target.value)}
+                placeholder="Enter Proper Shipping Name"
+                disabled={isGlobalLibrary}
+                className={isGlobalLibrary ? "bg-gray-100" : ""}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="packingGroup">Packing Group</Label>
+              <Input 
+                id="packingGroup"
+                value={formData.packingGroup}
+                onChange={(e) => handleInputChange('packingGroup', e.target.value)}
+                placeholder="Enter Packing Group"
+                disabled={isGlobalLibrary}
+                className={isGlobalLibrary ? "bg-gray-100" : ""}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="hazchemCode">HAZCHEM Code</Label>
+              <Input 
+                id="hazchemCode"
+                value={formData.hazchemCode}
+                onChange={(e) => handleInputChange('hazchemCode', e.target.value)}
+                placeholder="Enter HAZCHEM Code"
+                disabled={isGlobalLibrary}
+                className={isGlobalLibrary ? "bg-gray-100" : ""}
+              />
             </div>
           </>
         )}
