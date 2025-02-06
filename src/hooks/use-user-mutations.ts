@@ -24,21 +24,22 @@ export function useUserMutations(onSuccess: () => void) {
     mutationFn: async (data: UserData) => {
       console.log('Creating user with data:', data);
       
-      // Create user with service role client
-      const { data: userData, error: userError } = await supabase.auth.admin
-        .createUser({
-          email: data.email,
-          password: data.password,
-          email_confirm: true,
-          user_metadata: {
+      // Create user with signup endpoint instead of admin
+      const { data: userData, error: userError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password || Math.random().toString(36).slice(-8), // Generate random password if none provided
+        options: {
+          data: {
             first_name: data.first_name,
             last_name: data.last_name
           }
-        });
+        }
+      });
 
       if (userError) throw userError;
+      if (!userData.user) throw new Error('No user returned from signup');
 
-      // Create user profile with service role client
+      // Create user profile
       const { data: profileData, error: profileError } = await supabase
         .from('users')
         .insert({
@@ -48,7 +49,6 @@ export function useUserMutations(onSuccess: () => void) {
           email: data.email,
           phone_number: data.phone_number,
           active: data.active,
-          password: data.password,
           manager_id: data.manager_id || null,
           location_id: data.location_id || null
         })
