@@ -11,6 +11,7 @@ import { ProductForm } from "@/components/products/ProductForm";
 import type { Product, ProductFilters as ProductFiltersType } from "@/types/product";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { exportProductsToExcel } from "@/utils/exportUtils";
 
 export default function Products() {
   const [filters, setFilters] = useState<ProductFiltersType>({
@@ -24,6 +25,7 @@ export default function Products() {
   const [showFilters, setShowFilters] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
   const { toast } = useToast();
 
   const { data: products = [], isLoading, error, refetch } = useQuery({
@@ -122,11 +124,64 @@ export default function Products() {
     }
   }, [error, toast]);
 
-  const handleExport = () => {
-    toast({
-      title: "Export Started",
-      description: "Your product data is being exported to Excel..."
-    });
+  const handleExport = async () => {
+    console.log('Starting export process');
+    setIsExporting(true);
+    try {
+      // Get the filtered data from the ProductList component
+      const filteredData = products?.filter((item) => {
+        if (filters.search) {
+          const searchTerm = filters.search.toLowerCase();
+          const searchableFields = [
+            item.name,
+            item.code,
+            item.brandName,
+            item.unit,
+            item.description,
+            item.otherNames,
+            item.uses,
+            item.sds?.supplier?.supplier_name,
+            item.sds?.dgClass?.label,
+          ].filter(Boolean);
+
+          const matchesSearch = searchableFields.some(
+            field => field?.toLowerCase().includes(searchTerm)
+          );
+
+          if (!matchesSearch) return false;
+        }
+
+        if (filters.supplier.length > 0 && item.sds?.supplier?.supplier_name && !filters.supplier.includes(item.sds.supplier.supplier_name)) {
+          return false;
+        }
+        if (filters.status.length > 0 && !filters.status.includes(item.status)) {
+          return false;
+        }
+        if (filters.isDG !== null && item.sds?.isDG !== filters.isDG) {
+          return false;
+        }
+        if (filters.dgClass.length > 0 && item.sds?.dgClass?.label && !filters.dgClass.includes(item.sds.dgClass.label)) {
+          return false;
+        }
+        return true;
+      }) || [];
+
+      await exportProductsToExcel(filteredData);
+      
+      toast({
+        title: "Export Successful",
+        description: `Successfully exported ${filteredData.length} products to Excel`
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting the products",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleRefresh = () => {
@@ -201,6 +256,7 @@ export default function Products() {
               onToggleFilters={() => setShowFilters(!showFilters)}
               onExport={handleExport}
               onRefresh={handleRefresh}
+              isExporting={isExporting}
             />
           </div>
           
