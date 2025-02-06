@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProductList } from "@/components/products/ProductList";
@@ -12,8 +13,12 @@ import type { Product, ProductFilters as ProductFiltersType } from "@/types/prod
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { exportProductsToExcel } from "@/utils/exportUtils";
+import { useLocation } from "react-router-dom";
 
 export default function Products() {
+  const location = useLocation();
+  const showFormFromState = location.state?.showForm ?? false;
+  
   const [filters, setFilters] = useState<ProductFiltersType>({
     search: "",
     supplier: [],
@@ -23,7 +28,7 @@ export default function Products() {
   });
   
   const [showFilters, setShowFilters] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(showFormFromState);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const { toast } = useToast();
@@ -200,10 +205,13 @@ export default function Products() {
   const handleFormClose = () => {
     setShowForm(false);
     setSelectedProduct(null);
+    // Clear the state from the URL
+    window.history.replaceState({}, document.title);
   };
 
   const handleFormSave = () => {
     refetch();
+    handleFormClose();
     toast({
       title: "Success",
       description: "Product saved successfully"
