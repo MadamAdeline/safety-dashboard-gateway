@@ -26,7 +26,7 @@ export default function Products() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { toast } = useToast();
 
-  const { data: products = [], isLoading, error } = useQuery({
+  const { data: products = [], isLoading, error, refetch } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
       console.log('Fetching products from Supabase...');
@@ -88,7 +88,7 @@ export default function Products() {
         cryogenicFluid: item.cryogenic_fluid,
         otherNames: item.other_names,
         uses: item.uses,
-        status: item.product_status_id === 12 ? "ACTIVE" : "INACTIVE",
+        status: item.product_status_id === 12 ? "ACTIVE" : "INACTIVE" as "ACTIVE" | "INACTIVE",
         approvalStatusId: item.approval_status_id,
         productStatusId: item.product_status_id,
         sdsId: item.sds_id,
@@ -134,6 +134,7 @@ export default function Products() {
   };
 
   const handleRefresh = () => {
+    refetch();
     toast({
       title: "Refreshing Data",
       description: "Updating the products list..."
@@ -145,10 +146,35 @@ export default function Products() {
     setShowForm(true);
   };
 
+  const handleFormClose = () => {
+    setShowForm(false);
+    setSelectedProduct(null);
+  };
+
+  const handleFormSave = () => {
+    refetch();
+    toast({
+      title: "Success",
+      description: "Product saved successfully"
+    });
+  };
+
   if (isLoading) {
     return (
       <DashboardLayout>
         <div>Loading products...</div>
+      </DashboardLayout>
+    );
+  }
+
+  if (showForm) {
+    return (
+      <DashboardLayout>
+        <ProductForm 
+          onClose={handleFormClose}
+          onSave={handleFormSave}
+          initialData={selectedProduct}
+        />
       </DashboardLayout>
     );
   }
@@ -169,39 +195,29 @@ export default function Products() {
           </Button>
         </div>
         
-        {showForm ? (
-          <ProductForm 
-            onClose={() => {
-              setShowForm(false);
-              setSelectedProduct(null);
-            }}
-            initialData={selectedProduct}
-          />
-        ) : (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-              <ProductSearch 
-                value={filters.search}
-                onChange={(value) => setFilters({ ...filters, search: value })}
-              />
-              <ProductActions 
-                onToggleFilters={() => setShowFilters(!showFilters)}
-                onExport={handleExport}
-                onRefresh={handleRefresh}
-              />
-            </div>
-            
-            {showFilters && (
-              <ProductFilters filters={filters} onFiltersChange={setFilters} />
-            )}
-            
-            <ProductList 
-              data={products} 
-              filters={filters} 
-              onEdit={handleEdit}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
+            <ProductSearch 
+              value={filters.search}
+              onChange={(value) => setFilters({ ...filters, search: value })}
+            />
+            <ProductActions 
+              onToggleFilters={() => setShowFilters(!showFilters)}
+              onExport={handleExport}
+              onRefresh={handleRefresh}
             />
           </div>
-        )}
+          
+          {showFilters && (
+            <ProductFilters filters={filters} onFiltersChange={setFilters} />
+          )}
+          
+          <ProductList 
+            data={products} 
+            filters={filters} 
+            onEdit={handleEdit}
+          />
+        </div>
       </div>
     </DashboardLayout>
   );
