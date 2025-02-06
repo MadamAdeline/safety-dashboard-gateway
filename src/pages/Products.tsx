@@ -76,8 +76,20 @@ export default function Products() {
         throw error;
       }
 
-      console.log('Products fetched:', data);
-      return data as Product[];
+      // Transform the data to match the Product type
+      const transformedData = data.map(item => ({
+        ...item,
+        sds: item.sds ? {
+          id: item.sds.id,
+          isDG: item.sds.isDG,
+          dgClass: Array.isArray(item.sds.dgClass) ? item.sds.dgClass[0] : item.sds.dgClass,
+          supplier: Array.isArray(item.sds.supplier) ? item.sds.supplier[0] : item.sds.supplier,
+          packingGroup: Array.isArray(item.sds.packingGroup) ? item.sds.packingGroup[0] : item.sds.packingGroup
+        } : null
+      })) as Product[];
+
+      console.log('Products fetched and transformed:', transformedData);
+      return transformedData;
     },
     retry: 1
   });
