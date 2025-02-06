@@ -190,31 +190,32 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
 
   const filteredData = sortLocations(
     locations.filter((item) => {
-      // Apply filters only if they are active
-      const hasActiveFilters = filters.search || filters.type.length > 0 || filters.status.length > 0 || filters.parentLocation;
-      
-      if (!hasActiveFilters) {
-        return true; // Show all records when no filters are active
+      let matchesSearch = true;
+      let matchesType = true;
+      let matchesStatus = true;
+      let matchesParent = true;
+
+      // Only apply search if there is a search term
+      if (filters.search) {
+        matchesSearch = searchInLocation(item, filters.search);
       }
 
-      // Check each active filter
-      if (filters.search && !searchInLocation(item, filters.search)) {
-        return false;
+      // Only apply type filter if types are selected
+      if (filters.type.length > 0) {
+        matchesType = filters.type.includes(getLocationTypeLabel(item) as any);
       }
 
-      if (filters.type.length > 0 && !filters.type.includes(getLocationTypeLabel(item) as any)) {
-        return false;
+      // Only apply status filter if statuses are selected
+      if (filters.status.length > 0) {
+        matchesStatus = filters.status.includes(getLocationStatus(item));
       }
 
-      if (filters.status.length > 0 && !filters.status.includes(getLocationStatus(item))) {
-        return false;
+      // Only apply parent filter if parent is selected
+      if (filters.parentLocation) {
+        matchesParent = item.parent_location_id === filters.parentLocation;
       }
 
-      if (filters.parentLocation && item.parent_location_id !== filters.parentLocation) {
-        return false;
-      }
-
-      return true;
+      return matchesSearch && matchesType && matchesStatus && matchesParent;
     })
   );
 
@@ -238,11 +239,12 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
     );
   };
 
-  const handleSearchChange = (location: Location) => {
+  const handleSearchChange = (location: Location | null) => {
     console.log('Search changed:', location);
+    // Clear search if location is null
     onFiltersChange({
       ...filters,
-      search: location?.name || ''
+      search: location ? location.name : ''
     });
   };
 
