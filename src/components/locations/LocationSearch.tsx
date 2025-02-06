@@ -39,8 +39,8 @@ export function LocationSearch({
           master_data (id, label),
           status_lookup (id, status_name)
         `)
-        .eq('status_id', 1); // Only fetch active locations
-      
+        .eq('status_id', 8); // Only fetch active locations
+
       if (error) {
         console.error('Error fetching locations:', error);
         throw error;
@@ -51,9 +51,9 @@ export function LocationSearch({
         ...location,
         coordinates: location.coordinates || null,
         parent_location_id: location.parent_location_id || null,
+        full_path: location.full_path || null
       })) as Location[];
     },
-    staleTime: 5000 // Cache for 5 seconds
   });
 
   useEffect(() => {
@@ -135,4 +135,3 @@ export function LocationSearch({
     </div>
   );
 }
-
