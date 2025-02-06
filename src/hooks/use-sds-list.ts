@@ -6,8 +6,7 @@ export function useSDSList() {
   return useQuery({
     queryKey: ['sds'],
     queryFn: async () => {
-      console.log('Fetching all SDS data from Supabase');
-      
+      console.log('Fetching SDS data from Supabase');
       const { data, error } = await supabase
         .from('sds')
         .select(`
