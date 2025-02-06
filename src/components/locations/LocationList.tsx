@@ -1,4 +1,3 @@
-
 import { Table, TableBody } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Plus, Check, X } from "lucide-react";
@@ -119,7 +118,8 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
         type_id: newLocation.type_id,
         parent_location_id: newLocation.parent_location_id || null,
         status_id: 1, // Default to ACTIVE
-        coordinates: newLocation.coordinates || { lat: -37.8136, lng: 144.9631 }
+        coordinates: newLocation.coordinates || { lat: -37.8136, lng: 144.9631 },
+        full_path: null, // This will be computed by the trigger
       });
 
       toast({
@@ -188,7 +188,10 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
   };
 
   const filteredData = sortLocations(
-    locations.filter((item) => {
+    locations.map(item => ({
+      ...item,
+      full_path: item.full_path || null
+    })).filter((item) => {
       let matchesFilter = true;
 
       // Apply text search if there's a search term

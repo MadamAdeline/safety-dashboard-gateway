@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Input } from "@/components/ui/input";
@@ -22,7 +23,7 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     type: (initialData?.master_data?.label as LocationType) ?? "Region",
     typeId: initialData?.type_id ?? "",
     parentLocationId: initialData?.parent_location_id ?? null,
-    status: "ACTIVE" as LocationStatus, // We'll update this in useEffect after getting status mapping
+    status: "ACTIVE" as LocationStatus,
     coordinates: initialData?.coordinates ?? { lat: -37.8136, lng: 144.9631 }
   });
 
@@ -158,6 +159,7 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
         parent_location_id: formData.parentLocationId,
         status_id: statusMap[formData.status],
         coordinates: formData.coordinates,
+        full_path: null, // This will be computed by the trigger
       };
 
       console.log('Prepared location data:', locationData);
