@@ -24,6 +24,10 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [status, setStatus] = useState<"ACTIVE" | "INACTIVE" | "REQUESTED">(initialData?.status ?? 'ACTIVE');
   const [supplier, setSupplier] = useState("");
+  const [dgClassId, setDgClassId] = useState(initialData?.dgClassId ?? "");
+  const [subsidiaryDgClassId, setSubsidiaryDgClassId] = useState(initialData?.subsidiaryDgClassId ?? "");
+  const [packingGroupId, setPackingGroupId] = useState(initialData?.packingGroupId ?? "");
+  const [dgSubDivisionId, setDgSubDivisionId] = useState(initialData?.dgSubDivisionId ?? "");
   const [formData, setFormData] = useState({
     productName: initialData?.productName ?? "",
     productId: initialData?.productId ?? "",
@@ -32,10 +36,6 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     issueDate: initialData?.issueDate ?? "",
     revisionDate: initialData?.revisionDate ?? "",
     expiryDate: initialData?.expiryDate ?? "",
-    dgClassId: initialData?.dgClassId ?? "",
-    subsidiaryDgClassId: initialData?.subsidiaryDgClassId ?? "",
-    packingGroupId: initialData?.packingGroupId ?? "",
-    dgSubDivisionId: initialData?.dgSubDivisionId ?? "",
     unNumber: initialData?.unNumber ?? "",
     unProperShippingName: initialData?.unProperShippingName ?? "",
     hazchemCode: initialData?.hazchemCode ?? ""
@@ -44,6 +44,10 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   console.log("NewSDSForm - Current Form Data:", formData);
   console.log("NewSDSForm - isDG:", isDG);
   console.log("NewSDSForm - supplier:", supplier);
+  console.log("NewSDSForm - dgClassId:", dgClassId);
+  console.log("NewSDSForm - subsidiaryDgClassId:", subsidiaryDgClassId);
+  console.log("NewSDSForm - packingGroupId:", packingGroupId);
+  console.log("NewSDSForm - dgSubDivisionId:", dgSubDivisionId);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -53,6 +57,10 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       console.log("NewSDSForm - Setting initial data:", initialData);
       setIsDG(initialData.isDG);
       setStatus(initialData.status);
+      setDgClassId(initialData.dgClassId ?? "");
+      setSubsidiaryDgClassId(initialData.subsidiaryDgClassId ?? "");
+      setPackingGroupId(initialData.packingGroupId ?? "");
+      setDgSubDivisionId(initialData.dgSubDivisionId ?? "");
       setFormData({
         productName: initialData.productName,
         productId: initialData.productId,
@@ -61,10 +69,6 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         issueDate: initialData.issueDate,
         revisionDate: initialData.revisionDate ?? "",
         expiryDate: initialData.expiryDate,
-        dgClassId: initialData.dgClassId ?? "",
-        subsidiaryDgClassId: initialData.subsidiaryDgClassId ?? "",
-        packingGroupId: initialData.packingGroupId ?? "",
-        dgSubDivisionId: initialData.dgSubDivisionId ?? "",
         unNumber: initialData.unNumber ?? "",
         unProperShippingName: initialData.unProperShippingName ?? "",
         hazchemCode: initialData.hazchemCode ?? ""
@@ -116,6 +120,10 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       console.log("Form data being saved:", formData);
       console.log("isDG status:", isDG);
       console.log("Selected supplier:", supplier);
+      console.log("DG Class ID:", dgClassId);
+      console.log("Subsidiary DG Class ID:", subsidiaryDgClassId);
+      console.log("Packing Group ID:", packingGroupId);
+      console.log("DG Subdivision ID:", dgSubDivisionId);
       
       if (!supplier) {
         toast({
@@ -146,10 +154,10 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         issueDate: formData.issueDate,
         revisionDate: formData.revisionDate || null,
         expiryDate: formData.expiryDate,
-        dgClassId: isDG ? formData.dgClassId || null : null,
-        subsidiaryDgClassId: isDG ? formData.subsidiaryDgClassId || null : null,
-        packingGroupId: isDG ? formData.packingGroupId || null : null,
-        dgSubDivisionId: isDG ? formData.dgSubDivisionId || null : null,
+        dgClassId: isDG ? dgClassId || null : null,
+        subsidiaryDgClassId: isDG ? subsidiaryDgClassId || null : null,
+        packingGroupId: isDG ? packingGroupId || null : null,
+        dgSubDivisionId: isDG ? dgSubDivisionId || null : null,
         unNumber: isDG ? formData.unNumber || null : null,
         unProperShippingName: isDG ? formData.unProperShippingName || null : null,
         hazchemCode: isDG ? formData.hazchemCode || null : null,
@@ -220,6 +228,14 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
                   setSupplier={setSupplier}
                   formData={formData}
                   setFormData={setFormData}
+                  dgClassId={dgClassId}
+                  setDgClassId={setDgClassId}
+                  subsidiaryDgClassId={subsidiaryDgClassId}
+                  setSubsidiaryDgClassId={setSubsidiaryDgClassId}
+                  packingGroupId={packingGroupId}
+                  setPackingGroupId={setPackingGroupId}
+                  dgSubDivisionId={dgSubDivisionId}
+                  setDgSubDivisionId={setDgSubDivisionId}
                 />
               </TabsContent>
 
