@@ -40,7 +40,6 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
   const [statusOptions, setStatusOptions] = useState<{ id: number; name: string; category: string }[]>([]);
   const { toast } = useToast();
 
-  // Fetch status options on component mount
   useEffect(() => {
     const fetchStatusOptions = async () => {
       console.log('Fetching status options...');
@@ -74,8 +73,39 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
     fetchStatusOptions();
   }, [toast]);
 
+  const checkDuplicateCode = async (code: string): Promise<boolean> => {
+    const { data, error } = await supabase
+      .from('products')
+      .select('id')
+      .eq('product_code', code)
+      .single();
+
+    if (error && error.code === 'PGRST116') {
+      // No data found, code is unique
+      return false;
+    }
+
+    // If we're editing and the found product is the current one, it's not a duplicate
+    if (data && initialData && data.id === initialData.id) {
+      return false;
+    }
+
+    return !!data;
+  };
+
   const handleSave = async () => {
     try {
+      // Check for duplicate product code
+      const isDuplicate = await checkDuplicateCode(formData.code);
+      if (isDuplicate) {
+        toast({
+          title: "Error",
+          description: "This product code is already in use. Please use a different code.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const productData = {
         product_name: formData.name,
         product_code: formData.code,
@@ -117,7 +147,7 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
       console.error('Error saving product:', error);
       toast({
         title: "Error",
-        description: "Failed to save product",
+        description: "Failed to save product. Please try again.",
         variant: "destructive",
       });
     }
