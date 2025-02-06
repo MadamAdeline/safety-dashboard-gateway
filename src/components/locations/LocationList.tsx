@@ -384,13 +384,6 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
               <Plus className="h-4 w-4 mr-2" />
               Quick Add
             </Button>
-            <Button
-              onClick={() => onEdit(null)}
-              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add New Location
-            </Button>
           </div>
         </div>
         
