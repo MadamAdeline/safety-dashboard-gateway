@@ -28,6 +28,7 @@ export function UserForm({ onClose, initialData }: UserFormProps) {
     phone_number: initialData?.phone_number || "",
     active: initialData?.active || "active",
     role_id: initialData?.user_roles?.[0]?.role_id || "",
+    password: "", // Added password field
   });
   
   const { toast } = useToast();
@@ -56,6 +57,7 @@ export function UserForm({ onClose, initialData }: UserFormProps) {
           email: data.email,
           phone_number: data.phone_number,
           active: data.active,
+          password: data.password, // Include password in creation
         }])
         .select()
         .single();
@@ -96,16 +98,23 @@ export function UserForm({ onClose, initialData }: UserFormProps) {
 
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
+      const updateData: any = {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        phone_number: data.phone_number,
+        active: data.active,
+      };
+      
+      // Only include password in update if it was changed
+      if (data.password) {
+        updateData.password = data.password;
+      }
+
       // Update user
       const { error: userError } = await supabase
         .from('users')
-        .update({
-          first_name: data.first_name,
-          last_name: data.last_name,
-          email: data.email,
-          phone_number: data.phone_number,
-          active: data.active,
-        })
+        .update(updateData)
         .eq('id', initialData.id);
 
       if (userError) throw userError;
@@ -218,6 +227,17 @@ export function UserForm({ onClose, initialData }: UserFormProps) {
               id="phone_number"
               value={formData.phone_number}
               onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              placeholder={initialData ? "Leave blank to keep current password" : "Enter password"}
             />
           </div>
 
