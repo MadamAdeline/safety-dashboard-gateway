@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProductList } from "@/components/products/ProductList";
 import { ProductFilters } from "@/components/products/ProductFilters";
@@ -75,14 +75,16 @@ export default function Products() {
     }
   });
 
-  if (error) {
-    console.error('Query error:', error);
-    toast({
-      title: "Error loading products",
-      description: "There was a problem loading the products list. Please try again.",
-      variant: "destructive"
-    });
-  }
+  useEffect(() => {
+    if (error) {
+      console.error('Query error:', error);
+      toast({
+        title: "Error loading products",
+        description: "There was a problem loading the products list. Please try again.",
+        variant: "destructive"
+      });
+    }
+  }, [error, toast]);
 
   const handleExport = () => {
     toast({
