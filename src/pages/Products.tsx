@@ -52,7 +52,7 @@ export default function Products() {
           sds (
             id,
             is_dg,
-            dg_class_id (
+            dg_class_id:master_data!sds_dg_class_id_fkey (
               id,
               label
             ),
@@ -60,7 +60,7 @@ export default function Products() {
               id,
               supplier_name
             ),
-            packing_group_id (
+            packing_group_id:master_data!sds_packing_group_id_fkey (
               id,
               label
             )
