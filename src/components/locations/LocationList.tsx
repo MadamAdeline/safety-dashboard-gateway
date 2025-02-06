@@ -369,21 +369,23 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
         </Table>
       </div>
 
-      <div className="flex items-center justify-between">
-        <Button
-          onClick={startNewLocation}
-          className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Location
-        </Button>
-        
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col space-y-4">
+        <div className="flex items-center justify-between">
           <p className="text-sm text-gray-500">
             Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredData.length)} of{" "}
             {filteredData.length} results
           </p>
           
+          <Button
+            onClick={startNewLocation}
+            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Quick Add
+          </Button>
+        </div>
+        
+        <div className="flex justify-center">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
