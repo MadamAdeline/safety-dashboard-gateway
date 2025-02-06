@@ -148,7 +148,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       }
 
       queryClient.invalidateQueries({ queryKey: ['sds'] });
-      onClose();
+      // Removed the onClose() call here so the form stays open after saving
     } catch (error) {
       console.error("Error saving SDS:", error);
       toast({
