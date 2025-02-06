@@ -22,7 +22,7 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     type: (initialData?.master_data?.label as LocationType) ?? "Region",
     typeId: initialData?.type_id ?? "",
     parentLocationId: initialData?.parent_location_id ?? null,
-    status: initialData?.status_lookup?.status_name === "Active" ? "ACTIVE" as LocationStatus : "INACTIVE" as LocationStatus,
+    status: "ACTIVE" as LocationStatus, // We'll update this in useEffect after getting status mapping
     coordinates: initialData?.coordinates ?? { lat: -37.8136, lng: 144.9631 }
   });
 
@@ -34,6 +34,7 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
 
   const [locationTypes, setLocationTypes] = useState<LocationType[]>([]);
   const [statusMap, setStatusMap] = useState<{ [key: string]: number }>({});
+  const [reverseStatusMap, setReverseStatusMap] = useState<{ [key: number]: LocationStatus }>({});
 
   const { createLocation, updateLocation } = useLocations();
   const { toast } = useToast();
@@ -57,12 +58,28 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
         return acc;
       }, {} as { [key: string]: number });
 
+      const reverseMapping = data.reduce((acc, curr) => {
+        acc[curr.id] = curr.status_name.toUpperCase() as LocationStatus;
+        return acc;
+      }, {} as { [key: number]: LocationStatus });
+
       console.log('Status mapping fetched:', statusMapping);
+      console.log('Reverse status mapping:', reverseMapping);
+      
       setStatusMap(statusMapping);
+      setReverseStatusMap(reverseMapping);
+
+      // Set initial status based on the initialData and reverse mapping
+      if (initialData?.status_id) {
+        setFormData(prev => ({
+          ...prev,
+          status: reverseMapping[initialData.status_id] || "ACTIVE"
+        }));
+      }
     };
 
     fetchStatusIds();
-  }, []);
+  }, [initialData]);
 
   // Fetch location types from master_data
   useEffect(() => {
