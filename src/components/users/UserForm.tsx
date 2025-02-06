@@ -24,6 +24,7 @@ export function UserForm({ onClose, initialData }: UserFormProps) {
     location_id: initialData?.location_id || "",
   });
 
+  // Fetch roles
   const { data: roles } = useQuery({
     queryKey: ['roles'],
     queryFn: async () => {

@@ -17,6 +17,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 type UserWithRelations = Omit<User, 'manager'> & {
   user_roles?: {
+    role_id: string;
     roles: {
       role_name: string;
     };
@@ -43,6 +44,7 @@ export function UserList({ onEdit }: UserListProps) {
           .select(`
             *,
             user_roles (
+              role_id,
               roles (
                 role_name
               )
@@ -113,7 +115,7 @@ export function UserList({ onEdit }: UserListProps) {
               <TableCell>{user.email}</TableCell>
               <TableCell>
                 {user.user_roles?.map((userRole) => (
-                  <Badge key={userRole.roles.role_name} variant="outline">
+                  <Badge key={userRole.role_id} variant="outline">
                     {userRole.roles.role_name}
                   </Badge>
                 ))}
