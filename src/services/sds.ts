@@ -23,9 +23,6 @@ export async function createSDS(data: {
   dgSubDivisionId?: string | null;
   otherNames?: string;
   emergencyPhone?: string;
-  dgClass?: number | null;
-  subsidiaryDgClass?: string | null;
-  packingGroup?: string | null;
 }) {
   console.log("Creating SDS with data:", data);
   
@@ -47,9 +44,6 @@ export async function createSDS(data: {
     un_number: data.unNumber || null,
     un_proper_shipping_name: data.unProperShippingName || null,
     hazchem_code: data.hazchemCode || null,
-    dg_class: data.dgClass || null,
-    subsidiary_dg_class: data.subsidiaryDgClass || null,
-    packing_group: data.packingGroup || null,
     dg_class_id: data.dgClassId || null,
     subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
     packing_group_id: data.packingGroupId || null,
@@ -61,7 +55,15 @@ export async function createSDS(data: {
   const { data: result, error } = await supabase
     .from('sds')
     .insert(formattedData)
-    .select()
+    .select(`
+      *,
+      suppliers!fk_supplier (supplier_name),
+      status:status_lookup!fk_status (status_name),
+      dg_class:master_data!sds_dg_class_id_fkey (label),
+      subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
+      packing_group:master_data!sds_packing_group_id_fkey (label),
+      dg_subdivision:master_data!sds_dg_subdivision_id_fkey (label)
+    `)
     .single();
 
   if (error) {
@@ -95,9 +97,6 @@ export async function updateSDS(id: string, data: {
   dgSubDivisionId?: string | null;
   otherNames?: string;
   emergencyPhone?: string;
-  dgClass?: number | null;
-  subsidiaryDgClass?: string | null;
-  packingGroup?: string | null;
 }) {
   console.log("Updating SDS with ID:", id, "and data:", data);
   
@@ -119,9 +118,6 @@ export async function updateSDS(id: string, data: {
     un_number: data.unNumber || null,
     un_proper_shipping_name: data.unProperShippingName || null,
     hazchem_code: data.hazchemCode || null,
-    dg_class: data.dgClass || null,
-    subsidiary_dg_class: data.subsidiaryDgClass || null,
-    packing_group: data.packingGroup || null,
     dg_class_id: data.dgClassId || null,
     subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
     packing_group_id: data.packingGroupId || null,
@@ -134,7 +130,15 @@ export async function updateSDS(id: string, data: {
     .from('sds')
     .update(formattedData)
     .eq('id', id)
-    .select()
+    .select(`
+      *,
+      suppliers!fk_supplier (supplier_name),
+      status:status_lookup!fk_status (status_name),
+      dg_class:master_data!sds_dg_class_id_fkey (label),
+      subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
+      packing_group:master_data!sds_packing_group_id_fkey (label),
+      dg_subdivision:master_data!sds_dg_subdivision_id_fkey (label)
+    `)
     .single();
 
   if (error) {
