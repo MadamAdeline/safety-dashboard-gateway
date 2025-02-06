@@ -98,6 +98,7 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
               <TableHead className="text-dgxprt-navy font-semibold">DG Class</TableHead>
               <TableHead className="text-dgxprt-navy font-semibold">Supplier</TableHead>
               <TableHead className="text-dgxprt-navy font-semibold">Packing Group</TableHead>
+              <TableHead className="text-dgxprt-navy font-semibold">Status</TableHead>
               <TableHead className="w-24 text-dgxprt-navy font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -129,6 +130,18 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
                 <TableCell>{item.sds?.dgClass?.label || "-"}</TableCell>
                 <TableCell>{item.sds?.supplier?.supplier_name || "-"}</TableCell>
                 <TableCell>{item.sds?.packingGroup?.label || "-"}</TableCell>
+                <TableCell>
+                  <Badge 
+                    variant={item.status === "ACTIVE" ? "default" : "destructive"}
+                    className={
+                      item.status === "ACTIVE" 
+                        ? "bg-green-100 text-green-800" 
+                        : "bg-red-100 text-red-800"
+                    }
+                  >
+                    {item.status}
+                  </Badge>
+                </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button 
