@@ -75,7 +75,10 @@ export default function SDSLibrary() {
         currentContentType: item.current_content_type,
         unNumber: item.un_number,
         unProperShippingName: item.un_proper_shipping_name,
-        hazchemCode: item.hazchem_code
+        hazchemCode: item.hazchem_code,
+        otherNames: item.other_names,
+        emergencyPhone: item.emergency_phone,
+        revisionDate: item.revision_date
       }));
     }
   });

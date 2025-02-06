@@ -49,15 +49,18 @@ export type Database = {
           dg_class: number | null
           dg_class_id: string | null
           dg_subdivision_id: string | null
+          emergency_phone: string | null
           expiry_date: string | null
           hazchem_code: string | null
           id: string
           is_dg: boolean | null
           issue_date: string | null
+          other_names: string | null
           packing_group: string | null
           packing_group_id: string | null
           product_id: string
           product_name: string
+          revision_date: string | null
           status_id: number
           subsidiary_dg_class: string | null
           subsidiary_dg_class_id: string | null
@@ -75,15 +78,18 @@ export type Database = {
           dg_class?: number | null
           dg_class_id?: string | null
           dg_subdivision_id?: string | null
+          emergency_phone?: string | null
           expiry_date?: string | null
           hazchem_code?: string | null
           id?: string
           is_dg?: boolean | null
           issue_date?: string | null
+          other_names?: string | null
           packing_group?: string | null
           packing_group_id?: string | null
           product_id: string
           product_name: string
+          revision_date?: string | null
           status_id: number
           subsidiary_dg_class?: string | null
           subsidiary_dg_class_id?: string | null
@@ -101,15 +107,18 @@ export type Database = {
           dg_class?: number | null
           dg_class_id?: string | null
           dg_subdivision_id?: string | null
+          emergency_phone?: string | null
           expiry_date?: string | null
           hazchem_code?: string | null
           id?: string
           is_dg?: boolean | null
           issue_date?: string | null
+          other_names?: string | null
           packing_group?: string | null
           packing_group_id?: string | null
           product_id?: string
           product_name?: string
+          revision_date?: string | null
           status_id?: number
           subsidiary_dg_class?: string | null
           subsidiary_dg_class_id?: string | null
