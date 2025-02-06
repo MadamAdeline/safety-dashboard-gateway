@@ -231,6 +231,14 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
     );
   };
 
+  const handleSearchChange = (location: Location) => {
+    console.log('Search changed:', location);
+    onFiltersChange({
+      ...filters,
+      search: location.name
+    });
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
