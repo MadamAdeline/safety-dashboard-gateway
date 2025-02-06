@@ -10,6 +10,7 @@ import { LocationActions } from "@/components/locations/LocationActions";
 import { LocationTableHeader } from "./table/LocationTableHeader";
 import { LocationTableRow } from "./table/LocationTableRow";
 import { LocationPagination } from "./table/LocationPagination";
+import { LocationForm } from "./LocationForm";
 
 interface LocationListProps {
   filters: LocationFilters;
@@ -20,7 +21,7 @@ interface LocationListProps {
 export function LocationList({ filters, onEdit, onFiltersChange }: LocationListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [editingLocation, setEditingLocation] = useState<Partial<Location> | null>(null);
+  const [editingLocation, setEditingLocation] = useState<Location | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const itemsPerPage = 10;
 
@@ -173,12 +174,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
           
           <div className="flex gap-2">
             <Button
-              onClick={() => {
-                const newLocation: Partial<Location> = {
-                  isNew: true
-                };
-                setEditingLocation(newLocation);
-              }}
+              onClick={() => onEdit({ isNew: true } as Location)}
               className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
             >
               <Plus className="h-4 w-4 mr-2" />
