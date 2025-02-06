@@ -165,7 +165,13 @@ export function LocationActions({ onToggleFilters, onExport, onRefresh }: Locati
       </div>
       <Button
         variant="outline"
-        onClick={onRefresh}
+        onClick={() => {
+          onRefresh();
+          toast({
+            title: "Refreshed",
+            description: "Location list has been refreshed",
+          });
+        }}
         className="gap-2"
       >
         <RefreshCw className="h-4 w-4" />
