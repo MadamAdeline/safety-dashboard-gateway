@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import type { Location, LocationType, LocationStatus } from "@/types/location";
 import { LocationMap } from "./LocationMap";
 import { useLocations } from "@/hooks/use-locations";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LocationFormProps {
   onClose: () => void;
@@ -18,6 +19,7 @@ interface LocationFormProps {
 export function LocationForm({ onClose, initialData }: LocationFormProps) {
   const [name, setName] = useState(initialData?.name ?? "");
   const [type, setType] = useState<LocationType>((initialData?.master_data?.label as LocationType) ?? "Region");
+  const [typeId, setTypeId] = useState<string>(initialData?.type_id ?? "");
   const [parentLocation, setParentLocation] = useState(initialData?.parent_location_id ?? "");
   const [status, setStatus] = useState<LocationStatus>(initialData?.status_id === 1 ? "ACTIVE" : "INACTIVE");
   const [coordinates, setCoordinates] = useState(initialData?.coordinates ?? { lat: -37.8136, lng: 144.9631 });
@@ -25,11 +27,34 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
   const { createLocation, updateLocation } = useLocations();
   const { toast } = useToast();
 
+  // Fetch the type_id when type changes
+  useEffect(() => {
+    const fetchTypeId = async () => {
+      const { data, error } = await supabase
+        .from('master_data')
+        .select('id')
+        .eq('category', 'LOCATION_TYPE')
+        .eq('label', type)
+        .single();
+
+      if (error) {
+        console.error('Error fetching type_id:', error);
+        return;
+      }
+
+      if (data) {
+        setTypeId(data.id);
+      }
+    };
+
+    fetchTypeId();
+  }, [type]);
+
   const handleSave = async () => {
     try {
       const locationData = {
         name,
-        type_id: type, // This will be mapped to master_data id in the backend
+        type_id: typeId,
         parent_location_id: parentLocation || null,
         status_id: status === 'ACTIVE' ? 1 : 2,
         coordinates,

@@ -1,4 +1,3 @@
-
 import { ChevronDown, ChevronRight, Edit2, Building2, MapPin, Navigation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,7 @@ interface LocationNodeProps {
 
 const LocationNode = ({ location, level, onEdit, data }: LocationNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const children = data.filter(l => l.parentLocation === location.name);
+  const children = data.filter(l => l.parent_location_id === location.id);
   
   const getIcon = (type: string) => {
     switch (type) {
@@ -53,19 +52,19 @@ const LocationNode = ({ location, level, onEdit, data }: LocationNodeProps) => {
           ) : (
             <div className="w-6" />
           )}
-          {getIcon(location.type)}
+          {getIcon(location.master_data?.label ?? "")}
           <span className="text-sm font-medium">{location.name}</span>
           <Badge 
             variant="secondary" 
             className={cn(
               "ml-2 text-xs",
-              location.type === "Region" && "bg-blue-100 text-blue-800",
-              location.type === "District" && "bg-purple-100 text-purple-800",
-              location.type === "School" && "bg-green-100 text-green-800",
-              location.type === "Detailed Location" && "bg-orange-100 text-orange-800"
+              location.master_data?.label === "Region" && "bg-blue-100 text-blue-800",
+              location.master_data?.label === "District" && "bg-purple-100 text-purple-800",
+              location.master_data?.label === "School" && "bg-green-100 text-green-800",
+              location.master_data?.label === "Detailed Location" && "bg-orange-100 text-orange-800"
             )}
           >
-            {location.type.toLowerCase()}
+            {location.master_data?.label?.toLowerCase() ?? "unknown"}
           </Badge>
         </div>
         <Button
@@ -100,7 +99,7 @@ interface LocationHierarchyProps {
 }
 
 export function LocationHierarchy({ data, onEdit }: LocationHierarchyProps) {
-  const rootLocations = data.filter(location => !location.parentLocation);
+  const rootLocations = data.filter(location => !location.parent_location_id);
 
   return (
     <div className="bg-white rounded-lg shadow p-4">

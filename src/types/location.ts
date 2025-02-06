@@ -21,18 +21,6 @@ export interface Location {
   };
 }
 
-export interface LocationDisplay {
-  id: string;
-  name: string;
-  type: LocationType;
-  parentLocation: string;
-  status: LocationStatus;
-  coordinates: {
-    lat: number;
-    lng: number;
-  };
-}
-
 export interface LocationFilters {
   search: string;
   status: LocationStatus[];
