@@ -13,6 +13,11 @@ export interface SDS {
   currentFileName?: string;
   currentFileSize?: number;
   currentContentType?: string;
+  unNumber?: string;
+  unProperShippingName?: string;
+  packingGroup?: string;
+  hazchemCode?: string;
+  subsidiaryDgClass?: string;
 }
 
 export interface SDSFilters {

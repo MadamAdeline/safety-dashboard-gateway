@@ -27,7 +27,12 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     productId: initialData?.productId ?? "",
     issueDate: initialData?.issueDate ?? "",
     expiryDate: initialData?.expiryDate ?? "",
-    dgClass: initialData?.dgClass
+    dgClass: initialData?.dgClass,
+    unNumber: "",
+    unProperShippingName: "",
+    packingGroup: "",
+    hazchemCode: "",
+    subsidiaryDgClass: ""
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -42,17 +47,36 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         productId: initialData.productId,
         issueDate: initialData.issueDate,
         expiryDate: initialData.expiryDate,
-        dgClass: initialData.dgClass
+        dgClass: initialData.dgClass,
+        unNumber: "",
+        unProperShippingName: "",
+        packingGroup: "",
+        hazchemCode: "",
+        subsidiaryDgClass: ""
       });
     }
   }, [initialData]);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, extractedData?: any) => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
       setShowUploadDialog(false);
       console.log("File selected:", file.name);
+
+      if (extractedData) {
+        console.log("Extracted data:", extractedData);
+        setIsDG(true);
+        setFormData(prev => ({
+          ...prev,
+          dgClass: extractedData.dgClass,
+          unNumber: extractedData.unNumber,
+          unProperShippingName: extractedData.unProperShippingName,
+          packingGroup: extractedData.packingGroup,
+          hazchemCode: extractedData.hazchemCode,
+          subsidiaryDgClass: extractedData.subsidiaryDgClass
+        }));
+      }
     }
   };
 

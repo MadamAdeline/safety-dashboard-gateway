@@ -7,11 +7,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SDSUploadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onFileUpload: (event: React.ChangeEvent<HTMLInputElement>, extractedData?: any) => void;
 }
 
 export function SDSUploadDialog({ open, onOpenChange, onFileUpload }: SDSUploadDialogProps) {
@@ -22,7 +23,37 @@ export function SDSUploadDialog({ open, onOpenChange, onFileUpload }: SDSUploadD
     e.stopPropagation();
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const extractSDSData = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/extract-sds-data`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${supabase.supabaseKey}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to extract SDS data');
+      }
+
+      const { data } = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error extracting SDS data:', error);
+      toast({
+        title: "Warning",
+        description: "Could not extract data from PDF. Please fill in the fields manually.",
+        variant: "destructive"
+      });
+      return null;
+    }
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -30,12 +61,13 @@ export function SDSUploadDialog({ open, onOpenChange, onFileUpload }: SDSUploadD
     if (files.length > 0) {
       const file = files[0];
       if (file.type === 'application/pdf') {
+        const extractedData = await extractSDSData(file);
         const event = {
           target: {
             files: [file]
           }
         } as unknown as React.ChangeEvent<HTMLInputElement>;
-        onFileUpload(event);
+        onFileUpload(event, extractedData);
       } else {
         toast({
           title: "Invalid file type",
@@ -43,6 +75,14 @@ export function SDSUploadDialog({ open, onOpenChange, onFileUpload }: SDSUploadD
           variant: "destructive"
         });
       }
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const extractedData = await extractSDSData(file);
+      onFileUpload(e, extractedData);
     }
   };
 
@@ -70,7 +110,7 @@ export function SDSUploadDialog({ open, onOpenChange, onFileUpload }: SDSUploadD
               id="sdsUpload"
               className="hidden"
               accept=".pdf"
-              onChange={onFileUpload}
+              onChange={handleFileChange}
             />
             <label htmlFor="sdsUpload">
               <Button variant="secondary" className="cursor-pointer">
