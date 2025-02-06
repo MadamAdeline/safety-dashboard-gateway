@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import type { Product } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 import { SDSSearch } from "@/components/sds/SDSSearch";
+import type { SDS } from "@/types/sds";
 
 interface ProductFormProps {
   onClose: () => void;
@@ -124,6 +125,17 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
 
   const approvalStatusOptions = statusOptions.filter(option => option.category === 'PRODUCT_APPROVAL');
   const productStatusOptions = statusOptions.filter(option => option.category === 'PRODUCT_STATUS');
+
+  const handleSDSSelect = (selectedSDS: SDS | SDS[]) => {
+    // If it's a single SDS object
+    if (!Array.isArray(selectedSDS)) {
+      setFormData(prev => ({ ...prev, sdsId: selectedSDS.id }));
+    }
+    // If it's an array, take the first item (if exists)
+    else if (selectedSDS.length > 0) {
+      setFormData(prev => ({ ...prev, sdsId: selectedSDS[0].id }));
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -324,7 +336,7 @@ export function ProductForm({ onClose, initialData }: ProductFormProps) {
                 <Label>Associated SDS</Label>
                 <SDSSearch
                   selectedSdsId={formData.sdsId}
-                  onSDSSelect={(sds) => setFormData(prev => ({ ...prev, sdsId: sds.id }))}
+                  onSDSSelect={handleSDSSelect}
                 />
               </div>
             </TabsContent>
