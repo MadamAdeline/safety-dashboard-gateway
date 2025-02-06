@@ -14,10 +14,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@/types/user";
 
-interface UserListProps {
-  onEdit: (user: User) => void;
-}
-
 type UserWithRelations = Omit<User, 'manager'> & {
   user_roles?: {
     roles: {
@@ -32,6 +28,10 @@ type UserWithRelations = Omit<User, 'manager'> & {
     name: string;
   } | null;
 };
+
+interface UserListProps {
+  onEdit: (user: UserWithRelations) => void;  // Changed from User to UserWithRelations
+}
 
 export function UserList({ onEdit }: UserListProps) {
   const { data: users, isLoading } = useQuery({
