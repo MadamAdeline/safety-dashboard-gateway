@@ -27,7 +27,12 @@ export async function createSDS(data: {
   const formattedData = {
     ...data,
     issue_date: data.issueDate || null,
-    expiry_date: data.expiryDate || null
+    expiry_date: data.expiryDate || null,
+    // Handle empty UUID fields by converting empty strings to null
+    dg_class_id: data.dgClassId || null,
+    subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
+    packing_group_id: data.packingGroupId || null,
+    dg_subdivision_id: data.dgSubDivisionId || null
   };
   
   const { data: result, error } = await supabase
@@ -47,10 +52,10 @@ export async function createSDS(data: {
       un_number: data.unNumber,
       un_proper_shipping_name: data.unProperShippingName,
       hazchem_code: data.hazchemCode,
-      dg_class_id: data.dgClassId,
-      subsidiary_dg_class_id: data.subsidiaryDgClassId,
-      packing_group_id: data.packingGroupId,
-      dg_subdivision_id: data.dgSubDivisionId
+      dg_class_id: formattedData.dg_class_id,
+      subsidiary_dg_class_id: formattedData.subsidiary_dg_class_id,
+      packing_group_id: formattedData.packing_group_id,
+      dg_subdivision_id: formattedData.dg_subdivision_id
     })
     .select()
     .single();
