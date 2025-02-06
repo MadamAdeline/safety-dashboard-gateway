@@ -62,7 +62,7 @@ export function GlobalSDSSearchDialog({
           .insert({
             product_name: sds.productName,
             product_id: sds.productId,
-            supplier_id: sds.supplierId,
+            supplier_id: 'c3a03764-6c11-4858-9fbe-93332fbdbc1c',
             is_dg: sds.isDG,
             issue_date: sds.issueDate,
             expiry_date: sds.expiryDate,
@@ -127,7 +127,7 @@ export function GlobalSDSSearchDialog({
       productName: "Sample Product 1",
       productId: "SP001",
       supplier: "Supplier A",
-      supplierId: "123e4567-e89b-12d3-a456-426614174000", // Valid UUID format
+      supplierId: "c3a03764-6c11-4858-9fbe-93332fbdbc1c",
       expiryDate: "2025-12-31",
       isDG: true,
       issueDate: "2023-01-01",
@@ -139,7 +139,7 @@ export function GlobalSDSSearchDialog({
       productName: "BP Butane",
       productId: "0000002705",
       supplier: "BP Australia Pty Ltd",
-      supplierId: "123e4567-e89b-12d3-a456-426614174001", // Valid UUID format
+      supplierId: "c3a03764-6c11-4858-9fbe-93332fbdbc1c",
       expiryDate: "2026-04-21",
       isDG: true,
       issueDate: "2021-04-21",
@@ -310,3 +310,4 @@ export function GlobalSDSSearchDialog({
     </Dialog>
   );
 }
+
