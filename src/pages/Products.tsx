@@ -10,7 +10,7 @@ import { ProductActions } from "@/components/products/ProductActions";
 import { ProductForm } from "@/components/products/ProductForm";
 import type { Product, ProductFilters as ProductFiltersType } from "@/types/product";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Products() {
   const [filters, setFilters] = useState<ProductFiltersType>({
@@ -31,40 +31,36 @@ export default function Products() {
     queryFn: async () => {
       console.log('Fetching products from Supabase...');
       
-      if (!supabase) {
-        console.error('Supabase client is not initialized');
-        throw new Error('Supabase client is not initialized');
-      }
-
       const { data, error } = await supabase
         .from('products')
         .select(`
           id,
-          name:product_name,
-          code:product_code,
-          brandName:brand_name,
+          product_name,
+          product_code,
+          brand_name,
           unit,
-          unitSize:unit_size,
+          unit_size,
           description,
-          productSet:product_set,
+          product_set,
           aerosol,
-          cryogenicFluid:cryogenic_fluid,
-          otherNames:other_names,
+          cryogenic_fluid,
+          other_names,
           uses,
-          status:product_status_id,
-          approvalStatusId:approval_status_id,
-          sds:sds_id (
+          product_status_id,
+          approval_status_id,
+          sds_id,
+          sds (
             id,
-            isDG:is_dg,
-            dgClass:dg_class_id (
+            is_dg,
+            dg_class_id (
               id,
               label
             ),
-            supplier:supplier_id (
+            supplier_id (
               id,
               supplier_name
             ),
-            packingGroup:packing_group_id (
+            packing_group_id (
               id,
               label
             )
@@ -76,22 +72,37 @@ export default function Products() {
         throw error;
       }
 
+      console.log('Raw products data:', data);
+
       // Transform the data to match the Product type
       const transformedData = data.map(item => ({
-        ...item,
-        sds: item.sds && item.sds[0] ? {
-          id: item.sds[0].id,
-          isDG: item.sds[0].isDG,
-          dgClass: item.sds[0].dgClass?.[0] || undefined,
-          supplier: item.sds[0].supplier?.[0] || undefined,
-          packingGroup: item.sds[0].packingGroup?.[0] || undefined
-        } : null
+        id: item.id,
+        name: item.product_name,
+        code: item.product_code,
+        brandName: item.brand_name,
+        unit: item.unit,
+        unitSize: item.unit_size,
+        description: item.description,
+        productSet: item.product_set,
+        aerosol: item.aerosol,
+        cryogenicFluid: item.cryogenic_fluid,
+        otherNames: item.other_names,
+        uses: item.uses,
+        status: item.product_status_id,
+        approvalStatusId: item.approval_status_id,
+        sdsId: item.sds_id,
+        sds: item.sds ? {
+          id: item.sds.id,
+          isDG: item.sds.is_dg,
+          dgClass: item.sds.dg_class_id?.[0],
+          supplier: item.sds.supplier_id?.[0],
+          packingGroup: item.sds.packing_group_id?.[0]
+        } : undefined
       })) as Product[];
 
-      console.log('Products fetched and transformed:', transformedData);
+      console.log('Transformed products data:', transformedData);
       return transformedData;
-    },
-    retry: 1
+    }
   });
 
   useEffect(() => {
