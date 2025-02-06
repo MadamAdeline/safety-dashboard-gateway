@@ -42,6 +42,12 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
     return location.status_id === 1 ? "ACTIVE" : "INACTIVE";
   };
 
+  const getParentLocationName = (location: Location): string => {
+    if (!location.parent_location_id) return "-";
+    const parentLocation = locations.find(loc => loc.id === location.parent_location_id);
+    return parentLocation ? parentLocation.name : "-";
+  };
+
   const filteredData = locations.map(item => ({
     ...item,
     coordinates: typeof item.coordinates === 'string' 
@@ -138,7 +144,7 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
                     {item.master_data?.label || "Unknown"}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-dgxprt-navy">{item.parent_location_id || "-"}</TableCell>
+                <TableCell className="text-dgxprt-navy">{getParentLocationName(item)}</TableCell>
                 <TableCell>
                   <Badge 
                     variant={item.status_id === 1 ? "default" : "destructive"}
