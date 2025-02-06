@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      master_data: {
+        Row: {
+          category: string
+          created_at: string | null
+          id: string
+          label: string
+          sort_order: number
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          id?: string
+          label: string
+          sort_order?: number
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          id?: string
+          label?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       sds: {
         Row: {
           created_at: string | null
