@@ -22,7 +22,13 @@ export function SDSList({ data, filters, onEdit }: SDSListProps) {
   const itemsPerPage = 10;
   const queryClient = useQueryClient();
 
-  const filteredData = data.filter((item) => {
+  // First sort the data by product name
+  const sortedData = [...data].sort((a, b) => 
+    a.productName.toLowerCase().localeCompare(b.productName.toLowerCase())
+  );
+
+  // Then apply filters to the sorted data
+  const filteredData = sortedData.filter((item) => {
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       return (
