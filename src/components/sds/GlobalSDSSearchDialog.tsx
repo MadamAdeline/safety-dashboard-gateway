@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Dialog,
@@ -16,34 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import type { SDS } from "@/types/sds";
 import { SDSRequestDialog } from "./SDSRequestDialog";
 import { SDSSearch } from "@/components/sds/SDSSearch";
-
-// Sample data for demonstration
-const sampleSearchResults: SDS[] = [
-  {
-    id: "1234-5678-9012-3456",
-    productName: "Sample Product 1",
-    productId: "SP001",
-    supplier: "Supplier A",
-    supplierId: "supplier-a-uuid",
-    expiryDate: "2025-12-31",
-    isDG: true,
-    issueDate: "2023-01-01",
-    status: "ACTIVE",
-    sdsSource: "Global Library"
-  },
-  {
-    id: "2345-6789-0123-4567",
-    productName: "BP Butane",
-    productId: "0000002705",
-    supplier: "BP Australia Pty Ltd",
-    supplierId: "bp-australia-uuid",
-    expiryDate: "2026-04-21",
-    isDG: true,
-    issueDate: "2021-04-21",
-    status: "ACTIVE",
-    sdsSource: "Global Library"
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
 
 interface GlobalSDSSearchDialogProps {
   open: boolean;
@@ -74,18 +48,63 @@ export function GlobalSDSSearchDialog({
     setSearchResults(sampleSearchResults);
   };
 
-  const handleAddToLibrary = () => {
+  const handleAddToLibrary = async () => {
+    console.log("Adding selected items to library");
     const selectedSDS = searchResults.filter(sds => 
       selectedItems.includes(sds.productId)
     );
     
-    onSDSSelect(selectedSDS);
-    toast({
-      title: "Success",
-      description: `${selectedItems.length} SDS(s) have been added to your library.`,
-    });
-    onOpenChange(false);
-    setSelectedItems([]);
+    try {
+      // Insert selected SDS records into the database
+      for (const sds of selectedSDS) {
+        const { error } = await supabase
+          .from('sds')
+          .insert({
+            product_name: sds.productName,
+            product_id: sds.productId,
+            supplier_id: sds.supplierId,
+            is_dg: sds.isDG,
+            issue_date: sds.issueDate,
+            expiry_date: sds.expiryDate,
+            status_id: 3, // Active status
+            dg_class_id: sds.dgClassId,
+            subsidiary_dg_class_id: sds.subsidiaryDgClassId,
+            packing_group_id: sds.packingGroupId,
+            dg_subdivision_id: sds.dgSubDivisionId,
+            current_file_path: sds.currentFilePath,
+            current_file_name: sds.currentFileName,
+            current_file_size: sds.currentFileSize,
+            current_content_type: sds.currentContentType,
+            un_number: sds.unNumber,
+            un_proper_shipping_name: sds.unProperShippingName,
+            hazchem_code: sds.hazchemCode,
+            other_names: sds.otherNames,
+            emergency_phone: sds.emergencyPhone
+          });
+
+        if (error) {
+          console.error('Error inserting SDS:', error);
+          throw error;
+        }
+      }
+
+      toast({
+        title: "Success",
+        description: `${selectedItems.length} SDS(s) have been added to your library.`,
+      });
+      
+      onSDSSelect(selectedSDS);
+      onOpenChange(false);
+      setSelectedItems([]);
+      
+    } catch (error) {
+      console.error('Error adding SDS to library:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add SDS to library. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const toggleSelectItem = (productId: string) => {
@@ -100,6 +119,34 @@ export function GlobalSDSSearchDialog({
     setShowRequestDialog(false);
     onOpenChange(false);
   };
+
+  // Sample data for demonstration
+  const sampleSearchResults: SDS[] = [
+    {
+      id: "1234-5678-9012-3456",
+      productName: "Sample Product 1",
+      productId: "SP001",
+      supplier: "Supplier A",
+      supplierId: "supplier-a-uuid",
+      expiryDate: "2025-12-31",
+      isDG: true,
+      issueDate: "2023-01-01",
+      status: "ACTIVE",
+      sdsSource: "Global Library"
+    },
+    {
+      id: "2345-6789-0123-4567",
+      productName: "BP Butane",
+      productId: "0000002705",
+      supplier: "BP Australia Pty Ltd",
+      supplierId: "bp-australia-uuid",
+      expiryDate: "2026-04-21",
+      isDG: true,
+      issueDate: "2021-04-21",
+      status: "ACTIVE",
+      sdsSource: "Global Library"
+    }
+  ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
