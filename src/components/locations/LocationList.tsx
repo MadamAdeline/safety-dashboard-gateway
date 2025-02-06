@@ -27,7 +27,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
   const [newLocation, setNewLocation] = useState<Partial<Location> | null>(null);
   const itemsPerPage = 10;
 
-  const { locations, isLoading, createLocation } = useLocations();
+  const { locations, isLoading, createLocation, deleteLocation } = useLocations();
   const { toast } = useToast();
 
   const getLocationTypeLabel = (location: Location): string => {
