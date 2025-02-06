@@ -36,11 +36,11 @@ export function SDSTableRow({ item, isSelected, onToggleSelect, onEdit, onDelete
       }
 
       // Delete all version records
-      console.log('Deleting version records for SDS:', item.productId);
+      console.log('Deleting version records for SDS:', item.id);
       const { error: versionsError } = await supabase
         .from('sds_versions')
         .delete()
-        .eq('sds_id', item.productId);
+        .eq('sds_id', item.id);
 
       if (versionsError) {
         console.error('Error deleting versions:', versionsError);
@@ -48,11 +48,11 @@ export function SDSTableRow({ item, isSelected, onToggleSelect, onEdit, onDelete
       }
 
       // Finally, delete the SDS record
-      console.log('Deleting SDS record:', item.productId);
+      console.log('Deleting SDS record:', item.id);
       const { error: sdsError } = await supabase
         .from('sds')
         .delete()
-        .eq('product_id', item.productId);
+        .eq('id', item.id);
 
       if (sdsError) {
         console.error('Error deleting SDS:', sdsError);

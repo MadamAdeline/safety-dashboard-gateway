@@ -1,4 +1,5 @@
 export interface SDS {
+  id: string;
   productName: string;
   productId: string;
   isDG: boolean;
