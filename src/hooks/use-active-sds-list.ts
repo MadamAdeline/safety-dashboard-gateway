@@ -12,9 +12,9 @@ export function useActiveSdsList() {
       const { data: statusData, error: statusError } = await supabase
         .from('status_lookup')
         .select('id')
-        .eq('category', 'SDS_LIBRARY')
+        .eq('category', 'SDS_Library')  // Fixed case to match database
         .eq('status_name', 'ACTIVE')
-        .single();
+        .maybeSingle();  // Changed from single() to maybeSingle()
 
       if (statusError) {
         console.error('Error fetching active status:', statusError);
@@ -22,7 +22,7 @@ export function useActiveSdsList() {
       }
 
       if (!statusData) {
-        console.error('No active status found for SDS_LIBRARY');
+        console.error('No active status found for SDS_Library');
         return [];
       }
 
