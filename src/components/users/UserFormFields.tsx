@@ -54,12 +54,25 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
       
       const { data, error } = await supabase
         .from('locations')
-        .select('*')
+        .select(`
+          id,
+          name,
+          type_id,
+          parent_location_id,
+          status_id,
+          coordinates,
+          master_data (id, label),
+          status_lookup (id, status_name)
+        `)
         .eq('id', formData.location_id)
         .single();
       
       if (error) throw error;
-      return data;
+      return data ? {
+        ...data,
+        coordinates: data.coordinates || null,
+        parent_location_id: data.parent_location_id || null,
+      } as Location : null;
     },
     enabled: !!formData.location_id
   });

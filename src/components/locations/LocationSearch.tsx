@@ -32,6 +32,9 @@ export function LocationSearch({
           id,
           name,
           type_id,
+          parent_location_id,
+          status_id,
+          coordinates,
           master_data (id, label),
           status_lookup (id, status_name)
         `)
@@ -42,7 +45,11 @@ export function LocationSearch({
         throw error;
       }
 
-      return data || [];
+      return (data || []).map(location => ({
+        ...location,
+        coordinates: location.coordinates || null,
+        parent_location_id: location.parent_location_id || null,
+      })) as Location[];
     }
   });
 
