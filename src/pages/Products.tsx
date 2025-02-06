@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProductList } from "@/components/products/ProductList";
@@ -8,6 +7,7 @@ import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { ProductSearch } from "@/components/products/ProductSearch";
 import { ProductActions } from "@/components/products/ProductActions";
+import { ProductForm } from "@/components/products/ProductForm";
 import type { Product, ProductFilters as ProductFiltersType } from "@/types/product";
 
 const sampleData: Product[] = [
@@ -45,6 +45,7 @@ export default function Products() {
   });
   
   const [showFilters, setShowFilters] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { toast } = useToast();
 
@@ -64,7 +65,7 @@ export default function Products() {
 
   const handleEdit = (product: Product) => {
     setSelectedProduct(product);
-    // TODO: Implement edit functionality
+    setShowForm(true);
   };
 
   return (
@@ -73,36 +74,49 @@ export default function Products() {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Products</h1>
           <Button 
-            onClick={() => {}} 
+            onClick={() => {
+              setSelectedProduct(null);
+              setShowForm(true);
+            }} 
             className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
           >
             <Plus className="mr-2 h-4 w-4" /> New Product
           </Button>
         </div>
         
-        <div className="flex flex-col space-y-4">
-          <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-            <ProductSearch 
-              value={filters.search}
-              onChange={(value) => setFilters({ ...filters, search: value })}
-            />
-            <ProductActions 
-              onToggleFilters={() => setShowFilters(!showFilters)}
-              onExport={handleExport}
-              onRefresh={handleRefresh}
+        {showForm ? (
+          <ProductForm 
+            onClose={() => {
+              setShowForm(false);
+              setSelectedProduct(null);
+            }}
+            initialData={selectedProduct}
+          />
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
+              <ProductSearch 
+                value={filters.search}
+                onChange={(value) => setFilters({ ...filters, search: value })}
+              />
+              <ProductActions 
+                onToggleFilters={() => setShowFilters(!showFilters)}
+                onExport={handleExport}
+                onRefresh={handleRefresh}
+              />
+            </div>
+            
+            {showFilters && (
+              <ProductFilters filters={filters} onFiltersChange={setFilters} />
+            )}
+            
+            <ProductList 
+              data={sampleData} 
+              filters={filters} 
+              onEdit={handleEdit}
             />
           </div>
-          
-          {showFilters && (
-            <ProductFilters filters={filters} onFiltersChange={setFilters} />
-          )}
-        </div>
-        
-        <ProductList 
-          data={sampleData} 
-          filters={filters} 
-          onEdit={handleEdit}
-        />
+        )}
       </div>
     </DashboardLayout>
   );

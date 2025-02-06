@@ -108,6 +108,7 @@ export type Database = {
           product_name: string
           product_set: boolean | null
           product_status_id: number | null
+          sds_id: string | null
           unit: string
           unit_size: number | null
           updated_at: string | null
@@ -126,6 +127,7 @@ export type Database = {
           product_name: string
           product_set?: boolean | null
           product_status_id?: number | null
+          sds_id?: string | null
           unit: string
           unit_size?: number | null
           updated_at?: string | null
@@ -144,6 +146,7 @@ export type Database = {
           product_name?: string
           product_set?: boolean | null
           product_status_id?: number | null
+          sds_id?: string | null
           unit?: string
           unit_size?: number | null
           updated_at?: string | null
@@ -162,6 +165,13 @@ export type Database = {
             columns: ["product_status_id"]
             isOneToOne: false
             referencedRelation: "status_lookup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_sds_id_fkey"
+            columns: ["sds_id"]
+            isOneToOne: false
+            referencedRelation: "sds"
             referencedColumns: ["id"]
           },
         ]
