@@ -7,6 +7,7 @@ import { useState } from "react";
 import { SDSTableHeader } from "./table/SDSTableHeader";
 import { SDSTableRow } from "./table/SDSTableRow";
 import { SDSPagination } from "./table/SDSPagination";
+import * as XLSX from 'xlsx';
 
 interface SDSListProps {
   data: SDS[];
@@ -20,8 +21,14 @@ export function SDSList({ data, filters, onEdit }: SDSListProps) {
   const itemsPerPage = 10;
 
   const filteredData = data.filter((item) => {
-    if (filters.search && !item.productName.toLowerCase().includes(filters.search.toLowerCase())) {
-      return false;
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      return (
+        item.productName.toLowerCase().includes(searchTerm) ||
+        item.productId.toLowerCase().includes(searchTerm) ||
+        item.supplier.toLowerCase().includes(searchTerm) ||
+        item.status.toLowerCase().includes(searchTerm)
+      );
     }
     return true;
   });

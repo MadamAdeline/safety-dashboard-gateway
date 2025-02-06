@@ -44,6 +44,7 @@ export function SDSDetailsTab({
   const { data: suppliers = [] } = useQuery({
     queryKey: ['suppliers'],
     queryFn: async () => {
+      console.log('Fetching suppliers from Supabase');
       const { data, error } = await supabase
         .from('suppliers')
         .select('*')
@@ -71,6 +72,16 @@ export function SDSDetailsTab({
       }));
     }
   }, [formData.issueDate, setFormData]);
+
+  useEffect(() => {
+    // Set initial supplier when editing
+    if (initialData?.supplier) {
+      const foundSupplier = suppliers.find(s => s.name === initialData.supplier);
+      if (foundSupplier) {
+        setSupplier(foundSupplier.id);
+      }
+    }
+  }, [initialData, suppliers, setSupplier]);
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData((prev: any) => ({
