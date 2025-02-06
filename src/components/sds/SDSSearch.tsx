@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useSDSList } from "@/hooks/use-sds-list";
+import { useActiveSdsList } from "@/hooks/use-active-sds-list";
 import type { SDS } from "@/types/sds";
 
 interface SDSSearchProps {
@@ -9,12 +10,16 @@ interface SDSSearchProps {
   initialSDS?: SDS | null;
   onSDSSelect: (sds: SDS | SDS[]) => void;
   className?: string;
+  activeOnly?: boolean;
 }
 
-export function SDSSearch({ selectedSdsId, initialSDS, onSDSSelect, className }: SDSSearchProps) {
+export function SDSSearch({ selectedSdsId, initialSDS, onSDSSelect, className, activeOnly = false }: SDSSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { data: sdsList } = useSDSList();
+  const { data: allSdsList } = useSDSList();
+  const { data: activeSdsList } = useActiveSdsList();
+
+  const sdsList = activeOnly ? activeSdsList : allSdsList;
 
   useEffect(() => {
     if (initialSDS) {

@@ -80,6 +80,7 @@ export function ProductSDSTab({ sdsId, onSDSSelect }: ProductSDSTabProps) {
           initialSDS={initialSDS}
           onSDSSelect={onSDSSelect}
           className="w-full"
+          activeOnly={true}
         />
       </div>
 
