@@ -38,7 +38,7 @@ export function SDSTableRow({ item, onEdit, onDelete }: SDSTableRowProps) {
       <TableCell className="text-dgxprt-navy">{item.supplier}</TableCell>
       <TableCell className="text-dgxprt-navy">{item.issueDate}</TableCell>
       <TableCell className="text-dgxprt-navy">{item.expiryDate}</TableCell>
-      <TableCell className="text-dgxprt-navy">{item.dgClass}</TableCell>
+      <TableCell className="text-dgxprt-navy">{item.dgClassId}</TableCell>
       <TableCell>
         <Badge 
           variant={item.status === "ACTIVE" ? "default" : "destructive"}
