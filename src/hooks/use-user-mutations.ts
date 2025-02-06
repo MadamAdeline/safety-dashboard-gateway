@@ -24,10 +24,13 @@ export function useUserMutations(onSuccess: () => void) {
     mutationFn: async (data: UserData) => {
       console.log('Creating user with data:', data);
       
+      // Generate random password if none provided
+      const password = data.password || Math.random().toString(36).slice(-8);
+      
       // Create user with admin signup
       const { data: userData, error: userError } = await supabase.auth.admin.createUser({
         email: data.email,
-        password: data.password || Math.random().toString(36).slice(-8), // Generate random password if none provided
+        password: password,
         email_confirm: true,
         user_metadata: {
           first_name: data.first_name,
@@ -42,12 +45,12 @@ export function useUserMutations(onSuccess: () => void) {
       const { data: profileData, error: profileError } = await supabase
         .from('users')
         .insert({
-          id: userData.user.id,
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,
           phone_number: data.phone_number,
           active: data.active,
+          password: password, // Store the same password in users table
           manager_id: data.manager_id || null,
           location_id: data.location_id || null
         })
@@ -92,7 +95,7 @@ export function useUserMutations(onSuccess: () => void) {
     mutationFn: async ({ id, data }: { id: string; data: UserData }) => {
       console.log('Updating user with data:', data);
       
-      const updateData: Partial<UserData> = {
+      const updateData: Partial<UserData> & { password?: string } = {
         first_name: data.first_name,
         last_name: data.last_name,
         email: data.email,
@@ -110,6 +113,9 @@ export function useUserMutations(onSuccess: () => void) {
         );
 
         if (authError) throw authError;
+        
+        // Also update password in users table
+        updateData.password = data.password;
       }
 
       console.log('Final update data:', updateData);
