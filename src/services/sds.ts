@@ -68,6 +68,72 @@ export async function createSDS(data: {
   return result;
 }
 
+export async function updateSDS(id: string, data: {
+  productName: string;
+  productId: string;
+  supplierId: string;
+  isDG: boolean;
+  issueDate?: string;
+  expiryDate?: string;
+  statusId: number;
+  currentFilePath?: string;
+  currentFileName?: string;
+  currentFileSize?: number;
+  currentContentType?: string;
+  unNumber?: string;
+  unProperShippingName?: string;
+  hazchemCode?: string;
+  dgClassId?: string;
+  subsidiaryDgClassId?: string;
+  packingGroupId?: string;
+  dgSubDivisionId?: string;
+}) {
+  console.log("Updating SDS with ID:", id, "and data:", data);
+  
+  const formattedData = {
+    ...data,
+    issue_date: data.issueDate || null,
+    expiry_date: data.expiryDate || null,
+    dg_class_id: data.dgClassId || null,
+    subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
+    packing_group_id: data.packingGroupId || null,
+    dg_subdivision_id: data.dgSubDivisionId || null
+  };
+
+  const { data: result, error } = await supabase
+    .from('sds')
+    .update({
+      product_name: data.productName,
+      product_id: data.productId,
+      supplier_id: data.supplierId,
+      is_dg: data.isDG,
+      issue_date: formattedData.issue_date,
+      expiry_date: formattedData.expiry_date,
+      status_id: data.statusId,
+      current_file_path: data.currentFilePath,
+      current_file_name: data.currentFileName,
+      current_file_size: data.currentFileSize,
+      current_content_type: data.currentContentType,
+      un_number: data.unNumber,
+      un_proper_shipping_name: data.unProperShippingName,
+      hazchem_code: data.hazchemCode,
+      dg_class_id: formattedData.dg_class_id,
+      subsidiary_dg_class_id: formattedData.subsidiary_dg_class_id,
+      packing_group_id: formattedData.packing_group_id,
+      dg_subdivision_id: formattedData.dg_subdivision_id
+    })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating SDS:", error);
+    throw error;
+  }
+
+  return result;
+}
+
 export async function uploadSDSFile(file: File) {
   console.log("Uploading SDS file:", file.name);
   
