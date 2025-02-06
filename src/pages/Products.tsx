@@ -31,11 +31,6 @@ export default function Products() {
     queryFn: async () => {
       console.log('Fetching products from Supabase...');
       
-      if (!supabase) {
-        console.error('Supabase client is not initialized');
-        throw new Error('Supabase client is not initialized');
-      }
-
       const { data, error } = await supabase
         .from('products')
         .select(`
@@ -79,19 +74,18 @@ export default function Products() {
       // Transform the data to match the Product type
       const transformedData = data.map(item => ({
         ...item,
-        sds: item.sds && item.sds[0] ? {
+        sds: item.sds && item.sds.length > 0 ? {
           id: item.sds[0].id,
           isDG: item.sds[0].isDG,
-          dgClass: item.sds[0].dgClass?.[0] || undefined,
-          supplier: item.sds[0].supplier?.[0] || undefined,
-          packingGroup: item.sds[0].packingGroup?.[0] || undefined
+          dgClass: item.sds[0].dgClass?.[0],
+          supplier: item.sds[0].supplier?.[0],
+          packingGroup: item.sds[0].packingGroup?.[0]
         } : null
       })) as Product[];
 
       console.log('Products fetched and transformed:', transformedData);
       return transformedData;
-    },
-    retry: 1
+    }
   });
 
   useEffect(() => {
