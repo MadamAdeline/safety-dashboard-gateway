@@ -28,20 +28,17 @@ export function SDSUploadDialog({ open, onOpenChange, onFileUpload }: SDSUploadD
     formData.append('file', file);
 
     try {
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/extract-sds-data`, {
-        method: 'POST',
+      console.log('Attempting to extract SDS data from PDF');
+      const response = await supabase.functions.invoke('extract-sds-data', {
         body: formData,
-        headers: {
-          'Authorization': `Bearer ${supabase.supabaseKey}`
-        }
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to extract SDS data');
+      if (!response.error) {
+        console.log('Successfully extracted SDS data:', response.data);
+        return response.data;
+      } else {
+        throw new Error(response.error.message);
       }
-
-      const { data } = await response.json();
-      return data;
     } catch (error) {
       console.error('Error extracting SDS data:', error);
       toast({

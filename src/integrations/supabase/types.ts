@@ -18,13 +18,18 @@ export type Database = {
           current_file_size: number | null
           dg_class: number | null
           expiry_date: string | null
+          hazchem_code: string | null
           id: string
           is_dg: boolean | null
           issue_date: string | null
+          packing_group: string | null
           product_id: string
           product_name: string
           status_id: number
+          subsidiary_dg_class: string | null
           supplier_id: string
+          un_number: string | null
+          un_proper_shipping_name: string | null
           updated_at: string | null
         }
         Insert: {
@@ -35,13 +40,18 @@ export type Database = {
           current_file_size?: number | null
           dg_class?: number | null
           expiry_date?: string | null
+          hazchem_code?: string | null
           id?: string
           is_dg?: boolean | null
           issue_date?: string | null
+          packing_group?: string | null
           product_id: string
           product_name: string
           status_id: number
+          subsidiary_dg_class?: string | null
           supplier_id: string
+          un_number?: string | null
+          un_proper_shipping_name?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -52,13 +62,18 @@ export type Database = {
           current_file_size?: number | null
           dg_class?: number | null
           expiry_date?: string | null
+          hazchem_code?: string | null
           id?: string
           is_dg?: boolean | null
           issue_date?: string | null
+          packing_group?: string | null
           product_id?: string
           product_name?: string
           status_id?: number
+          subsidiary_dg_class?: string | null
           supplier_id?: string
+          un_number?: string | null
+          un_proper_shipping_name?: string | null
           updated_at?: string | null
         }
         Relationships: [
