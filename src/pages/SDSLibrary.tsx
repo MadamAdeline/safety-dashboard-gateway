@@ -86,7 +86,6 @@ export default function SDSLibrary() {
         otherNames: item.other_names,
         emergencyPhone: item.emergency_phone,
         revisionDate: item.revision_date,
-        // Add missing request-related fields
         requestSupplierName: item.request_supplier_name,
         requestSupplierDetails: item.request_supplier_details,
         requestInformation: item.request_information,
@@ -123,12 +122,9 @@ export default function SDSLibrary() {
     queryClient.invalidateQueries({ queryKey: ['sds'] });
   };
 
-  const handleSDSSelect = (selectedSDS: SDS[]) => {
-    console.log("Selected SDS:", selectedSDS);
-    toast({
-      title: "Success",
-      description: `${selectedSDS.length} SDS(s) have been added to your library.`,
-    });
+  const handleSDSSelect = (sds: SDS) => {
+    setSelectedSDS(sds);
+    setFilters({ ...filters, search: sds.productName });
   };
 
   if (showNewSDS) {
@@ -173,8 +169,8 @@ export default function SDSLibrary() {
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
             <SDSSearch 
-              value={filters.search}
-              onChange={(value) => setFilters({ ...filters, search: value })}
+              selectedSdsId={selectedSDS?.id}
+              onSDSSelect={handleSDSSelect}
             />
             <SDSActions 
               onToggleFilters={() => setShowFilters(!showFilters)}
