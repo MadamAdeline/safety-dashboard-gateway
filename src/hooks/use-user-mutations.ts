@@ -1,5 +1,5 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/integrations/supabase/service-role-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import type { UserStatus } from "@/types/user";
@@ -28,7 +28,7 @@ export function useUserMutations(onSuccess: () => void) {
       const password = data.password || Math.random().toString(36).slice(-8);
       
       // Create user with admin signup
-      const { data: userData, error: userError } = await supabase.auth.admin.createUser({
+      const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
         email: data.email,
         password: password,
         email_confirm: true,
@@ -42,7 +42,7 @@ export function useUserMutations(onSuccess: () => void) {
       if (!userData.user) throw new Error('No user returned from signup');
 
       // Create user profile with service role client
-      const { data: profileData, error: profileError } = await supabase
+      const { data: profileData, error: profileError } = await supabaseAdmin
         .from('users')
         .insert({
           first_name: data.first_name,
@@ -61,7 +61,7 @@ export function useUserMutations(onSuccess: () => void) {
 
       // Assign role if provided
       if (data.role_id) {
-        const { error: roleError } = await supabase
+        const { error: roleError } = await supabaseAdmin
           .from('user_roles')
           .insert({
             user_id: profileData.id,
@@ -107,7 +107,7 @@ export function useUserMutations(onSuccess: () => void) {
 
       if (data.password) {
         // Update password if provided
-        const { error: authError } = await supabase.auth.admin.updateUserById(
+        const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(
           id,
           { password: data.password }
         );
@@ -121,7 +121,7 @@ export function useUserMutations(onSuccess: () => void) {
       console.log('Final update data:', updateData);
 
       // Update user profile
-      const { error: userError } = await supabase
+      const { error: userError } = await supabaseAdmin
         .from('users')
         .update(updateData)
         .eq('id', id);
@@ -131,7 +131,7 @@ export function useUserMutations(onSuccess: () => void) {
       // Update role if provided
       if (data.role_id) {
         // Delete existing role
-        const { error: deleteError } = await supabase
+        const { error: deleteError } = await supabaseAdmin
           .from('user_roles')
           .delete()
           .eq('user_id', id);
@@ -139,7 +139,7 @@ export function useUserMutations(onSuccess: () => void) {
         if (deleteError) throw deleteError;
 
         // Add new role
-        const { error: roleError } = await supabase
+        const { error: roleError } = await supabaseAdmin
           .from('user_roles')
           .insert({
             user_id: id,

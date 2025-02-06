@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Edit2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/integrations/supabase/service-role-client";
 import type { User } from "@/types/user";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -38,16 +38,8 @@ export function UserList({ onEdit }: UserListProps) {
     queryFn: async () => {
       console.log('Fetching users from Supabase...');
       try {
-        const { data, error } = await supabase.auth.admin.listUsers();
-        
-        if (error) {
-          console.error('Error fetching users:', error);
-          throw error;
-        }
-
         // Get additional user data from the users table
-        const userIds = data.users.map(user => user.id);
-        const { data: usersData, error: usersError } = await supabase
+        const { data: usersData, error: usersError } = await supabaseAdmin
           .from('users')
           .select(`
             *,
@@ -60,8 +52,7 @@ export function UserList({ onEdit }: UserListProps) {
               name,
               full_path
             )
-          `)
-          .in('id', userIds);
+          `);
         
         if (usersError) {
           console.error('Error fetching user details:', usersError);
