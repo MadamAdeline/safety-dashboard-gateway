@@ -45,12 +45,14 @@ export function LocationSearch({
         throw error;
       }
 
+      console.log('Fetched locations:', data);
       return (data || []).map(location => ({
         ...location,
         coordinates: location.coordinates || null,
         parent_location_id: location.parent_location_id || null,
       })) as Location[];
-    }
+    },
+    staleTime: 5000 // Cache for 5 seconds
   });
 
   useEffect(() => {
@@ -73,6 +75,7 @@ export function LocationSearch({
   const getParentLocationName = (location: Location): string => {
     if (!location.parent_location_id) return "-";
     const parentLocation = locations?.find(loc => loc.id === location.parent_location_id);
+    console.log('Finding parent for location:', location.name, 'Parent:', parentLocation?.name);
     return parentLocation ? parentLocation.name : "-";
   };
 
@@ -80,8 +83,18 @@ export function LocationSearch({
     if (!searchTerm) return true;
     
     const searchLower = searchTerm.toLowerCase();
-    return location.name.toLowerCase().includes(searchLower) ||
-           getParentLocationName(location).toLowerCase().includes(searchLower);
+    const nameMatch = location.name.toLowerCase().includes(searchLower);
+    const parentMatch = getParentLocationName(location).toLowerCase().includes(searchLower);
+    
+    console.log('Filtering location:', location.name, 'Name match:', nameMatch, 'Parent match:', parentMatch);
+    return nameMatch || parentMatch;
+  });
+
+  console.log('Rendered LocationSearch with:', {
+    searchTerm,
+    locationsCount: locations?.length,
+    filteredCount: filteredLocations?.length,
+    selectedLocationId
   });
 
   return (
@@ -105,18 +118,19 @@ export function LocationSearch({
                   selectedLocationId === location.id ? 'bg-gray-50' : ''
                 }`}
                 onClick={() => {
+                  console.log('Selected location:', location);
                   onLocationSelect(location);
                   setIsDropdownOpen(false);
                   setSearchTerm(location.name);
                 }}
               >
-                <div className="font-medium">{location.name}</div>
+                <div className="font-medium">{location.name || 'Unnamed Location'}</div>
                 <div className="text-sm text-gray-500">
                   Parent: {getParentLocationName(location)}
                 </div>
               </div>
             ))}
-            {filteredLocations?.length === 0 && (
+            {(!filteredLocations || filteredLocations.length === 0) && (
               <div className="p-2 text-gray-500 text-center">
                 No locations found
               </div>
