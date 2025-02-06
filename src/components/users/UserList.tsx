@@ -38,7 +38,16 @@ export function UserList({ onEdit }: UserListProps) {
     queryFn: async () => {
       console.log('Fetching users from Supabase...');
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabase.auth.admin.listUsers();
+        
+        if (error) {
+          console.error('Error fetching users:', error);
+          throw error;
+        }
+
+        // Get additional user data from the users table
+        const userIds = data.users.map(user => user.id);
+        const { data: usersData, error: usersError } = await supabase
           .from('users')
           .select(`
             *,
@@ -51,15 +60,16 @@ export function UserList({ onEdit }: UserListProps) {
               name,
               full_path
             )
-          `);
+          `)
+          .in('id', userIds);
         
-        if (error) {
-          console.error('Error fetching users:', error);
-          throw error;
+        if (usersError) {
+          console.error('Error fetching user details:', usersError);
+          throw usersError;
         }
 
-        console.log('Fetched users:', data);
-        return data as UserWithRelations[];
+        console.log('Fetched users:', usersData);
+        return usersData as UserWithRelations[];
       } catch (err) {
         console.error('Failed to fetch users:', err);
         toast({
@@ -150,4 +160,3 @@ export function UserList({ onEdit }: UserListProps) {
     </div>
   );
 }
-

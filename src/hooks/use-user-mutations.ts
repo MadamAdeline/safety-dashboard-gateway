@@ -24,22 +24,21 @@ export function useUserMutations(onSuccess: () => void) {
     mutationFn: async (data: UserData) => {
       console.log('Creating user with data:', data);
       
-      // Create user with signup endpoint instead of admin
-      const { data: userData, error: userError } = await supabase.auth.signUp({
+      // Create user with admin signup
+      const { data: userData, error: userError } = await supabase.auth.admin.createUser({
         email: data.email,
         password: data.password || Math.random().toString(36).slice(-8), // Generate random password if none provided
-        options: {
-          data: {
-            first_name: data.first_name,
-            last_name: data.last_name
-          }
+        email_confirm: true,
+        user_metadata: {
+          first_name: data.first_name,
+          last_name: data.last_name
         }
       });
 
       if (userError) throw userError;
       if (!userData.user) throw new Error('No user returned from signup');
 
-      // Create user profile
+      // Create user profile with service role client
       const { data: profileData, error: profileError } = await supabase
         .from('users')
         .insert({
@@ -102,14 +101,20 @@ export function useUserMutations(onSuccess: () => void) {
         manager_id: data.manager_id || null,
         location_id: data.location_id || null
       };
-      
+
       if (data.password) {
-        updateData.password = data.password;
+        // Update password if provided
+        const { error: authError } = await supabase.auth.admin.updateUserById(
+          id,
+          { password: data.password }
+        );
+
+        if (authError) throw authError;
       }
 
       console.log('Final update data:', updateData);
 
-      // Update user profile with service role client
+      // Update user profile
       const { error: userError } = await supabase
         .from('users')
         .update(updateData)
