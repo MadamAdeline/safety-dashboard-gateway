@@ -17,6 +17,19 @@ interface NewSDSFormProps {
   initialData?: SDS | null;
 }
 
+interface FormData {
+  productName: string;
+  productId: string;
+  otherNames: string;
+  emergencyPhone: string;
+  issueDate: string;
+  revisionDate: string;
+  expiryDate: string;
+  unNumber: string;
+  unProperShippingName: string;
+  hazchemCode: string;
+}
+
 export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   console.log("NewSDSForm - Initial Data:", initialData);
 
@@ -31,7 +44,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   const [dgSubDivisionId, setDgSubDivisionId] = useState(initialData?.dgSubDivisionId ?? "");
   
   const today = new Date();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     productName: initialData?.productName ?? "",
     productId: initialData?.productId ?? "",
     otherNames: initialData?.otherNames ?? "",
@@ -54,7 +67,6 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       setShowUploadDialog(false);
       console.log("File selected:", file.name);
 
-      // Only apply extracted data if it's a new record and fields are blank
       if (!initialData && extractedData && !formData.productName && !formData.productId) {
         console.log("New record with blank fields - applying extracted data:", extractedData);
         setIsDG(true);
@@ -148,7 +160,6 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       }
 
       queryClient.invalidateQueries({ queryKey: ['sds'] });
-      // Removed the onClose() call here so the form stays open after saving
     } catch (error) {
       console.error("Error saving SDS:", error);
       toast({
