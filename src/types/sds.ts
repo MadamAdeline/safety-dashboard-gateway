@@ -8,44 +8,44 @@ export interface SDS {
   supplierId: string;
   issueDate: string;
   expiryDate: string;
-  dgClassId: string;
+  dgClassId: string | null;
   dgClass: {
     id: string;
     label: string;
-  };
-  subsidiaryDgClassId: string;
+  } | null;
+  subsidiaryDgClassId: string | null;
   subsidiaryDgClass: {
     id: string;
     label: string;
-  };
-  packingGroupId: string;
+  } | null;
+  packingGroupId: string | null;
   packingGroup: {
     id: string;
     label: string;
-  };
-  dgSubDivisionId: string;
+  } | null;
+  dgSubDivisionId: string | null;
   dgSubDivision: {
     id: string;
     label: string;
-  };
+  } | null;
   status: 'ACTIVE' | 'INACTIVE' | 'REQUESTED';
-  sdsSource: string;
-  source: string;
-  currentFilePath: string;
-  currentFileName: string;
-  currentFileSize: number;
-  currentContentType: string;
-  unNumber: string;
-  unProperShippingName: string;
-  hazchemCode: string;
-  otherNames: string;
-  emergencyPhone: string;
-  revisionDate: string;
-  requestSupplierName: string;
-  requestSupplierDetails: string;
-  requestInformation: string;
-  requestDate: string;
-  requestedBy: string;
+  sdsSource: string | null;
+  source: string | null;
+  currentFilePath: string | null;
+  currentFileName: string | null;
+  currentFileSize: number | null;
+  currentContentType: string | null;
+  unNumber: string | null;
+  unProperShippingName: string | null;
+  hazchemCode: string | null;
+  otherNames: string | null;
+  emergencyPhone: string | null;
+  revisionDate: string | null;
+  requestSupplierName: string | null;
+  requestSupplierDetails: string | null;
+  requestInformation: string | null;
+  requestDate: string | null;
+  requestedBy: string | null;
 }
 
 export interface SDSFilters {
