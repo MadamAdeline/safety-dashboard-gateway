@@ -7,6 +7,22 @@ export function useSDSList() {
     queryKey: ['sds'],
     queryFn: async () => {
       console.log('Fetching ACTIVE SDS data from Supabase');
+      
+      // First, get the correct status ID for ACTIVE SDS_Library
+      const { data: statusData, error: statusError } = await supabase
+        .from('status_lookup')
+        .select('id')
+        .eq('category', 'SDS_Library')
+        .eq('status_name', 'ACTIVE')
+        .single();
+
+      if (statusError) {
+        console.error('Error fetching status ID:', statusError);
+        throw statusError;
+      }
+
+      console.log('Retrieved ACTIVE status ID:', statusData.id);
+
       const { data, error } = await supabase
         .from('sds')
         .select(`
@@ -18,7 +34,7 @@ export function useSDSList() {
           packing_group:master_data!sds_packing_group_id_fkey (id, label),
           dg_subdivision:master_data!sds_dg_subdivision_id_fkey (id, label)
         `)
-        .eq('status_id', 1); // Filter for ACTIVE status (status_id = 1)
+        .eq('status_id', statusData.id);
 
       if (error) {
         console.error('Error fetching SDS:', error);
