@@ -22,7 +22,7 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     type: (initialData?.master_data?.label as LocationType) ?? "Region",
     typeId: initialData?.type_id ?? "",
     parentLocationId: initialData?.parent_location_id ?? null,
-    status: initialData?.status_id === 1 ? "ACTIVE" as LocationStatus : "INACTIVE" as LocationStatus,
+    status: initialData?.status_lookup?.status_name === "Active" ? "ACTIVE" as LocationStatus : "INACTIVE" as LocationStatus,
     coordinates: initialData?.coordinates ?? { lat: -37.8136, lng: 144.9631 }
   });
 
@@ -33,9 +33,36 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
   }>>([]);
 
   const [locationTypes, setLocationTypes] = useState<LocationType[]>([]);
+  const [statusMap, setStatusMap] = useState<{ [key: string]: number }>({});
 
   const { createLocation, updateLocation } = useLocations();
   const { toast } = useToast();
+
+  // Fetch status IDs for locations
+  useEffect(() => {
+    const fetchStatusIds = async () => {
+      console.log('Fetching status IDs for locations...');
+      const { data, error } = await supabase
+        .from('status_lookup')
+        .select('id, status_name')
+        .eq('category', 'LOCATION');
+
+      if (error) {
+        console.error('Error fetching status IDs:', error);
+        return;
+      }
+
+      const statusMapping = data.reduce((acc, curr) => {
+        acc[curr.status_name.toUpperCase()] = curr.id;
+        return acc;
+      }, {} as { [key: string]: number });
+
+      console.log('Status mapping fetched:', statusMapping);
+      setStatusMap(statusMapping);
+    };
+
+    fetchStatusIds();
+  }, []);
 
   // Fetch location types from master_data
   useEffect(() => {
@@ -106,14 +133,17 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
 
   const handleSave = async () => {
     console.log('Saving location with data:', formData);
+    console.log('Using status map:', statusMap);
     try {
       const locationData = {
         name: formData.name,
         type_id: formData.typeId,
-        parent_location_id: formData.parentLocationId === "none" ? null : formData.parentLocationId,
-        status_id: formData.status === 'ACTIVE' ? 1 : 2,
+        parent_location_id: formData.parentLocationId,
+        status_id: statusMap[formData.status],
         coordinates: formData.coordinates,
       };
+
+      console.log('Prepared location data:', locationData);
 
       if (initialData?.id) {
         console.log('Updating existing location:', initialData.id);
@@ -199,16 +229,15 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
               <div className="space-y-2">
                 <Label htmlFor="parentLocation">Parent Location</Label>
                 <Select 
-                  value={formData.parentLocationId ?? "none"}
+                  value={formData.parentLocationId ?? undefined}
                   onValueChange={(value) => 
-                    setFormData(prev => ({ ...prev, parentLocationId: value === "none" ? null : value }))
+                    setFormData(prev => ({ ...prev, parentLocationId: value }))
                   }
                 >
                   <SelectTrigger id="parentLocation">
                     <SelectValue placeholder="Select parent location" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
                     {availableLocations.map((location) => (
                       <SelectItem key={location.id} value={location.id}>
                         {location.name} ({location.master_data.label})
