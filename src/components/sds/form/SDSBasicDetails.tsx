@@ -3,8 +3,9 @@ import { Label } from "@/components/ui/label";
 import { useSDSForm } from "./SDSFormContext";
 
 export function SDSBasicDetails() {
-  const { formData, setFormData, initialData } = useSDSForm();
+  const { formData, setFormData, initialData, status } = useSDSForm();
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
+  const isRequested = status === "REQUESTED";
 
   const handleInputChange = (field: string, value: string) => {
     console.log("Input change:", field, value);
@@ -23,8 +24,8 @@ export function SDSBasicDetails() {
           placeholder="Enter SDS product name" 
           value={formData.productName}
           onChange={(e) => handleInputChange('productName', e.target.value)}
-          readOnly={isGlobalLibrary}
-          className={isGlobalLibrary ? "bg-gray-100" : ""}
+          readOnly={isGlobalLibrary || isRequested}
+          className={isGlobalLibrary || isRequested ? "bg-gray-100" : ""}
         />
       </div>
       <div className="space-y-2">
@@ -34,8 +35,8 @@ export function SDSBasicDetails() {
           placeholder="Enter other SDS product names" 
           value={formData.otherNames}
           onChange={(e) => handleInputChange('otherNames', e.target.value)}
-          readOnly={isGlobalLibrary}
-          className={isGlobalLibrary ? "bg-gray-100" : ""}
+          readOnly={isGlobalLibrary || isRequested}
+          className={isGlobalLibrary || isRequested ? "bg-gray-100" : ""}
         />
       </div>
       <div className="space-y-2">
@@ -45,8 +46,8 @@ export function SDSBasicDetails() {
           placeholder="Enter SDS code" 
           value={formData.productId}
           onChange={(e) => handleInputChange('productId', e.target.value)}
-          readOnly={isGlobalLibrary}
-          className={isGlobalLibrary ? "bg-gray-100" : ""}
+          readOnly={isGlobalLibrary || isRequested}
+          className={isGlobalLibrary || isRequested ? "bg-gray-100" : ""}
         />
       </div>
       <div className="space-y-2">
@@ -56,8 +57,8 @@ export function SDSBasicDetails() {
           placeholder="Enter emergency contact" 
           value={formData.emergencyPhone}
           onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
-          readOnly={isGlobalLibrary}
-          className={isGlobalLibrary ? "bg-gray-100" : ""}
+          readOnly={isGlobalLibrary || isRequested}
+          className={isGlobalLibrary || isRequested ? "bg-gray-100" : ""}
         />
       </div>
     </div>

@@ -5,8 +5,9 @@ import { useEffect } from "react";
 import { addYears, format, isValid, parse } from "date-fns";
 
 export function SDSDatesSection() {
-  const { formData, setFormData, initialData } = useSDSForm();
+  const { formData, setFormData, initialData, status } = useSDSForm();
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
+  const isRequested = status === "REQUESTED";
 
   useEffect(() => {
     if (formData.issueDate) {
@@ -45,19 +46,19 @@ export function SDSDatesSection() {
           type="date" 
           value={formData.issueDate}
           onChange={(e) => handleInputChange('issueDate', e.target.value)}
-          readOnly={isGlobalLibrary}
-          className={isGlobalLibrary ? "bg-gray-100" : ""}
+          readOnly={isGlobalLibrary || isRequested}
+          className={isGlobalLibrary || isRequested ? "bg-gray-100" : ""}
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="revisionDate">Revision Date *</Label>
+        <Label htmlFor="revisionDate">Revision Date</Label>
         <Input 
           id="revisionDate" 
           type="date"
           value={formData.revisionDate}
           onChange={(e) => handleInputChange('revisionDate', e.target.value)}
-          readOnly={isGlobalLibrary}
-          className={isGlobalLibrary ? "bg-gray-100" : ""}
+          readOnly={isGlobalLibrary || isRequested}
+          className={isGlobalLibrary || isRequested ? "bg-gray-100" : ""}
         />
       </div>
       <div className="space-y-2">
@@ -67,8 +68,8 @@ export function SDSDatesSection() {
           type="date" 
           value={formData.expiryDate}
           onChange={(e) => handleInputChange('expiryDate', e.target.value)}
-          readOnly={isGlobalLibrary}
-          className={isGlobalLibrary ? "bg-gray-100" : ""}
+          readOnly={isGlobalLibrary || isRequested}
+          className={isGlobalLibrary || isRequested ? "bg-gray-100" : ""}
         />
       </div>
     </div>

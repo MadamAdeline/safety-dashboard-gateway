@@ -7,11 +7,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export function SDSSupplierSelect() {
-  const { supplier, setSupplier, initialData } = useSDSForm();
+  const { supplier, setSupplier, initialData, status } = useSDSForm();
   console.log("SDSSupplierSelect - Initial supplier:", supplier);
   console.log("SDSSupplierSelect - Initial data:", initialData);
   
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
+  const isRequested = status === "REQUESTED";
 
   const { data: suppliers = [] } = useQuery({
     queryKey: ['suppliers'],
@@ -42,9 +43,9 @@ export function SDSSupplierSelect() {
         <Select 
           value={supplier} 
           onValueChange={setSupplier}
-          disabled={isGlobalLibrary}
+          disabled={isGlobalLibrary || isRequested}
         >
-          <SelectTrigger className={`w-full ${isGlobalLibrary ? "bg-gray-100" : ""}`}>
+          <SelectTrigger className={`w-full ${isGlobalLibrary || isRequested ? "bg-gray-100" : ""}`}>
             <SelectValue placeholder="Select supplier" />
           </SelectTrigger>
           <SelectContent>
@@ -55,7 +56,12 @@ export function SDSSupplierSelect() {
             ))}
           </SelectContent>
         </Select>
-        <Button variant="outline" size="icon" disabled={isGlobalLibrary}>
+        <Button 
+          variant="outline" 
+          size="icon" 
+          disabled={isGlobalLibrary || isRequested}
+          className={isGlobalLibrary || isRequested ? "opacity-50" : ""}
+        >
           <Search className="h-4 w-4" />
         </Button>
       </div>
