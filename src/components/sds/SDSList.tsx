@@ -8,6 +8,7 @@ import { SDSTableHeader } from "./table/SDSTableHeader";
 import { SDSTableRow } from "./table/SDSTableRow";
 import { SDSPagination } from "./table/SDSPagination";
 import * as XLSX from 'xlsx';
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SDSListProps {
   data: SDS[];
@@ -19,6 +20,7 @@ export function SDSList({ data, filters, onEdit }: SDSListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const queryClient = useQueryClient();
 
   const filteredData = data.filter((item) => {
     if (filters.search) {
@@ -53,6 +55,10 @@ export function SDSList({ data, filters, onEdit }: SDSListProps) {
     );
   };
 
+  const handleDelete = () => {
+    queryClient.invalidateQueries({ queryKey: ['sds'] });
+  };
+
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -70,6 +76,7 @@ export function SDSList({ data, filters, onEdit }: SDSListProps) {
                 isSelected={selectedItems.includes(item.productId)}
                 onToggleSelect={toggleSelectItem}
                 onEdit={onEdit}
+                onDelete={handleDelete}
               />
             ))}
           </TableBody>
