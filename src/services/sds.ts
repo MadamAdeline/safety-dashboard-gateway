@@ -22,6 +22,13 @@ export async function createSDS(data: {
 }) {
   console.log("Creating SDS with data:", data);
   
+  // Handle empty dates by setting them to null
+  const formattedData = {
+    ...data,
+    issue_date: data.issueDate || null,
+    expiry_date: data.expiryDate || null
+  };
+  
   const { data: result, error } = await supabase
     .from('sds')
     .insert({
@@ -29,8 +36,8 @@ export async function createSDS(data: {
       product_id: data.productId,
       supplier_id: data.supplierId,
       is_dg: data.isDG,
-      issue_date: data.issueDate,
-      expiry_date: data.expiryDate,
+      issue_date: formattedData.issue_date,
+      expiry_date: formattedData.expiry_date,
       dg_class: data.dgClass,
       status_id: data.statusId,
       current_file_path: data.currentFilePath,
