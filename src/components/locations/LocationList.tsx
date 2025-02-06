@@ -347,7 +347,7 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
                         variant="ghost" 
                         size="icon"
                         className="hover:bg-dgxprt-hover text-dgxprt-navy"
-                        onClick={() => setEditingLocation(item)}
+                        onClick={() => onEdit(item)}
                       >
                         <Edit2 className="h-4 w-4" />
                       </Button>
@@ -376,13 +376,22 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
             {filteredData.length} results
           </p>
           
-          <Button
-            onClick={startNewLocation}
-            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Quick Add
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={startNewLocation}
+              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Quick Add
+            </Button>
+            <Button
+              onClick={() => onEdit(null)}
+              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add New Location
+            </Button>
+          </div>
         </div>
         
         <div className="flex justify-center">
