@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Network } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { LocationForm } from "@/components/locations/LocationForm";
+import { LocationHierarchy } from "@/components/locations/LocationHierarchy";
 import type { Location, LocationFilters as LocationFiltersType } from "@/types/location";
 
 export default function Locations() {
