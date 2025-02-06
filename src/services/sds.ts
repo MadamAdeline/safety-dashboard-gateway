@@ -14,6 +14,11 @@ export async function createSDS(data: {
   currentFileName?: string;
   currentFileSize?: number;
   currentContentType?: string;
+  unNumber?: string;
+  unProperShippingName?: string;
+  packingGroup?: string;
+  hazchemCode?: string;
+  subsidiaryDgClass?: string;
 }) {
   console.log("Creating SDS with data:", data);
   
@@ -31,7 +36,12 @@ export async function createSDS(data: {
       current_file_path: data.currentFilePath,
       current_file_name: data.currentFileName,
       current_file_size: data.currentFileSize,
-      current_content_type: data.currentContentType
+      current_content_type: data.currentContentType,
+      un_number: data.unNumber,
+      un_proper_shipping_name: data.unProperShippingName,
+      packing_group: data.packingGroup,
+      hazchem_code: data.hazchemCode,
+      subsidiary_dg_class: data.subsidiaryDgClass
     })
     .select()
     .single();

@@ -28,11 +28,11 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     issueDate: initialData?.issueDate ?? "",
     expiryDate: initialData?.expiryDate ?? "",
     dgClass: initialData?.dgClass,
-    unNumber: "",
-    unProperShippingName: "",
-    packingGroup: "",
-    hazchemCode: "",
-    subsidiaryDgClass: ""
+    unNumber: initialData?.unNumber ?? "",
+    unProperShippingName: initialData?.unProperShippingName ?? "",
+    packingGroup: initialData?.packingGroup ?? "",
+    hazchemCode: initialData?.hazchemCode ?? "",
+    subsidiaryDgClass: initialData?.subsidiaryDgClass ?? ""
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -47,11 +47,11 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         issueDate: initialData.issueDate,
         expiryDate: initialData.expiryDate,
         dgClass: initialData.dgClass,
-        unNumber: "",
-        unProperShippingName: "",
-        packingGroup: "",
-        hazchemCode: "",
-        subsidiaryDgClass: ""
+        unNumber: initialData.unNumber ?? "",
+        unProperShippingName: initialData.unProperShippingName ?? "",
+        packingGroup: initialData.packingGroup ?? "",
+        hazchemCode: initialData.hazchemCode ?? "",
+        subsidiaryDgClass: initialData.subsidiaryDgClass ?? ""
       });
     }
   }, [initialData]);
@@ -68,14 +68,14 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         setIsDG(true);
         setFormData(prev => ({
           ...prev,
-          productName: extractedData.productName,
-          productId: extractedData.productId,
+          productName: extractedData.productName || "",
+          productId: extractedData.productId || "",
           dgClass: extractedData.dgClass,
-          unNumber: extractedData.unNumber,
-          unProperShippingName: extractedData.unProperShippingName,
-          packingGroup: extractedData.packingGroup,
-          hazchemCode: extractedData.hazchemCode,
-          subsidiaryDgClass: extractedData.subsidiaryDgClass
+          unNumber: extractedData.unNumber || "",
+          unProperShippingName: extractedData.unProperShippingName || "",
+          packingGroup: extractedData.packingGroup || "",
+          hazchemCode: extractedData.hazchemCode || "",
+          subsidiaryDgClass: extractedData.subsidiaryDgClass || ""
         }));
       }
     }
@@ -84,6 +84,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   const handleSave = async () => {
     try {
       console.log("Starting SDS save process");
+      console.log("Form data being saved:", formData);
       
       if (!supplier) {
         toast({
@@ -111,6 +112,11 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         issueDate: formData.issueDate,
         expiryDate: formData.expiryDate,
         dgClass: isDG ? formData.dgClass : undefined,
+        unNumber: isDG ? formData.unNumber : undefined,
+        unProperShippingName: isDG ? formData.unProperShippingName : undefined,
+        packingGroup: isDG ? formData.packingGroup : undefined,
+        hazchemCode: isDG ? formData.hazchemCode : undefined,
+        subsidiaryDgClass: isDG ? formData.subsidiaryDgClass : undefined,
         statusId,
         ...(fileData && {
           currentFilePath: fileData.filePath,
