@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SDSRequestDialogProps {
   open: boolean;
@@ -18,19 +20,73 @@ interface SDSRequestDialogProps {
 
 export function SDSRequestDialog({ open, onOpenChange }: SDSRequestDialogProps) {
   const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    productName: "",
+    productCode: "",
+    otherProductName: "",
+    supplierName: "",
+    otherSupplierDetails: "",
+    requestInfo: ""
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting SDS request");
+    console.log("Submitting SDS request:", formData);
     
-    // Here you would typically send the email to DGXprt's team
-    
-    toast({
-      title: "Request Submitted",
-      description: "Your SDS request has been sent to the DGXprt team.",
-    });
-    
-    onOpenChange(false);
+    try {
+      // Get the status ID for "REQUESTED"
+      const { data: statusData } = await supabase
+        .from('status_lookup')
+        .select('id')
+        .eq('category', 'SDS_Library')
+        .eq('status_name', 'REQUESTED')
+        .single();
+
+      if (!statusData) {
+        throw new Error("Could not find REQUESTED status ID");
+      }
+
+      // Create new SDS record
+      const { data: sdsData, error: sdsError } = await supabase
+        .from('sds')
+        .insert({
+          product_name: formData.productName,
+          product_id: formData.productCode,
+          other_names: formData.otherProductName,
+          request_supplier_name: formData.supplierName,
+          request_supplier_details: formData.otherSupplierDetails,
+          request_information: formData.requestInfo,
+          request_date: format(new Date(), 'yyyy-MM-dd'),
+          requested_by: "d.c.adeline@gmail.com",
+          status_id: statusData.id
+        })
+        .select()
+        .single();
+
+      if (sdsError) throw sdsError;
+
+      toast({
+        title: "Request Submitted",
+        description: "Your SDS request has been sent to the DGXprt team.",
+      });
+      
+      onOpenChange(false);
+      setFormData({
+        productName: "",
+        productCode: "",
+        otherProductName: "",
+        supplierName: "",
+        otherSupplierDetails: "",
+        requestInfo: ""
+      });
+    } catch (error) {
+      console.error("Error submitting SDS request:", error);
+      toast({
+        title: "Error",
+        description: "Failed to submit SDS request. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -42,38 +98,61 @@ export function SDSRequestDialog({ open, onOpenChange }: SDSRequestDialogProps) 
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="productName">SDS Product Name</Label>
-            <Input id="productName" />
+            <Label htmlFor="productName">SDS Product Name *</Label>
+            <Input 
+              id="productName"
+              value={formData.productName}
+              onChange={(e) => setFormData(prev => ({ ...prev, productName: e.target.value }))}
+              required
+            />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="productCode">SDS Product Code</Label>
-            <Input id="productCode" />
+            <Label htmlFor="productCode">SDS Product Code *</Label>
+            <Input 
+              id="productCode"
+              value={formData.productCode}
+              onChange={(e) => setFormData(prev => ({ ...prev, productCode: e.target.value }))}
+              required
+            />
           </div>
           
           <div className="space-y-2">
             <Label htmlFor="otherProductName">Other Product Name</Label>
-            <Input id="otherProductName" />
+            <Input 
+              id="otherProductName"
+              value={formData.otherProductName}
+              onChange={(e) => setFormData(prev => ({ ...prev, otherProductName: e.target.value }))}
+            />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="supplierName">Supplier Name</Label>
-            <Input id="supplierName" />
+            <Label htmlFor="supplierName">Supplier Name *</Label>
+            <Input 
+              id="supplierName"
+              value={formData.supplierName}
+              onChange={(e) => setFormData(prev => ({ ...prev, supplierName: e.target.value }))}
+              required
+            />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="otherSupplierDetails">Other Supplier Details, if known</Label>
-            <Textarea id="otherSupplierDetails" />
+            <Label htmlFor="otherSupplierDetails">Other Supplier Details</Label>
+            <Textarea 
+              id="otherSupplierDetails"
+              value={formData.otherSupplierDetails}
+              onChange={(e) => setFormData(prev => ({ ...prev, otherSupplierDetails: e.target.value }))}
+            />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="requestInfo">Request Information</Label>
-            <Textarea id="requestInfo" />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="user">User</Label>
-            <Input id="user" value="Current User" readOnly className="bg-gray-100" />
+            <Label htmlFor="requestInfo">Request Information *</Label>
+            <Textarea 
+              id="requestInfo"
+              value={formData.requestInfo}
+              onChange={(e) => setFormData(prev => ({ ...prev, requestInfo: e.target.value }))}
+              required
+            />
           </div>
           
           <div className="space-y-2">

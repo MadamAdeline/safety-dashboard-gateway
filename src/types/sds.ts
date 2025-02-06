@@ -39,6 +39,11 @@ export interface SDS {
   otherNames?: string;
   emergencyPhone?: string;
   revisionDate?: string;
+  requestSupplierName?: string;
+  requestSupplierDetails?: string;
+  requestInformation?: string;
+  requestDate?: string;
+  requestedBy?: string;
 }
 
 export interface SDSFilters {

@@ -58,6 +58,11 @@ export type Database = {
           packing_group_id: string | null
           product_id: string
           product_name: string
+          request_date: string | null
+          request_information: string | null
+          request_supplier_details: string | null
+          request_supplier_name: string | null
+          requested_by: string | null
           revision_date: string | null
           status_id: number
           subsidiary_dg_class_id: string | null
@@ -84,6 +89,11 @@ export type Database = {
           packing_group_id?: string | null
           product_id: string
           product_name: string
+          request_date?: string | null
+          request_information?: string | null
+          request_supplier_details?: string | null
+          request_supplier_name?: string | null
+          requested_by?: string | null
           revision_date?: string | null
           status_id: number
           subsidiary_dg_class_id?: string | null
@@ -110,6 +120,11 @@ export type Database = {
           packing_group_id?: string | null
           product_id?: string
           product_name?: string
+          request_date?: string | null
+          request_information?: string | null
+          request_supplier_details?: string | null
+          request_supplier_name?: string | null
+          requested_by?: string | null
           revision_date?: string | null
           status_id?: number
           subsidiary_dg_class_id?: string | null
