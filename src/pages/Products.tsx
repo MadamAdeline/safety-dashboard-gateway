@@ -4,7 +4,7 @@ import { ProductList } from "@/components/products/ProductList";
 import { ProductFilters } from "@/components/products/ProductFilters";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { ProductSearch } from "@/components/products/ProductSearch";
 import { ProductActions } from "@/components/products/ProductActions";
 import { ProductForm } from "@/components/products/ProductForm";
@@ -26,7 +26,7 @@ export default function Products() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { toast } = useToast();
 
-  const { data: products = [], isLoading } = useQuery({
+  const { data: products = [], isLoading, error } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
       console.log('Fetching products from Supabase...');
@@ -63,8 +63,7 @@ export default function Products() {
               label
             )
           )
-        `)
-        .order('product_name');
+        `);
 
       if (error) {
         console.error('Error fetching products:', error);
@@ -75,6 +74,15 @@ export default function Products() {
       return data as Product[];
     }
   });
+
+  if (error) {
+    console.error('Query error:', error);
+    toast({
+      title: "Error loading products",
+      description: "There was a problem loading the products list. Please try again.",
+      variant: "destructive"
+    });
+  }
 
   const handleExport = () => {
     toast({
