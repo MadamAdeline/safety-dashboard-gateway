@@ -34,8 +34,8 @@ export function useUserMutations(onSuccess: () => void) {
           phone_number: data.phone_number,
           active: data.active,
           password: data.password,
-          manager_id: data.manager_id,
-          location_id: data.location_id
+          manager_id: data.manager_id || null,
+          location_id: data.location_id || null
         })
         .select()
         .single();
@@ -84,8 +84,8 @@ export function useUserMutations(onSuccess: () => void) {
         email: data.email,
         phone_number: data.phone_number,
         active: data.active,
-        manager_id: data.manager_id,
-        location_id: data.location_id
+        manager_id: data.manager_id || null,
+        location_id: data.location_id || null
       };
       
       if (data.password) {
