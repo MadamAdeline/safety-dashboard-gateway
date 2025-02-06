@@ -21,7 +21,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [status, setStatus] = useState<"ACTIVE" | "INACTIVE" | "REQUESTED">(initialData?.status ?? 'ACTIVE');
-  const [supplier, setSupplier] = useState(initialData?.supplier ?? "");
+  const [supplier, setSupplier] = useState("");
   const [formData, setFormData] = useState({
     productName: initialData?.productName ?? "",
     productId: initialData?.productId ?? "",
@@ -41,7 +41,6 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     if (initialData) {
       setIsDG(initialData.isDG);
       setStatus(initialData.status);
-      setSupplier(initialData.supplier);
       setFormData({
         productName: initialData.productName,
         productId: initialData.productId,
@@ -86,6 +85,15 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     try {
       console.log("Starting SDS save process");
       
+      if (!supplier) {
+        toast({
+          title: "Error",
+          description: "Please select a supplier",
+          variant: "destructive"
+        });
+        return;
+      }
+
       let fileData = null;
       if (selectedFile) {
         fileData = await uploadSDSFile(selectedFile);
@@ -98,7 +106,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       await createSDS({
         productName: formData.productName,
         productId: formData.productId,
-        supplierId: supplier, // Use the selected supplier ID directly
+        supplierId: supplier,
         isDG,
         issueDate: formData.issueDate,
         expiryDate: formData.expiryDate,
