@@ -12,10 +12,26 @@ import { Button } from "@/components/ui/button";
 import { Edit2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@/types/user";
 
 interface UserListProps {
-  onEdit: (user: any) => void;
+  onEdit: (user: User) => void;
 }
+
+type UserWithRelations = User & {
+  user_roles?: {
+    roles: {
+      role_name: string;
+    };
+  }[];
+  manager?: {
+    first_name: string;
+    last_name: string;
+  } | null;
+  location?: {
+    name: string;
+  } | null;
+};
 
 export function UserList({ onEdit }: UserListProps) {
   const { data: users, isLoading } = useQuery({
@@ -40,7 +56,7 @@ export function UserList({ onEdit }: UserListProps) {
         `);
       
       if (error) throw error;
-      return data;
+      return data as UserWithRelations[];
     }
   });
 
@@ -77,7 +93,7 @@ export function UserList({ onEdit }: UserListProps) {
               </TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>
-                {user.user_roles?.map((userRole: any) => (
+                {user.user_roles?.map((userRole) => (
                   <Badge key={userRole.roles.role_name} variant="outline">
                     {userRole.roles.role_name}
                   </Badge>
