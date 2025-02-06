@@ -239,8 +239,10 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
     <div className="space-y-4">
       <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
         <LocationSearch 
-          value={filters.search}
-          onChange={(value) => onFiltersChange({ ...filters, search: value })}
+          selectedLocationId={null}
+          initialLocation={null}
+          onLocationSelect={handleSearchChange}
+          className="w-full"
         />
         <LocationActions 
           onToggleFilters={() => setShowFilters(!showFilters)}
