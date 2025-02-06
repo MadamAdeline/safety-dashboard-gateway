@@ -48,9 +48,12 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       setFormData({
         productName: initialData.productName,
         productId: initialData.productId,
+        otherNames: initialData.otherNames ?? "",
+        emergencyPhone: initialData.emergencyPhone ?? "",
         issueDate: initialData.issueDate,
+        revisionDate: initialData.revisionDate ?? "",
         expiryDate: initialData.expiryDate,
-        dgClassId: initialData.dgClassId,
+        dgClassId: initialData.dgClassId ?? "",
         unNumber: initialData.unNumber ?? "",
         unProperShippingName: initialData.unProperShippingName ?? "",
         packingGroupId: initialData.packingGroupId ?? "",
