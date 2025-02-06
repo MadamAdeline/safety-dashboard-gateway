@@ -1,9 +1,11 @@
+
 export type LocationType = "Region" | "District" | "School" | "Detailed Location";
 export type LocationStatus = "ACTIVE" | "INACTIVE";
 
 export interface Location {
   id: string;
   name: string;
+  full_path: string | null;
   type_id: string;
   parent_location_id: string | null;
   status_id: number;
