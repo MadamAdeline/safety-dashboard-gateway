@@ -11,6 +11,8 @@ import {
 import type { Role, UserStatus } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { LocationSearch } from "@/components/locations/LocationSearch";
+import type { Location } from "@/types/location";
 
 interface UserFormFieldsProps {
   formData: {
@@ -44,19 +46,27 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
     }
   });
 
-  // Fetch locations
-  const { data: locations } = useQuery({
-    queryKey: ['locations'],
+  // Fetch current location if location_id exists
+  const { data: currentLocation } = useQuery({
+    queryKey: ['location', formData.location_id],
     queryFn: async () => {
+      if (!formData.location_id) return null;
+      
       const { data, error } = await supabase
         .from('locations')
-        .select('id, name')
-        .eq('status_id', 1); // Assuming 1 is active status
+        .select('*')
+        .eq('id', formData.location_id)
+        .single();
       
       if (error) throw error;
       return data;
-    }
+    },
+    enabled: !!formData.location_id
   });
+
+  const handleLocationSelect = (location: Location) => {
+    onChange("location_id", location.id);
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -150,22 +160,11 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
 
       <div className="space-y-2">
         <Label>Location</Label>
-        <Select
-          value={formData.location_id || "unassigned"}
-          onValueChange={(value) => onChange("location_id", value === "unassigned" ? "" : value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select location" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="unassigned">No Location</SelectItem>
-            {locations?.map((location) => (
-              <SelectItem key={location.id} value={location.id}>
-                {location.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <LocationSearch
+          selectedLocationId={formData.location_id}
+          initialLocation={currentLocation}
+          onLocationSelect={handleLocationSelect}
+        />
       </div>
 
       <div className="space-y-2">

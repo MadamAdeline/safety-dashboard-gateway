@@ -1,22 +1,112 @@
 
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import type { Location } from "@/types/location";
 
 interface LocationSearchProps {
-  value: string;
-  onChange: (value: string) => void;
+  selectedLocationId?: string | null;
+  initialLocation?: Location | null;
+  onLocationSelect: (location: Location) => void;
+  className?: string;
 }
 
-export function LocationSearch({ value, onChange }: LocationSearchProps) {
+export function LocationSearch({ 
+  selectedLocationId, 
+  initialLocation, 
+  onLocationSelect, 
+  className 
+}: LocationSearchProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const { data: locations } = useQuery({
+    queryKey: ['locations'],
+    queryFn: async () => {
+      console.log('Fetching locations from Supabase...');
+      const { data, error } = await supabase
+        .from('locations')
+        .select(`
+          id,
+          name,
+          type_id,
+          master_data (id, label),
+          status_lookup (id, status_name)
+        `)
+        .eq('status_id', 1); // Assuming 1 is active status
+      
+      if (error) {
+        console.error('Error fetching locations:', error);
+        throw error;
+      }
+
+      return data || [];
+    }
+  });
+
+  useEffect(() => {
+    if (initialLocation) {
+      console.log('Setting initial search term from location:', initialLocation.name);
+      setSearchTerm(initialLocation.name);
+    }
+  }, [initialLocation]);
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setIsDropdownOpen(true);
+    console.log("Searching for:", value);
+  };
+
+  const handleInputFocus = () => {
+    setIsDropdownOpen(true);
+  };
+
+  const filteredLocations = locations?.filter(location => 
+    location.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="flex-1 max-w-md relative">
-      <Input
-        placeholder="Search locations..."
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="pl-10"
-      />
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+    <div className={className}>
+      <div className="relative">
+        <Input
+          placeholder="Search locations..."
+          value={searchTerm}
+          onChange={(e) => handleSearch(e.target.value)}
+          onFocus={handleInputFocus}
+          className="pl-10"
+        />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        
+        {isDropdownOpen && locations && (
+          <div className="absolute w-full bg-white mt-1 border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+            {filteredLocations?.map(location => (
+              <div
+                key={location.id}
+                className={`p-2 hover:bg-gray-100 cursor-pointer ${
+                  selectedLocationId === location.id ? 'bg-gray-50' : ''
+                }`}
+                onClick={() => {
+                  onLocationSelect(location);
+                  setIsDropdownOpen(false);
+                  setSearchTerm(location.name);
+                }}
+              >
+                <div className="font-medium">{location.name}</div>
+                <div className="text-sm text-gray-500">
+                  {location.master_data?.label}
+                </div>
+              </div>
+            ))}
+            {filteredLocations?.length === 0 && (
+              <div className="p-2 text-gray-500 text-center">
+                No locations found
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
