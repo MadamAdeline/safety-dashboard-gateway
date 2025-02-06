@@ -82,7 +82,20 @@ export async function createSDS(data: {
   }
 
   console.log("Successfully created SDS:", result);
-  return result;
+  return {
+    ...result,
+    supplier: result.suppliers?.supplier_name,
+    status: result.status?.status_name,
+    dgClass: result.dg_class ? { id: result.dg_class_id, label: result.dg_class.label } : null,
+    subsidiaryDgClass: result.subsidiary_dg_class ? { id: result.subsidiary_dg_class_id, label: result.subsidiary_dg_class.label } : null,
+    packingGroup: result.packing_group ? { id: result.packing_group_id, label: result.packing_group.label } : null,
+    dgSubDivision: result.dg_subdivision ? { id: result.dg_subdivision_id, label: result.dg_subdivision.label } : null,
+    requestSupplierName: result.request_supplier_name,
+    requestSupplierDetails: result.request_supplier_details,
+    requestInformation: result.request_information,
+    requestDate: result.request_date,
+    requestedBy: result.requested_by
+  };
 }
 
 export async function updateSDS(id: string, data: {
@@ -167,7 +180,20 @@ export async function updateSDS(id: string, data: {
   }
 
   console.log("Successfully updated SDS:", result);
-  return result;
+  return {
+    ...result,
+    supplier: result.suppliers?.supplier_name,
+    status: result.status?.status_name,
+    dgClass: result.dg_class ? { id: result.dg_class_id, label: result.dg_class.label } : null,
+    subsidiaryDgClass: result.subsidiary_dg_class ? { id: result.subsidiary_dg_class_id, label: result.subsidiary_dg_class.label } : null,
+    packingGroup: result.packing_group ? { id: result.packing_group_id, label: result.packing_group.label } : null,
+    dgSubDivision: result.dg_subdivision ? { id: result.dg_subdivision_id, label: result.dg_subdivision.label } : null,
+    requestSupplierName: result.request_supplier_name,
+    requestSupplierDetails: result.request_supplier_details,
+    requestInformation: result.request_information,
+    requestDate: result.request_date,
+    requestedBy: result.requested_by
+  };
 }
 
 export async function uploadSDSFile(file: File) {
