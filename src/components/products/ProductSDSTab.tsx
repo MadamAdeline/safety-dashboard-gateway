@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { NewSDSForm } from "@/components/sds/NewSDSForm";
 import type { SDS } from "@/types/sds";
@@ -73,9 +74,7 @@ export function ProductSDSTab({ sdsId, onSDSSelect }: ProductSDSTabProps) {
 
   const handleNewSDSClose = () => {
     setShowNewSDS(false);
-    if (sdsId) {
-      fetchInitialSDS();
-    }
+    fetchInitialSDS();
   };
 
   const fetchInitialSDS = async () => {
