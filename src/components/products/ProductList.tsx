@@ -33,9 +33,29 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
   const itemsPerPage = 10;
 
   const filteredData = data.filter((item) => {
-    if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) {
-      return false;
+    // Search across all text fields
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      const searchableFields = [
+        item.name,
+        item.code,
+        item.brandName,
+        item.unit,
+        item.description,
+        item.otherNames,
+        item.uses,
+        item.sds?.supplier?.supplier_name,
+        item.sds?.dgClass?.label,
+      ].filter(Boolean); // Remove null/undefined values
+
+      const matchesSearch = searchableFields.some(
+        field => field?.toLowerCase().includes(searchTerm)
+      );
+
+      if (!matchesSearch) return false;
     }
+
+    // Keep existing filter conditions
     if (filters.supplier.length > 0 && item.sds?.supplier?.supplier_name && !filters.supplier.includes(item.sds.supplier.supplier_name)) {
       return false;
     }
