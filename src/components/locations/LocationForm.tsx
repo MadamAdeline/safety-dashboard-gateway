@@ -17,9 +17,9 @@ interface LocationFormProps {
 
 export function LocationForm({ onClose, initialData }: LocationFormProps) {
   const [name, setName] = useState(initialData?.name ?? "");
-  const [type, setType] = useState<LocationType>(initialData?.type ?? "Region");
-  const [parentLocation, setParentLocation] = useState(initialData?.parentLocation ?? "");
-  const [status, setStatus] = useState<LocationStatus>(initialData?.status ?? "ACTIVE");
+  const [type, setType] = useState<LocationType>((initialData?.master_data?.label as LocationType) ?? "Region");
+  const [parentLocation, setParentLocation] = useState(initialData?.parent_location_id ?? "");
+  const [status, setStatus] = useState<LocationStatus>(initialData?.status_id === 1 ? "ACTIVE" : "INACTIVE");
   const [coordinates, setCoordinates] = useState(initialData?.coordinates ?? { lat: -37.8136, lng: 144.9631 });
   
   const { createLocation, updateLocation } = useLocations();
@@ -29,9 +29,9 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     try {
       const locationData = {
         name,
-        type_id: type, // This needs to be mapped to the correct master_data id
+        type_id: type, // This will be mapped to master_data id in the backend
         parent_location_id: parentLocation || null,
-        status_id: status === 'ACTIVE' ? 1 : 2, // This needs to be mapped to the correct status_lookup id
+        status_id: status === 'ACTIVE' ? 1 : 2,
         coordinates,
       };
 

@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
-import type { Location, LocationFilters } from "@/types/location";
+import type { Location, LocationFilters, LocationType, LocationStatus } from "@/types/location";
 import { useState } from "react";
 import { useLocations } from "@/hooks/use-locations";
 
@@ -34,17 +34,25 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
 
   const { locations, isLoading, deleteLocation } = useLocations();
 
+  const getLocationType = (location: Location): LocationType => {
+    return location.master_data?.label as LocationType || "Region";
+  };
+
+  const getLocationStatus = (location: Location): LocationStatus => {
+    return location.status_id === 1 ? "ACTIVE" : "INACTIVE";
+  };
+
   const filteredData = locations.filter((item) => {
     if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) {
       return false;
     }
-    if (filters.type.length > 0 && !filters.type.includes(item.type)) {
+    if (filters.type.length > 0 && !filters.type.includes(getLocationType(item))) {
       return false;
     }
-    if (filters.status.length > 0 && !filters.status.includes(item.status)) {
+    if (filters.status.length > 0 && !filters.status.includes(getLocationStatus(item))) {
       return false;
     }
-    if (filters.parentLocation && item.parentLocation !== filters.parentLocation) {
+    if (filters.parentLocation && item.parent_location_id !== filters.parentLocation) {
       return false;
     }
     return true;
@@ -122,20 +130,20 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
                     variant="secondary"
                     className="bg-gray-100 text-gray-800"
                   >
-                    {item.type}
+                    {item.master_data?.label || "Unknown"}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-dgxprt-navy">{item.parentLocation || "-"}</TableCell>
+                <TableCell className="text-dgxprt-navy">{item.parent_location_id || "-"}</TableCell>
                 <TableCell>
                   <Badge 
-                    variant={item.status === "ACTIVE" ? "default" : "destructive"}
+                    variant={item.status_id === 1 ? "default" : "destructive"}
                     className={
-                      item.status === "ACTIVE" 
+                      item.status_id === 1
                         ? "bg-green-100 text-green-800" 
                         : "bg-red-100 text-red-800"
                     }
                   >
-                    {item.status}
+                    {item.status_lookup?.status_name || (item.status_id === 1 ? "Active" : "Inactive")}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -152,6 +160,7 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
                       variant="ghost" 
                       size="icon"
                       className="hover:bg-dgxprt-hover text-dgxprt-navy"
+                      onClick={() => handleDelete(item.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -217,4 +226,4 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
       </div>
     </div>
   );
-};
+}
