@@ -34,15 +34,26 @@ export function MasterDataList({ data, filters, onEdit, isLoading }: MasterDataL
   const itemsPerPage = 10;
 
   const filteredData = data.filter((item) => {
-    if (filters.search && !item.label.toLowerCase().includes(filters.search.toLowerCase())) {
-      return false;
+    // Search across all text fields (category and label)
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      const matchesSearch = 
+        item.category.toLowerCase().includes(searchTerm) ||
+        item.label.toLowerCase().includes(searchTerm);
+      
+      if (!matchesSearch) return false;
     }
+    
+    // Category filter
     if (filters.category.length > 0 && !filters.category.includes(item.category)) {
       return false;
     }
+    
+    // Status filter
     if (filters.status.length > 0 && !filters.status.includes(item.status)) {
       return false;
     }
+    
     return true;
   });
 
