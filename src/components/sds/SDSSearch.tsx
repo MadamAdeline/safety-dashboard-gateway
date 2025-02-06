@@ -1,23 +1,34 @@
-import { useActiveSDSList } from "@/hooks/use-active-sds-list";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useActiveSDSList } from "@/hooks/use-active-sds-list";
 import type { SDS } from "@/types/sds";
 
 interface SDSSearchProps {
   selectedSdsId?: string | null;
   initialSDS?: SDS | null;
-  onSDSSelect: (sds: SDS) => void;
+  onSDSSelect: (sds: SDS | SDS[]) => void;
   className?: string;
 }
 
 export function SDSSearch({ selectedSdsId, initialSDS, onSDSSelect, className }: SDSSearchProps) {
   const { data: sdsData = [], isLoading } = useActiveSDSList();
 
+  // Ensure sdsData is always an array
+  const safeSDSData = Array.isArray(sdsData) ? sdsData : [];
+  
   // Combine initial SDS with fetched data if it exists and isn't already in the list
-  const combinedData = initialSDS && !sdsData.find(sds => sds.id === initialSDS.id)
-    ? [initialSDS, ...sdsData]
-    : sdsData;
+  const combinedData = initialSDS && !safeSDSData.find(sds => sds.id === initialSDS.id)
+    ? [initialSDS, ...safeSDSData]
+    : safeSDSData;
+
+  if (isLoading) {
+    return (
+      <Command className={cn("w-[400px] bg-white border rounded-lg", className)}>
+        <CommandInput placeholder="Loading SDS..." disabled />
+        <CommandEmpty>Loading...</CommandEmpty>
+      </Command>
+    );
+  }
 
   return (
     <Command className={cn("w-[400px] bg-white border rounded-lg", className)}>
@@ -29,15 +40,15 @@ export function SDSSearch({ selectedSdsId, initialSDS, onSDSSelect, className }:
             key={sds.id}
             value={sds.productName}
             onSelect={() => onSDSSelect(sds)}
-            className="cursor-pointer"
+            className={cn(
+              "cursor-pointer",
+              selectedSdsId === sds.id && "bg-dgxprt-selected text-white"
+            )}
           >
-            <Check
-              className={cn(
-                "mr-2 h-4 w-4",
-                selectedSdsId === sds.id ? "opacity-100" : "opacity-0"
-              )}
-            />
-            {sds.productName}
+            <div className="flex flex-col">
+              <span className="font-medium">{sds.productName}</span>
+              <span className="text-sm text-gray-500">{sds.productId}</span>
+            </div>
           </CommandItem>
         ))}
       </CommandGroup>
