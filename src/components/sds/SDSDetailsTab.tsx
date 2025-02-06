@@ -7,7 +7,7 @@ import type { SDS } from "@/types/sds";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
-import { addYears, format } from "date-fns";
+import { addYears, format, isValid, parse } from "date-fns";
 
 interface SDSDetailsTabProps {
   initialData?: SDS | null;
@@ -38,7 +38,15 @@ export function SDSDetailsTab({
   supplier,
   setSupplier,
   formData,
-  setFormData
+  setFormData,
+  dgClassId,
+  setDgClassId,
+  subsidiaryDgClassId,
+  setSubsidiaryDgClassId,
+  packingGroupId,
+  setPackingGroupId,
+  dgSubDivisionId,
+  setDgSubDivisionId
 }: SDSDetailsTabProps) {
   console.log("SDSDetailsTab - Received props:", {
     initialData,
@@ -103,12 +111,20 @@ export function SDSDetailsTab({
   useEffect(() => {
     if (formData.issueDate) {
       console.log("Calculating expiry date from issue date:", formData.issueDate);
-      const issueDate = new Date(formData.issueDate);
-      const expiryDate = addYears(issueDate, 5);
-      setFormData(prev => ({
-        ...prev,
-        expiryDate: format(expiryDate, 'yyyy-MM-dd')
-      }));
+      try {
+        const issueDate = parse(formData.issueDate, 'yyyy-MM-dd', new Date());
+        if (isValid(issueDate)) {
+          const expiryDate = addYears(issueDate, 5);
+          setFormData(prev => ({
+            ...prev,
+            expiryDate: format(expiryDate, 'yyyy-MM-dd')
+          }));
+        } else {
+          console.error("Invalid issue date:", formData.issueDate);
+        }
+      } catch (error) {
+        console.error("Error calculating expiry date:", error);
+      }
     }
   }, [formData.issueDate, setFormData]);
 
@@ -428,4 +444,3 @@ export function SDSDetailsTab({
     </div>
   );
 }
-

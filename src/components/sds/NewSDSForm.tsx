@@ -10,6 +10,7 @@ import { SDSPreview } from "./SDSPreview";
 import { SDSUploadDialog } from "./SDSUploadDialog";
 import { createSDS, updateSDS, uploadSDSFile, getStatusId } from "@/services/sds";
 import { useQueryClient } from "@tanstack/react-query";
+import { format, addYears } from "date-fns";
 
 interface NewSDSFormProps {
   onClose: () => void;
@@ -28,14 +29,16 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   const [subsidiaryDgClassId, setSubsidiaryDgClassId] = useState(initialData?.subsidiaryDgClassId ?? "");
   const [packingGroupId, setPackingGroupId] = useState(initialData?.packingGroupId ?? "");
   const [dgSubDivisionId, setDgSubDivisionId] = useState(initialData?.dgSubDivisionId ?? "");
+  
+  const today = new Date();
   const [formData, setFormData] = useState({
     productName: initialData?.productName ?? "",
     productId: initialData?.productId ?? "",
     otherNames: initialData?.otherNames ?? "",
     emergencyPhone: initialData?.emergencyPhone ?? "",
-    issueDate: initialData?.issueDate ?? "",
+    issueDate: initialData?.issueDate ?? format(today, 'yyyy-MM-dd'),
     revisionDate: initialData?.revisionDate ?? "",
-    expiryDate: initialData?.expiryDate ?? "",
+    expiryDate: initialData?.expiryDate ?? format(addYears(today, 5), 'yyyy-MM-dd'),
     unNumber: initialData?.unNumber ?? "",
     unProperShippingName: initialData?.unProperShippingName ?? "",
     hazchemCode: initialData?.hazchemCode ?? ""
