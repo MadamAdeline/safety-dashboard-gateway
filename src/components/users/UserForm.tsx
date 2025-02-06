@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +20,8 @@ export function UserForm({ onClose, initialData }: UserFormProps) {
     active: initialData?.active || "active",
     role_id: initialData?.user_roles?.[0]?.role_id || "",
     password: "",
+    manager_id: initialData?.manager_id || "",
+    location_id: initialData?.location_id || "",
   });
 
   const { data: roles } = useQuery({

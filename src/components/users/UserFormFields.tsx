@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -8,6 +9,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Role, UserStatus } from "@/types/user";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UserFormFieldsProps {
   formData: {
@@ -18,6 +21,8 @@ interface UserFormFieldsProps {
     active: UserStatus;
     role_id: string;
     password: string;
+    manager_id?: string;
+    location_id?: string;
   };
   roles?: Role[];
   isEditing: boolean;
@@ -25,6 +30,34 @@ interface UserFormFieldsProps {
 }
 
 export function UserFormFields({ formData, roles, isEditing, onChange }: UserFormFieldsProps) {
+  // Fetch managers (all active users)
+  const { data: managers } = useQuery({
+    queryKey: ['users', 'managers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, first_name, last_name')
+        .eq('active', 'active');
+      
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  // Fetch locations
+  const { data: locations } = useQuery({
+    queryKey: ['locations'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('locations')
+        .select('id, name')
+        .eq('status_id', 1); // Assuming 1 is active status
+      
+      if (error) throw error;
+      return data;
+    }
+  });
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="space-y-2">
@@ -88,6 +121,46 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
             {roles?.map((role) => (
               <SelectItem key={role.id} value={role.id}>
                 {role.role_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Manager</Label>
+        <Select
+          value={formData.manager_id || ""}
+          onValueChange={(value) => onChange("manager_id", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select manager" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">No Manager</SelectItem>
+            {managers?.map((manager) => (
+              <SelectItem key={manager.id} value={manager.id}>
+                {manager.first_name} {manager.last_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Location</Label>
+        <Select
+          value={formData.location_id || ""}
+          onValueChange={(value) => onChange("location_id", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select location" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">No Location</SelectItem>
+            {locations?.map((location) => (
+              <SelectItem key={location.id} value={location.id}>
+                {location.name}
               </SelectItem>
             ))}
           </SelectContent>

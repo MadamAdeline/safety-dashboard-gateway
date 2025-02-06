@@ -1,3 +1,4 @@
+
 export type UserStatus = "active" | "inactive";
 
 export interface Role {
@@ -17,6 +18,12 @@ export interface User {
   last_login_date?: string;
   password: string;
   manager_id?: string;
+  location_id?: string;
   created_at?: string;
   updated_at?: string;
+  manager?: User;
+  location?: {
+    id: string;
+    name: string;
+  };
 }

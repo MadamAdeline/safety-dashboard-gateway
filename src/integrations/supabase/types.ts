@@ -505,6 +505,7 @@ export type Database = {
           id: string
           last_login_date: string | null
           last_name: string
+          location_id: string | null
           manager_id: string | null
           password: string
           phone_number: string | null
@@ -518,6 +519,7 @@ export type Database = {
           id?: string
           last_login_date?: string | null
           last_name: string
+          location_id?: string | null
           manager_id?: string | null
           password: string
           phone_number?: string | null
@@ -531,12 +533,20 @@ export type Database = {
           id?: string
           last_login_date?: string | null
           last_name?: string
+          location_id?: string | null
           manager_id?: string | null
           password?: string
           phone_number?: string | null
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "users_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "users_manager_id_fkey"
             columns: ["manager_id"]
