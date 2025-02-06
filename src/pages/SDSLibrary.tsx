@@ -63,6 +63,7 @@ export default function SDSLibrary() {
         productId: item.product_id,
         isDG: item.is_dg,
         supplier: item.suppliers?.supplier_name || 'Unknown',
+        supplierId: item.supplier_id, // Add this line to include supplier_id
         issueDate: item.issue_date,
         expiryDate: item.expiry_date,
         dgClassId: item.dg_class_id,

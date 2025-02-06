@@ -4,6 +4,7 @@ export interface SDS {
   productId: string;
   isDG: boolean;
   supplier: string;
+  supplierId: string;
   issueDate: string;
   expiryDate: string;
   status: 'ACTIVE' | 'INACTIVE' | 'REQUESTED';

@@ -24,7 +24,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [status, setStatus] = useState<"ACTIVE" | "INACTIVE" | "REQUESTED">(initialData?.status ?? 'ACTIVE');
-  const [supplier, setSupplier] = useState("");
+  const [supplier, setSupplier] = useState(initialData?.supplierId ?? "");
   const [dgClassId, setDgClassId] = useState(initialData?.dgClassId ?? "");
   const [subsidiaryDgClassId, setSubsidiaryDgClassId] = useState(initialData?.subsidiaryDgClassId ?? "");
   const [packingGroupId, setPackingGroupId] = useState(initialData?.packingGroupId ?? "");
