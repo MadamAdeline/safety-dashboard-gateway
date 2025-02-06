@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,9 @@ import Locations from "./pages/Locations";
 import Suppliers from "./pages/Suppliers";
 import MasterData from "./pages/MasterData";
 import Users from "./pages/Users";
+import SiteRegisters from "./pages/SiteRegisters";
+import RiskAssessments from "./pages/RiskAssessments";
+import WasteTracking from "./pages/WasteTracking";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,7 +45,9 @@ const App = () => (
             <Route path="/suppliers" element={<Suppliers />} />
             <Route path="/master-data" element={<MasterData />} />
             <Route path="/users" element={<Users />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/site-registers" element={<SiteRegisters />} />
+            <Route path="/risk-assessments" element={<RiskAssessments />} />
+            <Route path="/waste-tracking" element={<WasteTracking />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
