@@ -226,14 +226,17 @@ export function LocationList({ filters, onEdit }: LocationListProps) {
       </TableCell>
       <TableCell>
         <Select
-          value={location.parent_location_id || ''}
-          onValueChange={(value) => setEditingLocation({ ...location, parent_location_id: value })}
+          value={location.parent_location_id || 'none'}
+          onValueChange={(value) => setEditingLocation({ 
+            ...location, 
+            parent_location_id: value === 'none' ? null : value 
+          })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select parent" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">None</SelectItem>
+            <SelectItem value="none">None</SelectItem>
             {locations.map(loc => (
               <SelectItem key={loc.id} value={loc.id}>
                 {loc.name}
