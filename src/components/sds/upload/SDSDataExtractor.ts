@@ -4,14 +4,17 @@ export async function extractSDSData(file: File, showToast: (message: string) =>
   console.log('Attempting to extract SDS data from PDF:', file.name);
   
   try {
-    const { data, error } = await supabase.functions.invoke('extract-sds-data');
+    // Call the edge function to extract data
+    const { data, error } = await supabase.functions.invoke('extract-sds-data', {
+      body: { fileName: file.name }
+    });
     
     if (error) {
       console.error('Error calling Edge Function:', error);
       throw error;
     }
 
-    // Return empty values instead of hardcoded ones
+    // Return empty values for now until the edge function is implemented
     const extractedData = {
       productName: "",
       productId: "",
