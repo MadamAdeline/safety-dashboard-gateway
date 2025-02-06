@@ -122,9 +122,20 @@ export default function SDSLibrary() {
     queryClient.invalidateQueries({ queryKey: ['sds'] });
   };
 
-  const handleSDSSelect = (sds: SDS) => {
-    setSelectedSDS(sds);
-    setFilters({ ...filters, search: sds.productName });
+  const handleSDSSelect = (sdsInput: SDS | SDS[]) => {
+    console.log("Handling SDS selection:", sdsInput);
+    
+    if (Array.isArray(sdsInput)) {
+      // Handle array case (from GlobalSDSSearchDialog)
+      toast({
+        title: "Success",
+        description: `${sdsInput.length} SDS(s) have been added to your library.`,
+      });
+    } else {
+      // Handle single SDS case (from SDSSearch)
+      setSelectedSDS(sdsInput);
+      setFilters({ ...filters, search: sdsInput.productName });
+    }
   };
 
   if (showNewSDS) {
