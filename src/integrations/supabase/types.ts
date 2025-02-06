@@ -9,6 +9,61 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      locations: {
+        Row: {
+          coordinates: Json | null
+          created_at: string | null
+          id: string
+          name: string
+          parent_location_id: string | null
+          status_id: number
+          type_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          coordinates?: Json | null
+          created_at?: string | null
+          id?: string
+          name: string
+          parent_location_id?: string | null
+          status_id: number
+          type_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          coordinates?: Json | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          parent_location_id?: string | null
+          status_id?: number
+          type_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "locations_parent_location_id_fkey"
+            columns: ["parent_location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "locations_status_id_fkey"
+            columns: ["status_id"]
+            isOneToOne: false
+            referencedRelation: "status_lookup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "locations_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "master_data"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       master_data: {
         Row: {
           category: string

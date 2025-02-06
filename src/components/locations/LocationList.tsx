@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -21,19 +20,21 @@ import { Button } from "@/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
 import type { Location, LocationFilters } from "@/types/location";
 import { useState } from "react";
+import { useLocations } from "@/hooks/use-locations";
 
 interface LocationListProps {
-  data: Location[];
   filters: LocationFilters;
   onEdit: (location: Location) => void;
 }
 
-export function LocationList({ data, filters, onEdit }: LocationListProps) {
+export function LocationList({ filters, onEdit }: LocationListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const filteredData = data.filter((item) => {
+  const { locations, isLoading, deleteLocation } = useLocations();
+
+  const filteredData = locations.filter((item) => {
     if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) {
       return false;
     }
@@ -68,6 +69,18 @@ export function LocationList({ data, filters, onEdit }: LocationListProps) {
         : [...prev, id]
     );
   };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteLocation.mutateAsync(id);
+    } catch (error) {
+      console.error('Error deleting location:', error);
+    }
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="space-y-4">
@@ -204,4 +217,4 @@ export function LocationList({ data, filters, onEdit }: LocationListProps) {
       </div>
     </div>
   );
-}
+};

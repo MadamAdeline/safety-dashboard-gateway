@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Input } from "@/components/ui/input";
@@ -9,6 +8,7 @@ import { X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import type { Location, LocationType, LocationStatus } from "@/types/location";
 import { LocationMap } from "./LocationMap";
+import { useLocations } from "@/hooks/use-locations";
 
 interface LocationFormProps {
   onClose: () => void;
@@ -21,13 +21,38 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
   const [parentLocation, setParentLocation] = useState(initialData?.parentLocation ?? "");
   const [status, setStatus] = useState<LocationStatus>(initialData?.status ?? "ACTIVE");
   const [coordinates, setCoordinates] = useState(initialData?.coordinates ?? { lat: -37.8136, lng: 144.9631 });
+  
+  const { createLocation, updateLocation } = useLocations();
   const { toast } = useToast();
 
-  const handleSave = () => {
-    toast({
-      title: "Success",
-      description: "Location has been saved successfully"
-    });
+  const handleSave = async () => {
+    try {
+      const locationData = {
+        name,
+        type_id: type, // This needs to be mapped to the correct master_data id
+        parent_location_id: parentLocation || null,
+        status_id: status === 'ACTIVE' ? 1 : 2, // This needs to be mapped to the correct status_lookup id
+        coordinates,
+      };
+
+      if (initialData?.id) {
+        await updateLocation.mutateAsync({
+          id: initialData.id,
+          ...locationData,
+        });
+      } else {
+        await createLocation.mutateAsync(locationData);
+      }
+
+      onClose();
+    } catch (error) {
+      console.error('Error saving location:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save location",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -126,4 +151,4 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     </DashboardLayout>
   );
 }
-
+};
