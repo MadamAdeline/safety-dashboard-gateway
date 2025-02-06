@@ -34,7 +34,7 @@ export function SDSDetailsTab(props: SDSDetailsTabProps) {
   console.log("SDSDetailsTab - Initial Data:", props.initialData);
   const isGlobalLibrary = props.initialData?.sdsSource === "Global Library";
   const isRequested = props.status === "REQUESTED";
-  const source = isRequested || isGlobalLibrary ? "Global Library" : "Customer";
+  const source = props.initialData?.sdsSource || "Customer";
 
   return (
     <SDSFormContext.Provider value={props}>
