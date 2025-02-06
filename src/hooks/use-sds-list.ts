@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { SDS } from "@/types/sds";
@@ -45,6 +46,7 @@ export function useSDSList() {
         dgSubDivision: item.dg_subdivision,
         status: item.status?.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
         sdsSource: 'Customer' as const,
+        source: item.source,
         currentFilePath: item.current_file_path,
         currentFileName: item.current_file_name,
         currentFileSize: item.current_file_size,

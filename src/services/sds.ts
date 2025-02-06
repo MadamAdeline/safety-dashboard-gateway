@@ -28,6 +28,7 @@ export async function createSDS(data: {
   requestInformation?: string;
   requestDate?: string;
   requestedBy?: string;
+  source?: string;
 }) {
   console.log("Creating SDS with data:", data);
   
@@ -57,7 +58,8 @@ export async function createSDS(data: {
     request_supplier_details: data.requestSupplierDetails || null,
     request_information: data.requestInformation || null,
     request_date: data.requestDate || null,
-    requested_by: data.requestedBy || null
+    requested_by: data.requestedBy || null,
+    source: data.source || null
   };
 
   console.log("Formatted data for Supabase:", formattedData);
@@ -125,6 +127,7 @@ export async function updateSDS(id: string, data: {
   requestInformation?: string;
   requestDate?: string;
   requestedBy?: string;
+  source?: string;
 }) {
   console.log("Updating SDS with ID:", id, "and data:", data);
   
@@ -154,7 +157,8 @@ export async function updateSDS(id: string, data: {
     request_supplier_details: data.requestSupplierDetails || null,
     request_information: data.requestInformation || null,
     request_date: data.requestDate || null,
-    requested_by: data.requestedBy || null
+    requested_by: data.requestedBy || null,
+    source: data.source || null
   };
 
   console.log("Formatted data for Supabase:", formattedData);

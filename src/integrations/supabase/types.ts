@@ -225,6 +225,7 @@ export type Database = {
           request_supplier_name: string | null
           requested_by: string | null
           revision_date: string | null
+          source: string | null
           status_id: number
           subsidiary_dg_class_id: string | null
           supplier_id: string
@@ -256,6 +257,7 @@ export type Database = {
           request_supplier_name?: string | null
           requested_by?: string | null
           revision_date?: string | null
+          source?: string | null
           status_id: number
           subsidiary_dg_class_id?: string | null
           supplier_id: string
@@ -287,6 +289,7 @@ export type Database = {
           request_supplier_name?: string | null
           requested_by?: string | null
           revision_date?: string | null
+          source?: string | null
           status_id?: number
           subsidiary_dg_class_id?: string | null
           supplier_id?: string

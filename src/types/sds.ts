@@ -1,3 +1,4 @@
+
 export interface SDS {
   id: string;
   productName: string;
@@ -9,6 +10,7 @@ export interface SDS {
   expiryDate: string;
   status: 'ACTIVE' | 'INACTIVE' | 'REQUESTED';
   sdsSource: 'Customer' | 'Global Library';
+  source?: string;
   currentFilePath?: string;
   currentFileName?: string;
   currentFileSize?: number;
