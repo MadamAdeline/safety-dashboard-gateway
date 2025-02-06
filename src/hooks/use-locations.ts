@@ -6,7 +6,7 @@ import type { Location } from "@/types/location";
 export const useLocations = () => {
   const queryClient = useQueryClient();
 
-  const { data: locations = [], isLoading } = useQuery({
+  const { data: locations = [], isLoading, refetch } = useQuery({
     queryKey: ['locations'],
     queryFn: async () => {
       console.log('Fetching locations from Supabase...');
@@ -68,7 +68,7 @@ export const useLocations = () => {
 
       const locationData = {
         ...newLocation,
-        status_id: activeStatusId // Use the fetched active status ID
+        status_id: activeStatusId
       };
 
       console.log('Creating new location:', locationData);
@@ -167,5 +167,6 @@ export const useLocations = () => {
     createLocation,
     updateLocation,
     deleteLocation,
+    refetch
   };
 };

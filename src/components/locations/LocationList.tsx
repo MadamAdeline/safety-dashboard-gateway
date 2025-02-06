@@ -137,27 +137,36 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
   };
 
   const handleRefresh = async () => {
-    // Clear filters
-    onFiltersChange({
-      search: "",
-      status: [],
-      type: [],
-      parentLocation: null
-    });
-    
-    // Reset pagination
-    setCurrentPage(1);
-    
-    // Clear selection
-    setSelectedItems([]);
-    
-    // Refetch data
-    await refetch();
-    
-    toast({
-      title: "Refreshed",
-      description: "Location list has been refreshed and filters cleared",
-    });
+    try {
+      // Clear filters
+      onFiltersChange({
+        search: "",
+        status: [],
+        type: [],
+        parentLocation: null
+      });
+      
+      // Reset pagination
+      setCurrentPage(1);
+      
+      // Clear selection
+      setSelectedItems([]);
+      
+      // Refetch data
+      await refetch();
+      
+      toast({
+        title: "Refreshed",
+        description: "Location list has been refreshed and filters cleared",
+      });
+    } catch (error) {
+      console.error('Error refreshing locations:', error);
+      toast({
+        title: "Error",
+        description: "Failed to refresh locations",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredData = locations.map(item => ({
