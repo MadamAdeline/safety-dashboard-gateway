@@ -1,5 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import type { SDS } from "@/types/sds";
 import { SDSFormContext } from "./form/SDSFormContext";
 import { SDSBasicDetails } from "./form/SDSBasicDetails";
