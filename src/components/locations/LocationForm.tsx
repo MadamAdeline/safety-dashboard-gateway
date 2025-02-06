@@ -151,4 +151,3 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     </DashboardLayout>
   );
 }
-};
