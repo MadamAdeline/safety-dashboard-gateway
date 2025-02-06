@@ -94,6 +94,78 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          aerosol: boolean | null
+          approval_status_id: number | null
+          brand_name: string | null
+          created_at: string | null
+          cryogenic_fluid: boolean | null
+          description: string | null
+          id: string
+          other_names: string | null
+          product_code: string
+          product_name: string
+          product_set: boolean | null
+          product_status_id: number | null
+          unit: string
+          unit_size: number | null
+          updated_at: string | null
+          uses: string | null
+        }
+        Insert: {
+          aerosol?: boolean | null
+          approval_status_id?: number | null
+          brand_name?: string | null
+          created_at?: string | null
+          cryogenic_fluid?: boolean | null
+          description?: string | null
+          id?: string
+          other_names?: string | null
+          product_code: string
+          product_name: string
+          product_set?: boolean | null
+          product_status_id?: number | null
+          unit: string
+          unit_size?: number | null
+          updated_at?: string | null
+          uses?: string | null
+        }
+        Update: {
+          aerosol?: boolean | null
+          approval_status_id?: number | null
+          brand_name?: string | null
+          created_at?: string | null
+          cryogenic_fluid?: boolean | null
+          description?: string | null
+          id?: string
+          other_names?: string | null
+          product_code?: string
+          product_name?: string
+          product_set?: boolean | null
+          product_status_id?: number | null
+          unit?: string
+          unit_size?: number | null
+          updated_at?: string | null
+          uses?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_approval_status_id_fkey"
+            columns: ["approval_status_id"]
+            isOneToOne: false
+            referencedRelation: "status_lookup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_product_status_id_fkey"
+            columns: ["product_status_id"]
+            isOneToOne: false
+            referencedRelation: "status_lookup"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sds: {
         Row: {
           created_at: string | null
