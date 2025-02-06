@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
@@ -44,40 +44,8 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     hazchemCode: initialData?.hazchemCode ?? ""
   });
 
-  console.log("NewSDSForm - Current Form Data:", formData);
-  console.log("NewSDSForm - isDG:", isDG);
-  console.log("NewSDSForm - supplier:", supplier);
-  console.log("NewSDSForm - dgClassId:", dgClassId);
-  console.log("NewSDSForm - subsidiaryDgClassId:", subsidiaryDgClassId);
-  console.log("NewSDSForm - packingGroupId:", packingGroupId);
-  console.log("NewSDSForm - dgSubDivisionId:", dgSubDivisionId);
-
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (initialData) {
-      console.log("NewSDSForm - Setting initial data:", initialData);
-      setIsDG(initialData.isDG);
-      setStatus(initialData.status);
-      setDgClassId(initialData.dgClassId ?? "");
-      setSubsidiaryDgClassId(initialData.subsidiaryDgClassId ?? "");
-      setPackingGroupId(initialData.packingGroupId ?? "");
-      setDgSubDivisionId(initialData.dgSubDivisionId ?? "");
-      setFormData({
-        productName: initialData.productName,
-        productId: initialData.productId,
-        otherNames: initialData.otherNames ?? "",
-        emergencyPhone: initialData.emergencyPhone ?? "",
-        issueDate: initialData.issueDate,
-        revisionDate: initialData.revisionDate ?? "",
-        expiryDate: initialData.expiryDate,
-        unNumber: initialData.unNumber ?? "",
-        unProperShippingName: initialData.unProperShippingName ?? "",
-        hazchemCode: initialData.hazchemCode ?? ""
-      });
-    }
-  }, [initialData]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, extractedData?: any) => {
     const file = event.target.files?.[0];
@@ -91,15 +59,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         setIsDG(true);
         setFormData(prev => ({
           ...prev,
-          productName: extractedData.productName || "",
-          productId: extractedData.productId || "",
-          dgClassId: extractedData.dgClassId || "",
-          subsidiaryDgClassId: extractedData.subsidiaryDgClassId || "",
-          packingGroupId: extractedData.packingGroupId || "",
-          dgSubDivisionId: extractedData.dgSubDivisionId || "",
-          unNumber: extractedData.unNumber || "",
-          unProperShippingName: extractedData.unProperShippingName || "",
-          hazchemCode: extractedData.hazchemCode || ""
+          ...extractedData
         }));
       }
     }
@@ -119,15 +79,6 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
 
   const handleSave = async () => {
     try {
-      console.log("Starting SDS save process");
-      console.log("Form data being saved:", formData);
-      console.log("isDG status:", isDG);
-      console.log("Selected supplier:", supplier);
-      console.log("DG Class ID:", dgClassId);
-      console.log("Subsidiary DG Class ID:", subsidiaryDgClassId);
-      console.log("Packing Group ID:", packingGroupId);
-      console.log("DG Subdivision ID:", dgSubDivisionId);
-      
       if (!supplier) {
         toast({
           title: "Error",
@@ -173,17 +124,13 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         })
       };
 
-      console.log("Saving SDS data:", sdsData);
-
       if (initialData?.id) {
-        console.log("Updating existing SDS with ID:", initialData.id);
         await updateSDS(initialData.id, sdsData);
         toast({
           title: "Success",
           description: "SDS Record has been updated"
         });
       } else {
-        console.log("Creating new SDS record");
         await createSDS(sdsData);
         toast({
           title: "Success",

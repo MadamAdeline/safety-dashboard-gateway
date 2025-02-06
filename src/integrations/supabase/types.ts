@@ -46,7 +46,6 @@ export type Database = {
           current_file_name: string | null
           current_file_path: string | null
           current_file_size: number | null
-          dg_class: number | null
           dg_class_id: string | null
           dg_subdivision_id: string | null
           emergency_phone: string | null
@@ -62,7 +61,6 @@ export type Database = {
           product_name: string
           revision_date: string | null
           status_id: number
-          subsidiary_dg_class: string | null
           subsidiary_dg_class_id: string | null
           supplier_id: string
           un_number: string | null
@@ -75,7 +73,6 @@ export type Database = {
           current_file_name?: string | null
           current_file_path?: string | null
           current_file_size?: number | null
-          dg_class?: number | null
           dg_class_id?: string | null
           dg_subdivision_id?: string | null
           emergency_phone?: string | null
@@ -91,7 +88,6 @@ export type Database = {
           product_name: string
           revision_date?: string | null
           status_id: number
-          subsidiary_dg_class?: string | null
           subsidiary_dg_class_id?: string | null
           supplier_id: string
           un_number?: string | null
@@ -104,7 +100,6 @@ export type Database = {
           current_file_name?: string | null
           current_file_path?: string | null
           current_file_size?: number | null
-          dg_class?: number | null
           dg_class_id?: string | null
           dg_subdivision_id?: string | null
           emergency_phone?: string | null
@@ -120,7 +115,6 @@ export type Database = {
           product_name?: string
           revision_date?: string | null
           status_id?: number
-          subsidiary_dg_class?: string | null
           subsidiary_dg_class_id?: string | null
           supplier_id?: string
           un_number?: string | null
