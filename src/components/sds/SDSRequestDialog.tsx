@@ -12,14 +12,17 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SDSRequestDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onRequestComplete?: () => void;
 }
 
-export function SDSRequestDialog({ open, onOpenChange }: SDSRequestDialogProps) {
+export function SDSRequestDialog({ open, onOpenChange, onRequestComplete }: SDSRequestDialogProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     productName: "",
     productCode: "",
@@ -89,7 +92,7 @@ export function SDSRequestDialog({ open, onOpenChange }: SDSRequestDialogProps) 
           request_date: format(new Date(), 'yyyy-MM-dd'),
           requested_by: "d.c.adeline@gmail.com",
           status_id: statusData.id,
-          supplier_id: supplierId // Add the supplier_id here
+          supplier_id: supplierId
         })
         .select()
         .single();
@@ -101,7 +104,13 @@ export function SDSRequestDialog({ open, onOpenChange }: SDSRequestDialogProps) 
         description: "Your SDS request has been sent to the DGXprt team.",
       });
       
+      // Close the dialog and reset form
       onOpenChange(false);
+      if (onRequestComplete) {
+        onRequestComplete();
+      }
+      queryClient.invalidateQueries({ queryKey: ['sds'] });
+      
       setFormData({
         productName: "",
         productCode: "",

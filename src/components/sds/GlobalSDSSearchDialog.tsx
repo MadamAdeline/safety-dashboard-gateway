@@ -96,6 +96,11 @@ export function GlobalSDSSearchDialog({
     );
   };
 
+  const handleRequestComplete = () => {
+    setShowRequestDialog(false);
+    onOpenChange(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px]">
@@ -253,6 +258,7 @@ export function GlobalSDSSearchDialog({
       <SDSRequestDialog 
         open={showRequestDialog} 
         onOpenChange={setShowRequestDialog}
+        onRequestComplete={handleRequestComplete}
       />
     </Dialog>
   );
