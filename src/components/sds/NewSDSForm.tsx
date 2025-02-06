@@ -39,7 +39,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     unNumber: initialData?.unNumber ?? "",
     unProperShippingName: initialData?.unProperShippingName ?? "",
     hazchemCode: initialData?.hazchemCode ?? "",
-    dgClass: initialData?.dgClass ?? "",
+    dgClass: initialData?.dgClass ?? null,
     subsidiaryDgClass: initialData?.subsidiaryDgClass ?? "",
     packingGroup: initialData?.packingGroup ?? "",
     dgSubDivision: initialData?.dgSubDivision ?? ""
@@ -72,7 +72,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         unNumber: initialData.unNumber ?? "",
         unProperShippingName: initialData.unProperShippingName ?? "",
         hazchemCode: initialData.hazchemCode ?? "",
-        dgClass: initialData.dgClass ?? "",
+        dgClass: initialData.dgClass ?? null,
         subsidiaryDgClass: initialData.subsidiaryDgClass ?? "",
         packingGroup: initialData.packingGroup ?? "",
         dgSubDivision: initialData.dgSubDivision ?? ""
@@ -161,6 +161,10 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         unNumber: isDG ? formData.unNumber || null : null,
         unProperShippingName: isDG ? formData.unProperShippingName || null : null,
         hazchemCode: isDG ? formData.hazchemCode || null : null,
+        dgClass: isDG ? formData.dgClass || null : null,
+        subsidiaryDgClass: isDG ? formData.subsidiaryDgClass || null : null,
+        packingGroup: isDG ? formData.packingGroup || null : null,
+        dgSubDivision: isDG ? formData.dgSubDivision || null : null,
         statusId,
         ...(fileData && {
           currentFilePath: fileData.filePath,
