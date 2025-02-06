@@ -5,14 +5,16 @@ export type LocationStatus = "ACTIVE" | "INACTIVE";
 export interface Location {
   id: string;
   name: string;
-  full_path: string | null;
   type_id: string;
   parent_location_id: string | null;
   status_id: number;
+  full_path: string | null;
   coordinates: {
     lat: number;
     lng: number;
-  } | null | any; // Making it more flexible to handle JSON from Supabase
+  } | null;
+  created_at?: string | null;
+  updated_at?: string | null;
   master_data?: {
     id: string;
     label: string;
