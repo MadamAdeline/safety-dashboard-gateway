@@ -1,25 +1,17 @@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useActiveSDSList } from "@/hooks/use-active-sds-list";
 import type { SDS } from "@/types/sds";
 
 interface SDSSearchProps {
   selectedSdsId?: string | null;
-  initialSDS?: SDS | null;
-  onSDSSelect: (sds: SDS | SDS[]) => void;
+  onSDSSelect: (sds: SDS) => void;
   className?: string;
 }
 
-export function SDSSearch({ selectedSdsId, initialSDS, onSDSSelect, className }: SDSSearchProps) {
+export function SDSSearch({ selectedSdsId, onSDSSelect, className }: SDSSearchProps) {
   const { data: sdsData = [], isLoading } = useActiveSDSList();
-
-  // Ensure sdsData is always an array
-  const safeSDSData = Array.isArray(sdsData) ? sdsData : [];
-  
-  // Combine initial SDS with fetched data if it exists and isn't already in the list
-  const combinedData = initialSDS && !safeSDSData.find(sds => sds.id === initialSDS.id)
-    ? [initialSDS, ...safeSDSData]
-    : safeSDSData;
 
   if (isLoading) {
     return (
@@ -34,21 +26,21 @@ export function SDSSearch({ selectedSdsId, initialSDS, onSDSSelect, className }:
     <Command className={cn("w-[400px] bg-white border rounded-lg", className)}>
       <CommandInput placeholder="Search SDS..." />
       <CommandEmpty>No SDS found.</CommandEmpty>
-      <CommandGroup className="max-h-[300px] overflow-auto">
-        {combinedData.map((sds) => (
+      <CommandGroup>
+        {sdsData.map((sds) => (
           <CommandItem
             key={sds.id}
             value={sds.productName}
             onSelect={() => onSDSSelect(sds)}
-            className={cn(
-              "cursor-pointer",
-              selectedSdsId === sds.id && "bg-dgxprt-selected text-white"
-            )}
+            className="cursor-pointer"
           >
-            <div className="flex flex-col">
-              <span className="font-medium">{sds.productName}</span>
-              <span className="text-sm text-gray-500">{sds.productId}</span>
-            </div>
+            <Check
+              className={cn(
+                "mr-2 h-4 w-4",
+                selectedSdsId === sds.id ? "opacity-100" : "opacity-0"
+              )}
+            />
+            {sds.productName}
           </CommandItem>
         ))}
       </CommandGroup>
