@@ -14,8 +14,10 @@ serve(async (req) => {
   try {
     console.log('Edge Function: Starting PDF extraction');
     
-    // For now, return mock data since we don't have actual PDF parsing yet
+    // Mock extraction data - in a real implementation, this would parse the PDF
     const extractedData = {
+      productName: "Sample Product",
+      productId: "SDS-001",
       dgClass: 3,
       unNumber: "UN1263",
       unProperShippingName: "PAINT",

@@ -17,18 +17,17 @@ export async function extractSDSDataFromFile(file: File): Promise<SDSExtractionR
       };
     }
 
-    console.log('SDS extraction completed successfully');
+    console.log('SDS extraction completed successfully:', data);
     
-    // Return empty values until edge function implementation is complete
     const extractedData: ExtractedSDSData = {
-      productName: "",
-      productId: "",
-      dgClass: null,
-      unNumber: "",
-      unProperShippingName: "",
-      packingGroup: "",
-      hazchemCode: "",
-      subsidiaryDgClass: ""
+      productName: data.productName || "",
+      productId: data.productId || "",
+      dgClass: data.dgClass || null,
+      unNumber: data.unNumber || "",
+      unProperShippingName: data.unProperShippingName || "",
+      packingGroup: data.packingGroup || "",
+      hazchemCode: data.hazchemCode || "",
+      subsidiaryDgClass: data.subsidiaryDgClass || ""
     };
 
     return {
