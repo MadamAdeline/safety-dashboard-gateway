@@ -160,6 +160,8 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         })
       };
 
+      console.log("Saving SDS with data:", sdsData);
+
       if (initialData?.id) {
         await updateSDS(initialData.id, sdsData);
         toast({
