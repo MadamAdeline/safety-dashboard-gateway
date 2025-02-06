@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { SDSList } from "@/components/sds/SDSList";
@@ -13,13 +14,17 @@ import type { SDS, SDSFilters as SDSFiltersType } from "@/types/sds";
 import { SDSRequestDialog } from "@/components/sds/SDSRequestDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useLocation } from "react-router-dom";
 
 export default function SDSLibrary() {
+  const location = useLocation();
+  const showExpiredFilter = location.search === "?filter=expired";
+
   const [filters, setFilters] = useState<SDSFiltersType>({
     search: "",
-    dateField: null,
-    dateType: null,
-    dateFrom: "",
+    dateField: showExpiredFilter ? "expiryDate" : null,
+    dateType: showExpiredFilter ? "before" : null,
+    dateFrom: showExpiredFilter ? new Date().toISOString().split('T')[0] : "",
     dateTo: "",
     status: [],
     dgClass: [],
@@ -142,8 +147,18 @@ export default function SDSLibrary() {
     return <NewSDSForm onClose={handleClose} initialData={selectedSDS} />;
   }
 
-  // Filter the data based on search criteria
+  // Filter the data based on all criteria including expiry date
   const filteredData = sdsData.filter((item) => {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Apply expiry date filter if coming from dashboard
+    if (showExpiredFilter && item.expiryDate) {
+      if (item.expiryDate > today) {
+        return false;
+      }
+    }
+
+    // Apply search filter
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       return (
