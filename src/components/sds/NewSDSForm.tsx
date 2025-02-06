@@ -28,6 +28,11 @@ interface FormData {
   unNumber: string;
   unProperShippingName: string;
   hazchemCode: string;
+  requestSupplierName: string;
+  requestSupplierDetails: string;
+  requestInformation: string;
+  requestDate: string;
+  requestedBy: string;
 }
 
 export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
@@ -54,7 +59,12 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     expiryDate: initialData?.expiryDate ?? format(addYears(today, 5), 'yyyy-MM-dd'),
     unNumber: initialData?.unNumber ?? "",
     unProperShippingName: initialData?.unProperShippingName ?? "",
-    hazchemCode: initialData?.hazchemCode ?? ""
+    hazchemCode: initialData?.hazchemCode ?? "",
+    requestSupplierName: initialData?.requestSupplierName ?? "",
+    requestSupplierDetails: initialData?.requestSupplierDetails ?? "",
+    requestInformation: initialData?.requestInformation ?? "",
+    requestDate: initialData?.requestDate ?? "",
+    requestedBy: initialData?.requestedBy ?? ""
   });
 
   const { toast } = useToast();
@@ -131,6 +141,11 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         unProperShippingName: isDG ? formData.unProperShippingName || null : null,
         hazchemCode: isDG ? formData.hazchemCode || null : null,
         statusId,
+        requestSupplierName: formData.requestSupplierName || null,
+        requestSupplierDetails: formData.requestSupplierDetails || null,
+        requestInformation: formData.requestInformation || null,
+        requestDate: formData.requestDate || null,
+        requestedBy: formData.requestedBy || null,
         ...(fileData && {
           currentFilePath: fileData.filePath,
           currentFileName: fileData.fileName,
@@ -160,6 +175,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       }
 
       queryClient.invalidateQueries({ queryKey: ['sds'] });
+      onClose();
     } catch (error) {
       console.error("Error saving SDS:", error);
       toast({
