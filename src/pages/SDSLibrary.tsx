@@ -43,7 +43,11 @@ export default function SDSLibrary() {
         .select(`
           *,
           suppliers!sds_supplier_id_fkey (supplier_name),
-          status:status_lookup!sds_status_id_fkey (status_name)
+          status:status_lookup!sds_status_id_fkey (status_name),
+          dg_class:master_data!sds_dg_class_id_fkey (label),
+          subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
+          packing_group:master_data!sds_packing_group_id_fkey (label),
+          dg_subdivision:master_data!sds_dg_subdivision_id_fkey (label)
         `);
 
       if (error) {
@@ -59,13 +63,19 @@ export default function SDSLibrary() {
         supplier: item.suppliers?.supplier_name || 'Unknown',
         issueDate: item.issue_date,
         expiryDate: item.expiry_date,
-        dgClass: item.dg_class,
+        dgClassId: item.dg_class_id,
+        subsidiaryDgClassId: item.subsidiary_dg_class_id,
+        packingGroupId: item.packing_group_id,
+        dgSubDivisionId: item.dg_subdivision_id,
         status: item.status?.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
         sdsSource: 'Customer' as const,
         currentFilePath: item.current_file_path,
         currentFileName: item.current_file_name,
         currentFileSize: item.current_file_size,
-        currentContentType: item.current_content_type
+        currentContentType: item.current_content_type,
+        unNumber: item.un_number,
+        unProperShippingName: item.un_proper_shipping_name,
+        hazchemCode: item.hazchem_code
       }));
     }
   });

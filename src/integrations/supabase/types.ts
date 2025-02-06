@@ -47,16 +47,20 @@ export type Database = {
           current_file_path: string | null
           current_file_size: number | null
           dg_class: number | null
+          dg_class_id: string | null
+          dg_subdivision_id: string | null
           expiry_date: string | null
           hazchem_code: string | null
           id: string
           is_dg: boolean | null
           issue_date: string | null
           packing_group: string | null
+          packing_group_id: string | null
           product_id: string
           product_name: string
           status_id: number
           subsidiary_dg_class: string | null
+          subsidiary_dg_class_id: string | null
           supplier_id: string
           un_number: string | null
           un_proper_shipping_name: string | null
@@ -69,16 +73,20 @@ export type Database = {
           current_file_path?: string | null
           current_file_size?: number | null
           dg_class?: number | null
+          dg_class_id?: string | null
+          dg_subdivision_id?: string | null
           expiry_date?: string | null
           hazchem_code?: string | null
           id?: string
           is_dg?: boolean | null
           issue_date?: string | null
           packing_group?: string | null
+          packing_group_id?: string | null
           product_id: string
           product_name: string
           status_id: number
           subsidiary_dg_class?: string | null
+          subsidiary_dg_class_id?: string | null
           supplier_id: string
           un_number?: string | null
           un_proper_shipping_name?: string | null
@@ -91,16 +99,20 @@ export type Database = {
           current_file_path?: string | null
           current_file_size?: number | null
           dg_class?: number | null
+          dg_class_id?: string | null
+          dg_subdivision_id?: string | null
           expiry_date?: string | null
           hazchem_code?: string | null
           id?: string
           is_dg?: boolean | null
           issue_date?: string | null
           packing_group?: string | null
+          packing_group_id?: string | null
           product_id?: string
           product_name?: string
           status_id?: number
           subsidiary_dg_class?: string | null
+          subsidiary_dg_class_id?: string | null
           supplier_id?: string
           un_number?: string | null
           un_proper_shipping_name?: string | null
@@ -122,10 +134,38 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "sds_dg_class_id_fkey"
+            columns: ["dg_class_id"]
+            isOneToOne: false
+            referencedRelation: "master_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sds_dg_subdivision_id_fkey"
+            columns: ["dg_subdivision_id"]
+            isOneToOne: false
+            referencedRelation: "master_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sds_packing_group_id_fkey"
+            columns: ["packing_group_id"]
+            isOneToOne: false
+            referencedRelation: "master_data"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "sds_status_id_fkey"
             columns: ["status_id"]
             isOneToOne: false
             referencedRelation: "status_lookup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sds_subsidiary_dg_class_id_fkey"
+            columns: ["subsidiary_dg_class_id"]
+            isOneToOne: false
+            referencedRelation: "master_data"
             referencedColumns: ["id"]
           },
           {

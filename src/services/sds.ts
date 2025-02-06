@@ -8,7 +8,6 @@ export async function createSDS(data: {
   isDG: boolean;
   issueDate?: string;
   expiryDate?: string;
-  dgClass?: number;
   statusId: number;
   currentFilePath?: string;
   currentFileName?: string;
@@ -16,10 +15,11 @@ export async function createSDS(data: {
   currentContentType?: string;
   unNumber?: string;
   unProperShippingName?: string;
-  packingGroup?: string;
   hazchemCode?: string;
-  subsidiaryDgClass?: string;
-  dgSubDivision?: string;
+  dgClassId?: string;
+  subsidiaryDgClassId?: string;
+  packingGroupId?: string;
+  dgSubDivisionId?: string;
 }) {
   console.log("Creating SDS with data:", data);
   
@@ -39,7 +39,6 @@ export async function createSDS(data: {
       is_dg: data.isDG,
       issue_date: formattedData.issue_date,
       expiry_date: formattedData.expiry_date,
-      dg_class: data.dgClass,
       status_id: data.statusId,
       current_file_path: data.currentFilePath,
       current_file_name: data.currentFileName,
@@ -47,10 +46,11 @@ export async function createSDS(data: {
       current_content_type: data.currentContentType,
       un_number: data.unNumber,
       un_proper_shipping_name: data.unProperShippingName,
-      packing_group: data.packingGroup,
       hazchem_code: data.hazchemCode,
-      subsidiary_dg_class: data.subsidiaryDgClass,
-      dg_subdivision: data.dgSubDivision
+      dg_class_id: data.dgClassId,
+      subsidiary_dg_class_id: data.subsidiaryDgClassId,
+      packing_group_id: data.packingGroupId,
+      dg_subdivision_id: data.dgSubDivisionId
     })
     .select()
     .single();

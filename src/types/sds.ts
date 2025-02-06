@@ -6,7 +6,6 @@ export interface SDS {
   supplier: string;
   issueDate: string;
   expiryDate: string;
-  dgClass?: number;
   status: 'ACTIVE' | 'INACTIVE' | 'REQUESTED';
   sdsSource: 'Customer' | 'Global Library';
   currentFilePath?: string;
@@ -15,9 +14,11 @@ export interface SDS {
   currentContentType?: string;
   unNumber?: string;
   unProperShippingName?: string;
-  packingGroup?: string;
   hazchemCode?: string;
-  subsidiaryDgClass?: string;
+  dgClassId?: string;
+  subsidiaryDgClassId?: string;
+  packingGroupId?: string;
+  dgSubDivisionId?: string;
 }
 
 export interface SDSFilters {
