@@ -8,6 +8,7 @@ import { SDSDetailsTab } from "./SDSDetailsTab";
 import { SDSVersionTab } from "./SDSVersionTab";
 import { SDSPreview } from "./SDSPreview";
 import { SDSUploadDialog } from "./SDSUploadDialog";
+import { createSDS, uploadSDSFile, getStatusId } from "@/services/sds";
 
 interface NewSDSFormProps {
   onClose: () => void;
@@ -20,6 +21,13 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [status, setStatus] = useState<"ACTIVE" | "INACTIVE" | "REQUESTED">(initialData?.status ?? 'ACTIVE');
   const [supplier, setSupplier] = useState(initialData?.supplier ?? "");
+  const [formData, setFormData] = useState({
+    productName: initialData?.productName ?? "",
+    productId: initialData?.productId ?? "",
+    issueDate: initialData?.issueDate ?? "",
+    expiryDate: initialData?.expiryDate ?? "",
+    dgClass: initialData?.dgClass
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -27,23 +35,72 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       setIsDG(initialData.isDG);
       setStatus(initialData.status);
       setSupplier(initialData.supplier);
+      setFormData({
+        productName: initialData.productName,
+        productId: initialData.productId,
+        issueDate: initialData.issueDate,
+        expiryDate: initialData.expiryDate,
+        dgClass: initialData.dgClass
+      });
     }
   }, [initialData]);
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
       setShowUploadDialog(false);
-      console.log("File uploaded:", file.name);
+      console.log("File selected:", file.name);
     }
   };
 
-  const handleSave = () => {
-    toast({
-      title: "Success",
-      description: "SDS Record has been updated"
-    });
+  const handleSave = async () => {
+    try {
+      console.log("Starting SDS save process");
+      
+      // Upload file if selected
+      let fileData = null;
+      if (selectedFile) {
+        fileData = await uploadSDSFile(selectedFile);
+        console.log("File uploaded successfully:", fileData);
+      }
+
+      // Get status ID
+      const statusId = await getStatusId(status);
+      console.log("Retrieved status ID:", statusId);
+
+      // Create SDS record
+      await createSDS({
+        productName: formData.productName,
+        productId: formData.productId,
+        supplierId: "839e6e40-4d9c-465e-91e3-9d1dff58af21", // TODO: Get from supplier selection
+        isDG,
+        issueDate: formData.issueDate,
+        expiryDate: formData.expiryDate,
+        dgClass: isDG ? formData.dgClass : undefined,
+        statusId,
+        ...(fileData && {
+          currentFilePath: fileData.filePath,
+          currentFileName: fileData.fileName,
+          currentFileSize: fileData.fileSize,
+          currentContentType: fileData.contentType
+        })
+      });
+
+      toast({
+        title: "Success",
+        description: "SDS Record has been saved"
+      });
+
+      onClose();
+    } catch (error) {
+      console.error("Error saving SDS:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save SDS record",
+        variant: "destructive"
+      });
+    }
   };
 
   const openSDSInNewTab = () => {
@@ -76,6 +133,8 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
                   setStatus={setStatus}
                   supplier={supplier}
                   setSupplier={setSupplier}
+                  formData={formData}
+                  setFormData={setFormData}
                 />
               </TabsContent>
 
@@ -88,6 +147,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
           <SDSPreview 
             onUploadClick={() => setShowUploadDialog(true)} 
             initialData={initialData}
+            selectedFile={selectedFile}
           />
         </div>
       </div>

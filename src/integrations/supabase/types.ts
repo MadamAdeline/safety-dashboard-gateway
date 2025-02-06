@@ -12,6 +12,10 @@ export type Database = {
       sds: {
         Row: {
           created_at: string | null
+          current_content_type: string | null
+          current_file_name: string | null
+          current_file_path: string | null
+          current_file_size: number | null
           dg_class: number | null
           expiry_date: string | null
           id: string
@@ -25,6 +29,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          current_content_type?: string | null
+          current_file_name?: string | null
+          current_file_path?: string | null
+          current_file_size?: number | null
           dg_class?: number | null
           expiry_date?: string | null
           id?: string
@@ -38,6 +46,10 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          current_content_type?: string | null
+          current_file_name?: string | null
+          current_file_path?: string | null
+          current_file_size?: number | null
           dg_class?: number | null
           expiry_date?: string | null
           id?: string
@@ -82,7 +94,10 @@ export type Database = {
       }
       sds_versions: {
         Row: {
+          content_type: string | null
+          file_name: string | null
           file_path: string
+          file_size: number | null
           id: string
           notes: string | null
           sds_id: string
@@ -91,7 +106,10 @@ export type Database = {
           version_number: number
         }
         Insert: {
+          content_type?: string | null
+          file_name?: string | null
           file_path: string
+          file_size?: number | null
           id?: string
           notes?: string | null
           sds_id: string
@@ -100,7 +118,10 @@ export type Database = {
           version_number: number
         }
         Update: {
+          content_type?: string | null
+          file_name?: string | null
           file_path?: string
+          file_size?: number | null
           id?: string
           notes?: string | null
           sds_id?: string

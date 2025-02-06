@@ -1,0 +1,86 @@
+import { supabase } from "@/integrations/supabase/client";
+import type { SDS } from "@/types/sds";
+
+export async function createSDS(data: {
+  productName: string;
+  productId: string;
+  supplierId: string;
+  isDG: boolean;
+  issueDate?: string;
+  expiryDate?: string;
+  dgClass?: number;
+  statusId: number;
+  currentFilePath?: string;
+  currentFileName?: string;
+  currentFileSize?: number;
+  currentContentType?: string;
+}) {
+  console.log("Creating SDS with data:", data);
+  
+  const { data: result, error } = await supabase
+    .from('sds')
+    .insert({
+      product_name: data.productName,
+      product_id: data.productId,
+      supplier_id: data.supplierId,
+      is_dg: data.isDG,
+      issue_date: data.issueDate,
+      expiry_date: data.expiryDate,
+      dg_class: data.dgClass,
+      status_id: data.statusId,
+      current_file_path: data.currentFilePath,
+      current_file_name: data.currentFileName,
+      current_file_size: data.currentFileSize,
+      current_content_type: data.currentContentType
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating SDS:", error);
+    throw error;
+  }
+
+  return result;
+}
+
+export async function uploadSDSFile(file: File) {
+  console.log("Uploading SDS file:", file.name);
+  
+  const fileExt = file.name.split('.').pop();
+  const filePath = `${crypto.randomUUID()}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('sds_documents')
+    .upload(filePath, file);
+
+  if (uploadError) {
+    console.error("Error uploading file:", uploadError);
+    throw uploadError;
+  }
+
+  return {
+    filePath,
+    fileName: file.name,
+    fileSize: file.size,
+    contentType: file.type
+  };
+}
+
+export async function getStatusId(statusName: string, category: string = 'SDS_Library') {
+  console.log("Getting status ID for:", statusName, "in category:", category);
+  
+  const { data, error } = await supabase
+    .from('status_lookup')
+    .select('id')
+    .eq('category', category)
+    .eq('status_name', statusName)
+    .single();
+
+  if (error) {
+    console.error("Error getting status ID:", error);
+    throw error;
+  }
+
+  return data.id;
+}

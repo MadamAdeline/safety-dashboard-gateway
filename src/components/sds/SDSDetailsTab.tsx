@@ -13,6 +13,14 @@ interface SDSDetailsTabProps {
   setStatus: (value: "ACTIVE" | "INACTIVE" | "REQUESTED") => void;
   supplier: string;
   setSupplier: (value: string) => void;
+  formData: {
+    productName: string;
+    productId: string;
+    issueDate: string;
+    expiryDate: string;
+    dgClass?: number;
+  };
+  setFormData: (value: any) => void;
 }
 
 const suppliers = [
@@ -30,10 +38,19 @@ export function SDSDetailsTab({
   status, 
   setStatus,
   supplier,
-  setSupplier 
+  setSupplier,
+  formData,
+  setFormData
 }: SDSDetailsTabProps) {
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
   const isRequested = status === "REQUESTED" && isGlobalLibrary;
+
+  const handleInputChange = (field: string, value: string | number) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   return (
     <div className="space-y-4">
@@ -48,7 +65,8 @@ export function SDSDetailsTab({
           <Input 
             id="productName" 
             placeholder="Enter SDS product name" 
-            defaultValue={initialData?.productName}
+            value={formData.productName}
+            onChange={(e) => handleInputChange('productName', e.target.value)}
             readOnly={isGlobalLibrary}
             className={isGlobalLibrary ? "bg-gray-100" : ""}
           />
@@ -67,7 +85,8 @@ export function SDSDetailsTab({
           <Input 
             id="sdsCode" 
             placeholder="Enter SDS code" 
-            defaultValue={initialData?.productId}
+            value={formData.productId}
+            onChange={(e) => handleInputChange('productId', e.target.value)}
             readOnly={isGlobalLibrary}
             className={isGlobalLibrary ? "bg-gray-100" : ""}
           />
@@ -114,17 +133,6 @@ export function SDSDetailsTab({
             </SelectContent>
           </Select>
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="sdsSource">SDS Source</Label>
-          <Input 
-            id="sdsSource" 
-            value={initialData?.sdsSource ?? "Customer"} 
-            readOnly 
-            className="bg-gray-100"
-          />
-        </div>
-      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
@@ -188,11 +196,16 @@ export function SDSDetailsTab({
             </Button>
           </div>
         </div>
+
         {isDG && (
           <>
             <div className="space-y-2">
               <Label htmlFor="dgClass">DG Class *</Label>
-              <Select defaultValue={initialData?.dgClass?.toString()} disabled={isGlobalLibrary}>
+              <Select 
+                value={formData.dgClass?.toString()} 
+                onValueChange={(value) => handleInputChange('dgClass', parseInt(value))}
+                disabled={isGlobalLibrary}
+              >
                 <SelectTrigger id="dgClass" className={isGlobalLibrary ? "bg-gray-100" : ""}>
                   <SelectValue placeholder="Select DG Class" />
                 </SelectTrigger>

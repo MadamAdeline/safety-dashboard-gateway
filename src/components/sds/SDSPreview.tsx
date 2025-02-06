@@ -5,9 +5,10 @@ import type { SDS } from "@/types/sds";
 interface SDSPreviewProps {
   onUploadClick: () => void;
   initialData?: SDS | null;
+  selectedFile: File | null;
 }
 
-export function SDSPreview({ onUploadClick, initialData }: SDSPreviewProps) {
+export function SDSPreview({ onUploadClick, initialData, selectedFile }: SDSPreviewProps) {
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
 
   return (
@@ -28,11 +29,17 @@ export function SDSPreview({ onUploadClick, initialData }: SDSPreviewProps) {
       <div className="border rounded-lg p-4 bg-white">
         <h2 className="text-lg font-semibold mb-4">PDF Preview</h2>
         <div className="aspect-[1/1.4] bg-gray-100 rounded-lg overflow-hidden">
-          <img 
-            src="/lovable-uploads/efad172c-780d-4fdb-ba96-baa5719330bc.png" 
-            alt="SDS Preview"
-            className="w-full h-full object-contain"
-          />
+          {selectedFile ? (
+            <div className="w-full h-full flex items-center justify-center">
+              <p className="text-gray-600">Selected file: {selectedFile.name}</p>
+            </div>
+          ) : (
+            <img 
+              src="/lovable-uploads/efad172c-780d-4fdb-ba96-baa5719330bc.png" 
+              alt="SDS Preview"
+              className="w-full h-full object-contain"
+            />
+          )}
         </div>
       </div>
     </div>
