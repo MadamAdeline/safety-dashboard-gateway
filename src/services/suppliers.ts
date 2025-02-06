@@ -1,9 +1,10 @@
-import { supabase } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 import type { Supplier } from '@/types/supplier';
 
 export async function getSuppliers() {
   console.log('Fetching suppliers from Supabase');
   try {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('suppliers')
       .select('*')
@@ -25,6 +26,7 @@ export async function getSuppliers() {
 export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
   console.log('Creating supplier:', supplier);
   try {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('suppliers')
       .insert([supplier])
@@ -47,6 +49,7 @@ export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
 export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
   console.log('Updating supplier:', id, supplier);
   try {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('suppliers')
       .update(supplier)
@@ -70,6 +73,7 @@ export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
 export async function deleteSupplier(id: string) {
   console.log('Deleting supplier:', id);
   try {
+    const supabase = getSupabaseClient();
     const { error } = await supabase
       .from('suppliers')
       .delete()

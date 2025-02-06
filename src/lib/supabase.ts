@@ -13,15 +13,25 @@ if (!supabaseKey) {
   console.log('Please add your Supabase anon key using the form provided in the chat');
 }
 
-// Create the client with detailed error logging
-export const supabase = createClient(supabaseUrl, supabaseKey || '', {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-});
+// Only create the client if we have a valid key
+export const supabase = supabaseKey 
+  ? createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+      },
+    })
+  : null;
 
 // Add a helper to check if Supabase is properly configured
 export const isSupabaseConfigured = () => {
   return !!supabaseKey && supabaseKey.startsWith('eyJ');
+};
+
+// Helper function to get the client safely
+export const getSupabaseClient = () => {
+  if (!supabase) {
+    throw new Error('Supabase client not initialized. Please add your Supabase anon key.');
+  }
+  return supabase;
 };
