@@ -41,8 +41,8 @@ export default function SDSLibrary() {
         .from('sds')
         .select(`
           *,
-          suppliers:supplier_id (supplier_name),
-          status:status_id (status_name)
+          suppliers!sds_supplier_id_fkey (supplier_name),
+          status:status_lookup!sds_status_id_fkey (status_name)
         `);
 
       if (error) {
@@ -54,11 +54,11 @@ export default function SDSLibrary() {
         productName: item.product_name,
         productId: item.product_id,
         isDG: item.is_dg,
-        supplier: item.suppliers.supplier_name,
+        supplier: item.suppliers?.supplier_name || 'Unknown',
         issueDate: item.issue_date,
         expiryDate: item.expiry_date,
         dgClass: item.dg_class,
-        status: item.status.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
+        status: item.status?.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
         sdsSource: 'Customer' as const
       }));
     }
@@ -143,7 +143,6 @@ export default function SDSLibrary() {
           data={sdsData} 
           filters={filters} 
           onEdit={handleEdit}
-          isLoading={isLoading}
         />
 
         <GlobalSDSSearchDialog 
