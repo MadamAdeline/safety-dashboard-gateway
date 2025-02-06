@@ -11,21 +11,32 @@ export interface Product {
   cryogenicFluid?: boolean;
   otherNames?: string;
   uses?: string;
-  isDG: boolean;
-  dgClass?: number;
-  packGroup?: string;
-  unNumber?: string;
-  supplier: string;
   status: 'ACTIVE' | 'INACTIVE';
   approvalStatusId?: number;
   productStatusId?: number;
   sdsId?: string | null;
+  sds?: {
+    id: string;
+    isDG: boolean;
+    dgClass?: {
+      id: string;
+      label: string;
+    };
+    supplier?: {
+      id: string;
+      supplier_name: string;
+    };
+    packingGroup?: {
+      id: string;
+      label: string;
+    };
+  };
 }
 
 export interface ProductFilters {
   search: string;
   supplier: string[];
   status: string[];
-  dgClass: number[];
+  dgClass: string[];
   isDG: boolean | null;
 }

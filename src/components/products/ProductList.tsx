@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
-import type { Product } from "@/types/product";
+import type { Product, ProductFilters } from "@/types/product";
 import { useState } from "react";
 
 interface ProductListProps {
@@ -36,7 +36,7 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
     if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) {
       return false;
     }
-    if (filters.supplier.length > 0 && item.sds?.supplier && !filters.supplier.includes(item.sds.supplier)) {
+    if (filters.supplier.length > 0 && item.sds?.supplier?.supplier_name && !filters.supplier.includes(item.sds.supplier.supplier_name)) {
       return false;
     }
     if (filters.status.length > 0 && !filters.status.includes(item.status)) {
@@ -127,7 +127,7 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
                   </Badge>
                 </TableCell>
                 <TableCell>{item.sds?.dgClass?.label || "-"}</TableCell>
-                <TableCell>{item.sds?.supplier || "-"}</TableCell>
+                <TableCell>{item.sds?.supplier?.supplier_name || "-"}</TableCell>
                 <TableCell>{item.sds?.packingGroup?.label || "-"}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
