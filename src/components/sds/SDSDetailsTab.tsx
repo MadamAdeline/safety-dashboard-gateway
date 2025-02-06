@@ -134,7 +134,6 @@ export function SDSDetailsTab({
           </Select>
         </div>
 
-      <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="emergency">Emergency Phone</Label>
           <Input 
@@ -149,7 +148,8 @@ export function SDSDetailsTab({
           <Input 
             id="issueDate" 
             type="date" 
-            defaultValue={initialData?.issueDate}
+            value={formData.issueDate}
+            onChange={(e) => handleInputChange('issueDate', e.target.value)}
             readOnly={isGlobalLibrary}
             className={isGlobalLibrary ? "bg-gray-100" : ""}
           />
@@ -168,7 +168,8 @@ export function SDSDetailsTab({
           <Input 
             id="expiryDate" 
             type="date" 
-            defaultValue={initialData?.expiryDate}
+            value={formData.expiryDate}
+            onChange={(e) => handleInputChange('expiryDate', e.target.value)}
             readOnly={isGlobalLibrary}
             className={isGlobalLibrary ? "bg-gray-100" : ""}
           />
