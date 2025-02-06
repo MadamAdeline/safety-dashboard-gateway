@@ -11,6 +11,14 @@ import { LocationMap } from "./LocationMap";
 import { useLocations } from "@/hooks/use-locations";
 import { supabase } from "@/integrations/supabase/client";
 
+interface ParentLocationOption {
+  id: string;
+  name: string;
+  master_data: {
+    label: string;
+  };
+}
+
 interface LocationFormProps {
   onClose: () => void;
   initialData?: Location | null;
@@ -20,15 +28,14 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
   const [name, setName] = useState(initialData?.name ?? "");
   const [type, setType] = useState<LocationType>((initialData?.master_data?.label as LocationType) ?? "Region");
   const [typeId, setTypeId] = useState<string>(initialData?.type_id ?? "");
-  const [parentLocation, setParentLocation] = useState(initialData?.parent_location_id ?? "");
+  const [parentLocation, setParentLocation] = useState(initialData?.parent_location_id ?? "none");
   const [status, setStatus] = useState<LocationStatus>(initialData?.status_id === 1 ? "ACTIVE" : "INACTIVE");
   const [coordinates, setCoordinates] = useState(initialData?.coordinates ?? { lat: -37.8136, lng: 144.9631 });
-  const [availableLocations, setAvailableLocations] = useState<Location[]>([]);
+  const [availableLocations, setAvailableLocations] = useState<ParentLocationOption[]>([]);
   
   const { createLocation, updateLocation } = useLocations();
   const { toast } = useToast();
 
-  // Fetch available locations for parent location dropdown
   useEffect(() => {
     const fetchLocations = async () => {
       const { data, error } = await supabase
@@ -49,7 +56,6 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     fetchLocations();
   }, []);
 
-  // Fetch the type_id when type changes
   useEffect(() => {
     const fetchTypeId = async () => {
       const { data, error } = await supabase
@@ -77,7 +83,7 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
       const locationData = {
         name,
         type_id: typeId,
-        parent_location_id: parentLocation || null,
+        parent_location_id: parentLocation === "none" ? null : parentLocation,
         status_id: status === 'ACTIVE' ? 1 : 2,
         coordinates,
       };
@@ -160,7 +166,7 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
                     <SelectValue placeholder="Select parent location" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {availableLocations.map((location) => (
                       <SelectItem key={location.id} value={location.id}>
                         {location.name} ({location.master_data.label})
