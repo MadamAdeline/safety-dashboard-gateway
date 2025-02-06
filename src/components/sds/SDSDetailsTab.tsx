@@ -1,3 +1,4 @@
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +34,7 @@ export function SDSDetailsTab(props: SDSDetailsTabProps) {
   console.log("SDSDetailsTab - Initial Data:", props.initialData);
   const isGlobalLibrary = props.initialData?.sdsSource === "Global Library";
   const isRequested = props.status === "REQUESTED";
+  const source = isRequested || isGlobalLibrary ? "Global Library" : "Customer";
 
   return (
     <SDSFormContext.Provider value={props}>
@@ -65,6 +67,16 @@ export function SDSDetailsTab(props: SDSDetailsTabProps) {
               </SelectContent>
             </Select>
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="source">Source</Label>
+          <Input 
+            id="source" 
+            value={source}
+            readOnly
+            className="bg-gray-100"
+          />
         </div>
 
         <SDSDatesSection />
