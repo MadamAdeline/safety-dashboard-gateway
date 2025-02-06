@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -7,23 +6,15 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const formData = await req.formData()
-    const file = formData.get('file')
-
-    if (!file) {
-      return new Response(
-        JSON.stringify({ error: 'No file uploaded' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-      )
-    }
-
-    // Here we would integrate with a PDF parsing service
-    // For now, we'll return mock data
+    console.log('Edge Function: Starting PDF extraction');
+    
+    // For now, return mock data since we don't have actual PDF parsing yet
     const extractedData = {
       dgClass: 3,
       unNumber: "UN1263",
@@ -33,17 +24,28 @@ serve(async (req) => {
       subsidiaryDgClass: "6.1"
     }
 
+    console.log('Edge Function: Extracted data:', extractedData);
+
     return new Response(
-      JSON.stringify({ 
-        success: true,
-        data: extractedData
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify(extractedData),
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
     )
   } catch (error) {
+    console.error('Edge Function Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        }, 
+        status: 500 
+      }
     )
   }
 })

@@ -24,21 +24,18 @@ export function SDSUploadDialog({ open, onOpenChange, onFileUpload }: SDSUploadD
   };
 
   const extractSDSData = async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-
+    console.log('Attempting to extract SDS data from PDF');
+    
     try {
-      console.log('Attempting to extract SDS data from PDF');
-      const response = await supabase.functions.invoke('extract-sds-data', {
-        body: formData,
-      });
-
-      if (!response.error) {
-        console.log('Successfully extracted SDS data:', response.data);
-        return response.data;
-      } else {
-        throw new Error(response.error.message);
+      const { data, error } = await supabase.functions.invoke('extract-sds-data');
+      
+      if (error) {
+        console.error('Error calling Edge Function:', error);
+        throw error;
       }
+
+      console.log('Successfully extracted SDS data:', data);
+      return data;
     } catch (error) {
       console.error('Error extracting SDS data:', error);
       toast({
