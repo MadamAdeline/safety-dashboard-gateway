@@ -50,6 +50,8 @@ export async function createSDS(data: {
     dg_subdivision_id: data.dgSubDivisionId || null
   };
 
+  console.log("Formatted data for Supabase:", formattedData);
+
   const { data: result, error } = await supabase
     .from('sds')
     .insert(formattedData)
@@ -112,6 +114,8 @@ export async function updateSDS(id: string, data: {
     packing_group_id: data.packingGroupId || null,
     dg_subdivision_id: data.dgSubDivisionId || null
   };
+
+  console.log("Formatted data for Supabase:", formattedData);
 
   const { data: result, error } = await supabase
     .from('sds')

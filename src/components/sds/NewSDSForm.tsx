@@ -128,12 +128,12 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       const sdsData = {
         productName: formData.productName,
         productId: formData.productId,
-        otherNames: formData.otherNames,
-        emergencyPhone: formData.emergencyPhone,
+        otherNames: formData.otherNames || null,
+        emergencyPhone: formData.emergencyPhone || null,
         supplierId: supplier,
         isDG,
         issueDate: formData.issueDate,
-        revisionDate: formData.revisionDate,
+        revisionDate: formData.revisionDate || null,
         expiryDate: formData.expiryDate,
         dgClassId: isDG ? formData.dgClassId : null,
         subsidiaryDgClassId: isDG ? formData.subsidiaryDgClassId : null,
@@ -150,6 +150,8 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
           currentContentType: fileData.contentType
         })
       };
+
+      console.log("Saving SDS data:", sdsData);
 
       if (initialData?.id) {
         await updateSDS(initialData.id, sdsData);
