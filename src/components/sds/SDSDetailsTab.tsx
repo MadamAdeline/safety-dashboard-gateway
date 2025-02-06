@@ -28,6 +28,7 @@ interface SDSDetailsTabProps {
     packingGroup?: string;
     hazchemCode?: string;
     subsidiaryDgClass?: string;
+    dgSubDivision?: string;
   };
   setFormData: (value: any) => void;
 }
@@ -46,6 +47,7 @@ export function SDSDetailsTab({
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
   const isRequested = status === "REQUESTED" && isGlobalLibrary;
 
+  // Fetch suppliers
   const { data: suppliers = [] } = useQuery({
     queryKey: ['suppliers'],
     queryFn: async () => {
@@ -66,6 +68,32 @@ export function SDSDetailsTab({
       }));
     }
   });
+
+  // Fetch master data for lookups
+  const { data: masterData = [] } = useQuery({
+    queryKey: ['masterData'],
+    queryFn: async () => {
+      console.log('Fetching master data for lookups');
+      const { data, error } = await supabase
+        .from('master_data')
+        .select('*')
+        .in('category', ['DG_CLASS', 'PACKING_GROUP', 'DG_SUBDIVISION'])
+        .eq('status', 'ACTIVE')
+        .order('sort_order');
+
+      if (error) {
+        console.error('Error fetching master data:', error);
+        throw error;
+      }
+
+      return data;
+    }
+  });
+
+  // Filter master data by category
+  const dgClasses = masterData.filter(item => item.category === 'DG_CLASS');
+  const packingGroups = masterData.filter(item => item.category === 'PACKING_GROUP');
+  const dgSubDivisions = masterData.filter(item => item.category === 'DG_SUBDIVISION');
 
   useEffect(() => {
     if (formData.issueDate) {
@@ -264,23 +292,73 @@ export function SDSDetailsTab({
                   <SelectValue placeholder="Select DG Class" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">Class 1 - Explosives</SelectItem>
-                  <SelectItem value="2">Class 2 - Gases</SelectItem>
-                  <SelectItem value="3">Class 3 - Flammable Liquids</SelectItem>
+                  {dgClasses.map((dgClass) => (
+                    <SelectItem key={dgClass.id} value={dgClass.label}>
+                      {dgClass.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="subsidiaryDgClass">Subsidiary DG Class</Label>
-              <Input 
-                id="subsidiaryDgClass"
-                value={formData.subsidiaryDgClass}
-                onChange={(e) => handleInputChange('subsidiaryDgClass', e.target.value)}
-                placeholder="Enter Subsidiary DG Class"
+              <Select 
+                value={formData.subsidiaryDgClass} 
+                onValueChange={(value) => handleInputChange('subsidiaryDgClass', value)}
                 disabled={isGlobalLibrary}
-                className={isGlobalLibrary ? "bg-gray-100" : ""}
-              />
+              >
+                <SelectTrigger id="subsidiaryDgClass" className={isGlobalLibrary ? "bg-gray-100" : ""}>
+                  <SelectValue placeholder="Select Subsidiary DG Class" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dgClasses.map((dgClass) => (
+                    <SelectItem key={dgClass.id} value={dgClass.label}>
+                      {dgClass.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="packingGroup">Packing Group</Label>
+              <Select 
+                value={formData.packingGroup} 
+                onValueChange={(value) => handleInputChange('packingGroup', value)}
+                disabled={isGlobalLibrary}
+              >
+                <SelectTrigger id="packingGroup" className={isGlobalLibrary ? "bg-gray-100" : ""}>
+                  <SelectValue placeholder="Select Packing Group" />
+                </SelectTrigger>
+                <SelectContent>
+                  {packingGroups.map((group) => (
+                    <SelectItem key={group.id} value={group.label}>
+                      {group.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="dgSubDivision">DG Sub Division</Label>
+              <Select 
+                value={formData.dgSubDivision} 
+                onValueChange={(value) => handleInputChange('dgSubDivision', value)}
+                disabled={isGlobalLibrary}
+              >
+                <SelectTrigger id="dgSubDivision" className={isGlobalLibrary ? "bg-gray-100" : ""}>
+                  <SelectValue placeholder="Select DG Sub Division" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dgSubDivisions.map((subdivision) => (
+                    <SelectItem key={subdivision.id} value={subdivision.label}>
+                      {subdivision.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
