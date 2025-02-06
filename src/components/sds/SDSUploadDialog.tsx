@@ -17,6 +17,14 @@ interface SDSUploadDialogProps {
 export function SDSUploadDialog({ open, onOpenChange, onFileUpload }: SDSUploadDialogProps) {
   const { toast } = useToast();
 
+  const showToast = (message: string) => {
+    toast({
+      title: "Warning",
+      description: message,
+      variant: "destructive"
+    });
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -30,7 +38,7 @@ export function SDSUploadDialog({ open, onOpenChange, onFileUpload }: SDSUploadD
     if (files.length > 0) {
       const file = files[0];
       if (file.type === 'application/pdf') {
-        const extractedData = await extractSDSData(file);
+        const extractedData = await extractSDSData(file, showToast);
         const event = {
           target: {
             files: [file]
@@ -50,7 +58,7 @@ export function SDSUploadDialog({ open, onOpenChange, onFileUpload }: SDSUploadD
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const extractedData = await extractSDSData(file);
+      const extractedData = await extractSDSData(file, showToast);
       onFileUpload(e, extractedData);
     }
   };

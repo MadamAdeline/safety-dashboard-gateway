@@ -1,8 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
-export async function extractSDSData(file: File) {
-  const { toast } = useToast();
+export async function extractSDSData(file: File, showToast: (message: string) => void) {
   console.log('Attempting to extract SDS data from PDF');
   
   try {
@@ -17,11 +15,7 @@ export async function extractSDSData(file: File) {
     return data;
   } catch (error) {
     console.error('Error extracting SDS data:', error);
-    toast({
-      title: "Warning",
-      description: "Could not extract data from PDF. Please fill in the fields manually.",
-      variant: "destructive"
-    });
+    showToast("Could not extract data from PDF. Please fill in the fields manually.");
     return null;
   }
 }
