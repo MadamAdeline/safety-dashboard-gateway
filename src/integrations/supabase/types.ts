@@ -55,7 +55,6 @@ export type Database = {
           is_dg: boolean | null
           issue_date: string | null
           other_names: string | null
-          packing_group: string | null
           packing_group_id: string | null
           product_id: string
           product_name: string
@@ -82,7 +81,6 @@ export type Database = {
           is_dg?: boolean | null
           issue_date?: string | null
           other_names?: string | null
-          packing_group?: string | null
           packing_group_id?: string | null
           product_id: string
           product_name: string
@@ -109,7 +107,6 @@ export type Database = {
           is_dg?: boolean | null
           issue_date?: string | null
           other_names?: string | null
-          packing_group?: string | null
           packing_group_id?: string | null
           product_id?: string
           product_name?: string

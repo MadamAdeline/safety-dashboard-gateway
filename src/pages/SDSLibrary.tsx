@@ -42,8 +42,8 @@ export default function SDSLibrary() {
         .from('sds')
         .select(`
           *,
-          suppliers!sds_supplier_id_fkey (supplier_name),
-          status:status_lookup!sds_status_id_fkey (status_name),
+          suppliers (supplier_name),
+          status:status_lookup (status_name),
           dg_class:master_data!sds_dg_class_id_fkey (label),
           subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
           packing_group:master_data!sds_packing_group_id_fkey (label),
@@ -54,6 +54,8 @@ export default function SDSLibrary() {
         console.error('Error fetching SDS:', error);
         throw error;
       }
+
+      console.log('Retrieved SDS data:', data);
 
       return data.map(item => ({
         id: item.id,
