@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import type { Location } from "@/types/location";
+import { useLocations } from "@/hooks/use-locations";
 
 interface LocationNodeProps {
   location: Location;
@@ -18,6 +19,8 @@ const LocationNode = ({ location, level, onEdit, data }: LocationNodeProps) => {
   
   const getIcon = (type: string) => {
     switch (type) {
+      case "Parent":
+        return <Building2 className="h-4 w-4 mr-2 text-gray-500" />;
       case "Region":
         return <Navigation className="h-4 w-4 mr-2 text-blue-500" />;
       case "District":
@@ -58,6 +61,7 @@ const LocationNode = ({ location, level, onEdit, data }: LocationNodeProps) => {
             variant="secondary" 
             className={cn(
               "ml-2 text-xs",
+              location.master_data?.label === "Parent" && "bg-gray-100 text-gray-800",
               location.master_data?.label === "Region" && "bg-blue-100 text-blue-800",
               location.master_data?.label === "District" && "bg-purple-100 text-purple-800",
               location.master_data?.label === "School" && "bg-green-100 text-green-800",
@@ -94,25 +98,50 @@ const LocationNode = ({ location, level, onEdit, data }: LocationNodeProps) => {
 };
 
 interface LocationHierarchyProps {
-  data: Location[];
   onEdit: (location: Location) => void;
 }
 
-export function LocationHierarchy({ data, onEdit }: LocationHierarchyProps) {
-  const rootLocations = data.filter(location => !location.parent_location_id);
+export function LocationHierarchy({ onEdit }: LocationHierarchyProps) {
+  const { locations = [], isLoading } = useLocations();
+  console.log('Locations for hierarchy:', locations);
+
+  // Find the parent location (type "Parent")
+  const parentLocation = locations.find(
+    location => location.master_data?.label === "Parent"
+  );
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-lg shadow p-4">
+        <div className="animate-pulse">
+          <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="space-y-3">
+            <div className="h-3 bg-gray-200 rounded"></div>
+            <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!parentLocation) {
+    return (
+      <div className="bg-white rounded-lg shadow p-4">
+        <p className="text-gray-500">No parent location found. Please create a location with type "Parent" first.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <h2 className="text-lg font-semibold mb-4">Location Hierarchy</h2>
-      {rootLocations.map(location => (
-        <LocationNode 
-          key={location.id} 
-          location={location} 
-          level={0}
-          onEdit={onEdit}
-          data={data}
-        />
-      ))}
+      <LocationNode 
+        key={parentLocation.id} 
+        location={parentLocation} 
+        level={0}
+        onEdit={onEdit}
+        data={locations}
+      />
     </div>
   );
 }
