@@ -13,6 +13,7 @@ import { Edit2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@/types/user";
+import { useToast } from "@/components/ui/use-toast";
 
 type UserWithRelations = Omit<User, 'manager'> & {
   user_roles?: {
@@ -30,26 +31,42 @@ interface UserListProps {
 }
 
 export function UserList({ onEdit }: UserListProps) {
-  const { data: users, isLoading } = useQuery({
+  const { toast } = useToast();
+  const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select(`
-          *,
-          user_roles (
-            roles (
-              role_name
+      console.log('Fetching users from Supabase...');
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select(`
+            *,
+            user_roles (
+              roles (
+                role_name
+              )
+            ),
+            location:locations (
+              name
             )
-          ),
-          location:locations (
-            name
-          )
-        `);
-      
-      if (error) throw error;
+          `);
+        
+        if (error) {
+          console.error('Error fetching users:', error);
+          throw error;
+        }
 
-      return data as UserWithRelations[];
+        console.log('Fetched users:', data);
+        return data as UserWithRelations[];
+      } catch (err) {
+        console.error('Failed to fetch users:', err);
+        toast({
+          title: "Error",
+          description: "Failed to load users. Please try again.",
+          variant: "destructive",
+        });
+        throw err;
+      }
     }
   });
 
@@ -57,6 +74,14 @@ export function UserList({ onEdit }: UserListProps) {
     return (
       <div className="bg-white rounded-lg shadow p-8 flex items-center justify-center">
         <div className="text-gray-500">Loading users...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-lg shadow p-8 flex items-center justify-center">
+        <div className="text-red-500">Error loading users. Please try again.</div>
       </div>
     );
   }
