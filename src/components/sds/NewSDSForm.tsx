@@ -31,12 +31,12 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     revisionDate: initialData?.revisionDate ?? "",
     expiryDate: initialData?.expiryDate ?? "",
     dgClassId: initialData?.dgClassId ?? "",
+    subsidiaryDgClassId: initialData?.subsidiaryDgClassId ?? "",
+    packingGroupId: initialData?.packingGroupId ?? "",
+    dgSubDivisionId: initialData?.dgSubDivisionId ?? "",
     unNumber: initialData?.unNumber ?? "",
     unProperShippingName: initialData?.unProperShippingName ?? "",
-    packingGroupId: initialData?.packingGroupId ?? "",
-    hazchemCode: initialData?.hazchemCode ?? "",
-    subsidiaryDgClassId: initialData?.subsidiaryDgClassId ?? "",
-    dgSubDivisionId: initialData?.dgSubDivisionId ?? ""
+    hazchemCode: initialData?.hazchemCode ?? ""
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -54,12 +54,12 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         revisionDate: initialData.revisionDate ?? "",
         expiryDate: initialData.expiryDate,
         dgClassId: initialData.dgClassId ?? "",
+        subsidiaryDgClassId: initialData.subsidiaryDgClassId ?? "",
+        packingGroupId: initialData.packingGroupId ?? "",
+        dgSubDivisionId: initialData.dgSubDivisionId ?? "",
         unNumber: initialData.unNumber ?? "",
         unProperShippingName: initialData.unProperShippingName ?? "",
-        packingGroupId: initialData.packingGroupId ?? "",
-        hazchemCode: initialData.hazchemCode ?? "",
-        subsidiaryDgClassId: initialData.subsidiaryDgClassId ?? "",
-        dgSubDivisionId: initialData.dgSubDivisionId ?? ""
+        hazchemCode: initialData.hazchemCode ?? ""
       });
     }
   }, [initialData]);
@@ -79,19 +79,18 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
           productName: extractedData.productName || "",
           productId: extractedData.productId || "",
           dgClassId: extractedData.dgClassId || "",
+          subsidiaryDgClassId: extractedData.subsidiaryDgClassId || "",
+          packingGroupId: extractedData.packingGroupId || "",
+          dgSubDivisionId: extractedData.dgSubDivisionId || "",
           unNumber: extractedData.unNumber || "",
           unProperShippingName: extractedData.unProperShippingName || "",
-          packingGroupId: extractedData.packingGroupId || "",
-          hazchemCode: extractedData.hazchemCode || "",
-          subsidiaryDgClassId: extractedData.subsidiaryDgClassId || "",
-          dgSubDivisionId: extractedData.dgSubDivisionId || ""
+          hazchemCode: extractedData.hazchemCode || ""
         }));
       }
     }
   };
 
   const handleOpenSDS = () => {
-    // If there's a file path in initialData, we can open it
     if (initialData?.currentFilePath) {
       window.open(initialData.currentFilePath, '_blank');
     } else {
@@ -137,12 +136,12 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         revisionDate: formData.revisionDate,
         expiryDate: formData.expiryDate,
         dgClassId: isDG ? formData.dgClassId : null,
+        subsidiaryDgClassId: isDG ? formData.subsidiaryDgClassId : null,
+        packingGroupId: isDG ? formData.packingGroupId : null,
+        dgSubDivisionId: isDG ? formData.dgSubDivisionId : null,
         unNumber: isDG ? formData.unNumber : null,
         unProperShippingName: isDG ? formData.unProperShippingName : null,
-        packingGroupId: isDG ? formData.packingGroupId : null,
         hazchemCode: isDG ? formData.hazchemCode : null,
-        subsidiaryDgClassId: isDG ? formData.subsidiaryDgClassId : null,
-        dgSubDivisionId: isDG ? formData.dgSubDivisionId : null,
         statusId,
         ...(fileData && {
           currentFilePath: fileData.filePath,
