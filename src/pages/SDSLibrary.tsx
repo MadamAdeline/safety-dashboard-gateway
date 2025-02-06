@@ -4,11 +4,11 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { SDSList } from "@/components/sds/SDSList";
 import { SDSFilters } from "@/components/sds/SDSFilters";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Plus, Search } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { NewSDSForm } from "@/components/sds/NewSDSForm";
 import { GlobalSDSSearchDialog } from "@/components/sds/GlobalSDSSearchDialog";
-import { SDSSearch } from "@/components/sds/SDSSearch";
 import { SDSActions } from "@/components/sds/SDSActions";
 import type { SDS, SDSFilters as SDSFiltersType } from "@/types/sds";
 import { SDSRequestDialog } from "@/components/sds/SDSRequestDialog";
@@ -36,6 +36,7 @@ export default function SDSLibrary() {
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
   const [showRequestDialog, setShowRequestDialog] = useState(false);
   const [selectedSDS, setSelectedSDS] = useState<SDS | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -137,9 +138,9 @@ export default function SDSLibrary() {
         description: `${sdsInput.length} SDS(s) have been added to your library.`,
       });
     } else {
-      // Handle single SDS case (from SDSSearch)
+      // Handle single SDS case
       setSelectedSDS(sdsInput);
-      setFilters({ ...filters, search: sdsInput.productName });
+      setSearchTerm(sdsInput.productName);
     }
   };
 
@@ -158,14 +159,18 @@ export default function SDSLibrary() {
       }
     }
 
-    // Apply search filter
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
+    // Apply search filter across all text fields
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
       return (
-        item.productName.toLowerCase().includes(searchTerm) ||
-        item.productId.toLowerCase().includes(searchTerm) ||
-        item.supplier.toLowerCase().includes(searchTerm) ||
-        item.status.toLowerCase().includes(searchTerm)
+        (item.productName?.toLowerCase().includes(searchLower) ?? false) ||
+        (item.productId?.toLowerCase().includes(searchLower) ?? false) ||
+        (item.supplier?.toLowerCase().includes(searchLower) ?? false) ||
+        (item.status?.toLowerCase().includes(searchLower) ?? false) ||
+        (item.unNumber?.toLowerCase().includes(searchLower) ?? false) ||
+        (item.unProperShippingName?.toLowerCase().includes(searchLower) ?? false) ||
+        (item.hazchemCode?.toLowerCase().includes(searchLower) ?? false) ||
+        (item.otherNames?.toLowerCase().includes(searchLower) ?? false)
       );
     }
     return true;
@@ -194,10 +199,16 @@ export default function SDSLibrary() {
         
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-            <SDSSearch 
-              selectedSdsId={selectedSDS?.id}
-              onSDSSelect={handleSDSSelect}
-            />
+            <div className="relative flex-1 max-w-md">
+              <Input
+                type="text"
+                placeholder="Search SDS..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            </div>
             <SDSActions 
               onToggleFilters={() => setShowFilters(!showFilters)}
               onExport={handleExport}
@@ -212,7 +223,7 @@ export default function SDSLibrary() {
         </div>
         
         <SDSList 
-          data={sdsData} 
+          data={filteredData} 
           filters={filters} 
           onEdit={handleEdit}
         />
