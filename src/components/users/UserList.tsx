@@ -30,7 +30,7 @@ type UserWithRelations = Omit<User, 'manager'> & {
 };
 
 interface UserListProps {
-  onEdit: (user: UserWithRelations) => void;  // Changed from User to UserWithRelations
+  onEdit: (user: UserWithRelations) => void;
 }
 
 export function UserList({ onEdit }: UserListProps) {
@@ -46,7 +46,7 @@ export function UserList({ onEdit }: UserListProps) {
               role_name
             )
           ),
-          manager:users!users_manager_id_fkey (
+          manager:users!manager_id (
             first_name,
             last_name
           ),
@@ -57,13 +57,7 @@ export function UserList({ onEdit }: UserListProps) {
       
       if (error) throw error;
 
-      // Transform the data to match our expected type
-      const transformedData = data?.map(user => ({
-        ...user,
-        manager: Array.isArray(user.manager) ? user.manager[0] || null : user.manager
-      }));
-
-      return transformedData as UserWithRelations[];
+      return data as UserWithRelations[];
     }
   });
 
