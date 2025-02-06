@@ -1,31 +1,15 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Table, TableBody } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Edit2, Trash2, Plus, Check, X } from "lucide-react";
-import type { Location, LocationFilters, LocationType, LocationStatus } from "@/types/location";
+import { Plus } from "lucide-react";
+import type { Location, LocationFilters } from "@/types/location";
 import { useState } from "react";
 import { useLocations } from "@/hooks/use-locations";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { LocationSearch } from "@/components/locations/LocationSearch";
 import { LocationActions } from "@/components/locations/LocationActions";
+import { LocationTableHeader } from "./table/LocationTableHeader";
+import { LocationTableRow } from "./table/LocationTableRow";
+import { LocationPagination } from "./table/LocationPagination";
 
 interface LocationListProps {
   filters: LocationFilters;
@@ -33,14 +17,10 @@ interface LocationListProps {
   onFiltersChange: (filters: LocationFilters) => void;
 }
 
-interface EditableLocation extends Partial<Location> {
-  isNew?: boolean;
-}
-
 export function LocationList({ filters, onEdit, onFiltersChange }: LocationListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [editingLocation, setEditingLocation] = useState<EditableLocation | null>(null);
+  const [editingLocation, setEditingLocation] = useState<Partial<Location> | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const itemsPerPage = 10;
 
@@ -78,54 +58,21 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
     );
   };
 
-  const handleSave = async (location: EditableLocation) => {
+  const handleDelete = async (id: string) => {
     try {
-      if (location.isNew) {
-        await createLocation.mutateAsync({
-          name: location.name || '',
-          type_id: location.type_id || '',
-          parent_location_id: location.parent_location_id || null,
-          status_id: location.status_id || 1,
-          coordinates: location.coordinates || { lat: -37.8136, lng: 144.9631 }
-        });
-        toast({
-          title: "Success",
-          description: "Location created successfully",
-        });
-      } else if (location.id) {
-        await updateLocation.mutateAsync({
-          id: location.id,
-          name: location.name || '',
-          type_id: location.type_id || '',
-          parent_location_id: location.parent_location_id || null,
-          status_id: location.status_id || 1,
-          coordinates: location.coordinates || { lat: -37.8136, lng: 144.9631 }
-        });
-        toast({
-          title: "Success",
-          description: "Location updated successfully",
-        });
-      }
-      setEditingLocation(null);
+      await deleteLocation.mutateAsync(id);
+      toast({
+        title: "Success",
+        description: "Location deleted successfully",
+      });
     } catch (error) {
-      console.error('Error saving location:', error);
+      console.error('Error deleting location:', error);
       toast({
         title: "Error",
-        description: "Failed to save location",
+        description: "Failed to delete location",
         variant: "destructive",
       });
     }
-  };
-
-  const startNewLocation = () => {
-    setEditingLocation({
-      isNew: true,
-      name: '',
-      type_id: '',
-      parent_location_id: null,
-      status_id: 1,
-      coordinates: { lat: -37.8136, lng: 144.9631 }
-    });
   };
 
   const filteredData = locations.map(item => ({
@@ -169,122 +116,9 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
     );
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteLocation.mutateAsync(id);
-      toast({
-        title: "Success",
-        description: "Location deleted successfully",
-      });
-    } catch (error) {
-      console.error('Error deleting location:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete location",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
-  const renderEditableRow = (location: EditableLocation) => (
-    <TableRow key={location.id || 'new'}>
-      <TableCell>
-        <Checkbox
-          checked={location.id ? selectedItems.includes(location.id) : false}
-          onCheckedChange={() => location.id && toggleSelectItem(location.id)}
-        />
-      </TableCell>
-      <TableCell>
-        <Input
-          value={location.name || ''}
-          onChange={(e) => setEditingLocation({ ...location, name: e.target.value })}
-          className="w-full"
-        />
-      </TableCell>
-      <TableCell>
-        <Select
-          value={location.type_id}
-          onValueChange={(value) => setEditingLocation({ ...location, type_id: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select type" />
-          </SelectTrigger>
-          <SelectContent>
-            {locations
-              .map(loc => loc.master_data)
-              .filter((md, index, self) => 
-                md && self.findIndex(t => t?.id === md.id) === index
-              )
-              .map(type => type && (
-                <SelectItem key={type.id} value={type.id}>
-                  {type.label}
-                </SelectItem>
-              ))
-            }
-          </SelectContent>
-        </Select>
-      </TableCell>
-      <TableCell>
-        <Select
-          value={location.parent_location_id || 'none'}
-          onValueChange={(value) => setEditingLocation({ 
-            ...location, 
-            parent_location_id: value === 'none' ? null : value 
-          })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select parent" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">None</SelectItem>
-            {locations.map(loc => (
-              <SelectItem key={loc.id} value={loc.id}>
-                {loc.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </TableCell>
-      <TableCell>
-        <Select
-          value={String(location.status_id || 1)}
-          onValueChange={(value) => setEditingLocation({ ...location, status_id: Number(value) })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1">Active</SelectItem>
-            <SelectItem value="2">Inactive</SelectItem>
-          </SelectContent>
-        </Select>
-      </TableCell>
-      <TableCell>
-        <div className="flex space-x-2">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hover:bg-green-100 text-green-600"
-            onClick={() => handleSave(location)}
-          >
-            <Check className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hover:bg-red-100 text-red-600"
-            onClick={() => setEditingLocation(null)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
-  );
 
   return (
     <div className="space-y-4">
@@ -295,7 +129,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
         />
         <LocationActions 
           onToggleFilters={() => setShowFilters(!showFilters)}
-          onExport={() => {}} // This is now handled within LocationActions
+          onExport={() => {}} 
           onRefresh={() => {
             toast({
               title: "Refreshed",
@@ -308,85 +142,24 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <Table>
-          <TableHeader>
-            <TableRow className="bg-[#F1F0FB] border-b border-gray-200">
-              <TableHead className="w-12">
-                <Checkbox
-                  checked={
-                    paginatedData.length > 0 &&
-                    selectedItems.length === paginatedData.length
-                  }
-                  onCheckedChange={toggleSelectAll}
-                />
-              </TableHead>
-              <TableHead className="text-dgxprt-navy font-semibold">Location Name</TableHead>
-              <TableHead className="text-dgxprt-navy font-semibold">Type</TableHead>
-              <TableHead className="text-dgxprt-navy font-semibold">Parent Location</TableHead>
-              <TableHead className="text-dgxprt-navy font-semibold">Status</TableHead>
-              <TableHead className="w-24 text-dgxprt-navy font-semibold">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+          <LocationTableHeader
+            onToggleSelectAll={toggleSelectAll}
+            isAllSelected={paginatedData.length > 0 && selectedItems.length === paginatedData.length}
+            hasData={paginatedData.length > 0}
+          />
           <TableBody>
             {paginatedData.map((item) => (
-              editingLocation?.id === item.id ? (
-                renderEditableRow(editingLocation)
-              ) : (
-                <TableRow 
-                  key={item.id}
-                  className="hover:bg-[#F1F0FB] transition-colors"
-                >
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedItems.includes(item.id)}
-                      onCheckedChange={() => toggleSelectItem(item.id)}
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium text-dgxprt-navy">{item.name}</TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant="secondary"
-                      className="bg-gray-100 text-gray-800"
-                    >
-                      {item.master_data?.label || "Unknown"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-dgxprt-navy">{getParentLocationName(item)}</TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={item.status_id === 1 ? "default" : "destructive"}
-                      className={
-                        item.status_id === 1
-                          ? "bg-green-100 text-green-800" 
-                          : "bg-red-100 text-red-800"
-                      }
-                    >
-                      {item.status_lookup?.status_name || (item.status_id === 1 ? "Active" : "Inactive")}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        className="hover:bg-dgxprt-hover text-dgxprt-navy"
-                        onClick={() => onEdit(item)}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        className="hover:bg-dgxprt-hover text-dgxprt-navy"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )
+              <LocationTableRow
+                key={item.id}
+                location={item}
+                isSelected={selectedItems.includes(item.id)}
+                onToggleSelect={toggleSelectItem}
+                onEdit={onEdit}
+                onDelete={handleDelete}
+                getLocationTypeLabel={getLocationTypeLabel}
+                getParentLocationName={getParentLocationName}
+              />
             ))}
-            {editingLocation?.isNew && renderEditableRow(editingLocation)}
           </TableBody>
         </Table>
       </div>
@@ -400,7 +173,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
           
           <div className="flex gap-2">
             <Button
-              onClick={startNewLocation}
+              onClick={() => setEditingLocation({ isNew: true })}
               className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -410,51 +183,11 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
         </div>
         
         <div className="flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage((p) => Math.max(1, p - 1));
-                  }}
-                  aria-disabled={currentPage === 1}
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setCurrentPage(page);
-                    }}
-                    isActive={currentPage === page}
-                    className={
-                      currentPage === page 
-                        ? "bg-dgxprt-selected text-white hover:bg-dgxprt-selected/90" 
-                        : "hover:bg-dgxprt-hover"
-                    }
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage((p) => Math.min(totalPages, p + 1));
-                  }}
-                  aria-disabled={currentPage === totalPages}
-                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          <LocationPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
     </div>
