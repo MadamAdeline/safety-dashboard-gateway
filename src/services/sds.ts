@@ -7,6 +7,7 @@ export async function createSDS(data: {
   supplierId: string;
   isDG: boolean;
   issueDate?: string;
+  revisionDate?: string;
   expiryDate?: string;
   statusId: number;
   currentFilePath?: string;
@@ -20,15 +21,16 @@ export async function createSDS(data: {
   subsidiaryDgClassId?: string;
   packingGroupId?: string;
   dgSubDivisionId?: string;
+  otherNames?: string;
+  emergencyPhone?: string;
 }) {
   console.log("Creating SDS with data:", data);
   
-  // Handle empty dates by setting them to null
   const formattedData = {
     ...data,
     issue_date: data.issueDate || null,
+    revision_date: data.revisionDate || null,
     expiry_date: data.expiryDate || null,
-    // Handle empty UUID fields by converting empty strings to null
     dg_class_id: data.dgClassId || null,
     subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
     packing_group_id: data.packingGroupId || null,
@@ -40,9 +42,12 @@ export async function createSDS(data: {
     .insert({
       product_name: data.productName,
       product_id: data.productId,
+      other_names: data.otherNames,
+      emergency_phone: data.emergencyPhone,
       supplier_id: data.supplierId,
       is_dg: data.isDG,
       issue_date: formattedData.issue_date,
+      revision_date: formattedData.revision_date,
       expiry_date: formattedData.expiry_date,
       status_id: data.statusId,
       current_file_path: data.currentFilePath,
@@ -74,6 +79,7 @@ export async function updateSDS(id: string, data: {
   supplierId: string;
   isDG: boolean;
   issueDate?: string;
+  revisionDate?: string;
   expiryDate?: string;
   statusId: number;
   currentFilePath?: string;
@@ -87,12 +93,15 @@ export async function updateSDS(id: string, data: {
   subsidiaryDgClassId?: string;
   packingGroupId?: string;
   dgSubDivisionId?: string;
+  otherNames?: string;
+  emergencyPhone?: string;
 }) {
   console.log("Updating SDS with ID:", id, "and data:", data);
   
   const formattedData = {
     ...data,
     issue_date: data.issueDate || null,
+    revision_date: data.revisionDate || null,
     expiry_date: data.expiryDate || null,
     dg_class_id: data.dgClassId || null,
     subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
@@ -105,9 +114,12 @@ export async function updateSDS(id: string, data: {
     .update({
       product_name: data.productName,
       product_id: data.productId,
+      other_names: data.otherNames,
+      emergency_phone: data.emergencyPhone,
       supplier_id: data.supplierId,
       is_dg: data.isDG,
       issue_date: formattedData.issue_date,
+      revision_date: formattedData.revision_date,
       expiry_date: formattedData.expiry_date,
       status_id: data.statusId,
       current_file_path: data.currentFilePath,

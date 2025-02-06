@@ -19,6 +19,9 @@ export interface SDS {
   subsidiaryDgClassId?: string;
   packingGroupId?: string;
   dgSubDivisionId?: string;
+  otherNames?: string;
+  emergencyPhone?: string;
+  revisionDate?: string;
 }
 
 export interface SDSFilters {
