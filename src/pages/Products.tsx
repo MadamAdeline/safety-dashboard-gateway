@@ -79,12 +79,12 @@ export default function Products() {
       // Transform the data to match the Product type
       const transformedData = data.map(item => ({
         ...item,
-        sds: item.sds ? {
-          id: item.sds.id,
-          isDG: item.sds.isDG,
-          dgClass: Array.isArray(item.sds.dgClass) ? item.sds.dgClass[0] : item.sds.dgClass,
-          supplier: Array.isArray(item.sds.supplier) ? item.sds.supplier[0] : item.sds.supplier,
-          packingGroup: Array.isArray(item.sds.packingGroup) ? item.sds.packingGroup[0] : item.sds.packingGroup
+        sds: item.sds && item.sds[0] ? {
+          id: item.sds[0].id,
+          isDG: item.sds[0].isDG,
+          dgClass: item.sds[0].dgClass?.[0] || undefined,
+          supplier: item.sds[0].supplier?.[0] || undefined,
+          packingGroup: item.sds[0].packingGroup?.[0] || undefined
         } : null
       })) as Product[];
 
