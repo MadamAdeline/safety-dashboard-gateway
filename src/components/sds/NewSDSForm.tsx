@@ -78,12 +78,13 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
           ...prev,
           productName: extractedData.productName || "",
           productId: extractedData.productId || "",
-          dgClassId: extractedData.dgClassId,
+          dgClassId: extractedData.dgClassId || "",
           unNumber: extractedData.unNumber || "",
           unProperShippingName: extractedData.unProperShippingName || "",
           packingGroupId: extractedData.packingGroupId || "",
           hazchemCode: extractedData.hazchemCode || "",
-          subsidiaryDgClassId: extractedData.subsidiaryDgClassId || ""
+          subsidiaryDgClassId: extractedData.subsidiaryDgClassId || "",
+          dgSubDivisionId: extractedData.dgSubDivisionId || ""
         }));
       }
     }
@@ -122,13 +123,13 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         issueDate: formData.issueDate,
         revisionDate: formData.revisionDate,
         expiryDate: formData.expiryDate,
-        dgClassId: isDG ? formData.dgClassId : undefined,
-        unNumber: isDG ? formData.unNumber : undefined,
-        unProperShippingName: isDG ? formData.unProperShippingName : undefined,
-        packingGroupId: isDG ? formData.packingGroupId : undefined,
-        hazchemCode: isDG ? formData.hazchemCode : undefined,
-        subsidiaryDgClassId: isDG ? formData.subsidiaryDgClassId : undefined,
-        dgSubDivisionId: isDG ? formData.dgSubDivisionId : undefined,
+        dgClassId: isDG ? formData.dgClassId : null,
+        unNumber: isDG ? formData.unNumber : null,
+        unProperShippingName: isDG ? formData.unProperShippingName : null,
+        packingGroupId: isDG ? formData.packingGroupId : null,
+        hazchemCode: isDG ? formData.hazchemCode : null,
+        subsidiaryDgClassId: isDG ? formData.subsidiaryDgClassId : null,
+        dgSubDivisionId: isDG ? formData.dgSubDivisionId : null,
         statusId,
         ...(fileData && {
           currentFilePath: fileData.filePath,
@@ -164,10 +165,6 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     }
   };
 
-  const openSDSInNewTab = () => {
-    window.open("/lovable-uploads/efad172c-780d-4fdb-ba96-baa5719330bc.png", '_blank');
-  };
-
   return (
     <DashboardLayout>
       <div className="max-w-full">
@@ -200,7 +197,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
               </TabsContent>
 
               <TabsContent value="version">
-                <SDSVersionTab onOpenSDS={openSDSInNewTab} />
+                <SDSVersionTab />
               </TabsContent>
             </Tabs>
           </div>

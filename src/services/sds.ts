@@ -17,10 +17,10 @@ export async function createSDS(data: {
   unNumber?: string;
   unProperShippingName?: string;
   hazchemCode?: string;
-  dgClassId?: string;
-  subsidiaryDgClassId?: string;
-  packingGroupId?: string;
-  dgSubDivisionId?: string;
+  dgClassId?: string | null;
+  subsidiaryDgClassId?: string | null;
+  packingGroupId?: string | null;
+  dgSubDivisionId?: string | null;
   otherNames?: string;
   emergencyPhone?: string;
 }) {
@@ -29,21 +29,21 @@ export async function createSDS(data: {
   const formattedData = {
     product_name: data.productName,
     product_id: data.productId,
-    other_names: data.otherNames,
-    emergency_phone: data.emergencyPhone,
+    other_names: data.otherNames || null,
+    emergency_phone: data.emergencyPhone || null,
     supplier_id: data.supplierId,
     is_dg: data.isDG,
     issue_date: data.issueDate || null,
     revision_date: data.revisionDate || null,
     expiry_date: data.expiryDate || null,
     status_id: data.statusId,
-    current_file_path: data.currentFilePath,
-    current_file_name: data.currentFileName,
-    current_file_size: data.currentFileSize,
-    current_content_type: data.currentContentType,
-    un_number: data.unNumber,
-    un_proper_shipping_name: data.unProperShippingName,
-    hazchem_code: data.hazchemCode,
+    current_file_path: data.currentFilePath || null,
+    current_file_name: data.currentFileName || null,
+    current_file_size: data.currentFileSize || null,
+    current_content_type: data.currentContentType || null,
+    un_number: data.unNumber || null,
+    un_proper_shipping_name: data.unProperShippingName || null,
+    hazchem_code: data.hazchemCode || null,
     dg_class_id: data.dgClassId || null,
     subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
     packing_group_id: data.packingGroupId || null,
@@ -80,10 +80,10 @@ export async function updateSDS(id: string, data: {
   unNumber?: string;
   unProperShippingName?: string;
   hazchemCode?: string;
-  dgClassId?: string;
-  subsidiaryDgClassId?: string;
-  packingGroupId?: string;
-  dgSubDivisionId?: string;
+  dgClassId?: string | null;
+  subsidiaryDgClassId?: string | null;
+  packingGroupId?: string | null;
+  dgSubDivisionId?: string | null;
   otherNames?: string;
   emergencyPhone?: string;
 }) {
@@ -92,21 +92,21 @@ export async function updateSDS(id: string, data: {
   const formattedData = {
     product_name: data.productName,
     product_id: data.productId,
-    other_names: data.otherNames,
-    emergency_phone: data.emergencyPhone,
+    other_names: data.otherNames || null,
+    emergency_phone: data.emergencyPhone || null,
     supplier_id: data.supplierId,
     is_dg: data.isDG,
     issue_date: data.issueDate || null,
     revision_date: data.revisionDate || null,
     expiry_date: data.expiryDate || null,
     status_id: data.statusId,
-    current_file_path: data.currentFilePath,
-    current_file_name: data.currentFileName,
-    current_file_size: data.currentFileSize,
-    current_content_type: data.currentContentType,
-    un_number: data.unNumber,
-    un_proper_shipping_name: data.unProperShippingName,
-    hazchem_code: data.hazchemCode,
+    current_file_path: data.currentFilePath || null,
+    current_file_name: data.currentFileName || null,
+    current_file_size: data.currentFileSize || null,
+    current_content_type: data.currentContentType || null,
+    un_number: data.unNumber || null,
+    un_proper_shipping_name: data.unProperShippingName || null,
+    hazchem_code: data.hazchemCode || null,
     dg_class_id: data.dgClassId || null,
     subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
     packing_group_id: data.packingGroupId || null,
