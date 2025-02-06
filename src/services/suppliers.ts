@@ -14,7 +14,7 @@ export async function getSuppliers() {
       throw error;
     }
 
-    console.log('Fetched suppliers:', data);
+    console.log('Successfully fetched suppliers:', data);
     return data;
   } catch (error) {
     console.error('Failed to fetch suppliers:', error);
@@ -80,7 +80,7 @@ export async function deleteSupplier(id: string) {
       throw error;
     }
 
-    console.log('Deleted supplier:', id);
+    console.log('Successfully deleted supplier:', id);
   } catch (error) {
     console.error('Failed to delete supplier:', error);
     throw error;
