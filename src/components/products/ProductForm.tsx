@@ -1,17 +1,12 @@
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import type { Product } from "@/types/product";
-import { supabase } from "@/integrations/supabase/client";
-import { SDSSearch } from "@/components/sds/SDSSearch";
 import type { SDS } from "@/types/sds";
+import { supabase } from "@/integrations/supabase/client";
+import { ProductFormHeader } from "./ProductFormHeader";
+import { ProductDetailsTab } from "./ProductDetailsTab";
+import { ProductSDSTab } from "./ProductSDSTab";
 
 interface ProductFormProps {
   onClose: () => void;
@@ -78,10 +73,10 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
       .from('products')
       .select('id')
       .eq('product_code', code)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code === 'PGRST116') {
-      // No data found, code is unique
+    if (error) {
+      console.error('Error checking duplicate code:', error);
       return false;
     }
 
@@ -167,25 +162,11 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
   return (
     <div className="max-w-full">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">
-          {initialData ? "Edit Product" : "New Product"}
-        </h1>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button 
-            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90" 
-            onClick={handleSave}
-          >
-            Save
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <ProductFormHeader
+        isEditing={!!initialData}
+        onClose={onClose}
+        onSave={handleSave}
+      />
 
       <div className="bg-white rounded-lg shadow p-6">
         <Tabs defaultValue="details" className="w-full">
@@ -194,178 +175,20 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
             <TabsTrigger value="sds">SDS Information</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="details" className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Product Name *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="brandName">Brand Name</Label>
-                  <Input
-                    id="brandName"
-                    value={formData.brandName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, brandName: e.target.value }))}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="code">Product Code *</Label>
-                  <Input
-                    id="code"
-                    value={formData.code}
-                    onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="unit">Unit *</Label>
-                    <Select 
-                      value={formData.unit}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, unit: value }))}
-                    >
-                      <SelectTrigger id="unit">
-                        <SelectValue placeholder="Select unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Litre (L)">Litre (L)</SelectItem>
-                        <SelectItem value="Kilogram (kg)">Kilogram (kg)</SelectItem>
-                        <SelectItem value="Gram (g)">Gram (g)</SelectItem>
-                        <SelectItem value="Millilitre (mL)">Millilitre (mL)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="unitSize">Unit Size</Label>
-                    <Input
-                      id="unitSize"
-                      type="number"
-                      value={formData.unitSize}
-                      onChange={(e) => setFormData(prev => ({ ...prev, unitSize: parseFloat(e.target.value) }))}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Product Characteristics</h3>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="productSet"
-                    checked={formData.productSet}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, productSet: checked }))}
-                  />
-                  <Label htmlFor="productSet">Product Set</Label>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="aerosol"
-                    checked={formData.aerosol}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, aerosol: checked }))}
-                  />
-                  <Label htmlFor="aerosol">Aerosol</Label>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="cryogenicFluid"
-                    checked={formData.cryogenicFluid}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, cryogenicFluid: checked }))}
-                  />
-                  <Label htmlFor="cryogenicFluid">Cryogenic Fluid</Label>
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="otherNames">Other Names</Label>
-                <Textarea
-                  id="otherNames"
-                  value={formData.otherNames}
-                  onChange={(e) => setFormData(prev => ({ ...prev, otherNames: e.target.value }))}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="uses">Uses</Label>
-                <Textarea
-                  id="uses"
-                  value={formData.uses}
-                  onChange={(e) => setFormData(prev => ({ ...prev, uses: e.target.value }))}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="approvalStatus">Approval Status *</Label>
-                  <Select
-                    value={formData.approvalStatusId?.toString()}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, approvalStatusId: parseInt(value) }))}
-                  >
-                    <SelectTrigger id="approvalStatus">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {approvalStatusOptions.map(option => (
-                        <SelectItem key={option.id} value={option.id.toString()}>
-                          {option.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="productStatus">Product Status *</Label>
-                  <Select
-                    value={formData.productStatusId?.toString()}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, productStatusId: parseInt(value) }))}
-                  >
-                    <SelectTrigger id="productStatus">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {productStatusOptions.map(option => (
-                        <SelectItem key={option.id} value={option.id.toString()}>
-                          {option.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
+          <TabsContent value="details">
+            <ProductDetailsTab
+              formData={formData}
+              setFormData={setFormData}
+              approvalStatusOptions={approvalStatusOptions}
+              productStatusOptions={productStatusOptions}
+            />
           </TabsContent>
 
           <TabsContent value="sds">
-            <div className="space-y-4">
-              <Label>Associated SDS</Label>
-              <SDSSearch
-                selectedSdsId={formData.sdsId}
-                onSDSSelect={handleSDSSelect}
-              />
-            </div>
+            <ProductSDSTab
+              sdsId={formData.sdsId}
+              onSDSSelect={handleSDSSelect}
+            />
           </TabsContent>
         </Tabs>
       </div>

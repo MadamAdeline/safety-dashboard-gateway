@@ -1,0 +1,185 @@
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+interface ProductDetailsTabProps {
+  formData: any;
+  setFormData: (data: any) => void;
+  approvalStatusOptions: any[];
+  productStatusOptions: any[];
+}
+
+export function ProductDetailsTab({ 
+  formData, 
+  setFormData,
+  approvalStatusOptions,
+  productStatusOptions 
+}: ProductDetailsTabProps) {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="name">Product Name *</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="brandName">Brand Name</Label>
+            <Input
+              id="brandName"
+              value={formData.brandName}
+              onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="code">Product Code *</Label>
+            <Input
+              id="code"
+              value={formData.code}
+              onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="unit">Unit *</Label>
+              <Select 
+                value={formData.unit}
+                onValueChange={(value) => setFormData({ ...formData, unit: value })}
+              >
+                <SelectTrigger id="unit">
+                  <SelectValue placeholder="Select unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Litre (L)">Litre (L)</SelectItem>
+                  <SelectItem value="Kilogram (kg)">Kilogram (kg)</SelectItem>
+                  <SelectItem value="Gram (g)">Gram (g)</SelectItem>
+                  <SelectItem value="Millilitre (mL)">Millilitre (mL)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="unitSize">Unit Size</Label>
+              <Input
+                id="unitSize"
+                type="number"
+                value={formData.unitSize}
+                onChange={(e) => setFormData({ ...formData, unitSize: parseFloat(e.target.value) })}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Product Characteristics</h3>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="productSet"
+              checked={formData.productSet}
+              onCheckedChange={(checked) => setFormData({ ...formData, productSet: checked })}
+            />
+            <Label htmlFor="productSet">Product Set</Label>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="aerosol"
+              checked={formData.aerosol}
+              onCheckedChange={(checked) => setFormData({ ...formData, aerosol: checked })}
+            />
+            <Label htmlFor="aerosol">Aerosol</Label>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="cryogenicFluid"
+              checked={formData.cryogenicFluid}
+              onCheckedChange={(checked) => setFormData({ ...formData, cryogenicFluid: checked })}
+            />
+            <Label htmlFor="cryogenicFluid">Cryogenic Fluid</Label>
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="otherNames">Other Names</Label>
+          <Textarea
+            id="otherNames"
+            value={formData.otherNames}
+            onChange={(e) => setFormData({ ...formData, otherNames: e.target.value })}
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="uses">Uses</Label>
+          <Textarea
+            id="uses"
+            value={formData.uses}
+            onChange={(e) => setFormData({ ...formData, uses: e.target.value })}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="approvalStatus">Approval Status *</Label>
+            <Select
+              value={formData.approvalStatusId?.toString()}
+              onValueChange={(value) => setFormData({ ...formData, approvalStatusId: parseInt(value) })}
+            >
+              <SelectTrigger id="approvalStatus">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                {approvalStatusOptions.map(option => (
+                  <SelectItem key={option.id} value={option.id.toString()}>
+                    {option.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="productStatus">Product Status *</Label>
+            <Select
+              value={formData.productStatusId?.toString()}
+              onValueChange={(value) => setFormData({ ...formData, productStatusId: parseInt(value) })}
+            >
+              <SelectTrigger id="productStatus">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                {productStatusOptions.map(option => (
+                  <SelectItem key={option.id} value={option.id.toString()}>
+                    {option.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
