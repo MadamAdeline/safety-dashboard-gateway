@@ -20,18 +20,20 @@ export const supabase = createClient<Database>(
   }
 );
 
-// Test the connection with proper Promise typing
-void supabase.from('suppliers')
-  .select('count', { count: 'exact', head: true })
-  .then(() => {
+// Test the connection and properly handle the Promise chain
+const testConnection = async () => {
+  try {
+    await supabase.from('suppliers')
+      .select('count', { count: 'exact', head: true });
     console.log('3. Test query successful - Connection verified');
-    return Promise.resolve();
-  })
-  .catch(err => {
+  } catch (err) {
     console.error('3. Connection test failed:', err.message);
     console.error('Full error:', err);
-    return Promise.reject(err);
-  });
+  }
+};
+
+// Execute the test
+void testConnection();
 
 export const isSupabaseConfigured = () => {
   return !!SUPABASE_PUBLISHABLE_KEY;
