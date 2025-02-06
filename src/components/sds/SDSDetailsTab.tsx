@@ -19,6 +19,14 @@ interface SDSDetailsTabProps {
   setSupplier: (value: string) => void;
   formData: any;
   setFormData: (value: any) => void;
+  dgClassId: string;
+  setDgClassId: (value: string) => void;
+  subsidiaryDgClassId: string;
+  setSubsidiaryDgClassId: (value: string) => void;
+  packingGroupId: string;
+  setPackingGroupId: (value: string) => void;
+  dgSubDivisionId: string;
+  setDgSubDivisionId: (value: string) => void;
 }
 
 export function SDSDetailsTab({ 
@@ -420,3 +428,4 @@ export function SDSDetailsTab({
     </div>
   );
 }
+
