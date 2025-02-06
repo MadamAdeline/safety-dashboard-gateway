@@ -38,7 +38,7 @@ export function LocationSearch({
           master_data (id, label),
           status_lookup (id, status_name)
         `)
-        .eq('status_id', 1); // Assuming 1 is active status
+        .eq('status_id', 1); // Only fetch active locations
       
       if (error) {
         console.error('Error fetching locations:', error);
@@ -70,9 +70,19 @@ export function LocationSearch({
     setIsDropdownOpen(true);
   };
 
-  const filteredLocations = locations?.filter(location => 
-    location.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const getParentLocationName = (location: Location): string => {
+    if (!location.parent_location_id) return "-";
+    const parentLocation = locations?.find(loc => loc.id === location.parent_location_id);
+    return parentLocation ? parentLocation.name : "-";
+  };
+
+  const filteredLocations = locations?.filter(location => {
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return location.name.toLowerCase().includes(searchLower) ||
+           getParentLocationName(location).toLowerCase().includes(searchLower);
+  });
 
   return (
     <div className={className}>
@@ -102,7 +112,7 @@ export function LocationSearch({
               >
                 <div className="font-medium">{location.name}</div>
                 <div className="text-sm text-gray-500">
-                  {location.master_data?.label}
+                  Parent: {getParentLocationName(location)}
                 </div>
               </div>
             ))}
