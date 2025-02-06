@@ -15,23 +15,45 @@ const sampleData: Product[] = [
     id: "1",
     name: "Acetone",
     code: "ACE20L",
-    isDG: true,
-    dgClass: 3,
-    packGroup: "II",
-    unNumber: "1090",
-    supplier: "AUSTRALIAN CHEMICAL REAGENTS",
     status: "ACTIVE",
+    sds: {
+      id: "sds1",
+      isDG: true,
+      dgClass: {
+        id: "class3",
+        label: "Class 3"
+      },
+      supplier: {
+        id: "sup1",
+        supplier_name: "AUSTRALIAN CHEMICAL REAGENTS"
+      },
+      packingGroup: {
+        id: "pg2",
+        label: "II"
+      }
+    }
   },
   {
     id: "2",
     name: "Methanol",
     code: "MET10L",
-    isDG: true,
-    dgClass: 3,
-    packGroup: "II",
-    unNumber: "1230",
-    supplier: "SIGMA ALDRICH",
     status: "ACTIVE",
+    sds: {
+      id: "sds2",
+      isDG: true,
+      dgClass: {
+        id: "class3",
+        label: "Class 3"
+      },
+      supplier: {
+        id: "sup2",
+        supplier_name: "SIGMA ALDRICH"
+      },
+      packingGroup: {
+        id: "pg2",
+        label: "II"
+      }
+    }
   }
 ];
 
