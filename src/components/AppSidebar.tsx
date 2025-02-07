@@ -1,3 +1,4 @@
+
 import {
   Sidebar,
   SidebarContent,
@@ -12,9 +13,9 @@ export function AppSidebar() {
     <Sidebar className="border-r border-gray-200 bg-dgxprt-sidebar">
       <div className="flex justify-center p-6">
         <img 
-          src="/lovable-uploads/6601a49f-3b97-4eb4-a178-d1ae4eea2557.png" 
+          src="/lovable-uploads/1473d268-4b58-4028-8b1a-c70b45d4ec34.png" 
           alt="DGXprt Logo" 
-          className="h-16" 
+          className="h-12" 
         />
       </div>
       <SidebarContent className="overflow-y-auto">

@@ -97,6 +97,55 @@ export type Database = {
         }
         Relationships: []
       }
+      product_approvals: {
+        Row: {
+          approved_at: string | null
+          assigned_to: string
+          decision_comment: string | null
+          id: string
+          product_id: string
+          status_id: number
+        }
+        Insert: {
+          approved_at?: string | null
+          assigned_to: string
+          decision_comment?: string | null
+          id?: string
+          product_id: string
+          status_id: number
+        }
+        Update: {
+          approved_at?: string | null
+          assigned_to?: string
+          decision_comment?: string | null
+          id?: string
+          product_id?: string
+          status_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_approvals_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_approvals_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_approvals_status_id_fkey"
+            columns: ["status_id"]
+            isOneToOne: false
+            referencedRelation: "status_lookup"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           aerosol: boolean | null
