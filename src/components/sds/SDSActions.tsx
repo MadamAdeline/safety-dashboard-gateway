@@ -14,14 +14,24 @@ interface SDSActionsProps {
 
 export function SDSActions({ onToggleFilters, onExport, onRefresh, data, allowDelete = true }: SDSActionsProps) {
   const handleExport = () => {
+    if (!data || data.length === 0) return;
+
     const exportData = data.map(item => ({
-      'Product Name': item.productName,
-      'Product ID': item.productId,
-      'Supplier': item.supplier,
+      'Product Name': item.productName || '',
+      'Product ID': item.productId || '',
+      'Supplier': item.supplier || '',
       'Is DG': item.isDG ? 'Yes' : 'No',
-      'Issue Date': item.issueDate,
-      'Expiry Date': item.expiryDate,
-      'Status': item.status
+      'Issue Date': item.issueDate || '',
+      'Expiry Date': item.expiryDate || '',
+      'Status': item.status || '',
+      'UN Number': item.unNumber || '',
+      'UN Proper Shipping Name': item.unProperShippingName || '',
+      'DG Class': item.dgClass?.label || '',
+      'Subsidiary DG Class': item.subsidiaryDgClass?.label || '',
+      'Packing Group': item.packingGroup?.label || '',
+      'Emergency Phone': item.emergencyPhone || '',
+      'Other Names': item.otherNames || '',
+      'Hazchem Code': item.hazchemCode || ''
     }));
 
     const ws = XLSX.utils.json_to_sheet(exportData);
