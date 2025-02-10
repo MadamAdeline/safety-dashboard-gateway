@@ -16,25 +16,13 @@ export function useProducts() {
           .from('products')
           .select(`
             *,
-            uom:master_data!products_uom_id_fkey (
-              id,
-              label
-            ),
+            uom:master_data!products_uom_id_fkey ( id, label ),
             sds:products_sds_id_fkey!inner (
               id,
               is_dg,
-              dg_class:master_data!sds_dg_class_id_fkey (
-                id,
-                label
-              ),
-              supplier:suppliers!sds_supplier_id_fkey (
-                id,
-                supplier_name
-              ),
-              packing_group:master_data!sds_packing_group_id_fkey (
-                id,
-                label
-              )
+              dg_class:master_data!sds_dg_class_id_fkey ( id, label ),
+              supplier:suppliers!sds_supplier_id_fkey ( id, supplier_name ),
+              packing_group:master_data!sds_packing_group_id_fkey ( id, label )
             )
           `);
         
