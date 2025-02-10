@@ -143,12 +143,30 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
         if (error) {
           if (error.code === '23505') {
-            const errorMsg = "A product with this name, code, and SDS combination already exists. Please modify one of these fields.";
-            toast({
-              title: "Duplicate Product",
-              description: errorMsg,
-              variant: "destructive",
-            });
+            try {
+              const errorBody = JSON.parse(error.message);
+              const details = errorBody?.details || '';
+              // Extract values from the details string using regex
+              const matches = details.match(/\((.*?)\)=\((.*?)\)/);
+              const fields = matches ? matches[1].split(', ') : [];
+              const values = matches ? matches[2].split(', ') : [];
+              
+              const duplicateInfo = fields.map((field, index) => 
+                `${field.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}: ${values[index]}`
+              ).join('\n');
+
+              toast({
+                title: "Duplicate Product",
+                description: `A product with these details already exists:\n${duplicateInfo}\n\nPlease modify one of these fields.`,
+                variant: "destructive",
+              });
+            } catch {
+              toast({
+                title: "Duplicate Product",
+                description: "A product with this name, code, and SDS combination already exists. Please modify one of these fields.",
+                variant: "destructive",
+              });
+            }
             return;
           }
           throw error;
@@ -160,12 +178,30 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
         if (error) {
           if (error.code === '23505') {
-            const errorMsg = "A product with this name, code, and SDS combination already exists. Please modify one of these fields.";
-            toast({
-              title: "Duplicate Product",
-              description: errorMsg,
-              variant: "destructive",
-            });
+            try {
+              const errorBody = JSON.parse(error.message);
+              const details = errorBody?.details || '';
+              // Extract values from the details string using regex
+              const matches = details.match(/\((.*?)\)=\((.*?)\)/);
+              const fields = matches ? matches[1].split(', ') : [];
+              const values = matches ? matches[2].split(', ') : [];
+              
+              const duplicateInfo = fields.map((field, index) => 
+                `${field.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}: ${values[index]}`
+              ).join('\n');
+
+              toast({
+                title: "Duplicate Product",
+                description: `A product with these details already exists:\n${duplicateInfo}\n\nPlease modify one of these fields.`,
+                variant: "destructive",
+              });
+            } catch {
+              toast({
+                title: "Duplicate Product",
+                description: "A product with this name, code, and SDS combination already exists. Please modify one of these fields.",
+                variant: "destructive",
+              });
+            }
             return;
           }
           throw error;
