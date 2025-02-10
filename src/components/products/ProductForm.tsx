@@ -108,7 +108,8 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         product_name: formData.name,
         product_code: formData.code,
         brand_name: formData.brandName,
-        uom_id: formData.uomId,
+        uom_id: formData.uomId || null,
+        unit: null, // Set unit to null since we're using uom_id now
         unit_size: formData.unitSize,
         description: formData.description,
         product_set: formData.productSet,
@@ -131,7 +132,7 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
       } else {
         const { error } = await supabase
           .from('products')
-          .insert([productData]);
+          .insert(productData);
 
         if (error) throw error;
       }
