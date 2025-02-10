@@ -143,10 +143,10 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
         if (error) {
           if (error.code === '23505') {
-            const errorBody = JSON.parse(error.body);
+            const errorDetails = error.message;
             toast({
               title: "Duplicate Product",
-              description: errorBody?.details || "A product with these details already exists",
+              description: errorDetails || "A product with these details already exists",
               variant: "destructive",
             });
             return;
@@ -160,10 +160,10 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
         if (error) {
           if (error.code === '23505') {
-            const errorBody = JSON.parse(error.body);
+            const errorDetails = error.message;
             toast({
               title: "Duplicate Product",
-              description: errorBody?.details || "A product with these details already exists",
+              description: errorDetails || "A product with these details already exists",
               variant: "destructive",
             });
             return;
