@@ -12,11 +12,11 @@ import { SDSUploadDialog } from "./SDSUploadDialog";
 import { createSDS, updateSDS, uploadSDSFile, getStatusId } from "@/services/sds";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, addYears } from "date-fns";
+import { useUserRole } from "@/hooks/use-user-role";
 
 interface NewSDSFormProps {
   onClose: () => void;
   initialData?: SDS | null;
-  readOnly?: boolean;
 }
 
 interface FormData {
@@ -37,9 +37,12 @@ interface FormData {
   requestedBy: string;
 }
 
-export function NewSDSForm({ onClose, initialData, readOnly = false }: NewSDSFormProps) {
+export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   console.log("NewSDSForm - Initial Data:", initialData);
-  console.log("Form read-only mode:", readOnly);
+  const { data: userRole } = useUserRole();
+  const isManager = userRole?.toLowerCase() === 'manager';
+  console.log("User role:", userRole);
+  console.log("Is manager:", isManager);
 
   const [isDG, setIsDG] = useState(initialData?.isDG ?? false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -74,7 +77,7 @@ export function NewSDSForm({ onClose, initialData, readOnly = false }: NewSDSFor
   const queryClient = useQueryClient();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, extractedData?: any) => {
-    if (readOnly) return;
+    if (isManager) return;
     
     const file = event.target.files?.[0];
     if (file) {
@@ -108,7 +111,7 @@ export function NewSDSForm({ onClose, initialData, readOnly = false }: NewSDSFor
   };
 
   const handleSave = async () => {
-    if (readOnly) {
+    if (isManager) {
       toast({
         title: "Read Only",
         description: "You don't have permission to modify this SDS.",
@@ -212,8 +215,8 @@ export function NewSDSForm({ onClose, initialData, readOnly = false }: NewSDSFor
         <SDSFormHeader 
           title={initialData ? "Edit Safety Data Sheet" : "New Safety Data Sheet"}
           onClose={onClose}
-          onSave={!readOnly ? handleSave : undefined}
-          readOnly={readOnly}
+          onSave={!isManager ? handleSave : undefined}
+          readOnly={isManager}
         />
 
         <div className="grid grid-cols-2 gap-6">
@@ -243,7 +246,7 @@ export function NewSDSForm({ onClose, initialData, readOnly = false }: NewSDSFor
                   setPackingGroupId={setPackingGroupId}
                   dgSubDivisionId={dgSubDivisionId}
                   setDgSubDivisionId={setDgSubDivisionId}
-                  readOnly={readOnly}
+                  readOnly={isManager}
                 />
               </TabsContent>
 
@@ -254,10 +257,10 @@ export function NewSDSForm({ onClose, initialData, readOnly = false }: NewSDSFor
           </div>
 
           <SDSPreview 
-            onUploadClick={() => !readOnly && setShowUploadDialog(true)} 
+            onUploadClick={() => !isManager && setShowUploadDialog(true)} 
             initialData={initialData}
             selectedFile={selectedFile}
-            readOnly={readOnly}
+            readOnly={isManager}
           />
         </div>
       </div>
