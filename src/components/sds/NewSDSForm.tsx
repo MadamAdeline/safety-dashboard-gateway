@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -210,59 +209,57 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   };
 
   return (
-    <DashboardLayout>
-      <div className="max-w-full">
-        <SDSFormHeader 
-          title={initialData ? "Edit Safety Data Sheet" : "New Safety Data Sheet"}
-          onClose={onClose}
-          onSave={!isManager ? handleSave : undefined}
+    <div className="max-w-full">
+      <SDSFormHeader 
+        title={initialData ? "Edit Safety Data Sheet" : "New Safety Data Sheet"}
+        onClose={onClose}
+        onSave={!isManager ? handleSave : undefined}
+        readOnly={isManager}
+      />
+
+      <div className="grid grid-cols-2 gap-6">
+        <div className="space-y-6">
+          <Tabs defaultValue="product-details" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="product-details">SDS Details</TabsTrigger>
+              <TabsTrigger value="version">Version History</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="product-details">
+              <SDSDetailsTab 
+                initialData={initialData}
+                isDG={isDG}
+                setIsDG={setIsDG}
+                status={status}
+                setStatus={setStatus}
+                supplier={supplier}
+                setSupplier={setSupplier}
+                formData={formData}
+                setFormData={setFormData}
+                dgClassId={dgClassId}
+                setDgClassId={setDgClassId}
+                subsidiaryDgClassId={subsidiaryDgClassId}
+                setSubsidiaryDgClassId={setSubsidiaryDgClassId}
+                packingGroupId={packingGroupId}
+                setPackingGroupId={setPackingGroupId}
+                dgSubDivisionId={dgSubDivisionId}
+                setDgSubDivisionId={setDgSubDivisionId}
+                readOnly={isManager}
+              />
+            </TabsContent>
+
+            <TabsContent value="version">
+              <SDSVersionTab onOpenSDS={handleOpenSDS} />
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        <SDSPreview 
+          onUploadClick={() => !isManager && setShowUploadDialog(true)} 
+          initialData={initialData}
+          selectedFile={selectedFile}
           readOnly={isManager}
         />
-
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-6">
-            <Tabs defaultValue="product-details" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="product-details">SDS Details</TabsTrigger>
-                <TabsTrigger value="version">Version History</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="product-details">
-                <SDSDetailsTab 
-                  initialData={initialData}
-                  isDG={isDG}
-                  setIsDG={setIsDG}
-                  status={status}
-                  setStatus={setStatus}
-                  supplier={supplier}
-                  setSupplier={setSupplier}
-                  formData={formData}
-                  setFormData={setFormData}
-                  dgClassId={dgClassId}
-                  setDgClassId={setDgClassId}
-                  subsidiaryDgClassId={subsidiaryDgClassId}
-                  setSubsidiaryDgClassId={setSubsidiaryDgClassId}
-                  packingGroupId={packingGroupId}
-                  setPackingGroupId={setPackingGroupId}
-                  dgSubDivisionId={dgSubDivisionId}
-                  setDgSubDivisionId={setDgSubDivisionId}
-                  readOnly={isManager}
-                />
-              </TabsContent>
-
-              <TabsContent value="version">
-                <SDSVersionTab onOpenSDS={handleOpenSDS} />
-              </TabsContent>
-            </Tabs>
-          </div>
-
-          <SDSPreview 
-            onUploadClick={() => !isManager && setShowUploadDialog(true)} 
-            initialData={initialData}
-            selectedFile={selectedFile}
-            readOnly={isManager}
-          />
-        </div>
       </div>
 
       <SDSUploadDialog 
@@ -270,6 +267,6 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         onOpenChange={setShowUploadDialog}
         onFileUpload={handleFileUpload}
       />
-    </DashboardLayout>
+    </div>
   );
 }
