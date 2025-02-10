@@ -15,34 +15,19 @@ export function useProducts() {
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select(`
-            id,
-            product_name,
-            product_code,
-            brand_name,
-            unit,
-            uom_id,
+            *,
             uom:master_data!products_uom_id_fkey (
               id,
               label
             ),
-            unit_size,
-            description,
-            product_set,
-            aerosol,
-            cryogenic_fluid,
-            other_names,
-            uses,
-            approval_status_id,
-            product_status_id,
-            sds_id,
-            sds:products_sds_id_fkey (
+            sds:products_sds_id_fkey!inner (
               id,
               is_dg,
               dg_class:master_data!sds_dg_class_id_fkey (
                 id,
                 label
               ),
-              supplier:suppliers (
+              supplier:suppliers!sds_supplier_id_fkey (
                 id,
                 supplier_name
               ),
@@ -111,4 +96,3 @@ export function useProducts() {
     }
   });
 }
-
