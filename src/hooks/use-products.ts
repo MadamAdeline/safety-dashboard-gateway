@@ -20,7 +20,7 @@ export function useProducts() {
               id,
               label
             ),
-            sds:products_sds_id_fkey (
+            sds:products_sds_id_fkey!inner (
               id,
               is_dg,
               dg_class:master_data!sds_dg_class_id_fkey (
