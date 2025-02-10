@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
@@ -70,6 +69,49 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
     fetchStatusOptions();
   }, [toast]);
+
+  useEffect(() => {
+    if (initialData?.id) {
+      // Fetch the complete product data including UOM when editing
+      const fetchProductData = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('products')
+            .select(`
+              *,
+              uom:master_data!products_uom_id_fkey (
+                id,
+                label
+              )
+            `)
+            .eq('id', initialData.id)
+            .single();
+
+          if (error) {
+            console.error('Error fetching product details:', error);
+            throw error;
+          }
+
+          if (data) {
+            setFormData(prev => ({
+              ...prev,
+              uomId: data.uom_id || "",
+              // Update other fields if needed
+            }));
+          }
+        } catch (error) {
+          console.error('Failed to fetch product details:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load product details",
+            variant: "destructive",
+          });
+        }
+      };
+
+      fetchProductData();
+    }
+  }, [initialData?.id, toast]);
 
   const checkDuplicateCode = async (code: string): Promise<boolean> => {
     const { data, error } = await supabase

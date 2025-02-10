@@ -22,6 +22,7 @@ import type { Product, ProductFilters } from "@/types/product";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface ProductListProps {
   data: Product[];
@@ -36,6 +37,40 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 10;
   const { toast } = useToast();
+
+  const { data: products, isLoading, error } = useQuery({
+    queryKey: ['products'],
+    queryFn: async () => {
+      console.log('Fetching products from Supabase...');
+      try {
+        const { data: productsData, error: productsError } = await supabase
+          .from('products')
+          .select(`
+            *,
+            uom:master_data!products_uom_id_fkey (
+              id,
+              label
+            )
+          `);
+        
+        if (productsError) {
+          console.error('Error fetching product details:', productsError);
+          throw productsError;
+        }
+
+        console.log('Fetched products:', productsData);
+        return productsData;
+      } catch (err) {
+        console.error('Failed to fetch products:', err);
+        toast({
+          title: "Error",
+          description: "Failed to load products. Please try again.",
+          variant: "destructive",
+        });
+        throw err;
+      }
+    }
+  });
 
   const handleDelete = async (product: Product) => {
     if (!product.id) return;
@@ -54,10 +89,7 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
         description: "Product deleted successfully",
       });
 
-      // Remove the deleted item from selectedItems
       setSelectedItems(prev => prev.filter(id => id !== product.id));
-
-      // Refresh the page to update the list
       window.location.reload();
     } catch (error) {
       console.error('Error deleting product:', error);
@@ -72,7 +104,6 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
   };
 
   const filteredData = data.filter((item) => {
-    // Search across all text fields
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       const searchableFields = [
@@ -85,7 +116,7 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
         item.uses,
         item.sds?.supplier?.supplier_name,
         item.sds?.dgClass?.label,
-      ].filter(Boolean); // Remove null/undefined values
+      ].filter(Boolean);
 
       const matchesSearch = searchableFields.some(
         field => field?.toLowerCase().includes(searchTerm)
@@ -94,7 +125,6 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
       if (!matchesSearch) return false;
     }
 
-    // Keep existing filter conditions
     if (filters.supplier.length > 0 && item.sds?.supplier?.supplier_name && !filters.supplier.includes(item.sds.supplier.supplier_name)) {
       return false;
     }
@@ -110,7 +140,6 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
     return true;
   });
 
-  // Sort by product name in ascending order
   const sortedData = [...filteredData].sort((a, b) => a.name.localeCompare(b.name));
 
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
@@ -152,7 +181,7 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
               <TableHead className="text-dgxprt-navy font-semibold">Product Code</TableHead>
               <TableHead className="text-dgxprt-navy font-semibold">Brand Name</TableHead>
               <TableHead className="text-dgxprt-navy font-semibold">Unit Size</TableHead>
-              <TableHead className="text-dgxprt-navy font-semibold">Unit</TableHead>
+              <TableHead className="text-dgxprt-navy font-semibold">Unit of Measure</TableHead>
               <TableHead className="text-dgxprt-navy font-semibold">DG</TableHead>
               <TableHead className="text-dgxprt-navy font-semibold">DG Class</TableHead>
               <TableHead className="text-dgxprt-navy font-semibold">Supplier</TableHead>
@@ -177,7 +206,7 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
                 <TableCell>{item.code}</TableCell>
                 <TableCell>{item.brandName || "-"}</TableCell>
                 <TableCell>{item.unitSize || "-"}</TableCell>
-                <TableCell>{item.unit || "-"}</TableCell>
+                <TableCell>{item.uom?.label || "-"}</TableCell>
                 <TableCell>
                   <Badge 
                     variant={item.sds?.isDG ? "default" : "secondary"}
