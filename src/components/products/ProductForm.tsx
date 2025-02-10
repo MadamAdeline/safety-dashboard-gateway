@@ -33,12 +33,14 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
   });
 
   const handleDuplicate = () => {
-    // Reset name and code while keeping other values
+    // Create a new form state by duplicating the current data
     setFormData(prev => ({
       ...prev,
       name: "",
       code: "",
     }));
+    // Clear the initialData to trigger creation mode
+    initialData = null;
   };
 
   const [statusOptions, setStatusOptions] = useState<{ id: number; name: string; category: string }[]>([]);
@@ -173,7 +175,8 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         sds_id: formData.sdsId
       };
 
-      if (initialData?.id) {
+      // Always insert a new record when duplicating (initialData will be null)
+      if (initialData?.id && !formData.isDuplicating) {
         const { error } = await supabase
           .from('products')
           .update(productData)
