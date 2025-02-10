@@ -23,7 +23,7 @@ export function LocationSearch({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const { data: locations } = useQuery({
-    queryKey: ['locations'],
+    queryKey: ['locations', 'search'],
     queryFn: async () => {
       console.log('Fetching locations from Supabase...');
       const { data, error } = await supabase
@@ -39,7 +39,7 @@ export function LocationSearch({
           master_data (id, label),
           status_lookup (id, status_name)
         `)
-        .eq('status_id', 8); // Only fetch active locations
+        .eq('status_id', 1); // Filter by ACTIVE status (status_id = 1)
 
       if (error) {
         console.error('Error fetching locations:', error);
@@ -119,9 +119,11 @@ export function LocationSearch({
                 }}
               >
                 <div className="font-medium">{location.name || 'Unnamed Location'}</div>
-                <div className="text-sm text-gray-500">
-                  {location.full_path}
-                </div>
+                {location.full_path && (
+                  <div className="text-sm text-gray-500">
+                    {location.full_path}
+                  </div>
+                )}
               </div>
             ))}
             {(!filteredLocations || filteredLocations.length === 0) && (
