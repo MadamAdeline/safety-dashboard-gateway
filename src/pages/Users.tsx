@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { exportUsersToExcel } from "@/utils/userExport";
+import type { User } from "@/types/user";
 
 export default function Users() {
   const [showNewUserForm, setShowNewUserForm] = useState(false);
@@ -20,7 +21,7 @@ export default function Users() {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const users = queryClient.getQueryData(['users']) || [];
+      const users = queryClient.getQueryData(['users']) as User[] || [];
       await exportUsersToExcel(users);
       toast({
         title: "Export Successful",

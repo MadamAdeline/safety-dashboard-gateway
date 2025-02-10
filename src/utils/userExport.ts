@@ -12,8 +12,8 @@ export const exportUsersToExcel = (users: User[]) => {
     'Email': user.email,
     'Phone Number': user.phone_number || '',
     'Status': user.active,
-    'Location': user.location?.full_path || '',
-    'Roles': user.user_roles?.map(ur => ur.roles.role_name).join(', ') || ''
+    'Location': user.location?.name || '', // Changed from full_path to name since that's what's in the type
+    'Roles': (user.user_roles || []).map(ur => ur.roles.role_name).join(', ') // Added null check with empty array default
   }));
 
   console.log('Transformed data for export:', exportData);
