@@ -32,6 +32,15 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
     sdsId: initialData?.sdsId ?? null
   });
 
+  const handleDuplicate = () => {
+    // Reset name and code while keeping other values
+    setFormData(prev => ({
+      ...prev,
+      name: "",
+      code: "",
+    }));
+  };
+
   const [statusOptions, setStatusOptions] = useState<{ id: number; name: string; category: string }[]>([]);
   const { toast } = useToast();
 
@@ -212,6 +221,8 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         isEditing={!!initialData}
         onClose={onClose}
         onSave={handleSave}
+        onDuplicate={handleDuplicate}
+        showDuplicate={!!initialData}
       />
 
       <div className="bg-white rounded-lg shadow p-6">
