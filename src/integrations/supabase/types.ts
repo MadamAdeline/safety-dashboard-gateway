@@ -471,7 +471,7 @@ export type Database = {
           email: string
           id: string
           phone_number: string | null
-          status_id: number
+          status_id: number | null
           supplier_name: string
         }
         Insert: {
@@ -481,7 +481,7 @@ export type Database = {
           email: string
           id?: string
           phone_number?: string | null
-          status_id: number
+          status_id?: number | null
           supplier_name: string
         }
         Update: {
@@ -491,7 +491,7 @@ export type Database = {
           email?: string
           id?: string
           phone_number?: string | null
-          status_id?: number
+          status_id?: number | null
           supplier_name?: string
         }
         Relationships: [
