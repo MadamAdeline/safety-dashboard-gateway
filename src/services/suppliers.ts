@@ -1,10 +1,10 @@
-import { getSupabaseClient } from '@/integrations/supabase/client';
+
+import { supabase } from "@/integrations/supabase/client";
 import type { Supplier } from '@/types/supplier';
 
 export async function getSuppliers() {
   console.log('Fetching suppliers from Supabase');
   try {
-    const supabase = getSupabaseClient();
     if (!supabase) {
       console.error('Supabase client not initialized');
       throw new Error('Supabase client not initialized');
@@ -42,7 +42,6 @@ export async function getSuppliers() {
 export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
   console.log('Creating supplier with data:', supplier);
   try {
-    const supabase = getSupabaseClient();
     if (!supabase) {
       console.error('Supabase client not initialized');
       throw new Error('Supabase client not initialized');
@@ -88,7 +87,6 @@ export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
 export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
   console.log('Updating supplier:', id, supplier);
   try {
-    const supabase = getSupabaseClient();
     if (!supabase) {
       console.error('Supabase client not initialized');
       throw new Error('Supabase client not initialized');
@@ -135,7 +133,6 @@ export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
 export async function deleteSupplier(id: string) {
   console.log('Deleting supplier:', id);
   try {
-    const supabase = getSupabaseClient();
     if (!supabase) {
       console.error('Supabase client not initialized');
       throw new Error('Supabase client not initialized');

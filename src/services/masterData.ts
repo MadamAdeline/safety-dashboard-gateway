@@ -1,10 +1,10 @@
-import { getSupabaseClient } from '@/integrations/supabase/client';
+
+import { supabase } from "@/integrations/supabase/client";
 import type { MasterData } from '@/types/masterData';
 
 export async function getMasterData() {
   console.log('Fetching master data from Supabase');
   try {
-    const supabase = getSupabaseClient();
     if (!supabase) {
       console.error('Supabase client not initialized');
       throw new Error('Supabase client not initialized');
@@ -32,7 +32,6 @@ export async function getMasterData() {
 export async function createMasterData(masterData: Omit<MasterData, 'id' | 'created_at' | 'updated_at'>) {
   console.log('Creating master data:', masterData);
   try {
-    const supabase = getSupabaseClient();
     if (!supabase) {
       console.error('Supabase client not initialized');
       throw new Error('Supabase client not initialized');
@@ -60,7 +59,6 @@ export async function createMasterData(masterData: Omit<MasterData, 'id' | 'crea
 export async function updateMasterData(id: string, masterData: Partial<MasterData>) {
   console.log('Updating master data:', id, masterData);
   try {
-    const supabase = getSupabaseClient();
     if (!supabase) {
       console.error('Supabase client not initialized');
       throw new Error('Supabase client not initialized');
@@ -89,7 +87,6 @@ export async function updateMasterData(id: string, masterData: Partial<MasterDat
 export async function deleteMasterData(id: string) {
   console.log('Deleting master data:', id);
   try {
-    const supabase = getSupabaseClient();
     if (!supabase) {
       console.error('Supabase client not initialized');
       throw new Error('Supabase client not initialized');
