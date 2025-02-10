@@ -13,13 +13,10 @@ export function UserFooter() {
   const { data: user, isLoading } = useQuery({
     queryKey: ['user'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
-      
       const { data: userData, error } = await supabase
         .from('users')
-        .select('first_name')
-        .eq('id', user.id)
+        .select('first_name, email')
+        .eq('email', localStorage.getItem('userEmail'))
         .single();
         
       if (error) {
@@ -27,17 +24,13 @@ export function UserFooter() {
         throw error;
       }
       
-      return {
-        ...user,
-        firstName: userData?.first_name
-      };
+      return userData;
     }
   });
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      localStorage.removeItem('userEmail');
       
       toast({
         title: "Success",
@@ -60,7 +53,7 @@ export function UserFooter() {
       <div className="flex items-center gap-2 px-2 py-2 text-white">
         <User className="h-4 w-4" />
         <span className="font-medium">
-          {isLoading ? 'Loading...' : (user?.firstName || 'User')}
+          {isLoading ? 'Loading...' : (user?.first_name || 'User')}
         </span>
       </div>
       <button 

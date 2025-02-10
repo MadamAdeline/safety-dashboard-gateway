@@ -27,7 +27,6 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: LoginDialogP
     setIsLoading(true);
 
     try {
-      // Query the users table to get the user data including first_name
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('id, first_name, email')
@@ -38,6 +37,9 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: LoginDialogP
       if (userError) throw userError;
 
       if (userData) {
+        // Store email in localStorage for UserFooter component
+        localStorage.setItem('userEmail', userData.email);
+        
         // Update last login date
         const { error: updateError } = await supabase
           .from('users')
