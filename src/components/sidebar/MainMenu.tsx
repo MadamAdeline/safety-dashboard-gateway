@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom"
 import { 
   Home, 
@@ -14,7 +15,7 @@ import {
 const mainMenuItems = [
   {
     label: "Home",
-    path: "/",
+    path: "/dashboard",
     icon: Home,
   },
   {
