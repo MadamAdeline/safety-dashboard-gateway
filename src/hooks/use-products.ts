@@ -20,14 +20,14 @@ export function useProducts() {
               id,
               label
             ),
-            sds:products_sds_id_fkey (
+            sds:sds!products_sds_id_fkey (
               id,
               is_dg,
               dg_class:master_data!sds_dg_class_id_fkey (
                 id,
                 label
               ),
-              supplier:suppliers (
+              supplier:suppliers!sds_supplier_id_fkey (
                 id,
                 supplier_name
               ),
