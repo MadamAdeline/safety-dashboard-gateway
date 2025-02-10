@@ -161,7 +161,7 @@ export type Database = {
           product_set: boolean | null
           product_status_id: number | null
           sds_id: string | null
-          unit: string
+          unit: string | null
           unit_size: number | null
           uom_id: string | null
           updated_at: string | null
@@ -181,7 +181,7 @@ export type Database = {
           product_set?: boolean | null
           product_status_id?: number | null
           sds_id?: string | null
-          unit: string
+          unit?: string | null
           unit_size?: number | null
           uom_id?: string | null
           updated_at?: string | null
@@ -201,7 +201,7 @@ export type Database = {
           product_set?: boolean | null
           product_status_id?: number | null
           sds_id?: string | null
-          unit?: string
+          unit?: string | null
           unit_size?: number | null
           uom_id?: string | null
           updated_at?: string | null

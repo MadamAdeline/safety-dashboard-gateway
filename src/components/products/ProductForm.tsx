@@ -109,7 +109,7 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         product_code: formData.code,
         brand_name: formData.brandName,
         uom_id: formData.uomId || null,
-        unit: null, // Set unit to null since we're using uom_id now
+        unit: null,
         unit_size: formData.unitSize,
         description: formData.description,
         product_set: formData.productSet,
