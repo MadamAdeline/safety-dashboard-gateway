@@ -70,7 +70,7 @@ export async function createSDS(data: {
     .insert(formattedData)
     .select(`
       *,
-      suppliers (supplier_name),
+      suppliers!supplier_id(supplier_name),
       status:status_lookup!inner (status_name),
       dg_class:master_data!sds_dg_class_id_fkey (label),
       subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
@@ -170,7 +170,7 @@ export async function updateSDS(id: string, data: {
     .eq('id', id)
     .select(`
       *,
-      suppliers (supplier_name),
+      suppliers!supplier_id(supplier_name),
       status:status_lookup!inner (status_name),
       dg_class:master_data!sds_dg_class_id_fkey (label),
       subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),

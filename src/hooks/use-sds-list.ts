@@ -12,7 +12,7 @@ export function useSDSList() {
         .from('sds')
         .select(`
           *,
-          suppliers (supplier_name),
+          suppliers!supplier_id(supplier_name),
           status:status_lookup!inner (status_name),
           dg_class:master_data!sds_dg_class_id_fkey (id, label),
           subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (id, label),
