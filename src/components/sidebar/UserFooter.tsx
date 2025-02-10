@@ -18,7 +18,7 @@ export function UserFooter() {
       
       const { data: userData, error } = await supabase
         .from('users')
-        .select('first_name, last_name')
+        .select('first_name')
         .eq('id', user.id)
         .single();
         
@@ -26,7 +26,7 @@ export function UserFooter() {
       
       return {
         ...user,
-        fullName: userData ? `${userData.first_name} ${userData.last_name}` : user.email
+        firstName: userData?.first_name || 'User'
       };
     }
   });
@@ -56,7 +56,7 @@ export function UserFooter() {
     <SidebarFooter className="mt-auto border-t border-dgxprt-sidebar p-4">
       <div className="flex items-center gap-2 px-2 py-2 text-white">
         <User className="h-4 w-4" />
-        <span className="font-medium">{user?.fullName || 'Loading...'}</span>
+        <span className="font-medium">{user?.firstName || 'Loading...'}</span>
       </div>
       <button 
         onClick={handleLogout}
