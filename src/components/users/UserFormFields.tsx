@@ -12,6 +12,7 @@ import type { Role, UserStatus } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LocationSearch } from "@/components/locations/LocationSearch";
+import { ManagerSearch } from "@/components/users/ManagerSearch";
 import type { Location } from "@/types/location";
 
 interface UserFormFieldsProps {
@@ -32,18 +33,22 @@ interface UserFormFieldsProps {
 }
 
 export function UserFormFields({ formData, roles, isEditing, onChange }: UserFormFieldsProps) {
-  // Fetch managers (all active users)
-  const { data: managers } = useQuery({
-    queryKey: ['users', 'managers'],
+  // Fetch current manager if manager_id exists
+  const { data: currentManager } = useQuery({
+    queryKey: ['user', 'manager', formData.manager_id],
     queryFn: async () => {
+      if (!formData.manager_id) return null;
+      
       const { data, error } = await supabase
         .from('users')
         .select('id, first_name, last_name')
-        .eq('active', 'active');
+        .eq('id', formData.manager_id)
+        .single();
       
       if (error) throw error;
       return data;
-    }
+    },
+    enabled: !!formData.manager_id
   });
 
   // Fetch current location if location_id exists
@@ -80,6 +85,10 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
 
   const handleLocationSelect = (location: Location) => {
     onChange("location_id", location.id);
+  };
+
+  const handleManagerSelect = (manager: { id: string; first_name: string; last_name: string }) => {
+    onChange("manager_id", manager.id);
   };
 
   return (
@@ -154,22 +163,13 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
 
       <div className="space-y-2">
         <Label>Manager</Label>
-        <Select
-          value={formData.manager_id || "unassigned"}
-          onValueChange={(value) => onChange("manager_id", value === "unassigned" ? "" : value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select manager" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="unassigned">No Manager</SelectItem>
-            {managers?.map((manager) => (
-              <SelectItem key={manager.id} value={manager.id}>
-                {manager.first_name} {manager.last_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <ManagerSearch
+          selectedManagerId={formData.manager_id}
+          initialManager={currentManager}
+          onManagerSelect={handleManagerSelect}
+          currentUserId={formData.id}
+          className="w-full"
+        />
       </div>
 
       <div className="space-y-2">
