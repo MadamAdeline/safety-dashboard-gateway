@@ -6,6 +6,10 @@ export interface Product {
   brandName?: string;
   unit?: string;
   uomId?: string;
+  uom?: {
+    id: string;
+    label: string;
+  };
   unitSize?: number;
   description?: string;
   productSet?: boolean;
