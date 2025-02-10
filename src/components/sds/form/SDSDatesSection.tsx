@@ -6,10 +6,10 @@ import { useEffect } from "react";
 import { addYears, format, isValid, parse } from "date-fns";
 
 export function SDSDatesSection() {
-  const { formData, setFormData, initialData, status } = useSDSForm();
+  const { formData, setFormData, initialData, status, readOnly } = useSDSForm();
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
   const isRequested = status === "REQUESTED";
-  const isReadOnly = isGlobalLibrary || isRequested;
+  const isReadOnly = isGlobalLibrary || isRequested || readOnly;
 
   useEffect(() => {
     if (formData.issueDate) {

@@ -8,13 +8,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export function SDSSupplierSelect() {
-  const { supplier, setSupplier, initialData, status } = useSDSForm();
+  const { supplier, setSupplier, initialData, status, readOnly } = useSDSForm();
   console.log("SDSSupplierSelect - Initial supplier:", supplier);
   console.log("SDSSupplierSelect - Initial data:", initialData);
   
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
   const isRequested = status === "REQUESTED";
-  const isReadOnly = isGlobalLibrary || isRequested;
+  const isReadOnly = isGlobalLibrary || isRequested || readOnly;
 
   const { data: suppliers = [] } = useQuery({
     queryKey: ['suppliers'],

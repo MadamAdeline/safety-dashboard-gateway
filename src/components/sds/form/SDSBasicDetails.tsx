@@ -4,9 +4,10 @@ import { Label } from "@/components/ui/label";
 import { useSDSForm } from "./SDSFormContext";
 
 export function SDSBasicDetails() {
-  const { formData, setFormData, initialData, status } = useSDSForm();
+  const { formData, setFormData, initialData, status, readOnly } = useSDSForm();
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
   const isRequested = status === "REQUESTED";
+  const isReadOnly = isGlobalLibrary || isRequested || readOnly;
 
   const handleInputChange = (field: string, value: string) => {
     console.log("Input change:", field, value);
@@ -25,8 +26,8 @@ export function SDSBasicDetails() {
           placeholder="Enter SDS product name" 
           value={formData.productName}
           onChange={(e) => handleInputChange('productName', e.target.value)}
-          readOnly={isGlobalLibrary || isRequested}
-          className={isGlobalLibrary || isRequested ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
+          readOnly={isReadOnly}
+          className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
         />
       </div>
       <div className="space-y-2">
@@ -36,8 +37,8 @@ export function SDSBasicDetails() {
           placeholder="Enter other SDS product names" 
           value={formData.otherNames}
           onChange={(e) => handleInputChange('otherNames', e.target.value)}
-          readOnly={isGlobalLibrary || isRequested}
-          className={isGlobalLibrary || isRequested ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
+          readOnly={isReadOnly}
+          className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
         />
       </div>
       <div className="space-y-2">
@@ -47,8 +48,8 @@ export function SDSBasicDetails() {
           placeholder="Enter SDS code" 
           value={formData.productId}
           onChange={(e) => handleInputChange('productId', e.target.value)}
-          readOnly={isGlobalLibrary || isRequested}
-          className={isGlobalLibrary || isRequested ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
+          readOnly={isReadOnly}
+          className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
         />
       </div>
       <div className="space-y-2">
@@ -58,8 +59,8 @@ export function SDSBasicDetails() {
           placeholder="Enter emergency contact" 
           value={formData.emergencyPhone}
           onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
-          readOnly={isGlobalLibrary || isRequested}
-          className={isGlobalLibrary || isRequested ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
+          readOnly={isReadOnly}
+          className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
         />
       </div>
     </div>
