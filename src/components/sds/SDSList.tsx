@@ -10,6 +10,8 @@ import { SDSTableRow } from "./table/SDSTableRow";
 import { SDSPagination } from "./table/SDSPagination";
 import { SDSSelectionProvider } from "./table/SDSSelectionContext";
 import { useQueryClient } from "@tanstack/react-query";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { SDSReadOnlyView } from "./SDSReadOnlyView";
 
 interface SDSListProps {
   data: SDS[];
@@ -21,6 +23,7 @@ interface SDSListProps {
 export function SDSList({ data, filters, onEdit, allowDelete = false }: SDSListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewingSDS, setViewingSDS] = useState<SDS | null>(null);
   const itemsPerPage = 10;
   const queryClient = useQueryClient();
 
@@ -52,6 +55,10 @@ export function SDSList({ data, filters, onEdit, allowDelete = false }: SDSListP
     queryClient.invalidateQueries({ queryKey: ['sds'] });
   };
 
+  const handleView = (sds: SDS) => {
+    setViewingSDS(sds);
+  };
+
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -70,6 +77,7 @@ export function SDSList({ data, filters, onEdit, allowDelete = false }: SDSListP
                   key={item.id}
                   item={item}
                   onEdit={onEdit}
+                  onView={handleView}
                   onDelete={handleDelete}
                   allowDelete={allowDelete}
                 />
@@ -87,6 +95,17 @@ export function SDSList({ data, filters, onEdit, allowDelete = false }: SDSListP
         totalItems={filteredData.length}
         onPageChange={setCurrentPage}
       />
+
+      <Dialog open={!!viewingSDS} onOpenChange={(open) => !open && setViewingSDS(null)}>
+        <DialogContent className="max-w-[90vw] h-[90vh] overflow-y-auto">
+          {viewingSDS && (
+            <SDSReadOnlyView 
+              initialData={viewingSDS}
+              onClose={() => setViewingSDS(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2, Trash2, Eye } from "lucide-react";
 import type { SDS } from "@/types/sds";
 import { useSDSSelection } from "./SDSSelectionContext";
 import { useSDSDelete } from "@/hooks/use-sds-delete";
@@ -11,11 +11,12 @@ import { useSDSDelete } from "@/hooks/use-sds-delete";
 interface SDSTableRowProps {
   item: SDS;
   onEdit: (sds: SDS) => void;
+  onView: (sds: SDS) => void;
   onDelete?: (sds: SDS) => void;
   allowDelete?: boolean;
 }
 
-export function SDSTableRow({ item, onEdit, onDelete, allowDelete = true }: SDSTableRowProps) {
+export function SDSTableRow({ item, onEdit, onView, onDelete, allowDelete = true }: SDSTableRowProps) {
   const { selectedItems, toggleSelectItem } = useSDSSelection();
   const { handleDelete } = useSDSDelete(onDelete);
 
@@ -69,6 +70,14 @@ export function SDSTableRow({ item, onEdit, onDelete, allowDelete = true }: SDST
       </TableCell>
       <TableCell>
         <div className="flex space-x-2">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="hover:bg-dgxprt-hover text-dgxprt-navy"
+            onClick={() => onView(item)}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
           <Button 
             variant="ghost" 
             size="icon"
