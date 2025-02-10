@@ -1,12 +1,10 @@
 
-import { DashboardLayout } from "@/components/DashboardLayout";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { SDS } from "@/types/sds";
 import { SDSDetailsTab } from "./SDSDetailsTab";
 import { SDSVersionTab } from "./SDSVersionTab";
 import { SDSPreview } from "./SDSPreview";
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SDSFormHeader } from "./SDSFormHeader";
 
 interface SDSReadOnlyViewProps {
   initialData: SDS;
@@ -21,13 +19,12 @@ export function SDSReadOnlyView({ initialData, onClose }: SDSReadOnlyViewProps) 
   };
 
   return (
-    <div className="max-w-full">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">View Safety Data Sheet</h1>
-        <Button variant="ghost" size="icon" onClick={onClose}>
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
+    <div className="space-y-6 max-w-full">
+      <SDSFormHeader
+        title="View Safety Data Sheet"
+        onClose={onClose}
+        readOnly={true}
+      />
 
       <div className="grid grid-cols-2 gap-6">
         <div className="space-y-6">
@@ -92,4 +89,3 @@ export function SDSReadOnlyView({ initialData, onClose }: SDSReadOnlyViewProps) 
     </div>
   );
 }
-

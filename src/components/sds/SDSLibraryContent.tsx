@@ -11,6 +11,7 @@ import { NewSDSForm } from "@/components/sds/NewSDSForm";
 import { GlobalSDSSearchDialog } from "@/components/sds/GlobalSDSSearchDialog";
 import { SDSRequestDialog } from "@/components/sds/SDSRequestDialog";
 import { SDSFilteredList } from "@/components/sds/SDSFilteredList";
+import { SDSReadOnlyView } from "@/components/sds/SDSReadOnlyView";
 import type { SDS, SDSFilters } from "@/types/sds";
 
 export function SDSLibraryContent() {
@@ -36,6 +37,7 @@ export function SDSLibraryContent() {
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
   const [showRequestDialog, setShowRequestDialog] = useState(false);
   const [selectedSDS, setSelectedSDS] = useState<SDS | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'edit' | 'view' | 'new'>('list');
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -103,6 +105,7 @@ export function SDSLibraryContent() {
   const handleClose = () => {
     setShowNewSDS(false);
     setSelectedSDS(null);
+    setViewMode('list');
     queryClient.invalidateQueries({ queryKey: ['sds'] });
   };
 
@@ -114,7 +117,7 @@ export function SDSLibraryContent() {
       });
     } else {
       setSelectedSDS(sdsInput);
-      setSearchTerm(sdsInput.productName);
+      setViewMode('view');
     }
   };
 
@@ -122,15 +125,22 @@ export function SDSLibraryContent() {
     return <div>Loading...</div>;
   }
 
-  if (showNewSDS) {
+  if (showNewSDS || viewMode === 'edit') {
     return <NewSDSForm onClose={handleClose} initialData={selectedSDS} />;
+  }
+
+  if (viewMode === 'view' && selectedSDS) {
+    return <SDSReadOnlyView initialData={selectedSDS} onClose={handleClose} />;
   }
 
   return (
     <div className="space-y-4 max-w-full">
       <SDSLibraryHeader 
         isAdmin={isAdmin}
-        onNewSDS={() => setShowNewSDS(true)}
+        onNewSDS={() => {
+          setShowNewSDS(true);
+          setViewMode('new');
+        }}
         onGlobalSearch={() => setShowGlobalSearch(true)}
       />
 
@@ -150,9 +160,12 @@ export function SDSLibraryContent() {
         filters={filters}
         searchTerm={searchTerm}
         onEdit={(sds: SDS) => {
-          console.log("Editing SDS with data:", sds);
           setSelectedSDS(sds);
-          setShowNewSDS(true);
+          if (sds.sdsSource === "Global Library") {
+            setViewMode('view');
+          } else {
+            setViewMode('edit');
+          }
         }}
         allowDelete={isAdmin}
       />
