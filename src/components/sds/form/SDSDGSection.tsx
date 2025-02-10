@@ -21,11 +21,14 @@ export function SDSDGSection() {
     packingGroupId,
     setPackingGroupId,
     dgSubDivisionId,
-    setDgSubDivisionId
+    setDgSubDivisionId,
+    status,
+    readOnly
   } = useSDSForm();
   
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
-  const isReadOnly = isGlobalLibrary;
+  const isRequested = status === "REQUESTED";
+  const isReadOnly = isGlobalLibrary || isRequested || readOnly;
 
   const { data: masterData = [] } = useQuery({
     queryKey: ['masterData'],
@@ -119,7 +122,7 @@ export function SDSDGSection() {
           <Label htmlFor="dgClass">DG Class *</Label>
           <Select 
             value={dgClassId || ""} 
-            onValueChange={(value) => setDgClassId(value)}
+            onValueChange={(value) => !isReadOnly && setDgClassId(value)}
             disabled={isReadOnly}
           >
             <SelectTrigger id="dgClass" className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}>
@@ -139,7 +142,7 @@ export function SDSDGSection() {
           <Label htmlFor="subsidiaryDgClass">Subsidiary DG Class</Label>
           <Select 
             value={subsidiaryDgClassId || ""} 
-            onValueChange={(value) => setSubsidiaryDgClassId(value)}
+            onValueChange={(value) => !isReadOnly && setSubsidiaryDgClassId(value)}
             disabled={isReadOnly}
           >
             <SelectTrigger id="subsidiaryDgClass" className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}>
@@ -159,7 +162,7 @@ export function SDSDGSection() {
           <Label htmlFor="packingGroup">Packing Group</Label>
           <Select 
             value={packingGroupId || ""} 
-            onValueChange={(value) => setPackingGroupId(value)}
+            onValueChange={(value) => !isReadOnly && setPackingGroupId(value)}
             disabled={isReadOnly}
           >
             <SelectTrigger id="packingGroup" className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}>
@@ -179,7 +182,7 @@ export function SDSDGSection() {
           <Label htmlFor="dgSubDivision">DG Sub Division</Label>
           <Select 
             value={dgSubDivisionId || ""} 
-            onValueChange={(value) => setDgSubDivisionId(value)}
+            onValueChange={(value) => !isReadOnly && setDgSubDivisionId(value)}
             disabled={isReadOnly}
           >
             <SelectTrigger id="dgSubDivision" className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}>
@@ -234,3 +237,4 @@ export function SDSDGSection() {
     </div>
   );
 }
+
