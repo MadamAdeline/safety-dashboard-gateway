@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,6 +39,7 @@ interface FormData {
 
 export function NewSDSForm({ onClose, initialData, readOnly = false }: NewSDSFormProps) {
   console.log("NewSDSForm - Initial Data:", initialData);
+  console.log("Form read-only mode:", readOnly);
 
   const [isDG, setIsDG] = useState(initialData?.isDG ?? false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -72,6 +74,8 @@ export function NewSDSForm({ onClose, initialData, readOnly = false }: NewSDSFor
   const queryClient = useQueryClient();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, extractedData?: any) => {
+    if (readOnly) return;
+    
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
@@ -104,6 +108,15 @@ export function NewSDSForm({ onClose, initialData, readOnly = false }: NewSDSFor
   };
 
   const handleSave = async () => {
+    if (readOnly) {
+      toast({
+        title: "Read Only",
+        description: "You don't have permission to modify this SDS.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       if (!supplier) {
         toast({
@@ -250,10 +263,11 @@ export function NewSDSForm({ onClose, initialData, readOnly = false }: NewSDSFor
       </div>
 
       <SDSUploadDialog 
-        open={showUploadDialog}
+        open={showUploadDialog} 
         onOpenChange={setShowUploadDialog}
         onFileUpload={handleFileUpload}
       />
     </DashboardLayout>
   );
 }
+
