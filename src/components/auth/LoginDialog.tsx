@@ -27,32 +27,33 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: LoginDialogP
     setIsLoading(true);
 
     try {
-      const { data: user, error } = await supabase
+      // Query the users table to get the user data including first_name
+      const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('*')
+        .select('id, first_name, email')
         .eq('email', email)
         .eq('password', password)
         .single();
 
-      if (error) throw error;
+      if (userError) throw userError;
 
-      if (user) {
+      if (userData) {
         // Update last login date
         const { error: updateError } = await supabase
           .from('users')
           .update({ last_login_date: new Date().toISOString() })
-          .eq('id', user.id);
+          .eq('id', userData.id);
 
         if (updateError) console.error('Error updating last login date:', updateError);
 
         toast({
           title: "Success",
-          description: "Successfully logged in!"
+          description: `Welcome back, ${userData.first_name}!`
         });
         
         onLoginSuccess?.();
         onOpenChange(false);
-        navigate('/dashboard'); // Navigate to dashboard after successful login
+        navigate('/dashboard');
       } else {
         toast({
           title: "Error",
