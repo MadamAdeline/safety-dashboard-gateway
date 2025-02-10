@@ -142,10 +142,11 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
           .eq('id', initialData.id);
 
         if (error) {
-          if (error.code === '23505') { // Unique violation error code
+          if (error.code === '23505') {
+            const details = JSON.parse(error.message)?.details;
             toast({
-              title: "Error",
-              description: "Product already exists. Please update the Product Name, Code or SDS",
+              title: "Duplicate Product",
+              description: details || "A product with these details already exists",
               variant: "destructive",
             });
             return;
@@ -158,10 +159,11 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
           .insert(productData);
 
         if (error) {
-          if (error.code === '23505') { // Unique violation error code
+          if (error.code === '23505') {
+            const details = JSON.parse(error.message)?.details;
             toast({
-              title: "Error",
-              description: "Product already exists. Please update the Product Name, Code or SDS",
+              title: "Duplicate Product",
+              description: details || "A product with these details already exists",
               variant: "destructive",
             });
             return;
