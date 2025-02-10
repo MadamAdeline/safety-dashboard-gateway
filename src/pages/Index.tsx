@@ -75,9 +75,14 @@ const Index = () => {
   const { data: userLocation, isLoading: isLoadingLocation } = useQuery({
     queryKey: ['userLocation'],
     queryFn: async () => {
+      console.log('Fetching user location...');
       const userEmail = localStorage.getItem('userEmail');
-      if (!userEmail) return null;
+      if (!userEmail) {
+        console.log('No user email found');
+        return null;
+      }
 
+      console.log('Fetching location for user:', userEmail);
       const { data, error } = await supabase
         .from('users')
         .select(`
@@ -94,6 +99,7 @@ const Index = () => {
         return null;
       }
 
+      console.log('Location data received:', data);
       return data?.locations?.full_path || null;
     }
   });
@@ -199,4 +205,3 @@ const Index = () => {
 };
 
 export default Index;
-
