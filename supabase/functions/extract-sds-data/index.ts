@@ -13,7 +13,8 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Edge Function: Starting PDF extraction');
+    const { fileName } = await req.json();
+    console.log('Edge Function: Starting PDF extraction for file:', fileName);
     
     // Mock extraction data - in a real implementation, this would parse the PDF
     const extractedData = {

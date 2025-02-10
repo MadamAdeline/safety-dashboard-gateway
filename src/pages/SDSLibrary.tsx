@@ -48,12 +48,12 @@ export default function SDSLibrary() {
         .from('sds')
         .select(`
           *,
-          suppliers!supplier_id(supplier_name),
-          status:status_lookup!inner (status_name),
-          dg_class:master_data!sds_dg_class_id_fkey (id, label),
-          subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (id, label),
-          packing_group:master_data!sds_packing_group_id_fkey (id, label),
-          dg_subdivision:master_data!sds_dg_subdivision_id_fkey (id, label)
+          suppliers!sds_supplier_id_fkey(supplier_name),
+          status:status_lookup!inner(status_name),
+          dg_class:master_data!sds_dg_class_id_fkey(id, label),
+          subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey(id, label),
+          packing_group:master_data!sds_packing_group_id_fkey(id, label),
+          dg_subdivision:master_data!sds_dg_subdivision_id_fkey(id, label)
         `);
 
       if (error) {
