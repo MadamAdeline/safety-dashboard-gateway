@@ -22,7 +22,6 @@ interface SDSListProps {
 export function SDSList({ data, filters, onEdit, allowDelete = false }: SDSListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedSDS, setSelectedSDS] = useState<SDS | null>(null);
   const itemsPerPage = 10;
   const queryClient = useQueryClient();
 
@@ -54,14 +53,6 @@ export function SDSList({ data, filters, onEdit, allowDelete = false }: SDSListP
     queryClient.invalidateQueries({ queryKey: ['sds'] });
   };
 
-  const handleCloseView = () => {
-    setSelectedSDS(null);
-  };
-
-  if (selectedSDS) {
-    return <SDSReadOnlyView initialData={selectedSDS} onClose={handleCloseView} />;
-  }
-
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -79,8 +70,8 @@ export function SDSList({ data, filters, onEdit, allowDelete = false }: SDSListP
                 <SDSTableRow
                   key={item.id}
                   item={item}
-                  onEdit={(sds) => setSelectedSDS(sds)}
-                  onView={(sds) => setSelectedSDS(sds)}
+                  onEdit={onEdit}
+                  onView={(sds) => onEdit(sds)}
                   onDelete={handleDelete}
                   allowDelete={allowDelete}
                 />
@@ -101,4 +92,3 @@ export function SDSList({ data, filters, onEdit, allowDelete = false }: SDSListP
     </div>
   );
 }
-
