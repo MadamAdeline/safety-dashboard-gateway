@@ -39,6 +39,7 @@ export function SDSLibraryContent() {
   const [selectedSDS, setSelectedSDS] = useState<SDS | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'edit' | 'view' | 'new'>('list');
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -170,6 +171,8 @@ export function SDSLibraryContent() {
         allowDelete={isAdmin}
         showViewButton={!isAdmin}
         showEditButton={isAdmin}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
       />
 
       <GlobalSDSSearchDialog 

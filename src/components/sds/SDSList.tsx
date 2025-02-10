@@ -19,6 +19,8 @@ interface SDSListProps {
   allowDelete?: boolean;
   showViewButton: boolean;
   showEditButton: boolean;
+  currentPage: number;
+  onPageChange: (page: number) => void;
 }
 
 export function SDSList({ 
@@ -28,10 +30,11 @@ export function SDSList({
   onEdit, 
   allowDelete = false,
   showViewButton,
-  showEditButton 
+  showEditButton,
+  currentPage,
+  onPageChange
 }: SDSListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const queryClient = useQueryClient();
 
@@ -99,7 +102,7 @@ export function SDSList({
         startIndex={startIndex}
         endIndex={startIndex + itemsPerPage}
         totalItems={filteredData.length}
-        onPageChange={setCurrentPage}
+        onPageChange={onPageChange}
       />
     </div>
   );

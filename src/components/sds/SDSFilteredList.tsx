@@ -11,6 +11,8 @@ interface SDSFilteredListProps {
   allowDelete: boolean;
   showViewButton: boolean;
   showEditButton: boolean;
+  currentPage: number;
+  onPageChange: (page: number) => void;
 }
 
 export function SDSFilteredList({
@@ -21,7 +23,9 @@ export function SDSFilteredList({
   onEdit,
   allowDelete,
   showViewButton,
-  showEditButton
+  showEditButton,
+  currentPage,
+  onPageChange
 }: SDSFilteredListProps) {
   const filteredData = sdsData.filter((item) => {
     const today = new Date().toISOString().split('T')[0];
@@ -57,6 +61,8 @@ export function SDSFilteredList({
       allowDelete={allowDelete}
       showViewButton={showViewButton}
       showEditButton={showEditButton}
+      currentPage={currentPage}
+      onPageChange={onPageChange}
     />
   );
 }
