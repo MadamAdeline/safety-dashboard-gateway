@@ -1,5 +1,5 @@
 
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { LogOut, User } from "lucide-react"
 import { SidebarFooter } from "@/components/ui/sidebar"
 import { supabase } from "@/integrations/supabase/client"
@@ -10,7 +10,7 @@ export function UserFooter() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const { data: user } = useQuery({
+  const { data: user, isLoading } = useQuery({
     queryKey: ['user'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -22,11 +22,14 @@ export function UserFooter() {
         .eq('id', user.id)
         .single();
         
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching user data:', error);
+        throw error;
+      }
       
       return {
         ...user,
-        firstName: userData?.first_name || 'User'
+        firstName: userData?.first_name
       };
     }
   });
@@ -56,7 +59,9 @@ export function UserFooter() {
     <SidebarFooter className="mt-auto border-t border-dgxprt-sidebar p-4">
       <div className="flex items-center gap-2 px-2 py-2 text-white">
         <User className="h-4 w-4" />
-        <span className="font-medium">{user?.firstName || 'Loading...'}</span>
+        <span className="font-medium">
+          {isLoading ? 'Loading...' : (user?.firstName || 'User')}
+        </span>
       </div>
       <button 
         onClick={handleLogout}
