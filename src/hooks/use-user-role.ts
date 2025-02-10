@@ -15,6 +15,7 @@ export function useUserRole() {
         .select(`
           id,
           user_roles (
+            role_id,
             roles (
               role_name
             )

@@ -6,6 +6,7 @@ import {
   AlertTriangle, 
   Trash2, 
   LineChart,
+  Loader,
 } from "lucide-react"
 import {
   SidebarMenuItem,
@@ -47,27 +48,46 @@ const mainMenuItems = [
 ]
 
 export function MainMenu() {
-  const { data: userRole, isLoading } = useUserRole();
+  const { data: userRole, isLoading, error } = useUserRole();
 
-  if (isLoading) return null;
+  console.log('User role:', userRole);
+  console.log('Is loading:', isLoading);
+  console.log('Error:', error);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-4 text-white">
+        <Loader className="h-4 w-4 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!userRole) {
+    console.log('No user role found');
+    return null;
+  }
+
+  const visibleItems = mainMenuItems.filter(item => 
+    item.allowedRoles.includes(userRole.toLowerCase())
+  );
+
+  console.log('Visible items:', visibleItems);
 
   return (
     <>
-      {mainMenuItems
-        .filter(item => item.allowedRoles.includes(userRole as string))
-        .map((item) => (
-          <SidebarMenuItem key={item.label}>
-            <SidebarMenuButton asChild>
-              <Link 
-                to={item.path} 
-                className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar aria-[current=page]:bg-dgxprt-selected"
-              >
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        ))}
+      {visibleItems.map((item) => (
+        <SidebarMenuItem key={item.label}>
+          <SidebarMenuButton asChild>
+            <Link 
+              to={item.path} 
+              className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar aria-[current=page]:bg-dgxprt-selected"
+            >
+              <item.icon className="h-4 w-4" />
+              <span>{item.label}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
     </>
   )
 }

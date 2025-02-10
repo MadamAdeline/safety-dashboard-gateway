@@ -8,6 +8,7 @@ import {
   Building2,
   Users,
   Database,
+  Loader,
 } from "lucide-react"
 import {
   SidebarMenuItem,
@@ -57,12 +58,24 @@ const adminItems = [
 export function AdminMenu() {
   const { data: userRole, isLoading } = useUserRole();
 
-  if (isLoading) return null;
+  console.log('Admin menu - User role:', userRole);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-4 text-white">
+        <Loader className="h-4 w-4 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!userRole) return null;
 
   // Only show admin section if user has access to at least one item
   const visibleItems = adminItems.filter(item => 
-    item.allowedRoles.includes(userRole as string)
+    item.allowedRoles.includes(userRole.toLowerCase())
   );
+
+  console.log('Admin menu - Visible items:', visibleItems);
 
   if (visibleItems.length === 0) return null;
 
