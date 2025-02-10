@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -52,7 +51,7 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
               id,
               label
             ),
-            sds (
+            sds:products_sds_id_fkey (
               id,
               is_dg,
               dg_class:master_data!sds_dg_class_id_fkey (
@@ -61,7 +60,7 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
               ),
               supplier:suppliers!sds_supplier_id_fkey (
                 id,
-                name:supplier_name
+                supplier_name
               ),
               packing_group:master_data!sds_packing_group_id_fkey (
                 id,
@@ -108,7 +107,7 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
             } : undefined,
             supplier: item.sds.supplier ? {
               id: item.sds.supplier.id,
-              supplier_name: item.sds.supplier.name
+              supplier_name: item.sds.supplier_name
             } : undefined,
             packingGroup: item.sds.packing_group ? {
               id: item.sds.packing_group.id,
@@ -368,4 +367,3 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
     </div>
   );
 }
-
