@@ -29,7 +29,7 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
     otherNames: initialData?.otherNames ?? "",
     uses: initialData?.uses ?? "",
     approvalStatusId: initialData?.approvalStatusId ?? null,
-    productStatusId: initialData?.productStatusId ?? 12, // Default to ACTIVE (12)
+    productStatusId: initialData?.productStatusId ?? 12,
     sdsId: initialData?.sdsId ?? null,
     isDuplicating: false
   });
@@ -171,6 +171,25 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
   const handleSave = async () => {
     try {
+      // First, check if a product with this combination exists
+      const { data: existingProduct, error: checkError } = await supabase
+        .from('products')
+        .select('id')
+        .eq('product_name', formData.name)
+        .eq('product_code', formData.code)
+        .eq('sds_id', formData.sdsId)
+        .single();
+
+      // If we get data back and it's not our current product, it's a duplicate
+      if (existingProduct && (!initialData?.id || existingProduct.id !== initialData.id)) {
+        toast({
+          title: "Duplicate Product",
+          description: "A product with this name, code, and SDS combination already exists. Please modify at least one of these fields.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const productData = {
         product_name: formData.name,
         product_code: formData.code,
@@ -189,43 +208,36 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         sds_id: formData.sdsId
       };
 
-      // Validate before saving
-      const isValid = await validateProduct(productData);
-      if (!isValid) return;
+      let savedSuccessfully = false;
 
       if (initialData?.id && !formData.isDuplicating) {
-        const { error } = await supabase
+        const { error: updateError } = await supabase
           .from('products')
           .update(productData)
           .eq('id', initialData.id);
 
-        if (error) {
-          if (error.code === '23505') {
-            handleDuplicateError(error);
-            return;
-          }
-          throw error;
+        if (updateError) {
+          throw updateError;
         }
+        savedSuccessfully = true;
       } else {
-        const { error } = await supabase
+        const { error: insertError } = await supabase
           .from('products')
           .insert(productData);
 
-        if (error) {
-          if (error.code === '23505') {
-            handleDuplicateError(error);
-            return;
-          }
-          throw error;
+        if (insertError) {
+          throw insertError;
         }
+        savedSuccessfully = true;
       }
 
-      onSave();
-      
-      toast({
-        title: "Success",
-        description: `Product ${initialData ? 'updated' : 'created'} successfully`,
-      });
+      if (savedSuccessfully) {
+        onSave();
+        toast({
+          title: "Success",
+          description: `Product ${initialData ? 'updated' : 'created'} successfully`,
+        });
+      }
     } catch (error) {
       console.error('Error saving product:', error);
       toast({
