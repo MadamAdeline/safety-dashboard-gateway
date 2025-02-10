@@ -2,7 +2,20 @@
 import * as XLSX from 'xlsx';
 import type { User } from '@/types/user';
 
-export const exportUsersToExcel = (users: User[]) => {
+// Define the extended type that includes user_roles, similar to UserList.tsx
+type UserWithRelations = Omit<User, 'manager'> & {
+  user_roles?: {
+    role_id: string;
+    roles: {
+      role_name: string;
+    };
+  }[];
+  location?: {
+    name: string;
+  } | null;
+};
+
+export const exportUsersToExcel = (users: UserWithRelations[]) => {
   console.log('Starting export of users to Excel:', users.length, 'users');
   
   // Transform the data for export
