@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
@@ -29,7 +30,8 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
     uses: initialData?.uses ?? "",
     approvalStatusId: initialData?.approvalStatusId ?? null,
     productStatusId: initialData?.productStatusId ?? 12, // Default to ACTIVE (12)
-    sdsId: initialData?.sdsId ?? null
+    sdsId: initialData?.sdsId ?? null,
+    isDuplicating: false // Add this flag to track duplication state
   });
 
   const handleDuplicate = () => {
@@ -38,6 +40,7 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
       ...prev,
       name: "",
       code: "",
+      isDuplicating: true // Set the flag when duplicating
     }));
     // Clear the initialData to trigger creation mode
     initialData = null;
