@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
@@ -116,11 +117,17 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
   const handleDuplicateError = (error: any) => {
     try {
-      const errorBody = JSON.parse(error.message);
+      // Check if error.message is already a parsed object
+      const errorBody = typeof error.message === 'object' ? error.message : JSON.parse(error.message);
       const details = errorBody?.details || '';
       const matches = details.match(/\((.*?)\)=\((.*?)\)/);
-      const fields = matches ? matches[1].split(', ') : [];
-      const values = matches ? matches[2].split(', ') : [];
+      
+      if (!matches) {
+        throw new Error('Unable to parse error details');
+      }
+      
+      const fields = matches[1].split(', ');
+      const values = matches[2].split(', ');
       
       const duplicateInfo = fields.map((field, index) => 
         `${field.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}: ${values[index]}`
@@ -131,10 +138,11 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         description: `A product with these details already exists:\n${duplicateInfo}\n\nPlease modify one of these fields.`,
         variant: "destructive",
       });
-    } catch {
+    } catch (parseError) {
+      console.error('Error parsing duplicate error:', parseError);
       toast({
         title: "Duplicate Product",
-        description: "A product with this name, code, and SDS combination already exists. Please modify one of these fields.",
+        description: "A product with the same name, code, and SDS combination already exists. Please modify at least one of these fields.",
         variant: "destructive",
       });
     }
