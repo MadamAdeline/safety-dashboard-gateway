@@ -28,7 +28,6 @@ export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, on
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Searching...");
-    // Sample data for demonstration
     setSearchResults([
       {
         id: "1234-5678-9012-3456",
@@ -114,6 +113,7 @@ export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, on
     try {
       // Insert selected SDS records into the database
       for (const sds of selectedSDS) {
+        console.log("Inserting SDS with source:", sds.source);
         const { error } = await supabase
           .from('sds')
           .insert({
