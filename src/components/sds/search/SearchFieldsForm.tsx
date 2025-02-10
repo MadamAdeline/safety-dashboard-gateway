@@ -8,6 +8,7 @@ interface SearchFields {
   productCode: string;
   supplier: string;
   unNumber: string;
+  source: string;  // Added source field
 }
 
 interface SearchFieldsFormProps {
@@ -29,7 +30,7 @@ export function SearchFieldsForm({ searchFields, onSearchFieldsChange, onSubmit 
               ...searchFields,
               productName: e.target.value
             })}
-            placeholder="Search SDS Library..."
+            placeholder="Search by product name..."
           />
         </div>
         
@@ -42,7 +43,7 @@ export function SearchFieldsForm({ searchFields, onSearchFieldsChange, onSubmit 
               ...searchFields,
               productCode: e.target.value
             })}
-            placeholder="Search SDS Library..."
+            placeholder="Search by product code..."
           />
         </div>
         
@@ -55,7 +56,20 @@ export function SearchFieldsForm({ searchFields, onSearchFieldsChange, onSubmit 
               ...searchFields,
               supplier: e.target.value
             })}
-            placeholder="Search SDS Library..."
+            placeholder="Search by supplier..."
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="source">Source</Label>
+          <Input
+            id="source"
+            value={searchFields.source}
+            onChange={(e) => onSearchFieldsChange({
+              ...searchFields,
+              source: e.target.value
+            })}
+            placeholder="Search by source..."
           />
         </div>
         
@@ -68,7 +82,7 @@ export function SearchFieldsForm({ searchFields, onSearchFieldsChange, onSubmit 
               ...searchFields,
               unNumber: e.target.value
             })}
-            placeholder="Search SDS Library..."
+            placeholder="Search by UN number..."
           />
         </div>
       </div>

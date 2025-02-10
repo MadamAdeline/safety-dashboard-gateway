@@ -10,6 +10,7 @@ interface SearchFields {
   productCode: string;
   supplier: string;
   unNumber: string;
+  source: string;  // Added source field
 }
 
 export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, onOpenChange: (open: boolean) => void) {
@@ -19,89 +20,78 @@ export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, on
     productCode: "",
     supplier: "",
     unNumber: "",
+    source: ""  // Added source field initialization
   });
   const [searchResults, setSearchResults] = useState<SDS[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Searching...");
-    setSearchResults([
-      {
-        id: "1234-5678-9012-3456",
-        productName: "Sample Product 1",
-        productId: "SP001",
-        supplier: "Supplier A",
-        supplierId: "c3a03764-6c11-4858-9fbe-93332fbdbc1c",
-        expiryDate: "2025-12-31",
-        isDG: true,
-        issueDate: "2023-01-01",
+    console.log("Searching with fields:", searchFields);
+    
+    try {
+      const { data, error } = await supabase
+        .from('sds')
+        .select(`
+          *,
+          suppliers!inner(supplier_name)
+        `)
+        .or(`
+          product_name.ilike.%${searchFields.productName}%,
+          product_id.ilike.%${searchFields.productCode}%,
+          source.ilike.%${searchFields.source}%
+        `);
+
+      if (error) throw error;
+
+      const formattedResults: SDS[] = data.map(item => ({
+        id: item.id,
+        productName: item.product_name,
+        productId: item.product_id,
+        supplier: item.suppliers?.supplier_name || "",
+        supplierId: item.supplier_id,
+        expiryDate: item.expiry_date,
+        isDG: item.is_dg,
+        issueDate: item.issue_date,
         status: "ACTIVE",
-        sdsSource: "Global Library",
-        source: "Global Library",
-        currentFilePath: null,
-        currentFileName: null,
-        currentFileSize: null,
-        currentContentType: null,
-        dgClassId: null,
+        sdsSource: item.source,
+        source: item.source,
+        currentFilePath: item.current_file_path,
+        currentFileName: item.current_file_name,
+        currentFileSize: item.current_file_size,
+        currentContentType: item.current_content_type,
+        dgClassId: item.dg_class_id,
         dgClass: null,
-        subsidiaryDgClassId: null,
+        subsidiaryDgClassId: item.subsidiary_dg_class_id,
         subsidiaryDgClass: null,
-        packingGroupId: null,
+        packingGroupId: item.packing_group_id,
         packingGroup: null,
-        dgSubDivisionId: null,
+        dgSubDivisionId: item.dg_subdivision_id,
         dgSubDivision: null,
-        unNumber: null,
-        unProperShippingName: null,
-        hazchemCode: null,
-        otherNames: null,
-        emergencyPhone: null,
-        revisionDate: null,
-        requestSupplierName: null,
-        requestSupplierDetails: null,
-        requestInformation: null,
-        requestDate: null,
-        requestedBy: null
-      },
-      {
-        id: "2345-6789-0123-4567",
-        productName: "BP Butane",
-        productId: "0000002705",
-        supplier: "BP Australia Pty Ltd",
-        supplierId: "c3a03764-6c11-4858-9fbe-93332fbdbc1c",
-        expiryDate: "2026-04-21",
-        isDG: true,
-        issueDate: "2021-04-21",
-        status: "ACTIVE",
-        sdsSource: "External",
-        source: "External",
-        currentFilePath: null,
-        currentFileName: null,
-        currentFileSize: null,
-        currentContentType: null,
-        dgClassId: null,
-        dgClass: null,
-        subsidiaryDgClassId: null,
-        subsidiaryDgClass: null,
-        packingGroupId: null,
-        packingGroup: null,
-        dgSubDivisionId: null,
-        dgSubDivision: null,
-        unNumber: null,
-        unProperShippingName: null,
-        hazchemCode: null,
-        otherNames: null,
-        emergencyPhone: null,
-        revisionDate: null,
-        requestSupplierName: null,
-        requestSupplierDetails: null,
-        requestInformation: null,
-        requestDate: null,
-        requestedBy: null
-      }
-    ]);
+        unNumber: item.un_number,
+        unProperShippingName: item.un_proper_shipping_name,
+        hazchemCode: item.hazchem_code,
+        otherNames: item.other_names,
+        emergencyPhone: item.emergency_phone,
+        revisionDate: item.revision_date,
+        requestSupplierName: item.request_supplier_name,
+        requestSupplierDetails: item.request_supplier_details,
+        requestInformation: item.request_information,
+        requestDate: item.request_date,
+        requestedBy: item.requested_by
+      }));
+
+      setSearchResults(formattedResults);
+    } catch (error) {
+      console.error('Error searching SDS:', error);
+      toast({
+        title: "Error",
+        description: "Failed to search SDS. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleAddToLibrary = async () => {
@@ -111,7 +101,6 @@ export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, on
     );
     
     try {
-      // Insert selected SDS records into the database
       for (const sds of selectedSDS) {
         console.log("Inserting SDS with source:", sds.source);
         const { error } = await supabase
@@ -123,7 +112,7 @@ export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, on
             is_dg: sds.isDG,
             issue_date: sds.issueDate,
             expiry_date: sds.expiryDate,
-            status_id: 3, // Active status
+            status_id: 3,
             source: sds.source,
             dg_class_id: sds.dgClassId,
             subsidiary_dg_class_id: sds.subsidiaryDgClassId,
