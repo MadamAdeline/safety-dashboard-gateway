@@ -21,7 +21,9 @@ export default function SDSLibrary() {
   const location = useLocation();
   const showExpiredFilter = location.search === "?filter=expired";
   const { data: userRole, isLoading: isLoadingRole } = useUserRole();
+  console.log('Current user role:', userRole); // Debug log
   const isAdmin = userRole === 'administrator';
+  console.log('Is admin:', isAdmin); // Debug log
 
   const [filters, setFilters] = useState<SDSFiltersType>({
     search: "",
@@ -146,6 +148,10 @@ export default function SDSLibrary() {
     }
   };
 
+  if (isLoadingRole) {
+    return <div>Loading...</div>;
+  }
+
   if (showNewSDS) {
     return (
       <NewSDSForm 
@@ -200,7 +206,7 @@ export default function SDSLibrary() {
                 </Button>
                 <Button 
                   onClick={() => setShowNewSDS(true)}
-                  className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+                  className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 text-white"
                 >
                   <Plus className="mr-2 h-4 w-4" /> New SDS
                 </Button>
