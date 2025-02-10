@@ -20,17 +20,56 @@ import { Button } from "@/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
 import type { Product, ProductFilters } from "@/types/product";
 import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductListProps {
   data: Product[];
   filters: ProductFilters;
   onEdit: (product: Product) => void;
+  onDelete?: (product: Product) => void;
 }
 
 export function ProductList({ data, filters, onEdit }: ProductListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 10;
+  const { toast } = useToast();
+
+  const handleDelete = async (product: Product) => {
+    if (!product.id) return;
+
+    try {
+      setIsDeleting(true);
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', product.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Product deleted successfully",
+      });
+
+      // Remove the deleted item from selectedItems
+      setSelectedItems(prev => prev.filter(id => id !== product.id));
+
+      // Refresh the page to update the list
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete product. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const filteredData = data.filter((item) => {
     // Search across all text fields
@@ -175,7 +214,9 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="hover:bg-dgxprt-hover text-dgxprt-navy"
+                      className="hover:bg-red-100 text-red-600"
+                      onClick={() => handleDelete(item)}
+                      disabled={isDeleting}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

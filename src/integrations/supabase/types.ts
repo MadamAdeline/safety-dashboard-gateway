@@ -206,6 +206,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_product_sds"
+            columns: ["sds_id"]
+            isOneToOne: false
+            referencedRelation: "sds"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "products_approval_status_id_fkey"
             columns: ["approval_status_id"]
             isOneToOne: false
