@@ -56,7 +56,7 @@ export default function Products() {
           product_status_id,
           approval_status_id,
           sds_id,
-          sds!sds_id (
+          sds:products_sds_id_fkey (
             id,
             is_dg,
             dg_class:master_data!sds_dg_class_id_fkey (
