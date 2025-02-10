@@ -117,25 +117,25 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
   const handleDuplicateError = (error: any) => {
     try {
-      // Check if error.message is already a parsed object
-      const errorBody = typeof error.message === 'object' ? error.message : JSON.parse(error.message);
-      const details = errorBody?.details || '';
-      const matches = details.match(/\((.*?)\)=\((.*?)\)/);
+      // Extract error details from the response
+      const errorDetails = typeof error.message === 'object' ? error.message : JSON.parse(error.message);
+      const constraintMatch = errorDetails.details.match(/\((.*?)\)=\((.*?)\)/);
       
-      if (!matches) {
+      if (!constraintMatch) {
         throw new Error('Unable to parse error details');
       }
       
-      const fields = matches[1].split(', ');
-      const values = matches[2].split(', ');
-      
-      const duplicateInfo = fields.map((field, index) => 
-        `${field.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}: ${values[index]}`
-      ).join('\n');
+      const [fields, values] = [constraintMatch[1].split(', '), constraintMatch[2].split(', ')];
+      const conflictingFields = fields.map((field: string, i: number) => {
+        const fieldName = field.split('_')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+        return `${fieldName}: ${values[i]}`;
+      });
 
       toast({
         title: "Duplicate Product",
-        description: `A product with these details already exists:\n${duplicateInfo}\n\nPlease modify one of these fields.`,
+        description: `Cannot save product. The following combination already exists:\n${conflictingFields.join('\n')}\n\nPlease modify at least one of these fields.`,
         variant: "destructive",
       });
     } catch (parseError) {
@@ -146,6 +146,27 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         variant: "destructive",
       });
     }
+  };
+
+  const validateProduct = async (productData: any) => {
+    const { data, error } = await supabase
+      .from('products')
+      .select('id')
+      .eq('product_name', productData.product_name)
+      .eq('product_code', productData.product_code)
+      .eq('sds_id', productData.sds_id)
+      .maybeSingle();
+
+    if (data && (!initialData?.id || data.id !== initialData.id)) {
+      toast({
+        title: "Validation Error",
+        description: "A product with this name, code, and SDS combination already exists.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    return true;
   };
 
   const handleSave = async () => {
@@ -167,6 +188,10 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         product_status_id: formData.productStatusId,
         sds_id: formData.sdsId
       };
+
+      // Validate before saving
+      const isValid = await validateProduct(productData);
+      if (!isValid) return;
 
       if (initialData?.id && !formData.isDuplicating) {
         const { error } = await supabase
