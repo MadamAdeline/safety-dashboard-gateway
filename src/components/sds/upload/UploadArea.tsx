@@ -1,3 +1,4 @@
+
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -8,6 +9,11 @@ interface UploadAreaProps {
 }
 
 export function UploadArea({ onDragOver, onDrop, onFileChange }: UploadAreaProps) {
+  const handleButtonClick = () => {
+    // Programmatically click the hidden file input
+    document.getElementById('sdsUpload')?.click();
+  };
+
   return (
     <div 
       className="border-2 border-dashed border-gray-300 rounded-lg p-8"
@@ -29,11 +35,13 @@ export function UploadArea({ onDragOver, onDrop, onFileChange }: UploadAreaProps
           accept=".pdf"
           onChange={onFileChange}
         />
-        <label htmlFor="sdsUpload">
-          <Button variant="secondary" className="cursor-pointer">
-            Choose file
-          </Button>
-        </label>
+        <Button 
+          variant="secondary" 
+          className="cursor-pointer"
+          onClick={handleButtonClick}
+        >
+          Choose file
+        </Button>
       </div>
     </div>
   );
