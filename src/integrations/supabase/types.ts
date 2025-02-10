@@ -348,20 +348,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_status"
-            columns: ["status_id"]
-            isOneToOne: false
-            referencedRelation: "status_lookup"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_supplier"
-            columns: ["supplier_id"]
-            isOneToOne: false
-            referencedRelation: "suppliers"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "sds_dg_class_id_fkey"
             columns: ["dg_class_id"]
             isOneToOne: false
@@ -443,13 +429,6 @@ export type Database = {
           version_number?: number
         }
         Relationships: [
-          {
-            foreignKeyName: "fk_sds"
-            columns: ["sds_id"]
-            isOneToOne: false
-            referencedRelation: "sds"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "sds_versions_sds_id_fkey"
             columns: ["sds_id"]
