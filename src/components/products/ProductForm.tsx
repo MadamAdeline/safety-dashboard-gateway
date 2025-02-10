@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
@@ -42,7 +43,9 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         const { data, error } = await supabase
           .from('status_lookup')
           .select('id, status_name, category')
-          .in('category', ['PRODUCT_APPROVAL', 'PRODUCT_STATUS']);
+          .in('category', ['PRODUCT_APPROVAL', 'PRODUCT_STATUS'])
+          .order('category', { ascending: true })
+          .order('status_name', { ascending: true });
 
         if (error) {
           console.error('Error fetching status options:', error);
