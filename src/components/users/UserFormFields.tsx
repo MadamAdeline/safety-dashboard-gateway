@@ -178,16 +178,8 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
           selectedLocationId={formData.location_id}
           initialLocation={currentLocation}
           onLocationSelect={handleLocationSelect}
+          className="w-full"
         />
-        {currentLocation?.full_path && (
-          <div className="mt-1">
-            <Input
-              value={currentLocation.full_path}
-              readOnly
-              className="bg-gray-50 text-sm text-gray-600 break-words"
-            />
-          </div>
-        )}
       </div>
 
       <div className="space-y-2">
