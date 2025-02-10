@@ -9,6 +9,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { exportUsersToExcel } from "@/utils/userExport";
 import type { User } from "@/types/user";
+import { Button } from "@/components/ui/button";
+import { Plus, Download, RefreshCw } from "lucide-react";
 
 export default function Users() {
   const [showNewUserForm, setShowNewUserForm] = useState(false);
