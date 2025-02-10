@@ -35,15 +35,14 @@ export function useProducts() {
             approval_status_id,
             product_status_id,
             sds_id,
-            sds!products_sds_id_fkey (
+            sds:products_sds_id_fkey (
               id,
               is_dg,
               dg_class:master_data!sds_dg_class_id_fkey (
                 id,
                 label
               ),
-              supplier_id,
-              supplier!sds_supplier_id_fkey (
+              supplier:suppliers (
                 id,
                 supplier_name
               ),
@@ -112,3 +111,4 @@ export function useProducts() {
     }
   });
 }
+
