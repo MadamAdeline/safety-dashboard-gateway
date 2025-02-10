@@ -35,6 +35,7 @@ export function SearchResultsTable({
             <TableHead>Product Name</TableHead>
             <TableHead>Product Code</TableHead>
             <TableHead>Supplier</TableHead>
+            <TableHead>Source</TableHead>
             <TableHead>Expiry Date</TableHead>
             <TableHead>View</TableHead>
           </TableRow>
@@ -51,6 +52,7 @@ export function SearchResultsTable({
               <TableCell>{sds.productName}</TableCell>
               <TableCell>{sds.productId}</TableCell>
               <TableCell>{sds.supplier}</TableCell>
+              <TableCell>{sds.source}</TableCell>
               <TableCell>{sds.expiryDate}</TableCell>
               <TableCell>
                 <Button variant="link">View SDS</Button>
@@ -77,3 +79,4 @@ export function SearchResultsTable({
     </div>
   );
 }
+
