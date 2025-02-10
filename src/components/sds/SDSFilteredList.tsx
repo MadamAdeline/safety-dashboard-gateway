@@ -6,6 +6,7 @@ interface SDSFilteredListProps {
   sdsData: SDS[];
   filters: SDSFilters;
   searchTerm: string;
+  onView: (sds: SDS) => void;
   onEdit: (sds: SDS) => void;
   allowDelete: boolean;
 }
@@ -14,6 +15,7 @@ export function SDSFilteredList({
   sdsData,
   filters,
   searchTerm,
+  onView,
   onEdit,
   allowDelete
 }: SDSFilteredListProps) {
@@ -46,6 +48,7 @@ export function SDSFilteredList({
     <SDSList 
       data={filteredData}
       filters={filters}
+      onView={onView}
       onEdit={onEdit}
       allowDelete={allowDelete}
     />

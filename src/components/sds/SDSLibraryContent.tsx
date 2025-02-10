@@ -159,6 +159,10 @@ export function SDSLibraryContent() {
         sdsData={sdsData}
         filters={filters}
         searchTerm={searchTerm}
+        onView={(sds: SDS) => {
+          setSelectedSDS(sds);
+          setViewMode('view');
+        }}
         onEdit={(sds: SDS) => {
           setSelectedSDS(sds);
           setViewMode('edit');
