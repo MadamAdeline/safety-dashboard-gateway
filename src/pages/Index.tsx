@@ -88,6 +88,7 @@ const Index = () => {
         .select(`
           location_id,
           locations (
+            id,
             full_path
           )
         `)
