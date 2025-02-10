@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Dialog,
@@ -92,7 +93,8 @@ export function SDSRequestDialog({ open, onOpenChange, onRequestComplete }: SDSR
           request_date: format(new Date(), 'yyyy-MM-dd'),
           requested_by: "d.c.adeline@gmail.com",
           status_id: statusData.id,
-          supplier_id: supplierId
+          supplier_id: supplierId,
+          source: "Global Library"  // Added this line to set the source
         })
         .select()
         .single();
