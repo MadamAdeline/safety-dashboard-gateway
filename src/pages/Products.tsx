@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProductList } from "@/components/products/ProductList";
@@ -55,18 +56,18 @@ export default function Products() {
           product_status_id,
           approval_status_id,
           sds_id,
-          sds (
+          sds!sds_id (
             id,
             is_dg,
-            dg_class_id:master_data!sds_dg_class_id_fkey (
+            dg_class:master_data!sds_dg_class_id_fkey (
               id,
               label
             ),
-            suppliers!sds_supplier_id_fkey (
+            supplier:suppliers!sds_supplier_id_fkey (
               id,
               supplier_name
             ),
-            packing_group_id:master_data!sds_packing_group_id_fkey (
+            packingGroup:master_data!sds_packing_group_id_fkey (
               id,
               label
             )
@@ -100,17 +101,17 @@ export default function Products() {
         sds: item.sds ? {
           id: item.sds.id,
           isDG: item.sds.is_dg,
-          dgClass: item.sds.dg_class_id ? {
-            id: item.sds.dg_class_id.id,
-            label: item.sds.dg_class_id.label
+          dgClass: item.sds.dg_class ? {
+            id: item.sds.dg_class.id,
+            label: item.sds.dg_class.label
           } : undefined,
-          supplier: item.sds.suppliers ? {
-            id: item.sds.suppliers.id,
-            supplier_name: item.sds.suppliers.supplier_name
+          supplier: item.sds.supplier ? {
+            id: item.sds.supplier.id,
+            supplier_name: item.sds.supplier.supplier_name
           } : undefined,
-          packingGroup: item.sds.packing_group_id ? {
-            id: item.sds.packing_group_id.id,
-            label: item.sds.packing_group_id.label
+          packingGroup: item.sds.packingGroup ? {
+            id: item.sds.packingGroup.id,
+            label: item.sds.packingGroup.label
           } : undefined
         } : undefined
       })) as Product[];
