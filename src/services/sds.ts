@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import type { SDS } from "@/types/sds";
 
@@ -69,8 +70,8 @@ export async function createSDS(data: {
     .insert(formattedData)
     .select(`
       *,
-      suppliers!fk_supplier (supplier_name),
-      status:status_lookup!fk_status (status_name),
+      suppliers (supplier_name),
+      status:status_lookup!inner (status_name),
       dg_class:master_data!sds_dg_class_id_fkey (label),
       subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
       packing_group:master_data!sds_packing_group_id_fkey (label),
@@ -87,7 +88,7 @@ export async function createSDS(data: {
   return {
     ...result,
     supplier: result.suppliers?.supplier_name,
-    status: result.status?.status_name,
+    status: result.status.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
     dgClass: result.dg_class ? { id: result.dg_class_id, label: result.dg_class.label } : null,
     subsidiaryDgClass: result.subsidiary_dg_class ? { id: result.subsidiary_dg_class_id, label: result.subsidiary_dg_class.label } : null,
     packingGroup: result.packing_group ? { id: result.packing_group_id, label: result.packing_group.label } : null,
@@ -169,8 +170,8 @@ export async function updateSDS(id: string, data: {
     .eq('id', id)
     .select(`
       *,
-      suppliers!fk_supplier (supplier_name),
-      status:status_lookup!fk_status (status_name),
+      suppliers (supplier_name),
+      status:status_lookup!inner (status_name),
       dg_class:master_data!sds_dg_class_id_fkey (label),
       subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
       packing_group:master_data!sds_packing_group_id_fkey (label),
@@ -187,7 +188,7 @@ export async function updateSDS(id: string, data: {
   return {
     ...result,
     supplier: result.suppliers?.supplier_name,
-    status: result.status?.status_name,
+    status: result.status.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
     dgClass: result.dg_class ? { id: result.dg_class_id, label: result.dg_class.label } : null,
     subsidiaryDgClass: result.subsidiary_dg_class ? { id: result.subsidiary_dg_class_id, label: result.subsidiary_dg_class.label } : null,
     packingGroup: result.packing_group ? { id: result.packing_group_id, label: result.packing_group.label } : null,

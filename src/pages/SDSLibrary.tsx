@@ -48,8 +48,8 @@ export default function SDSLibrary() {
         .from('sds')
         .select(`
           *,
-          suppliers!fk_supplier (supplier_name),
-          status:status_lookup!fk_status (status_name),
+          suppliers (supplier_name),
+          status:status_lookup!inner (status_name),
           dg_class:master_data!sds_dg_class_id_fkey (id, label),
           subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (id, label),
           packing_group:master_data!sds_packing_group_id_fkey (id, label),
@@ -80,7 +80,7 @@ export default function SDSLibrary() {
         packingGroup: item.packing_group,
         dgSubDivisionId: item.dg_subdivision_id,
         dgSubDivision: item.dg_subdivision,
-        status: item.status?.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
+        status: item.status.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
         sdsSource: item.source,
         source: item.source,
         currentFilePath: item.current_file_path,
