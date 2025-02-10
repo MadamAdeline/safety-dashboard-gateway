@@ -270,4 +270,3 @@ export function NewSDSForm({ onClose, initialData, readOnly = false }: NewSDSFor
     </DashboardLayout>
   );
 }
-
