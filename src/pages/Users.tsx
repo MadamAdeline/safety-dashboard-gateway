@@ -59,18 +59,40 @@ export default function Users() {
         />
       ) : (
         <div className="space-y-4">
-          <UserActions 
-            onNewUser={() => setShowNewUserForm(true)}
-            onExport={handleExport}
-            onRefresh={handleRefresh}
-            isExporting={isExporting}
-          />
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold">Users & Roles</h1>
+            <Button 
+              onClick={() => setShowNewUserForm(true)}
+              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
+            >
+              <Plus className="h-4 w-4" /> New User
+            </Button>
+          </div>
           
-          <div className="bg-white p-4 rounded-lg shadow">
+          <div className="bg-white p-4 rounded-lg shadow flex items-center justify-between">
             <UserSearch 
               value={searchTerm}
               onChange={setSearchTerm}
             />
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={handleExport}
+                className="gap-2"
+                disabled={isExporting}
+              >
+                <Download className="h-4 w-4" />
+                {isExporting ? "Exporting..." : "Export"}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleRefresh}
+                className="gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Refresh
+              </Button>
+            </div>
           </div>
           
           <UserList 
