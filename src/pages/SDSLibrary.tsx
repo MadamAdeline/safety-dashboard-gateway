@@ -23,7 +23,9 @@ export default function SDSLibrary() {
   const { data: userRole, isLoading: isLoadingRole } = useUserRole();
   console.log('Current user role:', userRole);
   const isAdmin = userRole?.toLowerCase() === 'administrator';
+  const isManager = userRole?.toLowerCase() === 'manager';
   console.log('Is admin:', isAdmin);
+  console.log('Is manager:', isManager);
 
   const [filters, setFilters] = useState<SDSFiltersType>({
     search: "",
@@ -157,23 +159,20 @@ export default function SDSLibrary() {
       <NewSDSForm 
         onClose={handleClose} 
         initialData={selectedSDS} 
-        readOnly={!isAdmin} 
+        readOnly={isManager} 
       />
     );
   }
 
-  // Filter the data based on all criteria including expiry date
   const filteredData = sdsData.filter((item) => {
     const today = new Date().toISOString().split('T')[0];
     
-    // Apply expiry date filter if coming from dashboard
     if (showExpiredFilter && item.expiryDate) {
       if (item.expiryDate > today) {
         return false;
       }
     }
 
-    // Apply search filter across all text fields
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       return (
