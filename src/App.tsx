@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { StrictMode } from "react";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
@@ -19,6 +19,8 @@ import Users from "./pages/Users";
 import SiteRegisters from "./pages/SiteRegisters";
 import RiskAssessments from "./pages/RiskAssessments";
 import WasteTracking from "./pages/WasteTracking";
+import { AccessDeniedDialog } from "./components/auth/AccessDeniedDialog";
+import { useRoutePermission } from "./hooks/use-route-permission";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,11 +32,23 @@ const queryClient = new QueryClient({
 });
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  // Check if user is logged in (you can modify this based on your auth state management)
-  const user = true; // For now, we'll assume the user is always logged in
+  const location = useLocation();
+  const userEmail = localStorage.getItem('userEmail');
+  const { isLoading, hasPermission } = useRoutePermission(location.pathname);
   
-  if (!user) {
+  // Check if user is logged in
+  if (!userEmail) {
     return <Navigate to="/" />;
+  }
+  
+  // Show loading state while checking permissions
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  
+  // Show access denied dialog if user doesn't have permission
+  if (!hasPermission) {
+    return <AccessDeniedDialog />;
   }
   
   return <>{children}</>;
