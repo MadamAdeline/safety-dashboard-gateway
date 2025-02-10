@@ -72,6 +72,32 @@ const Index = () => {
   console.log("Rendering Index page");
   const navigate = useNavigate();
 
+  const { data: userLocation, isLoading: isLoadingLocation } = useQuery({
+    queryKey: ['userLocation'],
+    queryFn: async () => {
+      const userEmail = localStorage.getItem('userEmail');
+      if (!userEmail) return null;
+
+      const { data, error } = await supabase
+        .from('users')
+        .select(`
+          location_id,
+          locations (
+            full_path
+          )
+        `)
+        .eq('email', userEmail)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user location:', error);
+        return null;
+      }
+
+      return data?.locations?.full_path || null;
+    }
+  });
+
   const { data: productsCount, isLoading: isLoadingProducts } = useQuery({
     queryKey: ['productsCount'],
     queryFn: async () => {
@@ -99,11 +125,11 @@ const Index = () => {
   const { data: expiredSDSCount, isLoading: isLoadingExpiredSDS } = useQuery({
     queryKey: ['expiredSDSCount'],
     queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0]; // Get only the date part in YYYY-MM-DD format
+      const today = new Date().toISOString().split('T')[0];
       const { count, error } = await supabase
         .from('sds')
         .select('*', { count: 'exact', head: true })
-        .lte('expiry_date', today); // Changed to less than or equal to (lte)
+        .lte('expiry_date', today);
       
       if (error) throw error;
       return count || 0;
@@ -112,7 +138,15 @@ const Index = () => {
   
   return (
     <DashboardLayout>
-      <h1 className="text-2xl font-bold text-dgxprt-navy mb-8">Dashboard Overview</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold text-dgxprt-navy">Dashboard Overview</h1>
+        {!isLoadingLocation && userLocation && (
+          <div className="text-right">
+            <p className="text-sm text-gray-600">Your location is set to:</p>
+            <p className="text-md font-medium text-dgxprt-navy">{userLocation}</p>
+          </div>
+        )}
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         <MetricCard
@@ -165,3 +199,4 @@ const Index = () => {
 };
 
 export default Index;
+
