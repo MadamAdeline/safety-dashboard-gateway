@@ -1,3 +1,4 @@
+
 import { createContext, useContext, Dispatch, SetStateAction } from 'react';
 import type { SDS } from '@/types/sds';
 
@@ -19,6 +20,7 @@ interface SDSFormContextType {
   dgSubDivisionId: string;
   setDgSubDivisionId: Dispatch<SetStateAction<string>>;
   initialData?: SDS | null;
+  readOnly?: boolean;
 }
 
 export const SDSFormContext = createContext<SDSFormContextType | undefined>(undefined);

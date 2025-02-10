@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -15,9 +14,10 @@ interface SDSListProps {
   data: SDS[];
   filters: SDSFilters;
   onEdit: (sds: SDS) => void;
+  allowDelete?: boolean;
 }
 
-export function SDSList({ data, filters, onEdit }: SDSListProps) {
+export function SDSList({ data, filters, onEdit, allowDelete }: SDSListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;

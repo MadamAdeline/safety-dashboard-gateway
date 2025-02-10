@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import type { SDS } from "@/types/sds";
@@ -8,9 +9,10 @@ interface SDSPreviewProps {
   onUploadClick: () => void;
   initialData?: SDS | null;
   selectedFile: File | null;
+  readOnly?: boolean;
 }
 
-export function SDSPreview({ onUploadClick, initialData, selectedFile }: SDSPreviewProps) {
+export function SDSPreview({ onUploadClick, initialData, selectedFile, readOnly }: SDSPreviewProps) {
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
@@ -34,7 +36,7 @@ export function SDSPreview({ onUploadClick, initialData, selectedFile }: SDSPrev
 
   return (
     <div className="space-y-4">
-      {!isGlobalLibrary && (
+      {!isGlobalLibrary && !readOnly && (
         <div className="flex justify-end">
           <Button 
             variant="outline" 
