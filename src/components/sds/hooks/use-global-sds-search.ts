@@ -119,12 +119,12 @@ export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, on
           .insert({
             product_name: sds.productName,
             product_id: sds.productId,
-            supplier_id: 'c3a03764-6c11-4858-9fbe-93332fbdbc1c',
+            supplier_id: sds.supplierId,
             is_dg: sds.isDG,
             issue_date: sds.issueDate,
             expiry_date: sds.expiryDate,
             status_id: 3, // Active status
-            source: sds.source || 'Global Library',
+            source: sds.source,
             dg_class_id: sds.dgClassId,
             subsidiary_dg_class_id: sds.subsidiaryDgClassId,
             packing_group_id: sds.packingGroupId,
