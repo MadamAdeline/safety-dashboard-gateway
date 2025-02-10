@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { SDSList } from "@/components/sds/SDSList";
@@ -15,10 +14,14 @@ import { SDSRequestDialog } from "@/components/sds/SDSRequestDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocation } from "react-router-dom";
+import { useUserRole } from "@/hooks/use-user-role";
+import { AccessDeniedDialog } from "@/components/auth/AccessDeniedDialog";
 
 export default function SDSLibrary() {
   const location = useLocation();
   const showExpiredFilter = location.search === "?filter=expired";
+  const { data: userRole, isLoading: isLoadingRole } = useUserRole();
+  const isAdmin = userRole === 'administrator';
 
   const [filters, setFilters] = useState<SDSFiltersType>({
     search: "",
@@ -133,20 +136,24 @@ export default function SDSLibrary() {
     console.log("Handling SDS selection:", sdsInput);
     
     if (Array.isArray(sdsInput)) {
-      // Handle array case (from GlobalSDSSearchDialog)
       toast({
         title: "Success",
         description: `${sdsInput.length} SDS(s) have been added to your library.`,
       });
     } else {
-      // Handle single SDS case
       setSelectedSDS(sdsInput);
       setSearchTerm(sdsInput.productName);
     }
   };
 
   if (showNewSDS) {
-    return <NewSDSForm onClose={handleClose} initialData={selectedSDS} />;
+    return (
+      <NewSDSForm 
+        onClose={handleClose} 
+        initialData={selectedSDS} 
+        readOnly={!isAdmin} 
+      />
+    );
   }
 
   // Filter the data based on all criteria including expiry date
@@ -182,20 +189,22 @@ export default function SDSLibrary() {
       <div className="space-y-4 max-w-full">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">SDS Library</h1>
-          <div className="flex gap-2">
-            <Button 
-              onClick={() => setShowGlobalSearch(true)}
-              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 text-white"
-            >
-              <Plus className="mr-2 h-4 w-4" /> SDS From Global Library
-            </Button>
-            <Button 
-              onClick={() => setShowNewSDS(true)}
-              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-            >
-              <Plus className="mr-2 h-4 w-4" /> New SDS
-            </Button>
-          </div>
+          {isAdmin && (
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => setShowGlobalSearch(true)}
+                className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 text-white"
+              >
+                <Plus className="mr-2 h-4 w-4" /> SDS From Global Library
+              </Button>
+              <Button 
+                onClick={() => setShowNewSDS(true)}
+                className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+              >
+                <Plus className="mr-2 h-4 w-4" /> New SDS
+              </Button>
+            </div>
+          )}
         </div>
         
         <div className="flex flex-col space-y-4">
@@ -215,6 +224,7 @@ export default function SDSLibrary() {
               onExport={handleExport}
               onRefresh={handleRefresh}
               data={filteredData}
+              allowDelete={isAdmin}
             />
           </div>
           
@@ -227,6 +237,7 @@ export default function SDSLibrary() {
           data={filteredData} 
           filters={filters} 
           onEdit={handleEdit}
+          allowDelete={isAdmin}
         />
 
         <GlobalSDSSearchDialog 

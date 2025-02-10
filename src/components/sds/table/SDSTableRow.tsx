@@ -12,9 +12,10 @@ interface SDSTableRowProps {
   item: SDS;
   onEdit: (sds: SDS) => void;
   onDelete?: (sds: SDS) => void;
+  allowDelete?: boolean;
 }
 
-export function SDSTableRow({ item, onEdit, onDelete }: SDSTableRowProps) {
+export function SDSTableRow({ item, onEdit, onDelete, allowDelete = true }: SDSTableRowProps) {
   const { selectedItems, toggleSelectItem } = useSDSSelection();
   const { handleDelete } = useSDSDelete(onDelete);
 
@@ -76,14 +77,16 @@ export function SDSTableRow({ item, onEdit, onDelete }: SDSTableRowProps) {
           >
             <Edit2 className="h-4 w-4" />
           </Button>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hover:bg-red-100 text-red-600"
-            onClick={() => handleDelete(item)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {allowDelete && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="hover:bg-red-100 text-red-600"
+              onClick={() => handleDelete(item)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </TableCell>
     </TableRow>

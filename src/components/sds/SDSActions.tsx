@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Filter, Download, RefreshCw } from "lucide-react";
 import * as XLSX from 'xlsx';
@@ -8,9 +9,10 @@ interface SDSActionsProps {
   onExport: () => void;
   onRefresh: () => void;
   data: SDS[];
+  allowDelete?: boolean;
 }
 
-export function SDSActions({ onToggleFilters, onExport, onRefresh, data }: SDSActionsProps) {
+export function SDSActions({ onToggleFilters, onExport, onRefresh, data, allowDelete = true }: SDSActionsProps) {
   const handleExport = () => {
     const exportData = data.map(item => ({
       'Product Name': item.productName,

@@ -15,6 +15,7 @@ import { format, addYears } from "date-fns";
 interface NewSDSFormProps {
   onClose: () => void;
   initialData?: SDS | null;
+  readOnly?: boolean;
 }
 
 interface FormData {
@@ -35,7 +36,7 @@ interface FormData {
   requestedBy: string;
 }
 
-export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
+export function NewSDSForm({ onClose, initialData, readOnly = false }: NewSDSFormProps) {
   console.log("NewSDSForm - Initial Data:", initialData);
 
   const [isDG, setIsDG] = useState(initialData?.isDG ?? false);
@@ -198,7 +199,8 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         <SDSFormHeader 
           title={initialData ? "Edit Safety Data Sheet" : "New Safety Data Sheet"}
           onClose={onClose}
-          onSave={handleSave}
+          onSave={!readOnly ? handleSave : undefined}
+          readOnly={readOnly}
         />
 
         <div className="grid grid-cols-2 gap-6">
@@ -228,6 +230,7 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
                   setPackingGroupId={setPackingGroupId}
                   dgSubDivisionId={dgSubDivisionId}
                   setDgSubDivisionId={setDgSubDivisionId}
+                  readOnly={readOnly}
                 />
               </TabsContent>
 
@@ -238,9 +241,10 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
           </div>
 
           <SDSPreview 
-            onUploadClick={() => setShowUploadDialog(true)} 
+            onUploadClick={() => !readOnly && setShowUploadDialog(true)} 
             initialData={initialData}
             selectedFile={selectedFile}
+            readOnly={readOnly}
           />
         </div>
       </div>

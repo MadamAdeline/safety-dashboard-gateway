@@ -28,6 +28,7 @@ interface SDSDetailsTabProps {
   setPackingGroupId: (value: string) => void;
   dgSubDivisionId: string;
   setDgSubDivisionId: (value: string) => void;
+  readOnly?: boolean;
 }
 
 export function SDSDetailsTab(props: SDSDetailsTabProps) {
@@ -37,7 +38,7 @@ export function SDSDetailsTab(props: SDSDetailsTabProps) {
   const source = props.initialData?.sdsSource || "Customer";
 
   return (
-    <SDSFormContext.Provider value={props}>
+    <SDSFormContext.Provider value={{ ...props, readOnly: props.readOnly }}>
       <div className="space-y-4">
         {isRequested && (
           <div className="p-4 bg-yellow-50 text-yellow-700 rounded-md mb-4">
@@ -55,9 +56,9 @@ export function SDSDetailsTab(props: SDSDetailsTabProps) {
             <Select 
               value={props.status} 
               onValueChange={(value: "ACTIVE" | "INACTIVE" | "REQUESTED") => props.setStatus(value)}
-              disabled={isRequested}
+              disabled={isRequested || props.readOnly}
             >
-              <SelectTrigger id="status" className={isRequested ? "bg-gray-100" : ""}>
+              <SelectTrigger id="status" className={isRequested || props.readOnly ? "bg-gray-100" : ""}>
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
