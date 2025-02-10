@@ -19,7 +19,6 @@ import Users from "./pages/Users";
 import SiteRegisters from "./pages/SiteRegisters";
 import RiskAssessments from "./pages/RiskAssessments";
 import WasteTracking from "./pages/WasteTracking";
-import { ComingSoon } from "./components/ComingSoon";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -64,7 +63,6 @@ const App = () => (
             <Route path="/site-registers" element={<PrivateRoute><SiteRegisters /></PrivateRoute>} />
             <Route path="/risk-assessments" element={<PrivateRoute><RiskAssessments /></PrivateRoute>} />
             <Route path="/waste-tracking" element={<PrivateRoute><WasteTracking /></PrivateRoute>} />
-            <Route path="/logout" element={<PrivateRoute><ComingSoon feature="Logout" /></PrivateRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
