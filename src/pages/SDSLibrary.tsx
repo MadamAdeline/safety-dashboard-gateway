@@ -189,22 +189,24 @@ export default function SDSLibrary() {
       <div className="space-y-4 max-w-full">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">SDS Library</h1>
-          {isAdmin && (
-            <div className="flex gap-2">
-              <Button 
-                onClick={() => setShowGlobalSearch(true)}
-                className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 text-white"
-              >
-                <Plus className="mr-2 h-4 w-4" /> SDS From Global Library
-              </Button>
-              <Button 
-                onClick={() => setShowNewSDS(true)}
-                className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-              >
-                <Plus className="mr-2 h-4 w-4" /> New SDS
-              </Button>
-            </div>
-          )}
+          <div className="flex gap-2">
+            {isAdmin && (
+              <>
+                <Button 
+                  onClick={() => setShowGlobalSearch(true)}
+                  className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 text-white"
+                >
+                  <Plus className="mr-2 h-4 w-4" /> SDS From Global Library
+                </Button>
+                <Button 
+                  onClick={() => setShowNewSDS(true)}
+                  className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+                >
+                  <Plus className="mr-2 h-4 w-4" /> New SDS
+                </Button>
+              </>
+            )}
+          </div>
         </div>
         
         <div className="flex flex-col space-y-4">
