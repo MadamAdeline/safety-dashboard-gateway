@@ -1,16 +1,10 @@
 
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LoginDialog } from "@/components/auth/LoginDialog";
 import { useState } from "react";
 
 export default function Landing() {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
-  const navigate = useNavigate();
-
-  const handleLoginSuccess = () => {
-    navigate("/");
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -48,7 +42,6 @@ export default function Landing() {
         <LoginDialog 
           open={showLoginDialog} 
           onOpenChange={setShowLoginDialog}
-          onLoginSuccess={handleLoginSuccess}
         />
       </div>
     </div>

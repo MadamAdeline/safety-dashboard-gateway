@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Lock, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface LoginDialogProps {
   open: boolean;
@@ -19,6 +20,7 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: LoginDialogP
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +52,7 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: LoginDialogP
         
         onLoginSuccess?.();
         onOpenChange(false);
+        navigate('/dashboard'); // Navigate to dashboard after successful login
       } else {
         toast({
           title: "Error",

@@ -35,7 +35,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const user = true; // For now, we'll assume the user is always logged in
   
   if (!user) {
-    return <Navigate to="/landing" />;
+    return <Navigate to="/" />;
   }
   
   return <>{children}</>;
@@ -49,8 +49,10 @@ const App = () => (
           <Toaster />
           <Sonner />
           <Routes>
-            <Route path="/landing" element={<Landing />} />
-            <Route path="/" element={<PrivateRoute><Index /></PrivateRoute>} />
+            {/* Landing page as the default route */}
+            <Route path="/" element={<Landing />} />
+            {/* Protected dashboard route */}
+            <Route path="/dashboard" element={<PrivateRoute><Index /></PrivateRoute>} />
             <Route path="/sds-library" element={<PrivateRoute><SDSLibrary /></PrivateRoute>} />
             <Route path="/sds-library/new" element={<PrivateRoute><NewSDSForm onClose={() => window.history.back()} /></PrivateRoute>} />
             <Route path="/compliance" element={<PrivateRoute><ComplianceDashboard /></PrivateRoute>} />
