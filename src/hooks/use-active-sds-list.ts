@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { SDS } from "@/types/sds";
@@ -12,9 +13,9 @@ export function useActiveSdsList() {
       const { data: statusData, error: statusError } = await supabase
         .from('status_lookup')
         .select('id')
-        .eq('category', 'SDS_Library')  // Fixed case to match database
+        .eq('category', 'SDS_Library')
         .eq('status_name', 'ACTIVE')
-        .maybeSingle();  // Changed from single() to maybeSingle()
+        .maybeSingle();
 
       if (statusError) {
         console.error('Error fetching active status:', statusError);
@@ -37,7 +38,7 @@ export function useActiveSdsList() {
           product_name,
           product_id,
           is_dg,
-          suppliers!fk_supplier (
+          suppliers!sds_supplier_id_fkey (
             id,
             supplier_name
           ),

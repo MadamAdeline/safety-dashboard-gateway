@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProductList } from "@/components/products/ProductList";
@@ -63,7 +62,7 @@ export default function Products() {
               id,
               label
             ),
-            suppliers!fk_supplier (
+            suppliers!sds_supplier_id_fkey (
               id,
               supplier_name
             ),

@@ -23,7 +23,7 @@ export function ProductSDSTab({ sdsId, onSDSSelect }: ProductSDSTabProps) {
         .from('sds')
         .select(`
           *,
-          suppliers!fk_supplier (supplier_name),
+          suppliers!sds_supplier_id_fkey (supplier_name),
           dg_class:master_data!sds_dg_class_id_fkey (id, label),
           subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (id, label),
           packing_group:master_data!sds_packing_group_id_fkey (id, label),
@@ -106,7 +106,7 @@ export function ProductSDSTab({ sdsId, onSDSSelect }: ProductSDSTabProps) {
       .from('sds')
       .select(`
         *,
-        suppliers!fk_supplier (supplier_name),
+        suppliers!sds_supplier_id_fkey (supplier_name),
         dg_class:master_data!sds_dg_class_id_fkey (id, label),
         subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (id, label),
         packing_group:master_data!sds_packing_group_id_fkey (id, label),
