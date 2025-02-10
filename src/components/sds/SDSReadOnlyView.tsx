@@ -40,6 +40,22 @@ export function SDSReadOnlyView({ initialData, onClose }: SDSReadOnlyViewProps) 
             <TabsContent value="product-details">
               <SDSDetailsTab 
                 initialData={initialData}
+                isDG={initialData.isDG}
+                setIsDG={() => {}}
+                status={initialData.status}
+                setStatus={() => {}}
+                supplier={initialData.supplier}
+                setSupplier={() => {}}
+                formData={initialData}
+                setFormData={() => {}}
+                dgClassId={initialData.dgClassId || ''}
+                setDgClassId={() => {}}
+                subsidiaryDgClassId={initialData.subsidiaryDgClassId || ''}
+                setSubsidiaryDgClassId={() => {}}
+                packingGroupId={initialData.packingGroupId || ''}
+                setPackingGroupId={() => {}}
+                dgSubDivisionId={initialData.dgSubDivisionId || ''}
+                setDgSubDivisionId={() => {}}
                 readOnly={true}
               />
             </TabsContent>
