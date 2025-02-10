@@ -1,8 +1,9 @@
+
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://xhdvjkgasmsaqmchfsjq.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZHZqa2dhc21zYXFtY2hmc2pxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg4MTI1MDcsImV4cCI6MjA1NDM4ODUwN30.hWnhkJLTGgAX4GarYQqlloSlAfpgwaI1LdajqTjsYAo";
+const SUPABASE_URL = "https://aejuqvqbcxqsxnlomkwx.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_ANON_KEY || '';
 
 console.log('=== Detailed Supabase Connection Debug ===');
 console.log('1. Initialization attempt with URL:', SUPABASE_URL);
