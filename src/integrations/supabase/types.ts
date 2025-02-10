@@ -348,13 +348,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_supplier"
-            columns: ["supplier_id"]
-            isOneToOne: false
-            referencedRelation: "suppliers"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "sds_dg_class_id_fkey"
             columns: ["dg_class_id"]
             isOneToOne: false
