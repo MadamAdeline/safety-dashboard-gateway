@@ -30,9 +30,10 @@ type UserWithRelations = Omit<User, 'manager'> & {
 
 interface UserListProps {
   onEdit: (user: UserWithRelations) => void;
+  searchTerm: string;
 }
 
-export function UserList({ onEdit }: UserListProps) {
+export function UserList({ onEdit, searchTerm }: UserListProps) {
   const { toast } = useToast();
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],
@@ -90,6 +91,16 @@ export function UserList({ onEdit }: UserListProps) {
     );
   }
 
+  const filteredUsers = users?.filter(user => {
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+    const email = user.email.toLowerCase();
+    
+    return fullName.includes(searchLower) || email.includes(searchLower);
+  });
+
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <Table>
@@ -104,7 +115,7 @@ export function UserList({ onEdit }: UserListProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users?.map((user) => (
+          {filteredUsers?.map((user) => (
             <TableRow 
               key={user.id}
               className="hover:bg-[#F1F0FB] transition-colors"
