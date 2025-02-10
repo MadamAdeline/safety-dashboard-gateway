@@ -168,6 +168,8 @@ export function SDSLibraryContent() {
           setViewMode('edit');
         }}
         allowDelete={isAdmin}
+        showViewButton={!isAdmin}
+        showEditButton={isAdmin}
       />
 
       <GlobalSDSSearchDialog 

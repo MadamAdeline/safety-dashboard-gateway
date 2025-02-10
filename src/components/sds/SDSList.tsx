@@ -17,9 +17,19 @@ interface SDSListProps {
   onView: (sds: SDS) => void;
   onEdit: (sds: SDS) => void;
   allowDelete?: boolean;
+  showViewButton: boolean;
+  showEditButton: boolean;
 }
 
-export function SDSList({ data, filters, onView, onEdit, allowDelete = false }: SDSListProps) {
+export function SDSList({ 
+  data, 
+  filters, 
+  onView, 
+  onEdit, 
+  allowDelete = false,
+  showViewButton,
+  showEditButton 
+}: SDSListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -74,6 +84,8 @@ export function SDSList({ data, filters, onView, onEdit, allowDelete = false }: 
                   onView={onView}
                   onDelete={handleDelete}
                   allowDelete={allowDelete}
+                  showViewButton={showViewButton}
+                  showEditButton={showEditButton}
                 />
               ))}
             </TableBody>

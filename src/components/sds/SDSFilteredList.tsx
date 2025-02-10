@@ -9,6 +9,8 @@ interface SDSFilteredListProps {
   onView: (sds: SDS) => void;
   onEdit: (sds: SDS) => void;
   allowDelete: boolean;
+  showViewButton: boolean;
+  showEditButton: boolean;
 }
 
 export function SDSFilteredList({
@@ -17,7 +19,9 @@ export function SDSFilteredList({
   searchTerm,
   onView,
   onEdit,
-  allowDelete
+  allowDelete,
+  showViewButton,
+  showEditButton
 }: SDSFilteredListProps) {
   const filteredData = sdsData.filter((item) => {
     const today = new Date().toISOString().split('T')[0];
@@ -51,6 +55,8 @@ export function SDSFilteredList({
       onView={onView}
       onEdit={onEdit}
       allowDelete={allowDelete}
+      showViewButton={showViewButton}
+      showEditButton={showEditButton}
     />
   );
 }

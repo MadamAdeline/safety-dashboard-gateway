@@ -14,9 +14,19 @@ interface SDSTableRowProps {
   onView: (sds: SDS) => void;
   onDelete?: (sds: SDS) => void;
   allowDelete?: boolean;
+  showViewButton: boolean;
+  showEditButton: boolean;
 }
 
-export function SDSTableRow({ item, onEdit, onView, onDelete, allowDelete = true }: SDSTableRowProps) {
+export function SDSTableRow({ 
+  item, 
+  onEdit, 
+  onView, 
+  onDelete, 
+  allowDelete = false,
+  showViewButton,
+  showEditButton
+}: SDSTableRowProps) {
   const { selectedItems, toggleSelectItem } = useSDSSelection();
   const { handleDelete } = useSDSDelete(onDelete);
 
@@ -70,22 +80,26 @@ export function SDSTableRow({ item, onEdit, onView, onDelete, allowDelete = true
       </TableCell>
       <TableCell>
         <div className="flex space-x-2">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hover:bg-dgxprt-hover text-dgxprt-navy"
-            onClick={() => onView(item)}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hover:bg-dgxprt-hover text-dgxprt-navy"
-            onClick={() => onEdit(item)}
-          >
-            <Edit2 className="h-4 w-4" />
-          </Button>
+          {showViewButton && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="hover:bg-dgxprt-hover text-dgxprt-navy"
+              onClick={() => onView(item)}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+          )}
+          {showEditButton && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="hover:bg-dgxprt-hover text-dgxprt-navy"
+              onClick={() => onEdit(item)}
+            >
+              <Edit2 className="h-4 w-4" />
+            </Button>
+          )}
           {allowDelete && (
             <Button 
               variant="ghost" 
