@@ -24,6 +24,7 @@ export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, on
   });
   const [searchResults, setSearchResults] = useState<SDS[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -105,6 +106,7 @@ export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, on
       }));
 
       setSearchResults(formattedResults);
+      setHasSearched(true);
     } catch (error) {
       console.error('Error searching SDS:', error);
       toast({
@@ -194,6 +196,7 @@ export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, on
     selectedItems,
     handleSearch,
     handleAddToLibrary,
-    toggleSelectItem
+    toggleSelectItem,
+    hasSearched
   };
 }

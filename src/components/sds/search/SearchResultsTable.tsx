@@ -27,9 +27,9 @@ export function SearchResultsTable({
   onAddToLibrary,
 }: SearchResultsTableProps) {
   return (
-    <div className="mt-6">
+    <div className="w-full">
       <Table>
-        <TableHeader>
+        <TableHeader className="sticky top-0 bg-white z-10">
           <TableRow>
             <TableHead className="w-12">Select</TableHead>
             <TableHead>Product Name</TableHead>
@@ -61,7 +61,7 @@ export function SearchResultsTable({
           ))}
         </TableBody>
       </Table>
-      <div className="mt-4 flex justify-between">
+      <div className="mt-4 sticky bottom-0 bg-white p-4 border-t flex justify-between">
         <Button 
           onClick={onRequestSDS}
           className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 text-white"
@@ -79,4 +79,3 @@ export function SearchResultsTable({
     </div>
   );
 }
-
