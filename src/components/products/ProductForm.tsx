@@ -91,7 +91,7 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
               )
             `)
             .eq('id', initialData.id)
-            .single();
+            .maybeSingle();
 
           if (error) throw error;
 
@@ -115,80 +115,42 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
     }
   }, [initialData?.id, toast]);
 
-  const handleDuplicateError = (error: any) => {
+  const checkForDuplicate = async () => {
     try {
-      // Extract error details from the response
-      const errorDetails = typeof error.message === 'object' ? error.message : JSON.parse(error.message);
-      const constraintMatch = errorDetails.details.match(/\((.*?)\)=\((.*?)\)/);
-      
-      if (!constraintMatch) {
-        throw new Error('Unable to parse error details');
-      }
-      
-      const [fields, values] = [constraintMatch[1].split(', '), constraintMatch[2].split(', ')];
-      const conflictingFields = fields.map((field: string, i: number) => {
-        const fieldName = field.split('_')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-        return `${fieldName}: ${values[i]}`;
-      });
-
-      toast({
-        title: "Duplicate Product",
-        description: `Cannot save product. The following combination already exists:\n${conflictingFields.join('\n')}\n\nPlease modify at least one of these fields.`,
-        variant: "destructive",
-      });
-    } catch (parseError) {
-      console.error('Error parsing duplicate error:', parseError);
-      toast({
-        title: "Duplicate Product",
-        description: "A product with the same name, code, and SDS combination already exists. Please modify at least one of these fields.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const validateProduct = async (productData: any) => {
-    const { data, error } = await supabase
-      .from('products')
-      .select('id')
-      .eq('product_name', productData.product_name)
-      .eq('product_code', productData.product_code)
-      .eq('sds_id', productData.sds_id)
-      .maybeSingle();
-
-    if (data && (!initialData?.id || data.id !== initialData.id)) {
-      toast({
-        title: "Validation Error",
-        description: "A product with this name, code, and SDS combination already exists.",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleSave = async () => {
-    try {
-      // First, check if a product with this combination exists
-      const { data: existingProduct, error: checkError } = await supabase
+      const { data, error } = await supabase
         .from('products')
         .select('id')
         .eq('product_name', formData.name)
         .eq('product_code', formData.code)
         .eq('sds_id', formData.sdsId)
-        .single();
+        .maybeSingle();
 
-      // If we get data back and it's not our current product, it's a duplicate
-      if (existingProduct && (!initialData?.id || existingProduct.id !== initialData.id)) {
+      if (error) {
+        throw error;
+      }
+
+      // If we found a product and it's not the one we're editing
+      if (data && (!initialData?.id || data.id !== initialData.id)) {
         toast({
           title: "Duplicate Product",
           description: "A product with this name, code, and SDS combination already exists. Please modify at least one of these fields.",
           variant: "destructive",
         });
-        return;
+        return true;
       }
+
+      return false;
+    } catch (error) {
+      console.error('Error checking for duplicate:', error);
+      return false;
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      // Check for duplicates before saving
+      const isDuplicate = await checkForDuplicate();
+      if (isDuplicate) return;
 
       const productData = {
         product_name: formData.name,
@@ -208,38 +170,40 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         sds_id: formData.sdsId
       };
 
-      let savedSuccessfully = false;
-
       if (initialData?.id && !formData.isDuplicating) {
         const { error: updateError } = await supabase
           .from('products')
           .update(productData)
           .eq('id', initialData.id);
 
-        if (updateError) {
-          throw updateError;
-        }
-        savedSuccessfully = true;
+        if (updateError) throw updateError;
       } else {
         const { error: insertError } = await supabase
           .from('products')
           .insert(productData);
 
-        if (insertError) {
-          throw insertError;
-        }
-        savedSuccessfully = true;
+        if (insertError) throw insertError;
       }
 
-      if (savedSuccessfully) {
-        onSave();
-        toast({
-          title: "Success",
-          description: `Product ${initialData ? 'updated' : 'created'} successfully`,
-        });
-      }
-    } catch (error) {
+      onSave();
+      toast({
+        title: "Success",
+        description: `Product ${initialData && !formData.isDuplicating ? 'updated' : 'created'} successfully`,
+      });
+    } catch (error: any) {
       console.error('Error saving product:', error);
+      
+      // Handle duplicate key error specifically
+      if (error?.code === '23505') {
+        toast({
+          title: "Duplicate Product",
+          description: "A product with this combination of name, code, and SDS already exists. Please modify at least one of these fields.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Handle other errors
       toast({
         title: "Error",
         description: "Failed to save product. Please try again.",
