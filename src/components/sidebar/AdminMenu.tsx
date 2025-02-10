@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom"
 import { 
   Settings,
@@ -12,41 +13,59 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
+import { useUserRole } from "@/hooks/use-user-role"
 
 const adminItems = [
   {
     label: "SDS Library",
     path: "/sds-library",
     icon: FileText,
+    allowedRoles: ['manager', 'administrator'],
   },
   {
     label: "Products",
     path: "/products",
     icon: Package,
+    allowedRoles: ['manager', 'administrator'],
   },
   {
     label: "Locations",
     path: "/locations",
     icon: MapPin,
+    allowedRoles: ['administrator'],
   },
   {
     label: "Suppliers",
     path: "/suppliers",
     icon: Building2,
+    allowedRoles: ['administrator'],
   },
   {
     label: "Users & Roles",
     path: "/users",
     icon: Users,
+    allowedRoles: ['administrator'],
   },
   {
     label: "Master Data",
     path: "/master-data",
     icon: Database,
+    allowedRoles: ['administrator'],
   },
 ]
 
 export function AdminMenu() {
+  const { data: userRole, isLoading } = useUserRole();
+
+  if (isLoading) return null;
+
+  // Only show admin section if user has access to at least one item
+  const visibleItems = adminItems.filter(item => 
+    item.allowedRoles.includes(userRole as string)
+  );
+
+  if (visibleItems.length === 0) return null;
+
   return (
     <SidebarMenuItem>
       <SidebarMenuButton className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar">
@@ -54,7 +73,7 @@ export function AdminMenu() {
         <span>Administration</span>
       </SidebarMenuButton>
       <div className="pl-4">
-        {adminItems.map((item) => (
+        {visibleItems.map((item) => (
           <SidebarMenuItem key={item.label}>
             <SidebarMenuButton asChild>
               <Link 
