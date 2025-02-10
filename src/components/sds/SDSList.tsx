@@ -10,7 +10,6 @@ import { SDSTableRow } from "./table/SDSTableRow";
 import { SDSPagination } from "./table/SDSPagination";
 import { SDSSelectionProvider } from "./table/SDSSelectionContext";
 import { useQueryClient } from "@tanstack/react-query";
-import { SDSReadOnlyView } from "./SDSReadOnlyView";
 
 interface SDSListProps {
   data: SDS[];

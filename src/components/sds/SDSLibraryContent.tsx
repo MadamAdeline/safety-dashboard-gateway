@@ -161,11 +161,7 @@ export function SDSLibraryContent() {
         searchTerm={searchTerm}
         onEdit={(sds: SDS) => {
           setSelectedSDS(sds);
-          if (sds.sdsSource === "Global Library") {
-            setViewMode('view');
-          } else {
-            setViewMode('edit');
-          }
+          setViewMode('edit');
         }}
         allowDelete={isAdmin}
       />
