@@ -31,18 +31,16 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
     approvalStatusId: initialData?.approvalStatusId ?? null,
     productStatusId: initialData?.productStatusId ?? 12, // Default to ACTIVE (12)
     sdsId: initialData?.sdsId ?? null,
-    isDuplicating: false // Add this flag to track duplication state
+    isDuplicating: false
   });
 
   const handleDuplicate = () => {
-    // Create a new form state by duplicating the current data
     setFormData(prev => ({
       ...prev,
       name: "",
       code: "",
-      isDuplicating: true // Set the flag when duplicating
+      isDuplicating: true
     }));
-    // Clear the initialData to trigger creation mode
     initialData = null;
   };
 
@@ -51,7 +49,6 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
   useEffect(() => {
     const fetchStatusOptions = async () => {
-      console.log('Fetching status options...');
       try {
         const { data, error } = await supabase
           .from('status_lookup')
@@ -60,12 +57,8 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
           .order('category', { ascending: true })
           .order('status_name', { ascending: true });
 
-        if (error) {
-          console.error('Error fetching status options:', error);
-          throw error;
-        }
+        if (error) throw error;
 
-        console.log('Fetched status options:', data);
         setStatusOptions(data.map(item => ({
           id: item.id,
           name: item.status_name,
@@ -86,7 +79,6 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
   useEffect(() => {
     if (initialData?.id) {
-      // Fetch the complete product data including UOM when editing
       const fetchProductData = async () => {
         try {
           const { data, error } = await supabase
@@ -101,16 +93,12 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
             .eq('id', initialData.id)
             .single();
 
-          if (error) {
-            console.error('Error fetching product details:', error);
-            throw error;
-          }
+          if (error) throw error;
 
           if (data) {
             setFormData(prev => ({
               ...prev,
               uomId: data.uom_id || "",
-              // Update other fields if needed
             }));
           }
         } catch (error) {
@@ -127,72 +115,8 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
     }
   }, [initialData?.id, toast]);
 
-  const checkDuplicateCode = async (code: string): Promise<boolean> => {
-    const { data, error } = await supabase
-      .from('products')
-      .select('id')
-      .eq('product_code', code)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error checking duplicate code:', error);
-      return false;
-    }
-
-    // If we're editing and the found product is the current one, it's not a duplicate
-    if (data && initialData && data.id === initialData.id) {
-      return false;
-    }
-
-    return !!data;
-  };
-
-  const checkDuplicateProduct = async () => {
-    const { data, error } = await supabase
-      .from('products')
-      .select('id')
-      .eq('product_name', formData.name)
-      .eq('product_code', formData.code)
-      .eq('sds_id', formData.sdsId)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error checking duplicate product:', error);
-      return false;
-    }
-
-    // If we're editing and the found product is the current one, it's not a duplicate
-    if (data && initialData && data.id === initialData.id) {
-      return false;
-    }
-
-    return !!data;
-  };
-
   const handleSave = async () => {
     try {
-      // Check for duplicate product code
-      const isDuplicateCode = await checkDuplicateCode(formData.code);
-      if (isDuplicateCode) {
-        toast({
-          title: "Error",
-          description: "This product code is already in use. Please use a different code.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Check for duplicate product (name, code, and SDS combination)
-      const isDuplicateProduct = await checkDuplicateProduct();
-      if (isDuplicateProduct) {
-        toast({
-          title: "Error",
-          description: "Product already exists. Please update the Product Name, Code or SDS",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const productData = {
         product_name: formData.name,
         product_code: formData.code,
@@ -211,20 +135,39 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         sds_id: formData.sdsId
       };
 
-      // Always insert a new record when duplicating (initialData will be null)
       if (initialData?.id && !formData.isDuplicating) {
         const { error } = await supabase
           .from('products')
           .update(productData)
           .eq('id', initialData.id);
 
-        if (error) throw error;
+        if (error) {
+          if (error.code === '23505') { // Unique violation error code
+            toast({
+              title: "Error",
+              description: "Product already exists. Please update the Product Name, Code or SDS",
+              variant: "destructive",
+            });
+            return;
+          }
+          throw error;
+        }
       } else {
         const { error } = await supabase
           .from('products')
           .insert(productData);
 
-        if (error) throw error;
+        if (error) {
+          if (error.code === '23505') { // Unique violation error code
+            toast({
+              title: "Error",
+              description: "Product already exists. Please update the Product Name, Code or SDS",
+              variant: "destructive",
+            });
+            return;
+          }
+          throw error;
+        }
       }
 
       onSave();
