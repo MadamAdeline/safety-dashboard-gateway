@@ -4,19 +4,21 @@ import { UserList } from "@/components/users/UserList";
 import { UserActions } from "@/components/users/UserActions";
 import { UserForm } from "@/components/users/UserForm";
 import { UserSearch } from "@/components/users/UserSearch";
+import { LoginDialog } from "@/components/auth/LoginDialog";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { exportUsersToExcel } from "@/utils/userExport";
 import type { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { Plus, Download, RefreshCw } from "lucide-react";
+import { Plus, Download, RefreshCw, LogIn } from "lucide-react";
 
 export default function Users() {
   const [showNewUserForm, setShowNewUserForm] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isExporting, setIsExporting] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -63,12 +65,21 @@ export default function Users() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Users & Roles</h1>
-            <Button 
-              onClick={() => setShowNewUserForm(true)}
-              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
-            >
-              <Plus className="h-4 w-4" /> New User
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                onClick={() => setShowLoginDialog(true)}
+                variant="outline"
+                className="gap-2"
+              >
+                <LogIn className="h-4 w-4" /> Login
+              </Button>
+              <Button 
+                onClick={() => setShowNewUserForm(true)}
+                className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
+              >
+                <Plus className="h-4 w-4" /> New User
+              </Button>
+            </div>
           </div>
           
           <div className="bg-white p-4 rounded-lg shadow flex items-center justify-between">
@@ -103,6 +114,11 @@ export default function Users() {
           />
         </div>
       )}
+
+      <LoginDialog 
+        open={showLoginDialog} 
+        onOpenChange={setShowLoginDialog} 
+      />
     </DashboardLayout>
   );
 }
