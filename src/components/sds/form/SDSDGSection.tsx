@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -24,6 +25,7 @@ export function SDSDGSection() {
   } = useSDSForm();
   
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
+  const isReadOnly = isGlobalLibrary;
 
   const { data: masterData = [] } = useQuery({
     queryKey: ['masterData'],
@@ -66,18 +68,18 @@ export function SDSDGSection() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => !isGlobalLibrary && setIsDG(true)}
-            disabled={isGlobalLibrary}
-            className={isGlobalLibrary ? "opacity-50" : ""}
+            onClick={() => !isReadOnly && setIsDG(true)}
+            disabled={isReadOnly}
+            className={isReadOnly ? "opacity-50 cursor-not-allowed" : ""}
           >
             Yes
           </Button>
           <Button
             type="button"
             variant="default"
-            onClick={() => !isGlobalLibrary && setIsDG(false)}
-            disabled={isGlobalLibrary}
-            className={isGlobalLibrary ? "opacity-50" : ""}
+            onClick={() => !isReadOnly && setIsDG(false)}
+            disabled={isReadOnly}
+            className={isReadOnly ? "opacity-50 cursor-not-allowed" : ""}
           >
             No
           </Button>
@@ -94,18 +96,18 @@ export function SDSDGSection() {
           <Button
             type="button"
             variant="default"
-            onClick={() => !isGlobalLibrary && setIsDG(true)}
-            disabled={isGlobalLibrary}
-            className={isGlobalLibrary ? "opacity-50" : ""}
+            onClick={() => !isReadOnly && setIsDG(true)}
+            disabled={isReadOnly}
+            className={isReadOnly ? "opacity-50 cursor-not-allowed" : ""}
           >
             Yes
           </Button>
           <Button
             type="button"
             variant="outline"
-            onClick={() => !isGlobalLibrary && setIsDG(false)}
-            disabled={isGlobalLibrary}
-            className={isGlobalLibrary ? "opacity-50" : ""}
+            onClick={() => !isReadOnly && setIsDG(false)}
+            disabled={isReadOnly}
+            className={isReadOnly ? "opacity-50 cursor-not-allowed" : ""}
           >
             No
           </Button>
@@ -118,9 +120,9 @@ export function SDSDGSection() {
           <Select 
             value={dgClassId || ""} 
             onValueChange={(value) => setDgClassId(value)}
-            disabled={isGlobalLibrary}
+            disabled={isReadOnly}
           >
-            <SelectTrigger id="dgClass" className={isGlobalLibrary ? "bg-gray-100" : ""}>
+            <SelectTrigger id="dgClass" className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}>
               <SelectValue placeholder="Select DG Class" />
             </SelectTrigger>
             <SelectContent>
@@ -138,9 +140,9 @@ export function SDSDGSection() {
           <Select 
             value={subsidiaryDgClassId || ""} 
             onValueChange={(value) => setSubsidiaryDgClassId(value)}
-            disabled={isGlobalLibrary}
+            disabled={isReadOnly}
           >
-            <SelectTrigger id="subsidiaryDgClass" className={isGlobalLibrary ? "bg-gray-100" : ""}>
+            <SelectTrigger id="subsidiaryDgClass" className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}>
               <SelectValue placeholder="Select Subsidiary DG Class" />
             </SelectTrigger>
             <SelectContent>
@@ -158,9 +160,9 @@ export function SDSDGSection() {
           <Select 
             value={packingGroupId || ""} 
             onValueChange={(value) => setPackingGroupId(value)}
-            disabled={isGlobalLibrary}
+            disabled={isReadOnly}
           >
-            <SelectTrigger id="packingGroup" className={isGlobalLibrary ? "bg-gray-100" : ""}>
+            <SelectTrigger id="packingGroup" className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}>
               <SelectValue placeholder="Select Packing Group" />
             </SelectTrigger>
             <SelectContent>
@@ -178,9 +180,9 @@ export function SDSDGSection() {
           <Select 
             value={dgSubDivisionId || ""} 
             onValueChange={(value) => setDgSubDivisionId(value)}
-            disabled={isGlobalLibrary}
+            disabled={isReadOnly}
           >
-            <SelectTrigger id="dgSubDivision" className={isGlobalLibrary ? "bg-gray-100" : ""}>
+            <SelectTrigger id="dgSubDivision" className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}>
               <SelectValue placeholder="Select DG Sub Division" />
             </SelectTrigger>
             <SelectContent>
@@ -200,8 +202,8 @@ export function SDSDGSection() {
             value={formData.unNumber}
             onChange={(e) => handleInputChange('unNumber', e.target.value)}
             placeholder="Enter UN Number"
-            disabled={isGlobalLibrary}
-            className={isGlobalLibrary ? "bg-gray-100" : ""}
+            readOnly={isReadOnly}
+            className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
           />
         </div>
 
@@ -212,8 +214,8 @@ export function SDSDGSection() {
             value={formData.unProperShippingName}
             onChange={(e) => handleInputChange('unProperShippingName', e.target.value)}
             placeholder="Enter Proper Shipping Name"
-            disabled={isGlobalLibrary}
-            className={isGlobalLibrary ? "bg-gray-100" : ""}
+            readOnly={isReadOnly}
+            className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
           />
         </div>
 
@@ -224,8 +226,8 @@ export function SDSDGSection() {
             value={formData.hazchemCode}
             onChange={(e) => handleInputChange('hazchemCode', e.target.value)}
             placeholder="Enter HAZCHEM Code"
-            disabled={isGlobalLibrary}
-            className={isGlobalLibrary ? "bg-gray-100" : ""}
+            readOnly={isReadOnly}
+            className={isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
           />
         </div>
       </div>

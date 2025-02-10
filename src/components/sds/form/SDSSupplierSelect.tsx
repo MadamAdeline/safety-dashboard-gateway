@@ -1,3 +1,4 @@
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
@@ -13,6 +14,7 @@ export function SDSSupplierSelect() {
   
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
   const isRequested = status === "REQUESTED";
+  const isReadOnly = isGlobalLibrary || isRequested;
 
   const { data: suppliers = [] } = useQuery({
     queryKey: ['suppliers'],
@@ -43,9 +45,9 @@ export function SDSSupplierSelect() {
         <Select 
           value={supplier} 
           onValueChange={setSupplier}
-          disabled={isGlobalLibrary || isRequested}
+          disabled={isReadOnly}
         >
-          <SelectTrigger className={`w-full ${isGlobalLibrary || isRequested ? "bg-gray-100" : ""}`}>
+          <SelectTrigger className={`w-full ${isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}`}>
             <SelectValue placeholder="Select supplier" />
           </SelectTrigger>
           <SelectContent>
@@ -59,8 +61,8 @@ export function SDSSupplierSelect() {
         <Button 
           variant="outline" 
           size="icon" 
-          disabled={isGlobalLibrary || isRequested}
-          className={isGlobalLibrary || isRequested ? "opacity-50" : ""}
+          disabled={isReadOnly}
+          className={isReadOnly ? "opacity-50 cursor-not-allowed" : ""}
         >
           <Search className="h-4 w-4" />
         </Button>

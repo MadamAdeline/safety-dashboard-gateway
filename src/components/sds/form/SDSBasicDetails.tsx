@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSDSForm } from "./SDSFormContext";
@@ -25,7 +26,7 @@ export function SDSBasicDetails() {
           value={formData.productName}
           onChange={(e) => handleInputChange('productName', e.target.value)}
           readOnly={isGlobalLibrary || isRequested}
-          className={isGlobalLibrary || isRequested ? "bg-gray-100" : ""}
+          className={isGlobalLibrary || isRequested ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
         />
       </div>
       <div className="space-y-2">
@@ -36,7 +37,7 @@ export function SDSBasicDetails() {
           value={formData.otherNames}
           onChange={(e) => handleInputChange('otherNames', e.target.value)}
           readOnly={isGlobalLibrary || isRequested}
-          className={isGlobalLibrary || isRequested ? "bg-gray-100" : ""}
+          className={isGlobalLibrary || isRequested ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
         />
       </div>
       <div className="space-y-2">
@@ -47,7 +48,7 @@ export function SDSBasicDetails() {
           value={formData.productId}
           onChange={(e) => handleInputChange('productId', e.target.value)}
           readOnly={isGlobalLibrary || isRequested}
-          className={isGlobalLibrary || isRequested ? "bg-gray-100" : ""}
+          className={isGlobalLibrary || isRequested ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
         />
       </div>
       <div className="space-y-2">
@@ -58,7 +59,7 @@ export function SDSBasicDetails() {
           value={formData.emergencyPhone}
           onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
           readOnly={isGlobalLibrary || isRequested}
-          className={isGlobalLibrary || isRequested ? "bg-gray-100" : ""}
+          className={isGlobalLibrary || isRequested ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}
         />
       </div>
     </div>
