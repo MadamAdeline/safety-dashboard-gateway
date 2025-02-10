@@ -143,22 +143,13 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
         if (error) {
           if (error.code === '23505') {
-            try {
-              const errorBody = JSON.parse((error as any).body);
-              toast({
-                title: "Duplicate Product",
-                description: errorBody?.details || "A product with these details already exists",
-                variant: "destructive",
-              });
-              return;
-            } catch {
-              toast({
-                title: "Duplicate Product",
-                description: "A product with these details already exists",
-                variant: "destructive",
-              });
-              return;
-            }
+            const errorMsg = "A product with this name, code, and SDS combination already exists. Please modify one of these fields.";
+            toast({
+              title: "Duplicate Product",
+              description: errorMsg,
+              variant: "destructive",
+            });
+            return;
           }
           throw error;
         }
@@ -169,22 +160,13 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
         if (error) {
           if (error.code === '23505') {
-            try {
-              const errorBody = JSON.parse((error as any).body);
-              toast({
-                title: "Duplicate Product",
-                description: errorBody?.details || "A product with these details already exists",
-                variant: "destructive",
-              });
-              return;
-            } catch {
-              toast({
-                title: "Duplicate Product",
-                description: "A product with these details already exists",
-                variant: "destructive",
-              });
-              return;
-            }
+            const errorMsg = "A product with this name, code, and SDS combination already exists. Please modify one of these fields.";
+            toast({
+              title: "Duplicate Product",
+              description: errorMsg,
+              variant: "destructive",
+            });
+            return;
           }
           throw error;
         }
@@ -254,4 +236,3 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
     </div>
   );
 }
-
