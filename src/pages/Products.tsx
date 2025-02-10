@@ -94,7 +94,7 @@ export default function Products() {
         cryogenicFluid: item.cryogenic_fluid,
         otherNames: item.other_names,
         uses: item.uses,
-        status: (item.product_status_id === 12 ? "ACTIVE" : "INACTIVE") as "ACTIVE" | "INACTIVE",
+        status: (item.product_status_id === 16 ? "ACTIVE" : "INACTIVE") as "ACTIVE" | "INACTIVE", // Fixed: Changed from 12 to 16 for ACTIVE status
         approvalStatusId: item.approval_status_id,
         productStatusId: item.product_status_id,
         sdsId: item.sds_id,
