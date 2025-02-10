@@ -159,7 +159,6 @@ export default function SDSLibrary() {
       <NewSDSForm 
         onClose={handleClose} 
         initialData={selectedSDS} 
-        readOnly={isManager} 
       />
     );
   }
