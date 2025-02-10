@@ -1,9 +1,11 @@
+
 export interface Product {
   id: string;
   name: string;
   code: string;
   brandName?: string;
   unit?: string;
+  uomId?: string;
   unitSize?: number;
   description?: string;
   productSet?: boolean;

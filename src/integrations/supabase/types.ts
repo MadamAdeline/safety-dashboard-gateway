@@ -163,6 +163,7 @@ export type Database = {
           sds_id: string | null
           unit: string
           unit_size: number | null
+          uom_id: string | null
           updated_at: string | null
           uses: string | null
         }
@@ -182,6 +183,7 @@ export type Database = {
           sds_id?: string | null
           unit: string
           unit_size?: number | null
+          uom_id?: string | null
           updated_at?: string | null
           uses?: string | null
         }
@@ -201,6 +203,7 @@ export type Database = {
           sds_id?: string | null
           unit?: string
           unit_size?: number | null
+          uom_id?: string | null
           updated_at?: string | null
           uses?: string | null
         }
@@ -231,6 +234,13 @@ export type Database = {
             columns: ["sds_id"]
             isOneToOne: false
             referencedRelation: "sds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_uom_id_fkey"
+            columns: ["uom_id"]
+            isOneToOne: false
+            referencedRelation: "master_data"
             referencedColumns: ["id"]
           },
         ]

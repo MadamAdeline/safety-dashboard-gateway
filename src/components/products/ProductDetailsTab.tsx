@@ -1,8 +1,12 @@
+
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ProductDetailsTabProps {
   formData: any;
@@ -17,6 +21,35 @@ export function ProductDetailsTab({
   approvalStatusOptions,
   productStatusOptions 
 }: ProductDetailsTabProps) {
+  const [uomOptions, setUomOptions] = useState<{ id: string; label: string }[]>([]);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchUOMOptions = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('master_data')
+          .select('id, label')
+          .eq('category', 'UOM')
+          .eq('status', 'ACTIVE')
+          .order('sort_order', { ascending: true });
+
+        if (error) throw error;
+
+        setUomOptions(data || []);
+      } catch (error) {
+        console.error('Error fetching UOM options:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load UOM options",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchUOMOptions();
+  }, [toast]);
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-6">
@@ -61,19 +94,20 @@ export function ProductDetailsTab({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="unit">Unit *</Label>
+              <Label htmlFor="uom">Unit of Measure *</Label>
               <Select 
-                value={formData.unit}
-                onValueChange={(value) => setFormData({ ...formData, unit: value })}
+                value={formData.uomId || ""}
+                onValueChange={(value) => setFormData({ ...formData, uomId: value })}
               >
-                <SelectTrigger id="unit">
-                  <SelectValue placeholder="Select unit" />
+                <SelectTrigger id="uom">
+                  <SelectValue placeholder="Select UOM" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Litre (L)">Litre (L)</SelectItem>
-                  <SelectItem value="Kilogram (kg)">Kilogram (kg)</SelectItem>
-                  <SelectItem value="Gram (g)">Gram (g)</SelectItem>
-                  <SelectItem value="Millilitre (mL)">Millilitre (mL)</SelectItem>
+                  {uomOptions.map(option => (
+                    <SelectItem key={option.id} value={option.id}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
