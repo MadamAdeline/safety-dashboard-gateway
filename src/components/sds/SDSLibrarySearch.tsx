@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { SDSActions } from "./SDSActions";
 import { SDSFilters } from "./SDSFilters";
-import type { SDSFilters as SDSFiltersType } from "@/types/sds";
+import type { SDSFilters as SDSFiltersType, SDS } from "@/types/sds";
 
 interface SDSLibrarySearchProps {
   showFilters: boolean;
@@ -13,6 +13,7 @@ interface SDSLibrarySearchProps {
   filters: SDSFiltersType;
   onFiltersChange: (filters: SDSFiltersType) => void;
   isAdmin: boolean;
+  data: SDS[];
 }
 
 export function SDSLibrarySearch({
@@ -22,7 +23,8 @@ export function SDSLibrarySearch({
   setSearchTerm,
   filters,
   onFiltersChange,
-  isAdmin
+  isAdmin,
+  data
 }: SDSLibrarySearchProps) {
   return (
     <div className="flex flex-col space-y-4">
@@ -41,7 +43,7 @@ export function SDSLibrarySearch({
           onToggleFilters={() => setShowFilters(!showFilters)}
           onExport={() => {}}
           onRefresh={() => {}}
-          data={[]}
+          data={data}
           allowDelete={isAdmin}
         />
       </div>

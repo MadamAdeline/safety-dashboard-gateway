@@ -14,7 +14,12 @@ interface SDSActionsProps {
 
 export function SDSActions({ onToggleFilters, onExport, onRefresh, data, allowDelete = true }: SDSActionsProps) {
   const handleExport = () => {
-    if (!data || data.length === 0) return;
+    if (!data || data.length === 0) {
+      console.log('No data to export');
+      return;
+    }
+
+    console.log('Exporting data:', data);
 
     const exportData = data.map(item => ({
       'Product Name': item.productName || '',
