@@ -142,6 +142,7 @@ export function SDSLibraryContent() {
         filters={filters}
         onFiltersChange={setFilters}
         isAdmin={isAdmin}
+        data={sdsData}
       />
 
       <SDSFilteredList
