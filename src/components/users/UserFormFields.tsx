@@ -17,6 +17,7 @@ import type { Location } from "@/types/location";
 
 interface UserFormFieldsProps {
   formData: {
+    id?: string; // Added id as optional since it won't exist for new users
     first_name: string;
     last_name: string;
     email: string;
