@@ -10,7 +10,7 @@ interface SearchFields {
   productCode: string;
   supplier: string;
   unNumber: string;
-  source: string;  // Added source field
+  source: string;
 }
 
 export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, onOpenChange: (open: boolean) => void) {
@@ -20,7 +20,7 @@ export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, on
     productCode: "",
     supplier: "",
     unNumber: "",
-    source: ""  // Added source field initialization
+    source: ""
   });
   const [searchResults, setSearchResults] = useState<SDS[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -32,17 +32,38 @@ export function useGlobalSDSSearch(onSDSSelect: (selectedSDS: SDS[]) => void, on
     console.log("Searching with fields:", searchFields);
     
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('sds')
         .select(`
           *,
           suppliers!inner(supplier_name)
-        `)
-        .or(`
-          product_name.ilike.%${searchFields.productName}%,
-          product_id.ilike.%${searchFields.productCode}%,
-          source.ilike.%${searchFields.source}%
         `);
+
+      // Build search conditions
+      const conditions = [];
+      
+      if (searchFields.productName) {
+        conditions.push(`product_name.ilike.%${searchFields.productName}%`);
+      }
+      if (searchFields.productCode) {
+        conditions.push(`product_id.ilike.%${searchFields.productCode}%`);
+      }
+      if (searchFields.supplier) {
+        conditions.push(`suppliers.supplier_name.ilike.%${searchFields.supplier}%`);
+      }
+      if (searchFields.unNumber) {
+        conditions.push(`un_number.ilike.%${searchFields.unNumber}%`);
+      }
+      if (searchFields.source) {
+        conditions.push(`source.ilike.%${searchFields.source}%`);
+      }
+
+      // Only add OR conditions if there are any search terms
+      if (conditions.length > 0) {
+        query = query.or(conditions.join(','));
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
