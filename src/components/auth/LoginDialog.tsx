@@ -11,9 +11,10 @@ import { Lock, User } from "lucide-react";
 interface LoginDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onLoginSuccess?: () => void;
 }
 
-export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
+export function LoginDialog({ open, onOpenChange, onLoginSuccess }: LoginDialogProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -46,6 +47,8 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
           title: "Success",
           description: "Successfully logged in!"
         });
+        
+        onLoginSuccess?.();
         onOpenChange(false);
       } else {
         toast({

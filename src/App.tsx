@@ -3,9 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { StrictMode } from "react";
 import Index from "./pages/Index";
+import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 import SDSLibrary from "./pages/SDSLibrary";
 import Products from "./pages/Products";
@@ -29,6 +30,17 @@ const queryClient = new QueryClient({
   },
 });
 
+const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+  // Check if user is logged in (you can modify this based on your auth state management)
+  const user = true; // For now, we'll assume the user is always logged in
+  
+  if (!user) {
+    return <Navigate to="/landing" />;
+  }
+  
+  return <>{children}</>;
+};
+
 const App = () => (
   <StrictMode>
     <BrowserRouter>
@@ -37,19 +49,20 @@ const App = () => (
           <Toaster />
           <Sonner />
           <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/sds-library" element={<SDSLibrary />} />
-            <Route path="/sds-library/new" element={<NewSDSForm onClose={() => window.history.back()} />} />
-            <Route path="/compliance" element={<ComplianceDashboard />} />
-            <Route path="/locations" element={<Locations />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/suppliers" element={<Suppliers />} />
-            <Route path="/master-data" element={<MasterData />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/site-registers" element={<SiteRegisters />} />
-            <Route path="/risk-assessments" element={<RiskAssessments />} />
-            <Route path="/waste-tracking" element={<WasteTracking />} />
-            <Route path="/logout" element={<ComingSoon feature="Logout" />} />
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/" element={<PrivateRoute><Index /></PrivateRoute>} />
+            <Route path="/sds-library" element={<PrivateRoute><SDSLibrary /></PrivateRoute>} />
+            <Route path="/sds-library/new" element={<PrivateRoute><NewSDSForm onClose={() => window.history.back()} /></PrivateRoute>} />
+            <Route path="/compliance" element={<PrivateRoute><ComplianceDashboard /></PrivateRoute>} />
+            <Route path="/locations" element={<PrivateRoute><Locations /></PrivateRoute>} />
+            <Route path="/products" element={<PrivateRoute><Products /></PrivateRoute>} />
+            <Route path="/suppliers" element={<PrivateRoute><Suppliers /></PrivateRoute>} />
+            <Route path="/master-data" element={<PrivateRoute><MasterData /></PrivateRoute>} />
+            <Route path="/users" element={<PrivateRoute><Users /></PrivateRoute>} />
+            <Route path="/site-registers" element={<PrivateRoute><SiteRegisters /></PrivateRoute>} />
+            <Route path="/risk-assessments" element={<PrivateRoute><RiskAssessments /></PrivateRoute>} />
+            <Route path="/waste-tracking" element={<PrivateRoute><WasteTracking /></PrivateRoute>} />
+            <Route path="/logout" element={<PrivateRoute><ComingSoon feature="Logout" /></PrivateRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
