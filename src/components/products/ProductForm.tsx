@@ -147,14 +147,47 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
     return !!data;
   };
 
+  const checkDuplicateProduct = async () => {
+    const { data, error } = await supabase
+      .from('products')
+      .select('id')
+      .eq('product_name', formData.name)
+      .eq('product_code', formData.code)
+      .eq('sds_id', formData.sdsId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error checking duplicate product:', error);
+      return false;
+    }
+
+    // If we're editing and the found product is the current one, it's not a duplicate
+    if (data && initialData && data.id === initialData.id) {
+      return false;
+    }
+
+    return !!data;
+  };
+
   const handleSave = async () => {
     try {
       // Check for duplicate product code
-      const isDuplicate = await checkDuplicateCode(formData.code);
-      if (isDuplicate) {
+      const isDuplicateCode = await checkDuplicateCode(formData.code);
+      if (isDuplicateCode) {
         toast({
           title: "Error",
           description: "This product code is already in use. Please use a different code.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check for duplicate product (name, code, and SDS combination)
+      const isDuplicateProduct = await checkDuplicateProduct();
+      if (isDuplicateProduct) {
+        toast({
+          title: "Error",
+          description: "Product already exists. Please update the Product Name, Code or SDS",
           variant: "destructive",
         });
         return;
