@@ -11,7 +11,7 @@ export default function Landing() {
       <div className="container mx-auto px-4 py-8">
         <header className="flex justify-between items-center mb-16">
           <img 
-            src="/lovable-uploads/1473d268-4b58-4028-8b1a-c70b45d4ec34.png" 
+            src="/lovable-uploads/b45d40e4-978f-4fda-917b-2b29914ef272.png" 
             alt="DGXprt Logo" 
             className="h-12" 
           />
@@ -26,16 +26,16 @@ export default function Landing() {
 
         <main className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-dgxprt-navy mb-6">
-            Safety Data Sheet Management
+            Workplace Hazardous Chemicals Management
           </h1>
-          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
-            Streamline your dangerous goods compliance with our comprehensive SDS management solution.
+          <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
+            Empowering organizations with comprehensive Hazardous Chemicals Safety & Compliance. From SDS and Products Management to Inventory Management, Risk Assessments, and Waste Tracking - all in one platform.
           </p>
           <Button 
             onClick={() => setShowLoginDialog(true)}
             className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 text-lg px-8 py-6 h-auto"
           >
-            Get Started
+            Login
           </Button>
         </main>
 
