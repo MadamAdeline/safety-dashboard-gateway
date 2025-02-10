@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +13,7 @@ import { createSDS, updateSDS, uploadSDSFile, getStatusId } from "@/services/sds
 import { useQueryClient } from "@tanstack/react-query";
 import { format, addYears } from "date-fns";
 import { useUserRole } from "@/hooks/use-user-role";
+import { SDSRelatedProductsTab } from "./SDSRelatedProductsTab";
 
 interface NewSDSFormProps {
   onClose: () => void;
@@ -220,9 +222,10 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       <div className="grid grid-cols-2 gap-6">
         <div className="space-y-6">
           <Tabs defaultValue="product-details" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="product-details">SDS Details</TabsTrigger>
               <TabsTrigger value="version">Version History</TabsTrigger>
+              <TabsTrigger value="related-products">Related Products</TabsTrigger>
             </TabsList>
 
             <TabsContent value="product-details">
@@ -250,6 +253,15 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
 
             <TabsContent value="version">
               <SDSVersionTab onOpenSDS={handleOpenSDS} />
+            </TabsContent>
+
+            <TabsContent value="related-products">
+              {initialData && <SDSRelatedProductsTab sds={initialData} />}
+              {!initialData && (
+                <div className="text-center p-4 text-gray-500">
+                  Related products will be available after saving the SDS.
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
