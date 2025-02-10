@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { SupplierList } from "@/components/suppliers/SupplierList";
@@ -21,6 +22,7 @@ export default function Suppliers() {
   const [showFilters, setShowFilters] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -94,6 +96,8 @@ export default function Suppliers() {
           filters={filters} 
           onEdit={handleEdit}
           isLoading={isLoading}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
         />
       </div>
     </DashboardLayout>

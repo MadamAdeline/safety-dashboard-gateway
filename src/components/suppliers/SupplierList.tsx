@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -26,11 +27,19 @@ interface SupplierListProps {
   filters: SupplierFilters;
   onEdit: (supplier: Supplier) => void;
   isLoading?: boolean;
+  currentPage: number;
+  onPageChange: (page: number) => void;
 }
 
-export function SupplierList({ data, filters, onEdit, isLoading }: SupplierListProps) {
+export function SupplierList({ 
+  data, 
+  filters, 
+  onEdit, 
+  isLoading,
+  currentPage,
+  onPageChange
+}: SupplierListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const filteredData = data.filter((item) => {
@@ -162,7 +171,7 @@ export function SupplierList({ data, filters, onEdit, isLoading }: SupplierListP
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  setCurrentPage((p) => Math.max(1, p - 1));
+                  onPageChange(Math.max(1, currentPage - 1));
                 }}
                 aria-disabled={currentPage === 1}
                 className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
@@ -174,7 +183,7 @@ export function SupplierList({ data, filters, onEdit, isLoading }: SupplierListP
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    setCurrentPage(page);
+                    onPageChange(page);
                   }}
                   isActive={currentPage === page}
                   className={
@@ -192,7 +201,7 @@ export function SupplierList({ data, filters, onEdit, isLoading }: SupplierListP
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  setCurrentPage((p) => Math.min(totalPages, p + 1));
+                  onPageChange(Math.min(totalPages, currentPage + 1));
                 }}
                 aria-disabled={currentPage === totalPages}
                 className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
