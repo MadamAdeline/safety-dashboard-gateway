@@ -21,9 +21,9 @@ export default function SDSLibrary() {
   const location = useLocation();
   const showExpiredFilter = location.search === "?filter=expired";
   const { data: userRole, isLoading: isLoadingRole } = useUserRole();
-  console.log('Current user role:', userRole); // Debug log
-  const isAdmin = userRole === 'administrator';
-  console.log('Is admin:', isAdmin); // Debug log
+  console.log('Current user role:', userRole);
+  const isAdmin = userRole?.toLowerCase() === 'administrator';
+  console.log('Is admin:', isAdmin);
 
   const [filters, setFilters] = useState<SDSFiltersType>({
     search: "",
