@@ -22,7 +22,7 @@ export function useUserRole() {
           )
         `)
         .eq('email', userEmail)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching user role:', error);

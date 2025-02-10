@@ -92,7 +92,7 @@ const Index = () => {
           )
         `)
         .eq('email', userEmail)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching user location:', error);

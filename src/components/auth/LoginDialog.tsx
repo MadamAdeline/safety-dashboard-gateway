@@ -27,14 +27,14 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: LoginDialogP
     setIsLoading(true);
 
     try {
-      const { data: userData, error: userError } = await supabase
+      const { data: userData, error } = await supabase
         .from('users')
         .select('id, first_name, email')
         .eq('email', email)
         .eq('password', password)
-        .single();
+        .maybeSingle();
 
-      if (userError) throw userError;
+      if (error) throw error;
 
       if (userData) {
         // Store email in localStorage for UserFooter component
