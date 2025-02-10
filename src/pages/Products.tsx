@@ -56,18 +56,18 @@ export default function Products() {
           product_status_id,
           approval_status_id,
           sds_id,
-          sds:products_sds_id_fkey (
+          sds!products_sds_id_fkey (
             id,
             is_dg,
-            dg_class:master_data!sds_dg_class_id_fkey (
+            dg_class!sds_dg_class_id_fkey (
               id,
               label
             ),
             supplier:suppliers!sds_supplier_id_fkey (
               id,
-              supplier_name
+              name:supplier_name
             ),
-            packingGroup:master_data!sds_packing_group_id_fkey (
+            packing_group:master_data!sds_packing_group_id_fkey (
               id,
               label
             )
@@ -107,11 +107,11 @@ export default function Products() {
           } : undefined,
           supplier: item.sds.supplier ? {
             id: item.sds.supplier.id,
-            supplier_name: item.sds.supplier.supplier_name
+            supplier_name: item.sds.supplier.name
           } : undefined,
-          packingGroup: item.sds.packingGroup ? {
-            id: item.sds.packingGroup.id,
-            label: item.sds.packingGroup.label
+          packingGroup: item.sds.packing_group ? {
+            id: item.sds.packing_group.id,
+            label: item.sds.packing_group.label
           } : undefined
         } : undefined
       })) as Product[];
