@@ -17,6 +17,7 @@ import type { SDS } from "@/types/sds";
 import { SDSRequestDialog } from "./SDSRequestDialog";
 import { SDSSearch } from "@/components/sds/SDSSearch";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface GlobalSDSSearchDialogProps {
   open: boolean;
@@ -40,6 +41,7 @@ export function GlobalSDSSearchDialog({
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { toast } = useToast();
   const [showRequestDialog, setShowRequestDialog] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +68,7 @@ export function GlobalSDSSearchDialog({
             issue_date: sds.issueDate,
             expiry_date: sds.expiryDate,
             status_id: 3, // Active status
-            source: 'Global Library', // Set source to Global Library
+            source: 'Global Library',
             dg_class_id: sds.dgClassId,
             subsidiary_dg_class_id: sds.subsidiaryDgClassId,
             packing_group_id: sds.packingGroupId,
@@ -87,6 +89,9 @@ export function GlobalSDSSearchDialog({
           throw error;
         }
       }
+
+      // Invalidate the SDS query to trigger a refresh
+      await queryClient.invalidateQueries({ queryKey: ['sds'] });
 
       toast({
         title: "Success",

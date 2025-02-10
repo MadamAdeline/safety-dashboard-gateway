@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -35,7 +36,8 @@ export function SDSList({ data, filters, onEdit }: SDSListProps) {
         item.productName.toLowerCase().includes(searchTerm) ||
         item.productId.toLowerCase().includes(searchTerm) ||
         item.supplier.toLowerCase().includes(searchTerm) ||
-        item.status.toLowerCase().includes(searchTerm)
+        item.status.toLowerCase().includes(searchTerm) ||
+        (item.source?.toLowerCase().includes(searchTerm) || false)
       );
     }
     return true;
