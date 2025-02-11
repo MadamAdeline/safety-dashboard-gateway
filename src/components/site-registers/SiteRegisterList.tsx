@@ -103,24 +103,36 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col space-y-4">
-        <Label>Location</Label>
-        <div className="flex items-center gap-4">
-          <div className="w-1/2">
-            <LocationSearch
-              selectedLocationId={selectedLocation?.id || null}
-              initialLocation={selectedLocation}
-              onLocationSelect={handleLocationSelect}
-              className="w-full"
-            />
+      <div className="space-y-4">
+        <div>
+          <Label>Location</Label>
+          <div className="flex items-center gap-4 mt-2">
+            <div className="w-1/2">
+              <LocationSearch
+                selectedLocationId={selectedLocation?.id || null}
+                initialLocation={selectedLocation}
+                onLocationSelect={handleLocationSelect}
+                className="w-full"
+              />
+            </div>
+            {selectedLocation?.full_path && (
+              <Input
+                value={selectedLocation.full_path}
+                readOnly
+                className="bg-gray-50 text-gray-600 flex-1"
+              />
+            )}
           </div>
-          {selectedLocation?.full_path && (
-            <Input
-              value={selectedLocation.full_path}
-              readOnly
-              className="bg-gray-50 text-gray-600 flex-1"
-            />
-          )}
+        </div>
+
+        <div className="relative">
+          <Input
+            type="text"
+            placeholder="Search site registers..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 w-full"
+          />
         </div>
       </div>
 
@@ -170,4 +182,3 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     </div>
   );
 }
-
