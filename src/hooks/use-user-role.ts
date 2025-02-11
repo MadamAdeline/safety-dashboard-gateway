@@ -13,6 +13,11 @@ interface UserData {
   }[];
 }
 
+export interface UserRoleData {
+  role: string | null;
+  locationId: string | null;
+}
+
 export function useUserRole() {
   return useQuery({
     queryKey: ['userRole'],
@@ -41,10 +46,11 @@ export function useUserRole() {
         return { role: null, locationId: null };
       }
 
-      console.log('Fetched user data:', userData);
+      const role = userData?.user_roles?.[0]?.roles?.role_name || null;
+      console.log('Fetched user data:', { role, locationId: userData?.location_id });
 
       return {
-        role: userData?.user_roles?.[0]?.roles?.role_name || null,
+        role,
         locationId: userData?.location_id || null
       };
     }
