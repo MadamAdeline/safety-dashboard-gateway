@@ -102,46 +102,49 @@ export function SiteRegisterDetailsTab({
             <Label className="text-lg font-semibold">Stock Information</Label>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="current_stock_level">Current Stock Level</Label>
-            <Input
-              id="current_stock_level"
-              type="number"
-              value={formData.current_stock_level || ''}
-              onChange={(e) => onChange("current_stock_level", parseFloat(e.target.value))}
-            />
-          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="current_stock_level">Current Stock Level</Label>
+              <Input
+                id="current_stock_level"
+                type="number"
+                value={formData.current_stock_level || ''}
+                onChange={(e) => onChange("current_stock_level", parseFloat(e.target.value))}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="max_stock_level">Max Stock Level</Label>
-            <Input
-              id="max_stock_level"
-              type="number"
-              value={formData.max_stock_level || ''}
-              onChange={(e) => onChange("max_stock_level", parseFloat(e.target.value))}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="max_stock_level">Max Stock Level</Label>
+              <Input
+                id="max_stock_level"
+                type="number"
+                value={formData.max_stock_level || ''}
+                onChange={(e) => onChange("max_stock_level", parseFloat(e.target.value))}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="uom_id">Unit of Measure</Label>
-            <Select
-              value={formData.uom_id}
-              onValueChange={(value) => onChange("uom_id", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select unit of measure" />
-              </SelectTrigger>
-              <SelectContent>
-                {uomOptions?.map((uom) => (
-                  <SelectItem key={uom.id} value={uom.id}>
-                    {uom.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label htmlFor="uom_id">Unit of Measure</Label>
+              <Select
+                value={formData.uom_id}
+                onValueChange={(value) => onChange("uom_id", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select unit of measure" />
+                </SelectTrigger>
+                <SelectContent>
+                  {uomOptions?.map((uom) => (
+                    <SelectItem key={uom.id} value={uom.id}>
+                      {uom.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </>
       )}
     </div>
   );
 }
+
