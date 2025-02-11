@@ -79,14 +79,16 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
           <Input value={product.brandName || ''} readOnly className="bg-gray-50" />
         </div>
 
-        <div className="space-y-2">
-          <Label>Unit of Measure</Label>
-          <Input value={product.uom?.label || ''} readOnly className="bg-gray-50" />
-        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Unit Size</Label>
+            <Input value={product.unitSize?.toString() || ''} readOnly className="bg-gray-50" />
+          </div>
 
-        <div className="space-y-2">
-          <Label>Unit Size</Label>
-          <Input value={product.unitSize?.toString() || ''} readOnly className="bg-gray-50" />
+          <div className="space-y-2">
+            <Label>Unit of Measure</Label>
+            <Input value={product.uom?.label || ''} readOnly className="bg-gray-50" />
+          </div>
         </div>
 
         <div className="space-y-2">
