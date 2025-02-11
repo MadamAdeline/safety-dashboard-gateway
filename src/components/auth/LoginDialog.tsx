@@ -27,28 +27,47 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: LoginDialogP
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('id, first_name, email')
+        .eq('email', email)
+        .eq('password', password)
+        .maybeSingle();
 
       if (error) throw error;
 
-      if (data.session) {
+      if (userData) {
+        // Store email in localStorage for UserFooter component
+        localStorage.setItem('userEmail', userData.email);
+        
+        // Update last login date
+        const { error: updateError } = await supabase
+          .from('users')
+          .update({ last_login_date: new Date().toISOString() })
+          .eq('id', userData.id);
+
+        if (updateError) console.error('Error updating last login date:', updateError);
+
         toast({
           title: "Success",
-          description: "Login successful!"
+          description: `Welcome back, ${userData.first_name}!`
         });
         
         onLoginSuccess?.();
         onOpenChange(false);
         navigate('/dashboard');
+      } else {
+        toast({
+          title: "Error",
+          description: "Invalid email or password",
+          variant: "destructive"
+        });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Login error:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to log in. Please try again.",
+        description: "Failed to log in. Please try again.",
         variant: "destructive"
       });
     } finally {

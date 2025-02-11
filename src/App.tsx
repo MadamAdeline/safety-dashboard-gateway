@@ -4,8 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { StrictMode, useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { StrictMode } from "react";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
@@ -22,7 +21,6 @@ import RiskAssessments from "./pages/RiskAssessments";
 import WasteTracking from "./pages/WasteTracking";
 import { AccessDeniedDialog } from "./components/auth/AccessDeniedDialog";
 import { useRoutePermission } from "./hooks/use-route-permission";
-import { LoginDialog } from "./components/auth/LoginDialog";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,56 +33,24 @@ const queryClient = new QueryClient({
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const { isLoading: permissionLoading, hasPermission } = useRoutePermission(location.pathname);
-  const [showLoginDialog, setShowLoginDialog] = useState(false);
-
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // Show loading state while checking session and permissions
-  if (loading || permissionLoading) {
+  const userEmail = localStorage.getItem('userEmail');
+  const { isLoading, hasPermission } = useRoutePermission(location.pathname);
+  
+  // Check if user is logged in
+  if (!userEmail) {
+    return <Navigate to="/" />;
+  }
+  
+  // Show loading state while checking permissions
+  if (isLoading) {
     return <div>Loading...</div>;
   }
-
-  // If no session, show login dialog
-  if (!session) {
-    if (!showLoginDialog) {
-      setShowLoginDialog(true);
-    }
-    return (
-      <>
-        <LoginDialog 
-          open={showLoginDialog} 
-          onOpenChange={setShowLoginDialog}
-          onLoginSuccess={() => setShowLoginDialog(false)}
-        />
-        <Navigate to="/" />
-      </>
-    );
-  }
-
+  
   // Show access denied dialog if user doesn't have permission
   if (!hasPermission) {
     return <AccessDeniedDialog />;
   }
-
+  
   return <>{children}</>;
 };
 
