@@ -23,26 +23,13 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
   });
 
   const handleAddNew = async () => {
-    const userEmail = localStorage.getItem('userEmail');
-    if (!userEmail) {
+    // Get the current authenticated user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
       toast({
         title: "Error",
-        description: "User not found",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const { data: userData } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', userEmail)
-      .single();
-
-    if (!userData) {
-      toast({
-        title: "Error",
-        description: "User not found",
+        description: "You must be logged in to perform this action",
         variant: "destructive",
       });
       return;
@@ -57,13 +44,14 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
         reason_id: newMovement.reason_id,
         quantity: parseFloat(newMovement.quantity),
         comments: newMovement.comments,
-        updated_by: userData.id,
+        updated_by: user.id, // Set the updated_by field to the current user's ID
       });
 
     if (error) {
+      console.error('Error adding stock movement:', error);
       toast({
         title: "Error",
-        description: "Failed to add stock movement",
+        description: error.message || "Failed to add stock movement",
         variant: "destructive",
       });
       return;
@@ -136,3 +124,4 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
     </div>
   );
 }
+
