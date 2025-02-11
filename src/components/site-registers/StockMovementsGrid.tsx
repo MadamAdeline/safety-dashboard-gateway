@@ -7,9 +7,10 @@ import { StockMovementsTable } from "./stock-movements/StockMovementsTable";
 
 interface StockMovementsGridProps {
   siteRegisterId: string;
+  onStockUpdate?: () => void;  // Added optional onStockUpdate prop
 }
 
-export function StockMovementsGrid({ siteRegisterId }: StockMovementsGridProps) {
+export function StockMovementsGrid({ siteRegisterId, onStockUpdate }: StockMovementsGridProps) {
   console.log('StockMovementsGrid rendering with siteRegisterId:', siteRegisterId);
   
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -88,6 +89,9 @@ export function StockMovementsGrid({ siteRegisterId }: StockMovementsGridProps) 
           onSuccess={() => {
             setIsAddingNew(false);
             refetch();
+            if (onStockUpdate) {
+              onStockUpdate();
+            }
           }}
         />
       )}
