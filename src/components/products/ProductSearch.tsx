@@ -18,7 +18,7 @@ interface ProductSearchProps {
 export function ProductSearch({ value, onChange, selectedProductId, onProductSelect, className }: ProductSearchProps) {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(value || "");
-  const { data: products, isLoading } = useProducts();
+  const { data: products = [], isLoading } = useProducts();
 
   useEffect(() => {
     if (value !== undefined) {
@@ -28,17 +28,12 @@ export function ProductSearch({ value, onChange, selectedProductId, onProductSel
 
   const selectedProduct = products?.find(p => p.id === selectedProductId);
 
-  const filteredProducts = products?.filter(product => {
-    if (!searchValue) return true;
-    return (
-      product.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      product.code.toLowerCase().includes(searchValue.toLowerCase())
-    );
-  }) || [];
-
-  console.log('ProductSearch - Products:', products);
-  console.log('ProductSearch - Filtered Products:', filteredProducts);
-  console.log('ProductSearch - Selected Product:', selectedProduct);
+  const filteredProducts = !searchValue 
+    ? products 
+    : products.filter(product => 
+        product.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+        product.code.toLowerCase().includes(searchValue.toLowerCase())
+      );
 
   const handleSearchChange = (newValue: string) => {
     setSearchValue(newValue);
@@ -69,27 +64,26 @@ export function ProductSearch({ value, onChange, selectedProductId, onProductSel
             <div className="py-6 text-center text-sm text-gray-500">
               Loading products...
             </div>
+          ) : filteredProducts.length === 0 ? (
+            <CommandEmpty>No products found.</CommandEmpty>
           ) : (
-            <>
-              <CommandEmpty>No products found.</CommandEmpty>
-              <CommandGroup>
-                {filteredProducts.map((product) => (
-                  <CommandItem
-                    key={product.id}
-                    onSelect={() => {
-                      onProductSelect?.(product);
-                      setOpen(false);
-                      setSearchValue("");
-                    }}
-                  >
-                    <div className="flex flex-col">
-                      <span>{product.name}</span>
-                      <span className="text-sm text-gray-500">{product.code}</span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </>
+            <CommandGroup>
+              {filteredProducts.map((product) => (
+                <CommandItem
+                  key={product.id}
+                  onSelect={() => {
+                    onProductSelect?.(product);
+                    setOpen(false);
+                    setSearchValue("");
+                  }}
+                >
+                  <div className="flex flex-col">
+                    <span>{product.name}</span>
+                    <span className="text-sm text-gray-500">{product.code}</span>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
           )}
         </Command>
       </PopoverContent>
