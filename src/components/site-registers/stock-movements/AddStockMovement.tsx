@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { Check } from "lucide-react";
 
 interface AddStockMovementProps {
   siteRegisterId: string;
@@ -158,9 +159,17 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
           className="w-full"
         />
       </div>
-      <div className="flex items-center">
-        <Button onClick={handleAddNew} className="w-full">Save</Button>
+      <div className="flex items-center justify-between w-full">
+        <div className="text-gray-400 text-sm"></div>
+        <Button 
+          onClick={handleAddNew} 
+          size="icon" 
+          className="ml-auto"
+        >
+          <Check className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
 }
+
