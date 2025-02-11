@@ -52,6 +52,13 @@ export default function SiteRegisters() {
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-dgxprt-navy">Site Register</h1>
+            <Button
+              onClick={() => setIsFormOpen(true)}
+              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add to Site Register
+            </Button>
           </div>
           
           <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
@@ -65,19 +72,10 @@ export default function SiteRegisters() {
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => setIsFormOpen(true)}
-                className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add to Site Register
-              </Button>
-              <SiteRegisterActions
-                onExport={handleExport}
-                onRefresh={handleRefresh}
-              />
-            </div>
+            <SiteRegisterActions
+              onExport={handleExport}
+              onRefresh={handleRefresh}
+            />
           </div>
         </div>
 
