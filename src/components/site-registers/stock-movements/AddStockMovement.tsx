@@ -102,7 +102,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
 
   return (
     <div className="grid grid-cols-6 gap-4 px-4 py-2">
-      <div className="flex items-center w-full">
+      <div className="w-full">
         <Input
           type="date"
           value={newMovement.movement_date}
@@ -110,7 +110,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
           className="w-full"
         />
       </div>
-      <div className="flex items-center w-full">
+      <div className="w-full">
         <Select
           value={newMovement.action}
           onValueChange={(value) => setNewMovement({ ...newMovement, action: value })}
@@ -125,7 +125,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
           </SelectContent>
         </Select>
       </div>
-      <div className="flex items-center w-full">
+      <div className="w-full">
         <Select
           value={newMovement.reason_id}
           onValueChange={(value) => setNewMovement({ ...newMovement, reason_id: value })}
@@ -142,7 +142,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
           </SelectContent>
         </Select>
       </div>
-      <div className="flex items-center w-full">
+      <div className="w-full">
         <Input
           type="number"
           placeholder="Quantity"
@@ -151,7 +151,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
           className="w-full"
         />
       </div>
-      <div className="flex items-center w-full">
+      <div className="w-full">
         <Input
           placeholder="Comments"
           value={newMovement.comments}
@@ -159,7 +159,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
           className="w-full"
         />
       </div>
-      <div className="flex items-center justify-end w-full">
+      <div className="w-full flex justify-end">
         <Button 
           onClick={handleAddNew} 
           size="icon" 

@@ -1,13 +1,5 @@
-
 import { format } from "date-fns";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Check } from "lucide-react";
 import { AddStockMovement } from "./AddStockMovement";
 
 interface StockMovement {
@@ -41,42 +33,34 @@ export function StockMovementsTable({
   onSuccess 
 }: StockMovementsTableProps) {
   return (
-    <div className="w-full table-fixed">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-full">Date</TableHead>
-            <TableHead className="w-full">Action</TableHead>
-            <TableHead className="w-full">Reason</TableHead>
-            <TableHead className="w-full">Quantity</TableHead>
-            <TableHead className="w-full">Comments</TableHead>
-            <TableHead className="w-full">Updated By</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {movements?.map((movement) => (
-            <TableRow key={movement.id}>
-              <TableCell>{format(new Date(movement.movement_date), 'dd/MM/yyyy')}</TableCell>
-              <TableCell>{movement.action}</TableCell>
-              <TableCell>{movement.master_data.label}</TableCell>
-              <TableCell>{movement.quantity}</TableCell>
-              <TableCell>{movement.comments}</TableCell>
-              <TableCell>{`${movement.users.first_name} ${movement.users.last_name}`}</TableCell>
-            </TableRow>
-          ))}
-          {showAddForm && (
-            <TableRow>
-              <TableCell colSpan={6} className="p-0">
-                <AddStockMovement
-                  siteRegisterId={siteRegisterId}
-                  stockReasons={stockReasons}
-                  onSuccess={onSuccess}
-                />
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+    <div className="w-full">
+      <div className="grid grid-cols-6 gap-4 px-4 py-2 font-semibold border-b bg-gray-100">
+        <div className="w-full">Date</div>
+        <div className="w-full">Action</div>
+        <div className="w-full">Reason</div>
+        <div className="w-full">Quantity</div>
+        <div className="w-full">Comments</div>
+        <div className="w-full">Updated By</div>
+      </div>
+
+      {movements?.map((movement) => (
+        <div key={movement.id} className="grid grid-cols-6 gap-4 px-4 py-2 border-b">
+          <div>{format(new Date(movement.movement_date), 'dd/MM/yyyy')}</div>
+          <div>{movement.action}</div>
+          <div>{movement.master_data.label}</div>
+          <div>{movement.quantity}</div>
+          <div>{movement.comments}</div>
+          <div>{`${movement.users.first_name} ${movement.users.last_name}`}</div>
+        </div>
+      ))}
+
+      {showAddForm && (
+        <AddStockMovement
+          siteRegisterId={siteRegisterId}
+          stockReasons={stockReasons}
+          onSuccess={onSuccess}
+        />
+      )}
     </div>
   );
 }
