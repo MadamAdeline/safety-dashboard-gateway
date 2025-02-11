@@ -122,26 +122,28 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
               <Input value={product.sds.supplier?.supplier_name || ''} readOnly className="bg-gray-50" />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox checked={product.sds.isDG || false} disabled />
-                <Label>Is Dangerous Good</Label>
-              </div>
-
-              {product.sds.isDG && product.sds.dgClass && (
-                <div className="space-y-2">
-                  <Label>DG Class</Label>
-                  <Input value={product.sds.dgClass.label || ''} readOnly className="bg-gray-50" />
-                </div>
-              )}
-
-              {product.sds.packingGroup && (
-                <div className="space-y-2">
-                  <Label>Packing Group</Label>
-                  <Input value={product.sds.packingGroup.label || ''} readOnly className="bg-gray-50" />
-                </div>
-              )}
+            <div className="flex items-center space-x-2">
+              <Checkbox checked={product.sds.isDG || false} disabled />
+              <Label>Is Dangerous Good</Label>
             </div>
+
+            {product.sds.isDG && (
+              <div className="grid grid-cols-2 gap-4">
+                {product.sds.dgClass && (
+                  <div className="space-y-2">
+                    <Label>DG Class</Label>
+                    <Input value={product.sds.dgClass.label || ''} readOnly className="bg-gray-50" />
+                  </div>
+                )}
+
+                {product.sds.packingGroup && (
+                  <div className="space-y-2">
+                    <Label>Packing Group</Label>
+                    <Input value={product.sds.packingGroup.label || ''} readOnly className="bg-gray-50" />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -158,3 +160,4 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
     </div>
   );
 }
+
