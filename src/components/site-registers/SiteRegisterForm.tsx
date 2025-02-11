@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SiteRegisterFormHeader } from "./SiteRegisterFormHeader";
 import { SiteRegisterDetailsTab } from "./SiteRegisterDetailsTab";
@@ -7,6 +7,7 @@ import { ProductInformationTab } from "./ProductInformationTab";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Product } from "@/types/product";
+import { useProductDetails } from "@/hooks/use-product-details";
 
 interface SiteRegisterFormProps {
   onClose: () => void;
@@ -26,6 +27,16 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Fetch product details when editing
+  const { data: productData } = useProductDetails(initialData?.product_id || "");
+
+  // Update selected product when product data is fetched
+  useEffect(() => {
+    if (productData) {
+      setSelectedProduct(productData);
+    }
+  }, [productData]);
 
   const handleSave = async () => {
     if (!formData.location_id || !formData.product_id) {
