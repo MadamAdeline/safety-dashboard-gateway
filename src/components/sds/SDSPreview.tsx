@@ -20,13 +20,17 @@ export function SDSPreview({ onUploadClick, initialData, selectedFile, readOnly 
     const fetchPdfUrl = async () => {
       if (initialData?.currentFilePath) {
         console.log('Fetching PDF URL for path:', initialData.currentFilePath);
-        const { data } = supabase.storage
-          .from('sds_documents')
-          .getPublicUrl(initialData.currentFilePath);
-        
-        if (data) {
-          console.log('Retrieved public URL:', data.publicUrl);
-          setPdfUrl(data.publicUrl);
+        try {
+          const { data } = supabase.storage
+            .from('sds_documents')
+            .getPublicUrl(initialData.currentFilePath);
+          
+          if (data) {
+            console.log('Retrieved public URL:', data.publicUrl);
+            setPdfUrl(data.publicUrl);
+          }
+        } catch (error) {
+          console.error('Error getting PDF URL:', error);
         }
       }
     };

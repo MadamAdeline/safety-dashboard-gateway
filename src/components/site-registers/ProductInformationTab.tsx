@@ -34,10 +34,10 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
     status: 'ACTIVE',
     sdsSource: null,
     source: null,
-    currentFilePath: null,
-    currentFileName: null,
+    currentFilePath: `${product.sds.id}.pdf`, // Set the file path for the SDS document
+    currentFileName: `${product.name}_SDS.pdf`,
     currentFileSize: null,
-    currentContentType: null,
+    currentContentType: 'application/pdf',
     issueDate: '',
     expiryDate: '',
     dgClassId: product.sds.dgClass?.id || '',
