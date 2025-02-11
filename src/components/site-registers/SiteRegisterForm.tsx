@@ -51,13 +51,19 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
       return;
     }
 
+    // Set the UOM ID from the selected product before saving
+    const dataToSave = {
+      ...formData,
+      uom_id: selectedProduct?.uomId || formData.uom_id,
+    };
+
     setIsSaving(true);
     try {
       if (initialData?.id) {
         // Update existing record
         const { error } = await supabase
           .from('site_registers')
-          .update(formData)
+          .update(dataToSave)
           .eq('id', initialData.id);
 
         if (error) throw error;
@@ -70,7 +76,7 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
         // Insert new record
         const { error } = await supabase
           .from('site_registers')
-          .insert([formData]);
+          .insert([dataToSave]);
 
         if (error) throw error;
 
@@ -101,6 +107,10 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     console.log("SiteRegisterForm - Handling product selection with full product:", product);
     setSelectedProduct(product);
     handleFieldChange("product_id", product.id);
+    // Set the UOM ID when product is selected
+    if (product.uomId) {
+      handleFieldChange("uom_id", product.uomId);
+    }
   };
 
   return (

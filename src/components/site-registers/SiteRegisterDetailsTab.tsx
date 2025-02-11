@@ -126,8 +126,9 @@ export function SiteRegisterDetailsTab({
             <div className="space-y-2">
               <Label htmlFor="uom_id">Unit of Measure</Label>
               <Select
-                value={formData.uom_id}
+                value={formData.uom_id || selectedProduct?.uomId || ''}
                 onValueChange={(value) => onChange("uom_id", value)}
+                disabled={true}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select unit of measure" />
@@ -147,4 +148,3 @@ export function SiteRegisterDetailsTab({
     </div>
   );
 }
-
