@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Location } from "@/types/location";
 import { SiteRegisterActions } from "@/components/site-registers/SiteRegisterActions";
+import { useUserRole } from "@/hooks/use-user-role";
 
 interface SiteRegisterListProps {
   searchTerm: string;
@@ -27,10 +28,20 @@ interface SiteRegisterListProps {
 }
 
 export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegisterListProps) {
+  const { data: userData } = useUserRole();
+  const isRestrictedRole = userData?.role && ["standard", "manager"].includes(userData.role.toLowerCase());
+  const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(
+    userData?.location ? {
+      id: userData.location.id,
+      name: userData.location.full_path.split(' > ').pop() || '',
+      full_path: userData.location.full_path,
+    } as Location : null
+  );
+
   const { data: siteRegisters, isLoading, refetch } = useQuery({
-    queryKey: ['site-registers'],
+    queryKey: ['site-registers', selectedLocation?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const query = supabase
         .from('site_registers')
         .select(`
           id,
@@ -56,6 +67,15 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
             full_path
           )
         `);
+
+      // If user is standard or manager, restrict to their assigned location
+      if (isRestrictedRole && userData?.location) {
+        query.eq('location_id', userData.location.id);
+      } else if (selectedLocation) {
+        query.eq('location_id', selectedLocation.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching site registers:', error);
@@ -92,8 +112,6 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
     }
   };
 
-  const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(null);
-
   const handleLocationSelect = (location: Location) => {
     console.log('Selected location:', location);
     setSelectedLocation(location);
@@ -124,26 +142,28 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col space-y-4">
-        <Label>Location</Label>
-        <div className="flex items-center gap-4">
-          <div className="w-1/2">
-            <LocationSearch
-              selectedLocationId={selectedLocation?.id || null}
-              initialLocation={selectedLocation}
-              onLocationSelect={handleLocationSelect}
-              className="w-full"
-            />
+      {!isRestrictedRole && (
+        <div className="flex flex-col space-y-4">
+          <Label>Location</Label>
+          <div className="flex items-center gap-4">
+            <div className="w-1/2">
+              <LocationSearch
+                selectedLocationId={selectedLocation?.id || null}
+                initialLocation={selectedLocation}
+                onLocationSelect={handleLocationSelect}
+                className="w-full"
+              />
+            </div>
+            {selectedLocation?.full_path && (
+              <Input
+                value={selectedLocation.full_path}
+                readOnly
+                className="bg-gray-50 text-gray-600 flex-1"
+              />
+            )}
           </div>
-          {selectedLocation?.full_path && (
-            <Input
-              value={selectedLocation.full_path}
-              readOnly
-              className="bg-gray-50 text-gray-600 flex-1"
-            />
-          )}
         </div>
-      </div>
+      )}
 
       <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
         <div className="relative flex-1 max-w-md">
