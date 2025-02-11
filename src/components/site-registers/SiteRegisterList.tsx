@@ -70,11 +70,18 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
 
       if (data?.locations) {
         const locationData = data.locations;
-        // Transform the coordinates to match the Location type
-        const coordinates = locationData.coordinates ? {
-          lat: typeof locationData.coordinates.lat === 'number' ? locationData.coordinates.lat : 0,
-          lng: typeof locationData.coordinates.lng === 'number' ? locationData.coordinates.lng : 0
-        } : null;
+        let coordinates = null;
+        
+        // Type check and transform coordinates
+        if (locationData.coordinates && 
+            typeof locationData.coordinates === 'object' && 
+            'lat' in locationData.coordinates && 
+            'lng' in locationData.coordinates) {
+          coordinates = {
+            lat: Number(locationData.coordinates.lat) || 0,
+            lng: Number(locationData.coordinates.lng) || 0
+          };
+        }
 
         return {
           ...locationData,
