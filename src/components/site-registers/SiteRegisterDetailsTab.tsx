@@ -18,12 +18,14 @@ interface SiteRegisterDetailsTabProps {
   };
   onChange: (field: string, value: string) => void;
   onProductSelect: (product: Product) => void;
+  selectedProduct: Product | null;
 }
 
 export function SiteRegisterDetailsTab({ 
   formData, 
   onChange,
-  onProductSelect 
+  onProductSelect,
+  selectedProduct
 }: SiteRegisterDetailsTabProps) {
   // Fetch current location if location_id exists
   const { data: currentLocation } = useQuery({
@@ -195,6 +197,7 @@ export function SiteRegisterDetailsTab({
         <Label>Product</Label>
         <ProductSearch
           selectedProductId={formData.product_id}
+          value={selectedProduct?.name}
           onProductSelect={handleProductSelect}
           className="w-full"
         />

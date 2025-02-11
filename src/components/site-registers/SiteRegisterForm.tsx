@@ -35,7 +35,6 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
 
   const handleProductSelect = (product: Product) => {
     console.log("SiteRegisterForm - Handling product selection with full product:", product);
-    
     setSelectedProduct(product);
     handleFieldChange("product_id", product.id);
   };
@@ -60,6 +59,7 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
               formData={formData}
               onChange={handleFieldChange}
               onProductSelect={handleProductSelect}
+              selectedProduct={selectedProduct}
             />
           </TabsContent>
 
