@@ -10,6 +10,8 @@ interface ProductInformationTabProps {
 }
 
 export function ProductInformationTab({ product }: ProductInformationTabProps) {
+  console.log("Product Information:", product);
+
   if (!product) {
     return (
       <div className="p-4 text-center text-gray-500">
