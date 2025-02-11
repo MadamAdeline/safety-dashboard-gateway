@@ -74,19 +74,23 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
         });
       } else {
         // Insert new record
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('site_registers')
-          .insert([dataToSave]);
+          .insert([dataToSave])
+          .select();
 
         if (error) throw error;
+
+        // Update initialData with the newly created record
+        if (data && data[0]) {
+          initialData = data[0];
+        }
 
         toast({
           title: "Success",
           description: "Site register created successfully",
         });
       }
-
-      onClose();
     } catch (error: any) {
       console.error('Error saving site register:', error);
       toast({
