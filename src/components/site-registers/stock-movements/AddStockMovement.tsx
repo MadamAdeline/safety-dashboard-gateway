@@ -18,7 +18,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
   const { toast } = useToast();
   const [newMovement, setNewMovement] = useState({
     movement_date: new Date().toISOString().split('T')[0],
-    action: '',
+    action: 'INCREASE' as const, // Initialize with a valid enum value
     reason_id: '',
     quantity: '',
     comments: '',
@@ -60,7 +60,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
         .insert({
           site_register_id: siteRegisterId,
           movement_date: new Date(newMovement.movement_date).toISOString(),
-          action: newMovement.action as any,
+          action: newMovement.action,
           reason_id: newMovement.reason_id,
           quantity: parseFloat(newMovement.quantity),
           comments: newMovement.comments,
@@ -84,7 +84,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
 
       setNewMovement({
         movement_date: new Date().toISOString().split('T')[0],
-        action: '',
+        action: 'INCREASE' as const,
         reason_id: '',
         quantity: '',
         comments: '',
@@ -113,7 +113,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
       <div className="w-full">
         <Select
           value={newMovement.action}
-          onValueChange={(value) => setNewMovement({ ...newMovement, action: value })}
+          onValueChange={(value) => setNewMovement({ ...newMovement, action: value as "INCREASE" | "DECREASE" | "OVERRIDE" })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Action" />
