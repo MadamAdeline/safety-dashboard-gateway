@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface AddStockMovementProps {
   siteRegisterId: string;
@@ -22,17 +23,32 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
     comments: '',
   });
 
+  // Fetch user ID based on email in localStorage
+  const { data: userData } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const userEmail = localStorage.getItem('userEmail');
+      if (!userEmail) {
+        throw new Error('No user email found');
+      }
+      
+      const { data, error } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', userEmail)
+        .maybeSingle();
+        
+      if (error) throw error;
+      return data;
+    }
+  });
+
   const handleAddNew = async () => {
     try {
-      // Get the current session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) throw sessionError;
-      
-      if (!session?.user) {
+      if (!userData?.id) {
         toast({
           title: "Error",
-          description: "You must be logged in to perform this action",
+          description: "User not found",
           variant: "destructive",
         });
         return;
@@ -47,7 +63,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
           reason_id: newMovement.reason_id,
           quantity: parseFloat(newMovement.quantity),
           comments: newMovement.comments,
-          updated_by: session.user.id,
+          updated_by: userData.id,
         });
 
       if (error) {
@@ -74,10 +90,10 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
       });
       onSuccess();
     } catch (error) {
-      console.error('Authentication error:', error);
+      console.error('Error adding stock movement:', error);
       toast({
         title: "Error",
-        description: "Authentication failed. Please try logging in again.",
+        description: "Failed to add stock movement. Please try again.",
         variant: "destructive",
       });
     }
