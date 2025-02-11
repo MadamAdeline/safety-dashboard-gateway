@@ -30,14 +30,11 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
   const { data: siteRegisters, isLoading, refetch } = useQuery({
     queryKey: ['site-registers'],
     queryFn: async () => {
-      console.log('Fetching site registers...');
       const { data, error } = await supabase
         .from('site_registers')
         .select(`
-          id,
-          override_product_name,
-          current_stock_level,
-          products:product_id (
+          *,
+          products (
             id,
             product_name,
             uom:master_data!products_uom_id_fkey (
@@ -45,7 +42,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
               label
             )
           ),
-          locations:location_id (
+          locations (
             id,
             name,
             full_path
@@ -57,7 +54,6 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
         throw error;
       }
 
-      console.log('Fetched data:', data);
       return data;
     },
   });
@@ -173,7 +169,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
             {filteredRegisters?.map((register) => (
               <TableRow key={register.id}>
                 <TableCell>{register.products?.product_name}</TableCell>
-                <TableCell>{register.override_product_name || '-'}</TableCell>
+                <TableCell>{register.override_product_name}</TableCell>
                 <TableCell>{register.locations?.name}</TableCell>
                 <TableCell>{register.products?.uom?.label}</TableCell>
                 <TableCell>{register.current_stock_level}</TableCell>
