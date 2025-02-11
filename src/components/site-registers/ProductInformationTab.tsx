@@ -28,8 +28,45 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
       </div>
 
       <div className="space-y-2">
+        <Label>Brand Name</Label>
+        <Input value={product.brandName || ''} readOnly className="bg-gray-50" />
+      </div>
+
+      <div className="space-y-2">
         <Label>Product Code</Label>
         <Input value={product.code || ''} readOnly className="bg-gray-50" />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Unit of Measure</Label>
+        <Input value={product.uom?.label || ''} readOnly className="bg-gray-50" />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Unit Size</Label>
+        <Input value={product.unitSize?.toString() || ''} readOnly className="bg-gray-50" />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Uses</Label>
+        <Textarea value={product.uses || ''} readOnly className="bg-gray-50" />
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div className="flex items-center space-x-2">
+          <Checkbox checked={product.aerosol || false} disabled />
+          <Label>Is Aerosol</Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Checkbox checked={product.cryogenicFluid || false} disabled />
+          <Label>Is Cryogenic Fluid</Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Checkbox checked={product.productSet || false} disabled />
+          <Label>Is Product Set</Label>
+        </div>
       </div>
 
       {product.sds && (
