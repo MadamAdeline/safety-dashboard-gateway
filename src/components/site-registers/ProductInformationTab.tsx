@@ -99,4 +99,3 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
     </div>
   );
 }
-
