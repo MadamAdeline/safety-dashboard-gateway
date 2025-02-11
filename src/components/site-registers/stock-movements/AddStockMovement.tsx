@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 interface AddStockMovementProps {
   siteRegisterId: string;
@@ -102,6 +102,17 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
     }
   };
 
+  const handleCancel = () => {
+    setNewMovement({
+      movement_date: new Date().toISOString().split('T')[0],
+      action: "INCREASE",
+      reason_id: '',
+      quantity: '',
+      comments: '',
+    });
+    onSuccess(); // This will close the add form
+  };
+
   return (
     <div className="grid grid-cols-6 gap-4 px-4 py-2">
       <div className="w-full">
@@ -161,7 +172,15 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
           className="w-full"
         />
       </div>
-      <div className="w-full flex justify-end">
+      <div className="w-full flex justify-end gap-2">
+        <Button 
+          onClick={handleCancel} 
+          size="icon" 
+          variant="ghost"
+          className="hover:bg-red-100"
+        >
+          <X className="h-4 w-4" />
+        </Button>
         <Button 
           onClick={handleAddNew} 
           size="icon" 
