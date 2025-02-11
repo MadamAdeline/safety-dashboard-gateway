@@ -28,6 +28,10 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     console.log("Saving site register:", formData);
   };
 
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   return (
     <div className="max-w-full">
       <SiteRegisterFormHeader
@@ -46,8 +50,8 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
           <TabsContent value="details">
             <SiteRegisterDetailsTab
               formData={formData}
-              onChange={(field, value) => setFormData(prev => ({ ...prev, [field]: value }))}
-              onProductSelect={(product) => setSelectedProduct(product)}
+              onChange={handleFieldChange}
+              onProductSelect={setSelectedProduct}
             />
           </TabsContent>
 
@@ -59,3 +63,4 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     </div>
   );
 }
+

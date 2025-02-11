@@ -58,6 +58,77 @@ export function SiteRegisterDetailsTab({
     enabled: !!formData.location_id
   });
 
+  // Fetch current product if product_id exists
+  const { data: currentProduct } = useQuery({
+    queryKey: ['product', formData.product_id],
+    queryFn: async () => {
+      if (!formData.product_id) return null;
+      
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          uom:master_data!products_uom_id_fkey (
+            id,
+            label
+          ),
+          sds:sds!products_sds_id_fkey (
+            id,
+            is_dg,
+            dg_class:master_data!sds_dg_class_id_fkey (
+              id,
+              label
+            ),
+            supplier:suppliers!sds_supplier_id_fkey (
+              id,
+              supplier_name
+            )
+          )
+        `)
+        .eq('id', formData.product_id)
+        .single();
+      
+      if (error) throw error;
+      
+      if (!data) return null;
+      
+      return {
+        id: data.id,
+        name: data.product_name,
+        code: data.product_code,
+        brandName: data.brand_name,
+        unit: data.unit,
+        uomId: data.uom_id,
+        uom: data.uom ? {
+          id: data.uom.id,
+          label: data.uom.label
+        } : undefined,
+        unitSize: data.unit_size,
+        description: data.description,
+        productSet: data.product_set,
+        aerosol: data.aerosol,
+        cryogenicFluid: data.cryogenic_fluid,
+        otherNames: data.other_names,
+        uses: data.uses,
+        status: data.product_status_id === 16 ? "ACTIVE" : "INACTIVE",
+        sdsId: data.sds_id,
+        sds: data.sds ? {
+          id: data.sds.id,
+          isDG: data.sds.is_dg,
+          dgClass: data.sds.dg_class ? {
+            id: data.sds.dg_class.id,
+            label: data.sds.dg_class.label
+          } : undefined,
+          supplier: data.sds.supplier ? {
+            id: data.sds.supplier.id,
+            supplier_name: data.sds.supplier.supplier_name
+          } : undefined
+        } : undefined
+      } as Product;
+    },
+    enabled: !!formData.product_id
+  });
+
   const handleLocationSelect = (location: Location) => {
     onChange("location_id", location.id);
   };
@@ -101,6 +172,7 @@ export function SiteRegisterDetailsTab({
           id="override_product_name"
           value={formData.override_product_name}
           onChange={(e) => onChange("override_product_name", e.target.value)}
+          placeholder={currentProduct?.name || ""}
         />
       </div>
 
@@ -125,3 +197,4 @@ export function SiteRegisterDetailsTab({
     </div>
   );
 }
+

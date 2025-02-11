@@ -21,6 +21,11 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
+        <Label>Product Name</Label>
+        <Input value={product.name} readOnly className="bg-gray-50" />
+      </div>
+
+      <div className="space-y-2">
         <Label>Product Code</Label>
         <Input value={product.code} readOnly className="bg-gray-50" />
       </div>
@@ -66,6 +71,32 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
           <Label>Is Product Set</Label>
         </div>
       </div>
+
+      {product.sds && (
+        <div className="space-y-4">
+          <h3 className="font-semibold">SDS Information</h3>
+          
+          <div className="space-y-2">
+            <Label>Supplier</Label>
+            <Input value={product.sds.supplier?.supplier_name || ''} readOnly className="bg-gray-50" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox checked={product.sds.isDG} disabled />
+              <Label>Is Dangerous Good</Label>
+            </div>
+
+            {product.sds.isDG && product.sds.dgClass && (
+              <div className="space-y-2">
+                <Label>DG Class</Label>
+                <Input value={product.sds.dgClass.label} readOnly className="bg-gray-50" />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
