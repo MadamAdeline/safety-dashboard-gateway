@@ -43,6 +43,7 @@ export function useProducts() {
           throw productsError;
         }
 
+        console.log('Raw API Response:', productsData);
         console.log('Fetched products:', productsData);
         
         return productsData.map(item => ({
