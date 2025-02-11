@@ -78,34 +78,42 @@ export function SiteRegisterDetailsTab({
 
   return (
     <div className="space-y-6">
-      <LocationSelection
-        locationId={formData.location_id}
-        onLocationSelect={handleLocationSelect}
-      />
-
-      <div className="space-y-2">
-        <Label htmlFor="exact_location">Exact Location (Free Text)</Label>
-        <Input
-          id="exact_location"
-          value={formData.exact_location}
-          onChange={(e) => onChange("exact_location", e.target.value)}
-        />
+      {/* Location Row */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <LocationSelection
+            locationId={formData.location_id}
+            onLocationSelect={handleLocationSelect}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="exact_location">Exact Location (Free Text)</Label>
+          <Input
+            id="exact_location"
+            value={formData.exact_location}
+            onChange={(e) => onChange("exact_location", e.target.value)}
+          />
+        </div>
       </div>
 
-      <ProductSelection
-        productId={formData.product_id}
-        selectedProduct={selectedProduct}
-        onProductSelect={onProductSelect}
-      />
-
-      <div className="space-y-2">
-        <Label htmlFor="override_product_name">Override Product Name</Label>
-        <Input
-          id="override_product_name"
-          value={formData.override_product_name}
-          onChange={(e) => onChange("override_product_name", e.target.value)}
-          placeholder={selectedProduct?.name || ""}
-        />
+      {/* Product Row */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <ProductSelection
+            productId={formData.product_id}
+            selectedProduct={selectedProduct}
+            onProductSelect={onProductSelect}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="override_product_name">Override Product Name</Label>
+          <Input
+            id="override_product_name"
+            value={formData.override_product_name}
+            onChange={(e) => onChange("override_product_name", e.target.value)}
+            placeholder={selectedProduct?.name || ""}
+          />
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -170,7 +178,7 @@ export function SiteRegisterDetailsTab({
           {showStockMovements && (
             <div className="pt-8">
               <StockMovementsGrid 
-                siteRegisterId={formData.id!} 
+                siteRegisterId={formData.id!}
                 onStockUpdate={onStockUpdate}
               />
             </div>
