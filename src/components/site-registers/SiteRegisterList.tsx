@@ -85,7 +85,6 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
   const handleLocationSelect = (location: Location) => {
     console.log('Selected location:', location);
     setSelectedLocation(location);
-    // We'll implement location filtering in a future update
   };
 
   const filteredRegisters = siteRegisters?.filter(register => {
@@ -104,26 +103,24 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
-        <div className="space-y-2">
-          <Label>Location</Label>
-          <div className="flex items-center gap-4">
-            <div className="w-[300px]">
-              <LocationSearch
-                selectedLocationId={selectedLocation?.id || null}
-                initialLocation={selectedLocation}
-                onLocationSelect={handleLocationSelect}
-                className="w-full"
-              />
-            </div>
-            {selectedLocation?.full_path && (
-              <Input
-                value={selectedLocation.full_path}
-                readOnly
-                className="bg-gray-50 text-gray-600"
-              />
-            )}
+      <div className="flex flex-col space-y-4">
+        <Label>Location</Label>
+        <div className="flex items-center gap-4">
+          <div className="w-1/2">
+            <LocationSearch
+              selectedLocationId={selectedLocation?.id || null}
+              initialLocation={selectedLocation}
+              onLocationSelect={handleLocationSelect}
+              className="w-full"
+            />
           </div>
+          {selectedLocation?.full_path && (
+            <Input
+              value={selectedLocation.full_path}
+              readOnly
+              className="bg-gray-50 text-gray-600 flex-1"
+            />
+          )}
         </div>
       </div>
 
@@ -144,7 +141,7 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
               <TableRow key={register.id}>
                 <TableCell>{register.products?.product_name}</TableCell>
                 <TableCell>{register.override_product_name}</TableCell>
-                <TableCell>{register.locations?.full_path}</TableCell>
+                <TableCell>{register.locations?.name}</TableCell>
                 <TableCell>{register.products?.uom?.label}</TableCell>
                 <TableCell>{register.current_stock_level}</TableCell>
                 <TableCell>
@@ -173,3 +170,4 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     </div>
   );
 }
+
