@@ -4,6 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SiteRegisterFormHeader } from "./SiteRegisterFormHeader";
 import { SiteRegisterDetailsTab } from "./SiteRegisterDetailsTab";
 import { ProductInformationTab } from "./ProductInformationTab";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import type { Product } from "@/types/product";
 
 interface SiteRegisterFormProps {
@@ -12,21 +14,69 @@ interface SiteRegisterFormProps {
 }
 
 export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps) {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     location_id: initialData?.location_id || "",
     product_id: initialData?.product_id || "",
     override_product_name: initialData?.override_product_name || "",
     exact_location: initialData?.exact_location || "",
     storage_conditions: initialData?.storage_conditions || "",
-    status_id: initialData?.status_id || "",
+    status_id: initialData?.status_id || 16, // Default to ACTIVE status
   });
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  console.log("SiteRegisterForm - Selected Product (before passing to ProductInformationTab):", selectedProduct);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
-    // TODO: Implement save functionality
-    console.log("Saving site register:", formData);
+    if (!formData.location_id || !formData.product_id) {
+      toast({
+        title: "Error",
+        description: "Please select both a location and a product",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      if (initialData?.id) {
+        // Update existing record
+        const { error } = await supabase
+          .from('site_registers')
+          .update(formData)
+          .eq('id', initialData.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Site register updated successfully",
+        });
+      } else {
+        // Insert new record
+        const { error } = await supabase
+          .from('site_registers')
+          .insert([formData]);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Site register created successfully",
+        });
+      }
+
+      onClose();
+    } catch (error: any) {
+      console.error('Error saving site register:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save site register",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleFieldChange = (field: string, value: string) => {
@@ -45,6 +95,7 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
         isEditing={!!initialData}
         onClose={onClose}
         onSave={handleSave}
+        isSaving={isSaving}
       />
 
       <div className="bg-white rounded-lg shadow p-6">
