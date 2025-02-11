@@ -45,7 +45,11 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
           locations (
             id,
             name,
-            full_path
+            full_path,
+            type_id,
+            parent_location_id,
+            status_id,
+            coordinates
           )
         `)
         .eq('email', userEmail)

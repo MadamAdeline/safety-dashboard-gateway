@@ -11,13 +11,15 @@ interface LocationSearchProps {
   initialLocation?: Location | null;
   onLocationSelect: (location: Location) => void;
   className?: string;
+  disabled?: boolean;
 }
 
 export function LocationSearch({ 
   selectedLocationId, 
   initialLocation, 
   onLocationSelect, 
-  className 
+  className,
+  disabled 
 }: LocationSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -100,10 +102,11 @@ export function LocationSearch({
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={handleInputFocus}
           className="pl-10"
+          disabled={disabled}
         />
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         
-        {isDropdownOpen && locations && (
+        {isDropdownOpen && locations && !disabled && (
           <div className="absolute w-full bg-white mt-1 border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
             {filteredLocations?.map(location => (
               <div
