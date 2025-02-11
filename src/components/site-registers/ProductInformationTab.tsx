@@ -10,9 +10,19 @@ interface ProductInformationTabProps {
 }
 
 export function ProductInformationTab({ product }: ProductInformationTabProps) {
-  console.log("Product Information:", product);
+  console.log("ProductInformationTab - Received product prop:", product);
+  console.log("ProductInformationTab - Product details:", {
+    name: product?.name,
+    brandName: product?.brandName,
+    code: product?.code,
+    uom: product?.uom,
+    unitSize: product?.unitSize,
+    uses: product?.uses,
+    sds: product?.sds
+  });
 
   if (!product) {
+    console.log("ProductInformationTab - No product selected");
     return (
       <div className="p-4 text-center text-gray-500">
         Please select a product to view its details
