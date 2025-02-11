@@ -2,12 +2,9 @@
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Plus, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Plus } from "lucide-react";
 import { SiteRegisterForm } from "@/components/site-registers/SiteRegisterForm";
 import { SiteRegisterList } from "@/components/site-registers/SiteRegisterList";
-import { SiteRegisterActions } from "@/components/site-registers/SiteRegisterActions";
-import { exportSiteRegistersToExcel } from "@/utils/exportUtils";
 
 export default function SiteRegisters() {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -22,16 +19,6 @@ export default function SiteRegisters() {
   const handleFormClose = () => {
     setIsFormOpen(false);
     setSelectedSiteRegister(null);
-  };
-
-  const handleExport = () => {
-    // This will be implemented when we have the data structure
-    console.log("Export functionality to be implemented");
-  };
-
-  const handleRefresh = () => {
-    // Implement refresh logic here
-    window.location.reload();
   };
 
   if (isFormOpen) {
@@ -63,6 +50,7 @@ export default function SiteRegisters() {
 
         <SiteRegisterList
           searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
           onEdit={handleEdit}
         />
       </div>

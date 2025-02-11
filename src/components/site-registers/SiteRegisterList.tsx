@@ -23,9 +23,10 @@ import { SiteRegisterActions } from "@/components/site-registers/SiteRegisterAct
 interface SiteRegisterListProps {
   searchTerm: string;
   onEdit: (siteRegister: any) => void;
+  setSearchTerm: (term: string) => void;
 }
 
-export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) {
+export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegisterListProps) {
   const { data: siteRegisters, isLoading, refetch } = useQuery({
     queryKey: ['site-registers'],
     queryFn: async () => {
@@ -103,8 +104,8 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     
     const searchLower = searchTerm.toLowerCase();
     return (
-      register.products?.product_name.toLowerCase().includes(searchLower) ||
-      register.override_product_name?.toLowerCase().includes(searchLower)
+      (register.products?.product_name?.toLowerCase().includes(searchLower)) ||
+      (register.override_product_name?.toLowerCase().includes(searchLower))
     );
   });
 
@@ -141,6 +142,7 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
             type="text"
             placeholder="Search site registers..."
             value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
