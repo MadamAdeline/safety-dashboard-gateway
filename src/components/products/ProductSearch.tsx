@@ -20,20 +20,25 @@ export function ProductSearch({ selectedProductId, onProductSelect, className }:
 
   const selectedProduct = products?.find(p => p.id === selectedProductId);
 
+  // Handle undefined products
   const filteredProducts = products?.filter(product => {
     if (!searchValue) return true;
     return (
-      product.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      product.code.toLowerCase().includes(searchValue.toLowerCase())
+      product.product_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      product.product_code.toLowerCase().includes(searchValue.toLowerCase())
     );
-  });
+  }) || [];
+
+  console.log('ProductSearch - Products:', products);
+  console.log('ProductSearch - Filtered Products:', filteredProducts);
+  console.log('ProductSearch - Selected Product:', selectedProduct);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <div className={`relative ${className}`}>
           <Input
-            value={selectedProduct ? selectedProduct.name : searchValue}
+            value={selectedProduct ? selectedProduct.product_name : searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             placeholder="Search products..."
             className="pl-10"
@@ -48,24 +53,32 @@ export function ProductSearch({ selectedProductId, onProductSelect, className }:
             value={searchValue}
             onValueChange={setSearchValue}
           />
-          <CommandEmpty>No products found.</CommandEmpty>
-          <CommandGroup>
-            {filteredProducts?.map((product) => (
-              <CommandItem
-                key={product.id}
-                onSelect={() => {
-                  onProductSelect(product);
-                  setOpen(false);
-                  setSearchValue("");
-                }}
-              >
-                <div className="flex flex-col">
-                  <span>{product.name}</span>
-                  <span className="text-sm text-gray-500">{product.code}</span>
-                </div>
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          {isLoading ? (
+            <div className="py-6 text-center text-sm text-gray-500">
+              Loading products...
+            </div>
+          ) : (
+            <>
+              <CommandEmpty>No products found.</CommandEmpty>
+              <CommandGroup>
+                {filteredProducts.map((product) => (
+                  <CommandItem
+                    key={product.id}
+                    onSelect={() => {
+                      onProductSelect(product);
+                      setOpen(false);
+                      setSearchValue("");
+                    }}
+                  >
+                    <div className="flex flex-col">
+                      <span>{product.product_name}</span>
+                      <span className="text-sm text-gray-500">{product.product_code}</span>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
