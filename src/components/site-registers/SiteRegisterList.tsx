@@ -168,7 +168,6 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
   };
 
   const handleLocationSelect = (location: Location) => {
-    console.log('Selected location:', location);
     setSelectedLocation(location);
   };
 
@@ -229,11 +228,11 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
           <TableBody>
             {filteredRegisters?.map((register) => (
               <TableRow key={register.id}>
-                <TableCell>{register.products?.product_name}</TableCell>
-                <TableCell>{register.override_product_name}</TableCell>
-                <TableCell>{register.locations?.full_path}</TableCell>
-                <TableCell>{register.products?.uom?.label}</TableCell>
-                <TableCell>{register.current_stock_level}</TableCell>
+                <TableCell>{register.products?.product_name || '-'}</TableCell>
+                <TableCell>{register.override_product_name || '-'}</TableCell>
+                <TableCell>{register.locations?.full_path || '-'}</TableCell>
+                <TableCell>{register.products?.uom?.label || '-'}</TableCell>
+                <TableCell>{register.current_stock_level?.toString() || '0'}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
@@ -260,4 +259,3 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     </div>
   );
 }
-
