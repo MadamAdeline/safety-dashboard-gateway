@@ -34,7 +34,6 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
     status: 'ACTIVE',
     sdsSource: null,
     source: null,
-    // Get the current_file_path from the SDS record
     currentFilePath: product.sds.currentFilePath || null,
     currentFileName: product.sds.currentFileName || `${product.name}_SDS.pdf`,
     currentFileSize: product.sds.currentFileSize || null,
@@ -66,6 +65,11 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
     <div className="grid grid-cols-2 gap-6">
       <div className="space-y-6">
         <div className="space-y-2">
+          <Label>Product Code</Label>
+          <Input value={product.code || ''} readOnly className="bg-gray-50" />
+        </div>
+
+        <div className="space-y-2">
           <Label>Product Name</Label>
           <Input value={product.name || ''} readOnly className="bg-gray-50" />
         </div>
@@ -73,11 +77,6 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
         <div className="space-y-2">
           <Label>Brand Name</Label>
           <Input value={product.brandName || ''} readOnly className="bg-gray-50" />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Product Code</Label>
-          <Input value={product.code || ''} readOnly className="bg-gray-50" />
         </div>
 
         <div className="space-y-2">
