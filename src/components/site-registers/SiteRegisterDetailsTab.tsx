@@ -109,7 +109,8 @@ export function SiteRegisterDetailsTab({
                 id="current_stock_level"
                 type="number"
                 value={formData.current_stock_level || ''}
-                onChange={(e) => onChange("current_stock_level", parseFloat(e.target.value))}
+                readOnly
+                className="bg-gray-100"
               />
             </div>
 
