@@ -6,7 +6,6 @@ import { ProductFilters } from "@/components/products/ProductFilters";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ProductSearch } from "@/components/products/ProductSearch";
 import { ProductActions } from "@/components/products/ProductActions";
 import { ProductForm } from "@/components/products/ProductForm";
 import type { Product, ProductFilters as ProductFiltersType } from "@/types/product";
@@ -14,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { exportProductsToExcel } from "@/utils/exportUtils";
 import { useLocation } from "react-router-dom";
+import { ProductListSearch } from "@/components/products/list/ProductListSearch";
 
 export default function Products() {
   const location = useLocation();
@@ -256,7 +256,7 @@ export default function Products() {
         
         <div className="space-y-4">
           <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-            <ProductSearch 
+            <ProductListSearch 
               value={filters.search}
               onChange={(value) => setFilters({ ...filters, search: value })}
             />
@@ -282,3 +282,4 @@ export default function Products() {
     </DashboardLayout>
   );
 }
+

@@ -1,4 +1,3 @@
-
 import { Table, TableBody } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import type { Product, ProductFilters } from "@/types/product";
@@ -63,12 +62,7 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
         item.name,
         item.code,
         item.brandName,
-        item.unit,
-        item.description,
-        item.otherNames,
-        item.uses,
         item.sds?.supplier?.supplier_name,
-        item.sds?.dgClass?.label,
       ].filter(Boolean);
 
       const matchesSearch = searchableFields.some(
