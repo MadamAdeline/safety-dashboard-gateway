@@ -58,6 +58,13 @@ export function ManagerSearch({
     setIsDropdownOpen(true);
   };
 
+  const handleInputBlur = () => {
+    // Use setTimeout to allow click events on dropdown items to fire before closing
+    setTimeout(() => {
+      setIsDropdownOpen(false);
+    }, 200);
+  };
+
   const filteredManagers = managers?.filter(manager => {
     if (!searchTerm) return true;
     
@@ -74,6 +81,7 @@ export function ManagerSearch({
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
           className="pl-10"
         />
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
