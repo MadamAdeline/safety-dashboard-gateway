@@ -1,3 +1,4 @@
+
 import * as XLSX from 'xlsx';
 import type { Product } from '@/types/product';
 
@@ -35,6 +36,32 @@ export const exportProductsToExcel = (products: Product[]) => {
 
   // Generate Excel file
   XLSX.writeFile(wb, `Products_Export_${new Date().toISOString().split('T')[0]}.xlsx`);
+  
+  console.log('Export completed successfully');
+};
+
+export const exportSiteRegistersToExcel = (siteRegisters: any[]) => {
+  console.log('Starting export of site registers to Excel:', siteRegisters.length, 'site registers');
+  
+  // Transform the data for export
+  const exportData = siteRegisters.map(register => ({
+    'Location': register.location?.name || '',
+    'Product': register.product?.name || '',
+    'Created At': register.created_at || '',
+    'Updated At': register.updated_at || ''
+  }));
+
+  console.log('Transformed data for export:', exportData);
+
+  // Create workbook and worksheet
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(exportData);
+
+  // Add worksheet to workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Site Registers');
+
+  // Generate Excel file
+  XLSX.writeFile(wb, `Site_Registers_Export_${new Date().toISOString().split('T')[0]}.xlsx`);
   
   console.log('Export completed successfully');
 };
