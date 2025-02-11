@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -88,10 +87,8 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
           )
         `);
 
-      // If user is standard or manager, restrict to their assigned location
-      if (isRestrictedRole && userData?.location) {
-        query.eq('location_id', userData.location.id);
-      } else if (locationHierarchy && locationHierarchy.length > 0) {
+      // Use location hierarchy for both restricted and admin users
+      if (locationHierarchy && locationHierarchy.length > 0) {
         // Extract just the IDs from the location hierarchy and include them in the query
         const locationIds = locationHierarchy.map(loc => loc.id);
         query.in('location_id', locationIds);
