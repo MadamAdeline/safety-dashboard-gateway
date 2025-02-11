@@ -1,7 +1,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -52,7 +52,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
         return [];
       }
 
-      return data; // Function already returns an array of location IDs
+      return data;
     },
     enabled: !!selectedLocation
   });
@@ -146,6 +146,10 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
     refetch();
   };
 
+  const handleClearLocation = () => {
+    setSelectedLocation(null);
+  };
+
   const filteredRegisters = siteRegisters?.filter(register => {
     if (!searchTerm) return true;
     
@@ -165,7 +169,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
       <div className="flex flex-col space-y-4">
         <Label>Location</Label>
         <div className="flex items-center gap-4">
-          <div className="w-1/2">
+          <div className="w-1/2 relative">
             {isRestrictedRole ? (
               <Input
                 value={selectedLocation?.name || ''}
@@ -173,12 +177,24 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
                 className="bg-gray-100 text-gray-600"
               />
             ) : (
-              <LocationSearch
-                selectedLocationId={selectedLocation?.id || null}
-                initialLocation={selectedLocation}
-                onLocationSelect={handleLocationSelect}
-                className="w-full"
-              />
+              <>
+                <LocationSearch
+                  selectedLocationId={selectedLocation?.id || null}
+                  initialLocation={selectedLocation}
+                  onLocationSelect={handleLocationSelect}
+                  className="w-full"
+                />
+                {selectedLocation && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2"
+                    onClick={handleClearLocation}
+                  >
+                    <X className="h-4 w-4 text-gray-500" />
+                  </Button>
+                )}
+              </>
             )}
           </div>
           {selectedLocation?.full_path && (
