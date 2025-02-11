@@ -1,77 +1,100 @@
 
-import { format } from "date-fns";
-import { Check } from "lucide-react";
-import { AddStockMovement } from "./AddStockMovement";
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { StockMovementsHeader } from "./stock-movements/StockMovementsHeader";
+import { StockMovementsTable } from "./stock-movements/StockMovementsTable";
 
-interface StockMovement {
-  id: string;
-  movement_date: string;
-  action: string;
-  quantity: number;
-  comments: string;
-  master_data: {
-    label: string;
-  };
-  users: {
-    first_name: string;
-    last_name: string;
-  };
-}
-
-interface StockMovementsTableProps {
-  movements: StockMovement[];
-  showAddForm?: boolean;
+interface StockMovementsGridProps {
   siteRegisterId: string;
-  stockReasons: Array<{ id: string; label: string }>;
-  onSuccess?: () => void;
+  onStockUpdate?: () => void;
 }
 
-export function StockMovementsTable({ 
-  movements, 
-  showAddForm,
-  siteRegisterId,
-  stockReasons,
-  onSuccess 
-}: StockMovementsTableProps) {
-  const queryClient = useQueryClient();
+export function StockMovementsGrid({ siteRegisterId, onStockUpdate }: StockMovementsGridProps) {
+  console.log('StockMovementsGrid rendering with siteRegisterId:', siteRegisterId);
+  
+  const [isAddingNew, setIsAddingNew] = useState(false);
 
-  const handleSuccess = () => {
-    // Invalidate both the stock movements and site register queries
-    queryClient.invalidateQueries({ queryKey: ['stockMovements', siteRegisterId] });
-    queryClient.invalidateQueries({ queryKey: ['siteRegister'] });
-    if (onSuccess) {
-      onSuccess();
+  // Fetch stock movements
+  const { data: stockMovements, refetch, isLoading, error } = useQuery({
+    queryKey: ['stockMovements', siteRegisterId],
+    queryFn: async () => {
+      console.log('Fetching stock movements for siteRegisterId:', siteRegisterId);
+      const { data, error } = await supabase
+        .from('stock_movements')
+        .select(`
+          *,
+          master_data (label),
+          users (first_name, last_name)
+        `)
+        .eq('site_register_id', siteRegisterId)
+        .order('movement_date', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching stock movements:', error);
+        throw error;
+      }
+      console.log('Fetched stock movements:', data);
+      return data;
+    },
+    enabled: !!siteRegisterId,
+  });
+
+  // Fetch stock reasons from master_data
+  const { data: stockReasons } = useQuery({
+    queryKey: ['stockReasons'],
+    queryFn: async () => {
+      console.log('Fetching stock reasons');
+      const { data, error } = await supabase
+        .from('master_data')
+        .select('id, label')
+        .eq('category', 'STOCK_REASON')
+        .eq('status', 'ACTIVE')
+        .order('sort_order');
+
+      if (error) {
+        console.error('Error fetching stock reasons:', error);
+        throw error;
+      }
+      console.log('Fetched stock reasons:', data);
+      return data;
+    },
+  });
+
+  const handleStockUpdate = () => {
+    setIsAddingNew(false);
+    refetch();
+    if (onStockUpdate) {
+      onStockUpdate();
     }
   };
 
+  if (!siteRegisterId) {
+    console.log('No siteRegisterId provided, not rendering grid');
+    return null;
+  }
+
+  if (isLoading) {
+    console.log('Stock movements are loading...');
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    console.error('Error in StockMovementsGrid:', error);
+    return <div>Error loading stock movements</div>;
+  }
+
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-6 gap-4 px-4 py-2 font-semibold border-b bg-gray-100">
-        <div className="w-full">Date</div>
-        <div className="w-full">Action</div>
-        <div className="w-full">Reason</div>
-        <div className="w-full">Quantity</div>
-        <div className="w-full">Comments</div>
-        <div className="w-full">Updated By</div>
-      </div>
+    <div className="space-y-4">
+      <StockMovementsHeader onAddClick={() => setIsAddingNew(true)} />
 
-      {movements?.map((movement) => (
-        <div key={movement.id} className="grid grid-cols-6 gap-4 px-4 py-2 border-b">
-          <div>{format(new Date(movement.movement_date), 'dd/MM/yyyy')}</div>
-          <div>{movement.action}</div>
-          <div>{movement.master_data.label}</div>
-          <div>{movement.quantity}</div>
-          <div>{movement.comments}</div>
-          <div>{`${movement.users.first_name} ${movement.users.last_name}`}</div>
-        </div>
-      ))}
-
-      {showAddForm && (
-        <AddStockMovement
+      {stockMovements && stockReasons && (
+        <StockMovementsTable 
+          movements={stockMovements}
+          showAddForm={isAddingNew}
           siteRegisterId={siteRegisterId}
           stockReasons={stockReasons}
-          onSuccess={handleSuccess}
+          onSuccess={handleStockUpdate}
         />
       )}
     </div>

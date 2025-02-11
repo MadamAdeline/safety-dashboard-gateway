@@ -48,6 +48,23 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     }
   }, [productData]);
 
+  const refreshFormData = async () => {
+    if (formData.id) {
+      const { data, error } = await supabase
+        .from('site_registers')
+        .select('*')
+        .eq('id', formData.id)
+        .single();
+
+      if (!error && data) {
+        setFormData(prev => ({
+          ...prev,
+          current_stock_level: data.current_stock_level
+        }));
+      }
+    }
+  };
+
   const handleSave = async () => {
     if (!formData.location_id || !formData.product_id) {
       toast({
@@ -148,6 +165,7 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
               onProductSelect={handleProductSelect}
               selectedProduct={selectedProduct}
               isEditing={!!initialData}
+              onStockUpdate={refreshFormData}
             />
           </TabsContent>
 
