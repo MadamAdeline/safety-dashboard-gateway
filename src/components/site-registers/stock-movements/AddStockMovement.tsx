@@ -100,7 +100,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
   };
 
   return (
-    <div className="grid grid-cols-6 gap-4 p-4 bg-gray-50 rounded-lg">
+    <div className="grid grid-cols-6 gap-4 p-4">
       <Input
         type="date"
         value={newMovement.movement_date}

@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AddStockMovement } from "./AddStockMovement";
 
 interface StockMovement {
   id: string;
@@ -26,9 +27,19 @@ interface StockMovement {
 
 interface StockMovementsTableProps {
   movements: StockMovement[];
+  showAddForm?: boolean;
+  siteRegisterId: string;
+  stockReasons: Array<{ id: string; label: string }>;
+  onSuccess?: () => void;
 }
 
-export function StockMovementsTable({ movements }: StockMovementsTableProps) {
+export function StockMovementsTable({ 
+  movements, 
+  showAddForm,
+  siteRegisterId,
+  stockReasons,
+  onSuccess 
+}: StockMovementsTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -52,6 +63,17 @@ export function StockMovementsTable({ movements }: StockMovementsTableProps) {
             <TableCell>{`${movement.users.first_name} ${movement.users.last_name}`}</TableCell>
           </TableRow>
         ))}
+        {showAddForm && (
+          <TableRow>
+            <TableCell colSpan={6} className="p-0">
+              <AddStockMovement
+                siteRegisterId={siteRegisterId}
+                stockReasons={stockReasons}
+                onSuccess={onSuccess}
+              />
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
     </Table>
   );

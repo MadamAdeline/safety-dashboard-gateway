@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { StockMovementsHeader } from "./stock-movements/StockMovementsHeader";
-import { AddStockMovement } from "./stock-movements/AddStockMovement";
 import { StockMovementsTable } from "./stock-movements/StockMovementsTable";
 
 interface StockMovementsGridProps {
@@ -80,8 +79,10 @@ export function StockMovementsGrid({ siteRegisterId }: StockMovementsGridProps) 
     <div className="space-y-4">
       <StockMovementsHeader onAddClick={() => setIsAddingNew(true)} />
 
-      {isAddingNew && stockReasons && (
-        <AddStockMovement
+      {stockMovements && stockReasons && (
+        <StockMovementsTable 
+          movements={stockMovements}
+          showAddForm={isAddingNew}
           siteRegisterId={siteRegisterId}
           stockReasons={stockReasons}
           onSuccess={() => {
@@ -90,8 +91,6 @@ export function StockMovementsGrid({ siteRegisterId }: StockMovementsGridProps) 
           }}
         />
       )}
-
-      {stockMovements && <StockMovementsTable movements={stockMovements} />}
     </div>
   );
 }
