@@ -59,9 +59,8 @@ export function useProducts() {
         }
 
         console.log('Raw API Response:', productsData);
-        console.log('Fetched products:', productsData);
         
-        return productsData.map(item => ({
+        const mappedProducts = productsData.map(item => ({
           id: item.id,
           name: item.product_name,
           code: item.product_code,
@@ -100,6 +99,9 @@ export function useProducts() {
             } : undefined
           } : undefined
         })) as Product[];
+
+        console.log('Mapped products:', mappedProducts);
+        return mappedProducts;
       } catch (err) {
         console.error('Failed to fetch products:', err);
         toast({
@@ -112,4 +114,3 @@ export function useProducts() {
     }
   });
 }
-
