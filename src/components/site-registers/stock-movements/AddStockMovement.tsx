@@ -46,8 +46,34 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
     }
   });
 
+  const validateForm = () => {
+    if (!newMovement.reason_id) {
+      toast({
+        title: "Error",
+        description: "Please select a reason",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    if (!newMovement.quantity || parseFloat(newMovement.quantity) <= 0) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid quantity",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleAddNew = async () => {
     try {
+      if (!validateForm()) {
+        return;
+      }
+
       if (!userData?.id) {
         toast({
           title: "Error",
