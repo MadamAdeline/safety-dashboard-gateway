@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { LocationSearch } from "@/components/locations/LocationSearch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import type { Location } from "@/types/location";
 
 interface SiteRegisterListProps {
@@ -77,8 +79,11 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     }
   };
 
+  const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(null);
+
   const handleLocationSelect = (location: Location) => {
     console.log('Selected location:', location);
+    setSelectedLocation(location);
     // We'll implement location filtering in a future update
   };
 
@@ -99,13 +104,25 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <div className="w-[300px]">
-          <LocationSearch
-            selectedLocationId={null}
-            initialLocation={null}
-            onLocationSelect={handleLocationSelect}
-            className="w-full"
-          />
+        <div className="space-y-2">
+          <Label>Location</Label>
+          <div className="flex items-center gap-4">
+            <div className="w-[300px]">
+              <LocationSearch
+                selectedLocationId={selectedLocation?.id || null}
+                initialLocation={selectedLocation}
+                onLocationSelect={handleLocationSelect}
+                className="w-full"
+              />
+            </div>
+            {selectedLocation?.full_path && (
+              <Input
+                value={selectedLocation.full_path}
+                readOnly
+                className="bg-gray-50 text-gray-600"
+              />
+            )}
+          </div>
         </div>
       </div>
 
