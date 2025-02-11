@@ -107,7 +107,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
           type="date"
           value={newMovement.movement_date}
           onChange={(e) => setNewMovement({ ...newMovement, movement_date: e.target.value })}
-          className="w-full"
+          className="w-32"
         />
       </div>
       <div className="flex items-center">
