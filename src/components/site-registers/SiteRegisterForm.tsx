@@ -23,6 +23,9 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     exact_location: initialData?.exact_location || "",
     storage_conditions: initialData?.storage_conditions || "",
     status_id: initialData?.status_id || 16, // Default to ACTIVE status
+    current_stock_level: initialData?.current_stock_level || null,
+    max_stock_level: initialData?.max_stock_level || null,
+    uom_id: initialData?.uom_id || null,
   });
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -90,7 +93,7 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     }
   };
 
-  const handleFieldChange = (field: string, value: string) => {
+  const handleFieldChange = (field: string, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -122,6 +125,7 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
               onChange={handleFieldChange}
               onProductSelect={handleProductSelect}
               selectedProduct={selectedProduct}
+              isEditing={!!initialData}
             />
           </TabsContent>
 
