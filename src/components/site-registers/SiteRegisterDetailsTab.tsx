@@ -40,7 +40,7 @@ export function SiteRegisterDetailsTab({
     isEditing,
     formDataId: formData?.id,
     hasFormData: !!formData,
-    fullFormData: formData // Add this to see the complete formData object
+    fullFormData: formData
   });
 
   const handleLocationSelect = (location: Location) => {
@@ -63,13 +63,14 @@ export function SiteRegisterDetailsTab({
     }
   });
 
-  // Only show stock movements if we're editing AND have a valid ID
-  const showStockMovements = isEditing && Boolean(formData?.id);
+  // Only show stock movements if we're in edit mode and have a valid ID
+  const showStockMovements = isEditing && typeof formData.id === 'string';
 
   console.log('Stock movements visibility check:', {
     isEditing,
     formDataId: formData?.id,
-    showStockMovements
+    showStockMovements,
+    typeofId: typeof formData.id
   });
 
   return (
