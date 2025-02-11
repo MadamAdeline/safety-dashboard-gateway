@@ -48,9 +48,9 @@ const mainMenuItems = [
 ]
 
 export function MainMenu() {
-  const { data: userRole, isLoading, error } = useUserRole();
+  const { data: userData, isLoading, error } = useUserRole();
 
-  console.log('User role:', userRole);
+  console.log('User role:', userData?.role);
   console.log('Is loading:', isLoading);
   console.log('Error:', error);
 
@@ -62,13 +62,13 @@ export function MainMenu() {
     );
   }
 
-  if (!userRole) {
+  if (!userData?.role) {
     console.log('No user role found');
     return null;
   }
 
   const visibleItems = mainMenuItems.filter(item => 
-    item.allowedRoles.includes(userRole.toLowerCase())
+    item.allowedRoles.includes(userData.role.toLowerCase())
   );
 
   console.log('Visible items:', visibleItems);

@@ -24,7 +24,7 @@ export function useRoutePermission(path: string) {
   const basePath = "/" + path.split("/")[1];
   
   const allowedRoles = routePermissions[basePath] || [];
-  const hasPermission = userRole ? allowedRoles.includes(userRole.toLowerCase()) : false;
+  const hasPermission = userRole?.role ? allowedRoles.includes(userRole.role.toLowerCase()) : false;
 
   return { isLoading, hasPermission };
 }

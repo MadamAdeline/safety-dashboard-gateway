@@ -41,8 +41,8 @@ interface FormData {
 export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
   console.log("NewSDSForm - Initial Data:", initialData);
   const { data: userRole } = useUserRole();
-  const isManager = userRole?.toLowerCase() === 'manager';
-  console.log("User role:", userRole);
+  const isManager = userRole?.role?.toLowerCase() === 'manager';
+  console.log("User role:", userRole?.role);
   console.log("Is manager:", isManager);
 
   const [isDG, setIsDG] = useState(initialData?.isDG ?? false);

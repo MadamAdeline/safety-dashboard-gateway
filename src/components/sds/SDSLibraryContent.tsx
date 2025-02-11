@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useUserRole } from "@/hooks/use-user-role";
@@ -18,8 +17,8 @@ export function SDSLibraryContent() {
   const location = useLocation();
   const showExpiredFilter = location.search === "?filter=expired";
   const { data: userRole, isLoading: isLoadingRole } = useUserRole();
-  const isAdmin = userRole?.toLowerCase() === 'administrator';
-  const isManager = userRole?.toLowerCase() === 'manager';
+  const isAdmin = userRole?.role?.toLowerCase() === 'administrator';
+  const isManager = userRole?.role?.toLowerCase() === 'manager';
 
   const [filters, setFilters] = useState<SDSFilters>({
     search: "",
