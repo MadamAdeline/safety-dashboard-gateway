@@ -58,7 +58,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
     enabled: !!selectedLocation
   });
 
-  const { data: siteRegisters, isLoading: isLoadingRegisters } = useQuery({
+  const { data: siteRegisters, isLoading: isLoadingRegisters, refetch } = useQuery({
     queryKey: ['site-registers', locationHierarchy],
     queryFn: async () => {
       const query = supabase
@@ -92,8 +92,9 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
       if (isRestrictedRole && userData?.location) {
         query.eq('location_id', userData.location.id);
       } else if (locationHierarchy && locationHierarchy.length > 0) {
-        // Include the selected location and all its children
-        query.in('location_id', locationHierarchy);
+        // Extract just the IDs from the location hierarchy and include them in the query
+        const locationIds = locationHierarchy.map(loc => loc.id);
+        query.in('location_id', locationIds);
       }
 
       const { data, error } = await query;
