@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +9,8 @@ import { ProductSelection } from "./ProductSelection";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { StockMovementsGrid } from "./StockMovementsGrid";
+import { useQueryClient } from "@tanstack/react-query";
+import React from "react";
 
 interface SiteRegisterDetailsTabProps {
   formData: {
@@ -43,6 +44,8 @@ export function SiteRegisterDetailsTab({
     fullFormData: formData
   });
 
+  const queryClient = useQueryClient();
+
   const handleLocationSelect = (location: Location) => {
     onChange("location_id", location.id);
   };
@@ -63,8 +66,32 @@ export function SiteRegisterDetailsTab({
     }
   });
 
+  // Fetch current site register data
+  const { data: currentSiteRegister } = useQuery({
+    queryKey: ['siteRegister', formData.id],
+    queryFn: async () => {
+      if (!formData.id) return null;
+      const { data, error } = await supabase
+        .from('site_registers')
+        .select('*')
+        .eq('id', formData.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!formData.id
+  });
+
   // Only show stock movements if we're in edit mode and the form has an ID
   const showStockMovements = isEditing && formData?.id && formData.id !== '';
+
+  // Update form data when site register data changes
+  React.useEffect(() => {
+    if (currentSiteRegister) {
+      onChange("current_stock_level", currentSiteRegister.current_stock_level);
+    }
+  }, [currentSiteRegister]);
 
   console.log('Stock movements visibility check:', {
     isEditing,
