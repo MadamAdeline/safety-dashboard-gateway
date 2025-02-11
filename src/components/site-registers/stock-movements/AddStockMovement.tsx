@@ -200,19 +200,19 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
       </div>
       <div className="w-full flex justify-end gap-2">
         <Button 
+          onClick={handleAddNew} 
+          size="icon"
+          className="bg-green-500 hover:bg-green-600"
+        >
+          <Check className="h-4 w-4 text-white" />
+        </Button>
+        <Button 
           onClick={handleCancel} 
-          size="icon" 
+          size="icon"
           variant="ghost"
           className="hover:bg-red-100"
         >
-          <X className="h-4 w-4" />
-        </Button>
-        <Button 
-          onClick={handleAddNew} 
-          size="icon" 
-          className="ml-auto"
-        >
-          <Check className="h-4 w-4" />
+          <X className="h-4 w-4 text-red-500" />
         </Button>
       </div>
     </div>
