@@ -34,9 +34,15 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
         .from('site_registers')
         .select(`
           id,
+          location_id,
+          product_id,
           override_product_name,
           current_stock_level,
-          products!inner (
+          exact_location,
+          storage_conditions,
+          max_stock_level,
+          uom_id,
+          products (
             id,
             product_name,
             uom:master_data!products_uom_id_fkey (
@@ -44,7 +50,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
               label
             )
           ),
-          locations!inner (
+          locations (
             id,
             name,
             full_path
@@ -56,6 +62,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
         throw error;
       }
 
+      console.log('Fetched site registers:', data);
       return data;
     },
   });
