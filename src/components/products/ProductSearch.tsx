@@ -64,33 +64,28 @@ export function ProductSearch({ value, onChange, selectedProductId, onProductSel
             value={searchValue}
             onValueChange={handleSearchChange}
           />
-          <div>
-            {isLoading ? (
-              <div className="py-6 text-center text-sm text-gray-500">
-                Loading products...
-              </div>
-            ) : !products || filteredProducts.length === 0 ? (
-              <CommandEmpty>No products found.</CommandEmpty>
-            ) : (
-              <CommandGroup>
-                {filteredProducts.map((product) => (
-                  <CommandItem
-                    key={product.id}
-                    onSelect={() => {
-                      onProductSelect?.(product);
-                      setOpen(false);
-                      setSearchValue("");
-                    }}
-                  >
-                    <div className="flex flex-col">
-                      <span>{product.name}</span>
-                      <span className="text-sm text-gray-500">{product.code}</span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
-          </div>
+          <CommandEmpty>
+            {isLoading ? "Loading products..." : "No products found."}
+          </CommandEmpty>
+          {!isLoading && products && filteredProducts.length > 0 && (
+            <CommandGroup>
+              {filteredProducts.map((product) => (
+                <CommandItem
+                  key={product.id}
+                  onSelect={() => {
+                    onProductSelect?.(product);
+                    setOpen(false);
+                    setSearchValue("");
+                  }}
+                >
+                  <div className="flex flex-col">
+                    <span>{product.name}</span>
+                    <span className="text-sm text-gray-500">{product.code}</span>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
