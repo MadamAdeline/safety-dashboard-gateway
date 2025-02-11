@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -72,7 +71,6 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
         const locationData = data.locations;
         let coordinates = null;
         
-        // Type check and transform coordinates
         if (locationData.coordinates && 
             typeof locationData.coordinates === 'object' && 
             'lat' in locationData.coordinates && 
@@ -100,7 +98,7 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
 
   // Set the user's location when it's loaded
   React.useEffect(() => {
-    if (userLocation && userRole?.toLowerCase() === 'standard') {
+    if (userLocation && ['manager', 'standard'].includes(userRole?.toLowerCase() || '')) {
       setSelectedLocation(userLocation);
     }
   }, [userLocation, userRole]);
@@ -181,7 +179,7 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     );
   });
 
-  const isLocationReadOnly = userRole?.toLowerCase() === 'standard';
+  const isLocationReadOnly = ['manager', 'standard'].includes(userRole?.toLowerCase() || '');
 
   if (isLoading) {
     return <div>Loading...</div>;
