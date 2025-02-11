@@ -10,7 +10,7 @@ interface ProductInformationTabProps {
 }
 
 export function ProductInformationTab({ product }: ProductInformationTabProps) {
-  console.log("ProductInformationTab - Received product prop:", product);
+  console.log("ProductInformationTab - Received product prop (complete):", product);
   
   if (!product) {
     console.log("ProductInformationTab - No product selected");

@@ -21,9 +21,8 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     status_id: initialData?.status_id || "",
   });
 
-  // Change this to store the complete product object
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  console.log("SiteRegisterForm - Selected Product:", selectedProduct);
+  console.log("SiteRegisterForm - Selected Product (before passing to ProductInformationTab):", selectedProduct);
 
   const handleSave = async () => {
     // TODO: Implement save functionality
@@ -36,7 +35,30 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
 
   const handleProductSelect = (product: Product) => {
     console.log("SiteRegisterForm - Handling product selection:", product);
-    setSelectedProduct(product);
+    if (product) {
+      // Ensure we're setting the complete product object
+      setSelectedProduct({
+        id: product.id,
+        name: product.name,
+        code: product.code,
+        brandName: product.brandName,
+        unit: product.unit,
+        uomId: product.uomId,
+        uom: product.uom,
+        unitSize: product.unitSize,
+        description: product.description,
+        productSet: product.productSet,
+        aerosol: product.aerosol,
+        cryogenicFluid: product.cryogenicFluid,
+        otherNames: product.otherNames,
+        uses: product.uses,
+        status: product.status,
+        approvalStatusId: product.approvalStatusId,
+        productStatusId: product.productStatusId,
+        sdsId: product.sdsId,
+        sds: product.sds
+      });
+    }
   };
 
   return (
