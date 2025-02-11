@@ -756,7 +756,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_location_hierarchy: {
+        Args: {
+          selected_location_id: string
+        }
+        Returns: {
+          id: string
+        }[]
+      }
     }
     Enums: {
       stock_action: "INCREASE" | "DECREASE" | "OVERRIDE"

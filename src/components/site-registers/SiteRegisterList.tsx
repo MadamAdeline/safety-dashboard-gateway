@@ -38,8 +38,28 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
     } as Location : null
   );
 
-  const { data: siteRegisters, isLoading, refetch } = useQuery({
-    queryKey: ['site-registers', selectedLocation?.id],
+  // Query to fetch all child locations for the selected location
+  const { data: locationHierarchy, isLoading: isLoadingLocations } = useQuery({
+    queryKey: ['locationHierarchy', selectedLocation?.id],
+    queryFn: async () => {
+      if (!selectedLocation) return [];
+
+      const { data, error } = await supabase.rpc('get_location_hierarchy', {
+        selected_location_id: selectedLocation.id
+      });
+
+      if (error) {
+        console.error("Error fetching child locations:", error);
+        return [];
+      }
+
+      return data; // Function already returns an array of location IDs
+    },
+    enabled: !!selectedLocation
+  });
+
+  const { data: siteRegisters, isLoading: isLoadingRegisters } = useQuery({
+    queryKey: ['site-registers', locationHierarchy],
     queryFn: async () => {
       const query = supabase
         .from('site_registers')
@@ -71,8 +91,9 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
       // If user is standard or manager, restrict to their assigned location
       if (isRestrictedRole && userData?.location) {
         query.eq('location_id', userData.location.id);
-      } else if (selectedLocation) {
-        query.eq('location_id', selectedLocation.id);
+      } else if (locationHierarchy && locationHierarchy.length > 0) {
+        // Include the selected location and all its children
+        query.in('location_id', locationHierarchy);
       }
 
       const { data, error } = await query;
@@ -85,6 +106,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
       console.log('Fetched site registers:', data);
       return data;
     },
+    enabled: !isLoadingLocations
   });
 
   const handleDelete = async (id: string) => {
@@ -136,7 +158,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
     );
   });
 
-  if (isLoading) {
+  if (isLoadingLocations || isLoadingRegisters) {
     return <div>Loading...</div>;
   }
 
