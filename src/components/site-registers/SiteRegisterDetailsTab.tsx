@@ -64,6 +64,8 @@ export function SiteRegisterDetailsTab({
     queryFn: async () => {
       if (!formData.product_id) return null;
       
+      console.log("Fetching product with ID:", formData.product_id);
+      
       const { data, error } = await supabase
         .from('products')
         .select(`
@@ -107,10 +109,15 @@ export function SiteRegisterDetailsTab({
         .eq('id', formData.product_id)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching product:', error);
+        throw error;
+      }
       
       if (!data) return null;
       
+      console.log("Raw product data from DB:", data);
+
       const product: Product = {
         id: data.id,
         name: data.product_name,
@@ -150,8 +157,8 @@ export function SiteRegisterDetailsTab({
           } : undefined
         } : undefined
       };
-      
-      console.log("Fetched product details:", product);
+
+      console.log("Mapped product object:", product);
       return product;
     },
     enabled: !!formData.product_id
