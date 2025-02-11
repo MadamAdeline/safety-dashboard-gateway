@@ -556,6 +556,67 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_movements: {
+        Row: {
+          action: Database["public"]["Enums"]["stock_action"]
+          comments: string | null
+          created_at: string | null
+          id: string
+          movement_date: string
+          quantity: number
+          reason_id: string
+          site_register_id: string
+          updated_at: string | null
+          updated_by: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["stock_action"]
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          movement_date?: string
+          quantity: number
+          reason_id: string
+          site_register_id: string
+          updated_at?: string | null
+          updated_by: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["stock_action"]
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          movement_date?: string
+          quantity?: number
+          reason_id?: string
+          site_register_id?: string
+          updated_at?: string | null
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_movements_reason_id_fkey"
+            columns: ["reason_id"]
+            isOneToOne: false
+            referencedRelation: "master_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_site_register_id_fkey"
+            columns: ["site_register_id"]
+            isOneToOne: false
+            referencedRelation: "site_registers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppliers: {
         Row: {
           address: string
@@ -698,6 +759,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      stock_action: "INCREASE" | "DECREASE" | "OVERRIDE"
       user_status: "active" | "inactive"
     }
     CompositeTypes: {
