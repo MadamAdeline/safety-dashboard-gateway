@@ -102,8 +102,19 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col space-y-4">
+    <div className="space-y-6">
+      {/* Site Register Title and Search */}
+      <div>
+        <h2 className="text-xl font-semibold">Site Register</h2>
+        <Input
+          type="text"
+          placeholder="Search site registers..."
+          className="w-full max-w-lg mt-2"
+        />
+      </div>
+
+      {/* Location Search Section */}
+      <div className="space-y-2">
         <Label>Location</Label>
         <div className="flex items-center gap-4">
           <div className="w-1/2">
@@ -124,6 +135,7 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
         </div>
       </div>
 
+      {/* Site Register Table */}
       <div className="bg-white rounded-lg shadow">
         <Table>
           <TableHeader>
@@ -170,4 +182,3 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     </div>
   );
 }
-
