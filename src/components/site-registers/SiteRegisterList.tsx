@@ -21,9 +21,10 @@ import type { Location } from "@/types/location";
 interface SiteRegisterListProps {
   searchTerm: string;
   onEdit: (siteRegister: any) => void;
+  setSearchTerm: (value: string) => void;
 }
 
-export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) {
+export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegisterListProps) {
   const { data: siteRegisters, isLoading, refetch } = useQuery({
     queryKey: ['site-registers'],
     queryFn: async () => {
