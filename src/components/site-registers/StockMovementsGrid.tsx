@@ -11,12 +11,15 @@ interface StockMovementsGridProps {
 }
 
 export function StockMovementsGrid({ siteRegisterId }: StockMovementsGridProps) {
+  console.log('StockMovementsGrid rendering with siteRegisterId:', siteRegisterId);
+  
   const [isAddingNew, setIsAddingNew] = useState(false);
 
   // Fetch stock movements
-  const { data: stockMovements, refetch } = useQuery({
+  const { data: stockMovements, refetch, isLoading, error } = useQuery({
     queryKey: ['stockMovements', siteRegisterId],
     queryFn: async () => {
+      console.log('Fetching stock movements for siteRegisterId:', siteRegisterId);
       const { data, error } = await supabase
         .from('stock_movements')
         .select(`
@@ -27,7 +30,11 @@ export function StockMovementsGrid({ siteRegisterId }: StockMovementsGridProps) 
         .eq('site_register_id', siteRegisterId)
         .order('movement_date', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching stock movements:', error);
+        throw error;
+      }
+      console.log('Fetched stock movements:', data);
       return data;
     },
     enabled: !!siteRegisterId,
@@ -37,6 +44,7 @@ export function StockMovementsGrid({ siteRegisterId }: StockMovementsGridProps) 
   const { data: stockReasons } = useQuery({
     queryKey: ['stockReasons'],
     queryFn: async () => {
+      console.log('Fetching stock reasons');
       const { data, error } = await supabase
         .from('master_data')
         .select('id, label')
@@ -44,13 +52,28 @@ export function StockMovementsGrid({ siteRegisterId }: StockMovementsGridProps) 
         .eq('status', 'ACTIVE')
         .order('sort_order');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching stock reasons:', error);
+        throw error;
+      }
+      console.log('Fetched stock reasons:', data);
       return data;
     },
   });
 
   if (!siteRegisterId) {
+    console.log('No siteRegisterId provided, not rendering grid');
     return null;
+  }
+
+  if (isLoading) {
+    console.log('Stock movements are loading...');
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    console.error('Error in StockMovementsGrid:', error);
+    return <div>Error loading stock movements</div>;
   }
 
   return (

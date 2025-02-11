@@ -36,6 +36,12 @@ export function SiteRegisterDetailsTab({
   selectedProduct,
   isEditing
 }: SiteRegisterDetailsTabProps) {
+  console.log('SiteRegisterDetailsTab rendering with:', {
+    isEditing,
+    formDataId: formData.id,
+    hasFormData: !!formData
+  });
+
   const handleLocationSelect = (location: Location) => {
     onChange("location_id", location.id);
   };
@@ -148,9 +154,12 @@ export function SiteRegisterDetailsTab({
           </div>
 
           {formData.id && (
-            <div className="pt-8">
-              <StockMovementsGrid siteRegisterId={formData.id} />
-            </div>
+            <>
+              <div className="pt-8">
+                {console.log('About to render StockMovementsGrid with ID:', formData.id)}
+                <StockMovementsGrid siteRegisterId={formData.id} />
+              </div>
+            </>
           )}
         </>
       )}
