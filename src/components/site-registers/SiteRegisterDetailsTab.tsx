@@ -147,9 +147,11 @@ export function SiteRegisterDetailsTab({
             </div>
           </div>
 
-          <div className="pt-4">
-            <StockMovementsGrid siteRegisterId={formData.id || ''} />
-          </div>
+          {formData.id && (
+            <div className="pt-8">
+              <StockMovementsGrid siteRegisterId={formData.id} />
+            </div>
+          )}
         </>
       )}
     </div>
