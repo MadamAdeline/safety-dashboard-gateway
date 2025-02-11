@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -98,10 +99,10 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
 
   // Set the user's location when it's loaded
   React.useEffect(() => {
-    if (userLocation && ['manager', 'standard'].includes(userRole?.toLowerCase() || '')) {
+    if (userLocation) {
       setSelectedLocation(userLocation);
     }
-  }, [userLocation, userRole]);
+  }, [userLocation]);
 
   const { data: siteRegisters, isLoading, refetch } = useQuery({
     queryKey: ['site-registers', selectedLocation?.id],
@@ -165,10 +166,6 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     }
   };
 
-  const handleLocationSelect = (location: Location) => {
-    setSelectedLocation(location);
-  };
-
   const filteredRegisters = siteRegisters?.filter(register => {
     if (!searchTerm) return true;
     
@@ -179,7 +176,7 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     );
   });
 
-  const isLocationReadOnly = ['manager', 'standard'].includes(userRole?.toLowerCase() || '');
+  const isLocationReadOnly = true; // Always readonly for both Manager and Standard users
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -195,7 +192,7 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
               <LocationSearch
                 selectedLocationId={selectedLocation?.id || null}
                 initialLocation={selectedLocation}
-                onLocationSelect={handleLocationSelect}
+                onLocationSelect={setSelectedLocation}
                 className="w-full"
                 disabled={isLocationReadOnly}
               />
