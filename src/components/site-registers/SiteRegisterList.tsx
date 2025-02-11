@@ -12,6 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { LocationSearch } from "@/components/locations/LocationSearch";
+import type { Location } from "@/types/location";
 
 interface SiteRegisterListProps {
   searchTerm: string;
@@ -75,6 +77,11 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     }
   };
 
+  const handleLocationSelect = (location: Location) => {
+    console.log('Selected location:', location);
+    // We'll implement location filtering in a future update
+  };
+
   const filteredRegisters = siteRegisters?.filter(register => {
     if (!searchTerm) return true;
     
@@ -90,48 +97,61 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
   }
 
   return (
-    <div className="bg-white rounded-lg shadow">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Product Name</TableHead>
-            <TableHead>Override Product Name</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Unit of Measure</TableHead>
-            <TableHead>Current Stock Level</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredRegisters?.map((register) => (
-            <TableRow key={register.id}>
-              <TableCell>{register.products?.product_name}</TableCell>
-              <TableCell>{register.override_product_name}</TableCell>
-              <TableCell>{register.locations?.full_path}</TableCell>
-              <TableCell>{register.products?.uom?.label}</TableCell>
-              <TableCell>{register.current_stock_level}</TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onEdit(register)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(register.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
+    <div className="space-y-4">
+      <div className="flex items-center gap-4">
+        <div className="flex-1">
+          <LocationSearch
+            selectedLocationId={null}
+            initialLocation={null}
+            onLocationSelect={handleLocationSelect}
+            className="w-full"
+          />
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Product Name</TableHead>
+              <TableHead>Override Product Name</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Unit of Measure</TableHead>
+              <TableHead>Current Stock Level</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {filteredRegisters?.map((register) => (
+              <TableRow key={register.id}>
+                <TableCell>{register.products?.product_name}</TableCell>
+                <TableCell>{register.override_product_name}</TableCell>
+                <TableCell>{register.locations?.full_path}</TableCell>
+                <TableCell>{register.products?.uom?.label}</TableCell>
+                <TableCell>{register.current_stock_level}</TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onEdit(register)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(register.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
