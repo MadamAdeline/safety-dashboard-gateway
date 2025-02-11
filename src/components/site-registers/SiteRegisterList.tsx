@@ -21,10 +21,9 @@ import type { Location } from "@/types/location";
 interface SiteRegisterListProps {
   searchTerm: string;
   onEdit: (siteRegister: any) => void;
-  setSearchTerm: (value: string) => void;
 }
 
-export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegisterListProps) {
+export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) {
   const { data: siteRegisters, isLoading, refetch } = useQuery({
     queryKey: ['site-registers'],
     queryFn: async () => {
@@ -104,36 +103,24 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
 
   return (
     <div className="space-y-4">
-      <div className="space-y-4">
-        <div>
-          <Label>Location</Label>
-          <div className="flex items-center gap-4 mt-2">
-            <div className="w-1/2">
-              <LocationSearch
-                selectedLocationId={selectedLocation?.id || null}
-                initialLocation={selectedLocation}
-                onLocationSelect={handleLocationSelect}
-                className="w-full"
-              />
-            </div>
-            {selectedLocation?.full_path && (
-              <Input
-                value={selectedLocation.full_path}
-                readOnly
-                className="bg-gray-50 text-gray-600 flex-1"
-              />
-            )}
+      <div className="flex flex-col space-y-4">
+        <Label>Location</Label>
+        <div className="flex items-center gap-4">
+          <div className="w-1/2">
+            <LocationSearch
+              selectedLocationId={selectedLocation?.id || null}
+              initialLocation={selectedLocation}
+              onLocationSelect={handleLocationSelect}
+              className="w-full"
+            />
           </div>
-        </div>
-
-        <div className="relative">
-          <Input
-            type="text"
-            placeholder="Search site registers..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 w-full"
-          />
+          {selectedLocation?.full_path && (
+            <Input
+              value={selectedLocation.full_path}
+              readOnly
+              className="bg-gray-50 text-gray-600 flex-1"
+            />
+          )}
         </div>
       </div>
 
@@ -183,3 +170,4 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
     </div>
   );
 }
+
