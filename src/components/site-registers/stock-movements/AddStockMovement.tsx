@@ -100,53 +100,66 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
   };
 
   return (
-    <div className="grid grid-cols-6 gap-4 p-4">
-      <Input
-        type="date"
-        value={newMovement.movement_date}
-        onChange={(e) => setNewMovement({ ...newMovement, movement_date: e.target.value })}
-      />
-      <Select
-        value={newMovement.action}
-        onValueChange={(value) => setNewMovement({ ...newMovement, action: value })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Action" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="INCREASE">Increase</SelectItem>
-          <SelectItem value="DECREASE">Decrease</SelectItem>
-          <SelectItem value="OVERRIDE">Override</SelectItem>
-        </SelectContent>
-      </Select>
-      <Select
-        value={newMovement.reason_id}
-        onValueChange={(value) => setNewMovement({ ...newMovement, reason_id: value })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Reason" />
-        </SelectTrigger>
-        <SelectContent>
-          {stockReasons?.map((reason) => (
-            <SelectItem key={reason.id} value={reason.id}>
-              {reason.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Input
-        type="number"
-        placeholder="Quantity"
-        value={newMovement.quantity}
-        onChange={(e) => setNewMovement({ ...newMovement, quantity: e.target.value })}
-      />
-      <Input
-        placeholder="Comments"
-        value={newMovement.comments}
-        onChange={(e) => setNewMovement({ ...newMovement, comments: e.target.value })}
-      />
-      <div className="flex gap-2">
-        <Button onClick={handleAddNew}>Save</Button>
+    <div className="grid grid-cols-6 gap-4 px-4 py-2">
+      <div className="flex items-center">
+        <Input
+          type="date"
+          value={newMovement.movement_date}
+          onChange={(e) => setNewMovement({ ...newMovement, movement_date: e.target.value })}
+          className="w-full"
+        />
+      </div>
+      <div className="flex items-center">
+        <Select
+          value={newMovement.action}
+          onValueChange={(value) => setNewMovement({ ...newMovement, action: value })}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Action" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="INCREASE">Increase</SelectItem>
+            <SelectItem value="DECREASE">Decrease</SelectItem>
+            <SelectItem value="OVERRIDE">Override</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex items-center">
+        <Select
+          value={newMovement.reason_id}
+          onValueChange={(value) => setNewMovement({ ...newMovement, reason_id: value })}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Reason" />
+          </SelectTrigger>
+          <SelectContent>
+            {stockReasons?.map((reason) => (
+              <SelectItem key={reason.id} value={reason.id}>
+                {reason.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex items-center">
+        <Input
+          type="number"
+          placeholder="Quantity"
+          value={newMovement.quantity}
+          onChange={(e) => setNewMovement({ ...newMovement, quantity: e.target.value })}
+          className="w-full"
+        />
+      </div>
+      <div className="flex items-center">
+        <Input
+          placeholder="Comments"
+          value={newMovement.comments}
+          onChange={(e) => setNewMovement({ ...newMovement, comments: e.target.value })}
+          className="w-full"
+        />
+      </div>
+      <div className="flex items-center">
+        <Button onClick={handleAddNew} className="w-full">Save</Button>
       </div>
     </div>
   );
