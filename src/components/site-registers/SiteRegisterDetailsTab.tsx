@@ -61,6 +61,15 @@ export function SiteRegisterDetailsTab({
         onLocationSelect={handleLocationSelect}
       />
 
+      <div className="space-y-2">
+        <Label htmlFor="exact_location">Exact Location (Free Text)</Label>
+        <Input
+          id="exact_location"
+          value={formData.exact_location}
+          onChange={(e) => onChange("exact_location", e.target.value)}
+        />
+      </div>
+
       <ProductSelection
         productId={formData.product_id}
         selectedProduct={selectedProduct}
@@ -74,15 +83,6 @@ export function SiteRegisterDetailsTab({
           value={formData.override_product_name}
           onChange={(e) => onChange("override_product_name", e.target.value)}
           placeholder={selectedProduct?.name || ""}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="exact_location">Exact Location</Label>
-        <Input
-          id="exact_location"
-          value={formData.exact_location}
-          onChange={(e) => onChange("exact_location", e.target.value)}
         />
       </div>
 
