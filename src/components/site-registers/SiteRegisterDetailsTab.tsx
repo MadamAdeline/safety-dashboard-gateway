@@ -39,7 +39,8 @@ export function SiteRegisterDetailsTab({
   console.log('SiteRegisterDetailsTab rendering with:', {
     isEditing,
     formDataId: formData?.id,
-    hasFormData: !!formData
+    hasFormData: !!formData,
+    fullFormData: formData // Add this to see the complete formData object
   });
 
   const handleLocationSelect = (location: Location) => {
@@ -62,7 +63,14 @@ export function SiteRegisterDetailsTab({
     }
   });
 
-  const showStockMovements = isEditing && formData?.id;
+  // Only show stock movements if we're editing AND have a valid ID
+  const showStockMovements = isEditing && Boolean(formData?.id);
+
+  console.log('Stock movements visibility check:', {
+    isEditing,
+    formDataId: formData?.id,
+    showStockMovements
+  });
 
   return (
     <div className="space-y-6">
@@ -157,7 +165,7 @@ export function SiteRegisterDetailsTab({
 
           {showStockMovements && (
             <div className="pt-8">
-              <StockMovementsGrid siteRegisterId={formData.id} />
+              <StockMovementsGrid siteRegisterId={formData.id!} />
             </div>
           )}
         </>
