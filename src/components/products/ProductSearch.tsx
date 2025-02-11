@@ -24,8 +24,8 @@ export function ProductSearch({ selectedProductId, onProductSelect, className }:
   const filteredProducts = products?.filter(product => {
     if (!searchValue) return true;
     return (
-      product.product_name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      product.product_code.toLowerCase().includes(searchValue.toLowerCase())
+      product.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      product.code.toLowerCase().includes(searchValue.toLowerCase())
     );
   }) || [];
 
@@ -38,7 +38,7 @@ export function ProductSearch({ selectedProductId, onProductSelect, className }:
       <PopoverTrigger asChild>
         <div className={`relative ${className}`}>
           <Input
-            value={selectedProduct ? selectedProduct.product_name : searchValue}
+            value={selectedProduct ? selectedProduct.name : searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             placeholder="Search products..."
             className="pl-10"
@@ -71,8 +71,8 @@ export function ProductSearch({ selectedProductId, onProductSelect, className }:
                     }}
                   >
                     <div className="flex flex-col">
-                      <span>{product.product_name}</span>
-                      <span className="text-sm text-gray-500">{product.product_code}</span>
+                      <span>{product.name}</span>
+                      <span className="text-sm text-gray-500">{product.code}</span>
                     </div>
                   </CommandItem>
                 ))}
