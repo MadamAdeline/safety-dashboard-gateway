@@ -2,12 +2,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { StockMovementsHeader } from "./stock-movements/StockMovementsHeader";
-import { StockMovementsTable } from "./stock-movements/StockMovementsTable";
+import { StockMovementsHeader } from "../stock-movements/StockMovementsHeader";
+import { StockMovementsTable } from "../stock-movements/StockMovementsTable";
 
 interface StockMovementsGridProps {
   siteRegisterId: string;
-  onStockUpdate?: () => void;
+  onStockUpdate?: () => void;  // Made optional with ?
 }
 
 export function StockMovementsGrid({ siteRegisterId, onStockUpdate }: StockMovementsGridProps) {
