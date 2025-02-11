@@ -49,7 +49,15 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
             type_id,
             parent_location_id,
             status_id,
-            coordinates
+            coordinates,
+            master_data (
+              id,
+              label
+            ),
+            status_lookup (
+              id,
+              status_name
+            )
           )
         `)
         .eq('email', userEmail)
@@ -60,7 +68,25 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
         return null;
       }
 
-      return data?.locations || null;
+      if (data?.locations) {
+        const locationData = data.locations;
+        // Transform the coordinates to match the Location type
+        const coordinates = locationData.coordinates ? {
+          lat: typeof locationData.coordinates.lat === 'number' ? locationData.coordinates.lat : 0,
+          lng: typeof locationData.coordinates.lng === 'number' ? locationData.coordinates.lng : 0
+        } : null;
+
+        return {
+          ...locationData,
+          coordinates,
+          parent_location_id: locationData.parent_location_id || null,
+          full_path: locationData.full_path || null,
+          master_data: locationData.master_data || undefined,
+          status_lookup: locationData.status_lookup || undefined
+        } as Location;
+      }
+
+      return null;
     },
     enabled: ['manager', 'standard'].includes(userRole?.toLowerCase() || '')
   });
@@ -227,3 +253,4 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     </div>
   );
 }
+
