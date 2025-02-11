@@ -455,6 +455,89 @@ export type Database = {
           },
         ]
       }
+      site_registers: {
+        Row: {
+          created_at: string | null
+          current_stock_level: number | null
+          exact_location: string | null
+          fire_protection_required: boolean | null
+          id: string
+          location_id: string
+          manifest_required: boolean | null
+          max_stock_level: number | null
+          override_product_name: string | null
+          placarding_required: boolean | null
+          product_id: string
+          status_id: number
+          storage_conditions: string | null
+          uom_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_stock_level?: number | null
+          exact_location?: string | null
+          fire_protection_required?: boolean | null
+          id?: string
+          location_id: string
+          manifest_required?: boolean | null
+          max_stock_level?: number | null
+          override_product_name?: string | null
+          placarding_required?: boolean | null
+          product_id: string
+          status_id: number
+          storage_conditions?: string | null
+          uom_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_stock_level?: number | null
+          exact_location?: string | null
+          fire_protection_required?: boolean | null
+          id?: string
+          location_id?: string
+          manifest_required?: boolean | null
+          max_stock_level?: number | null
+          override_product_name?: string | null
+          placarding_required?: boolean | null
+          product_id?: string
+          status_id?: number
+          storage_conditions?: string | null
+          uom_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_registers_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_registers_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_registers_status_id_fkey"
+            columns: ["status_id"]
+            isOneToOne: false
+            referencedRelation: "status_lookup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_registers_uom_id_fkey"
+            columns: ["uom_id"]
+            isOneToOne: false
+            referencedRelation: "master_data"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       status_lookup: {
         Row: {
           category: string
