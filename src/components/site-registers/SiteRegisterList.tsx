@@ -137,7 +137,7 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
         throw error;
       }
 
-      console.log('Site registers data:', data); // Debug log
+      console.log('Site registers data:', data);
       return data;
     },
   });
@@ -230,9 +230,9 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
                 <TableRow key={register.id}>
                   <TableCell>{register.products?.product_name || '-'}</TableCell>
                   <TableCell>{register.override_product_name || '-'}</TableCell>
-                  <TableCell>{register.locations?.full_path || '-'}</TableCell>
+                  <TableCell>{String(register.locations?.full_path || '-')}</TableCell>
                   <TableCell>{register.products?.uom?.label || '-'}</TableCell>
-                  <TableCell>{register.current_stock_level?.toString() || '0'}</TableCell>
+                  <TableCell>{String(register.current_stock_level || '0')}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
