@@ -36,7 +36,7 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
   const handleProductSelect = (product: Product) => {
     console.log("SiteRegisterForm - Handling product selection:", product);
     setSelectedProduct(product); // Simply pass the complete product object as is
-    onChange("product_id", product.id);
+    handleFieldChange("product_id", product.id);
   };
 
   return (
