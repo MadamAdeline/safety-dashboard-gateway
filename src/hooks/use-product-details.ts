@@ -37,6 +37,10 @@ export function useProductDetails(productId: string) {
           sds:sds!products_sds_id_fkey (
             id,
             is_dg,
+            current_file_path,
+            current_file_name,
+            current_file_size,
+            current_content_type,
             dg_class:master_data!sds_dg_class_id_fkey (
               id,
               label
@@ -88,6 +92,10 @@ export function useProductDetails(productId: string) {
         sds: data.sds ? {
           id: data.sds.id,
           isDG: data.sds.is_dg,
+          currentFilePath: data.sds.current_file_path,
+          currentFileName: data.sds.current_file_name,
+          currentFileSize: data.sds.current_file_size,
+          currentContentType: data.sds.current_content_type,
           dgClass: data.sds.dg_class ? {
             id: data.sds.dg_class.id,
             label: data.sds.dg_class.label

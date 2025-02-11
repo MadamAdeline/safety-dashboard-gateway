@@ -24,6 +24,10 @@ export interface Product {
   sds?: {
     id: string;
     isDG: boolean;
+    currentFilePath?: string;
+    currentFileName?: string;
+    currentFileSize?: number;
+    currentContentType?: string;
     dgClass?: {
       id: string;
       label: string;

@@ -34,11 +34,11 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
     status: 'ACTIVE',
     sdsSource: null,
     source: null,
-    // Use the actual SDS ID without assuming .pdf extension
-    currentFilePath: product.sds.id,
-    currentFileName: `${product.name}_SDS.pdf`,
-    currentFileSize: null,
-    currentContentType: 'application/pdf',
+    // Get the current_file_path from the SDS record
+    currentFilePath: product.sds.currentFilePath || null,
+    currentFileName: product.sds.currentFileName || `${product.name}_SDS.pdf`,
+    currentFileSize: product.sds.currentFileSize || null,
+    currentContentType: product.sds.currentContentType || 'application/pdf',
     issueDate: '',
     expiryDate: '',
     dgClassId: product.sds.dgClass?.id || '',
