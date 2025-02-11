@@ -57,17 +57,17 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
 
       <div className="grid grid-cols-3 gap-4">
         <div className="flex items-center space-x-2">
-          <Checkbox checked={product.aerosol} disabled />
+          <Checkbox checked={product.aerosol || false} disabled />
           <Label>Is Aerosol</Label>
         </div>
 
         <div className="flex items-center space-x-2">
-          <Checkbox checked={product.cryogenicFluid} disabled />
+          <Checkbox checked={product.cryogenicFluid || false} disabled />
           <Label>Is Cryogenic Fluid</Label>
         </div>
 
         <div className="flex items-center space-x-2">
-          <Checkbox checked={product.productSet} disabled />
+          <Checkbox checked={product.productSet || false} disabled />
           <Label>Is Product Set</Label>
         </div>
       </div>
