@@ -67,7 +67,22 @@ export function SiteRegisterDetailsTab({
       const { data, error } = await supabase
         .from('products')
         .select(`
-          *,
+          id,
+          product_name,
+          product_code,
+          brand_name,
+          unit,
+          uom_id,
+          unit_size,
+          description,
+          product_set,
+          aerosol,
+          cryogenic_fluid,
+          other_names,
+          uses,
+          product_status_id,
+          approval_status_id,
+          sds_id,
           uom:master_data!products_uom_id_fkey (
             id,
             label
@@ -82,6 +97,10 @@ export function SiteRegisterDetailsTab({
             supplier:suppliers!sds_supplier_id_fkey (
               id,
               supplier_name
+            ),
+            packing_group:master_data!sds_packing_group_id_fkey (
+              id,
+              label
             )
           )
         `)
@@ -92,7 +111,7 @@ export function SiteRegisterDetailsTab({
       
       if (!data) return null;
       
-      return {
+      const product: Product = {
         id: data.id,
         name: data.product_name,
         code: data.product_code,
@@ -111,6 +130,8 @@ export function SiteRegisterDetailsTab({
         otherNames: data.other_names,
         uses: data.uses,
         status: data.product_status_id === 16 ? "ACTIVE" : "INACTIVE",
+        approvalStatusId: data.approval_status_id,
+        productStatusId: data.product_status_id,
         sdsId: data.sds_id,
         sds: data.sds ? {
           id: data.sds.id,
@@ -122,9 +143,16 @@ export function SiteRegisterDetailsTab({
           supplier: data.sds.supplier ? {
             id: data.sds.supplier.id,
             supplier_name: data.sds.supplier.supplier_name
+          } : undefined,
+          packingGroup: data.sds.packing_group ? {
+            id: data.sds.packing_group.id,
+            label: data.sds.packing_group.label
           } : undefined
         } : undefined
-      } as Product;
+      };
+      
+      console.log("Fetched product details:", product);
+      return product;
     },
     enabled: !!formData.product_id
   });
@@ -197,4 +225,3 @@ export function SiteRegisterDetailsTab({
     </div>
   );
 }
-
