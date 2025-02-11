@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -169,7 +168,7 @@ export function SiteRegisterDetailsTab({
   };
 
   const handleProductSelect = (product: Product) => {
-    onChange("product_id", product.id);
+    console.log("SiteRegisterDetailsTab - Selected product before passing:", product);
     onProductSelect(product);
   };
 

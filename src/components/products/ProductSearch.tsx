@@ -34,8 +34,23 @@ export function ProductSearch({
           id,
           product_name,
           product_code,
+          brand_name,
+          unit,
+          unit_size,
+          description,
+          product_set,
+          aerosol,
+          cryogenic_fluid,
+          other_names,
+          uses,
           product_status_id,
+          approval_status_id,
           sds_id,
+          uom_id,
+          uom:master_data!products_uom_id_fkey (
+            id,
+            label
+          ),
           sds:sds!products_sds_id_fkey (
             id,
             is_dg,
@@ -64,7 +79,23 @@ export function ProductSearch({
         id: item.id,
         name: item.product_name,
         code: item.product_code,
+        brandName: item.brand_name,
+        unit: item.unit,
+        uomId: item.uom_id,
+        uom: item.uom ? {
+          id: item.uom.id,
+          label: item.uom.label
+        } : undefined,
+        unitSize: item.unit_size,
+        description: item.description,
+        productSet: item.product_set,
+        aerosol: item.aerosol,
+        cryogenicFluid: item.cryogenic_fluid,
+        otherNames: item.other_names,
+        uses: item.uses,
         status: (item.product_status_id === 16 ? "ACTIVE" : "INACTIVE") as "ACTIVE" | "INACTIVE",
+        approvalStatusId: item.approval_status_id,
+        productStatusId: item.product_status_id,
         sdsId: item.sds_id,
         sds: item.sds ? {
           id: item.sds.id,
@@ -110,11 +141,10 @@ export function ProductSearch({
     const nameMatch = product.name.toLowerCase().includes(searchLower);
     const codeMatch = product.code.toLowerCase().includes(searchLower);
     
-    console.log('Filtering product:', product.name, 'Name match:', nameMatch, 'Code match:', codeMatch);
     return nameMatch || codeMatch;
   });
 
-  console.log('Rendered ProductSearch with:', {
+  console.log('ProductSearch rendering with:', {
     searchTerm,
     productsCount: products?.length,
     filteredCount: filteredProducts?.length,
