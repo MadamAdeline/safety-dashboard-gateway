@@ -18,7 +18,7 @@ interface ProductSearchProps {
 export function ProductSearch({ value, onChange, selectedProductId, onProductSelect, className }: ProductSearchProps) {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(value || "");
-  const { data: products = [], isLoading } = useProducts();
+  const { data: products, isLoading } = useProducts();
 
   useEffect(() => {
     if (value !== undefined) {
@@ -26,14 +26,18 @@ export function ProductSearch({ value, onChange, selectedProductId, onProductSel
     }
   }, [value]);
 
-  const selectedProduct = products?.find(p => p.id === selectedProductId);
+  const selectedProduct = selectedProductId && products 
+    ? products.find(p => p.id === selectedProductId)
+    : null;
 
-  const filteredProducts = !searchValue 
-    ? products 
-    : products.filter(product => 
-        product.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-        product.code.toLowerCase().includes(searchValue.toLowerCase())
-      );
+  const filteredProducts = products && Array.isArray(products) 
+    ? (!searchValue 
+      ? products 
+      : products.filter(product => 
+          product.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          product.code.toLowerCase().includes(searchValue.toLowerCase())
+        ))
+    : [];
 
   const handleSearchChange = (newValue: string) => {
     setSearchValue(newValue);
@@ -64,7 +68,7 @@ export function ProductSearch({ value, onChange, selectedProductId, onProductSel
             <div className="py-6 text-center text-sm text-gray-500">
               Loading products...
             </div>
-          ) : filteredProducts.length === 0 ? (
+          ) : !products || filteredProducts.length === 0 ? (
             <CommandEmpty>No products found.</CommandEmpty>
           ) : (
             <CommandGroup>
