@@ -124,6 +124,22 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
         </div>
       </div>
 
+      <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
+        <div className="relative flex-1 max-w-md">
+          <Input
+            type="text"
+            placeholder="Search site registers..."
+            value={searchTerm}
+            className="pl-10"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        </div>
+        <SiteRegisterActions
+          onExport={handleExport}
+          onRefresh={handleRefresh}
+        />
+      </div>
+
       <div className="bg-white rounded-lg shadow">
         <Table>
           <TableHeader>
@@ -170,4 +186,3 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     </div>
   );
 }
-
