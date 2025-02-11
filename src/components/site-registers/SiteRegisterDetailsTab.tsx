@@ -9,9 +9,11 @@ import { LocationSelection } from "./LocationSelection";
 import { ProductSelection } from "./ProductSelection";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { StockMovementsGrid } from "./StockMovementsGrid";
 
 interface SiteRegisterDetailsTabProps {
   formData: {
+    id?: string;
     location_id: string;
     product_id: string;
     override_product_name: string;
@@ -144,6 +146,12 @@ export function SiteRegisterDetailsTab({
               </Select>
             </div>
           </div>
+
+          {formData.id && (
+            <div className="pt-4">
+              <StockMovementsGrid siteRegisterId={formData.id} />
+            </div>
+          )}
         </>
       )}
     </div>
