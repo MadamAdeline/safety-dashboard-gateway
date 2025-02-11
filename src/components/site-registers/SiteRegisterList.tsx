@@ -142,28 +142,34 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
 
   return (
     <div className="space-y-4">
-      {!isRestrictedRole && (
-        <div className="flex flex-col space-y-4">
-          <Label>Location</Label>
-          <div className="flex items-center gap-4">
-            <div className="w-1/2">
+      <div className="flex flex-col space-y-4">
+        <Label>Location</Label>
+        <div className="flex items-center gap-4">
+          <div className="w-1/2">
+            {isRestrictedRole ? (
+              <Input
+                value={selectedLocation?.name || ''}
+                readOnly
+                className="bg-gray-100 text-gray-600"
+              />
+            ) : (
               <LocationSearch
                 selectedLocationId={selectedLocation?.id || null}
                 initialLocation={selectedLocation}
                 onLocationSelect={handleLocationSelect}
                 className="w-full"
               />
-            </div>
-            {selectedLocation?.full_path && (
-              <Input
-                value={selectedLocation.full_path}
-                readOnly
-                className="bg-gray-50 text-gray-600 flex-1"
-              />
             )}
           </div>
+          {selectedLocation?.full_path && (
+            <Input
+              value={selectedLocation.full_path}
+              readOnly
+              className="bg-gray-50 text-gray-600 flex-1"
+            />
+          )}
         </div>
-      )}
+      </div>
 
       <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
         <div className="relative flex-1 max-w-md">
