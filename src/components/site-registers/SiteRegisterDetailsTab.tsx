@@ -156,8 +156,11 @@ export function SiteRegisterDetailsTab({
           {formData.id && (
             <>
               <div className="pt-8">
-                {console.log('About to render StockMovementsGrid with ID:', formData.id)}
-                <StockMovementsGrid siteRegisterId={formData.id} />
+                {/* Log before rendering the grid */}
+                {(() => {
+                  console.log('About to render StockMovementsGrid with ID:', formData.id);
+                  return <StockMovementsGrid siteRegisterId={formData.id} />;
+                })()}
               </div>
             </>
           )}
