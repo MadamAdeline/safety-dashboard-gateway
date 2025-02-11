@@ -2,6 +2,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Search } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -17,6 +18,7 @@ import { LocationSearch } from "@/components/locations/LocationSearch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Location } from "@/types/location";
+import { SiteRegisterActions } from "@/components/site-registers/SiteRegisterActions";
 
 interface SiteRegisterListProps {
   searchTerm: string;
@@ -85,6 +87,15 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
   const handleLocationSelect = (location: Location) => {
     console.log('Selected location:', location);
     setSelectedLocation(location);
+  };
+
+  const handleExport = () => {
+    // Implement export functionality
+    console.log("Export functionality to be implemented");
+  };
+
+  const handleRefresh = () => {
+    refetch();
   };
 
   const filteredRegisters = siteRegisters?.filter(register => {
