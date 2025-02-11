@@ -34,8 +34,37 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
   };
 
   const handleProductSelect = (product: Product) => {
-    console.log("SiteRegisterForm - Handling product selection:", product);
-    setSelectedProduct(product); // Simply pass the complete product object as is
+    console.log("SiteRegisterForm - Handling product selection with full product:", product);
+    // Create a complete Product object ensuring all fields are properly mapped
+    const completeProduct: Product = {
+      id: product.id,
+      name: product.name,
+      code: product.code,
+      brandName: product.brandName,
+      unit: product.unit,
+      uomId: product.uomId,
+      uom: product.uom,
+      unitSize: product.unitSize,
+      description: product.description,
+      productSet: product.productSet,
+      aerosol: product.aerosol,
+      cryogenicFluid: product.cryogenicFluid,
+      otherNames: product.otherNames,
+      uses: product.uses,
+      status: product.status,
+      approvalStatusId: product.approvalStatusId,
+      productStatusId: product.productStatusId,
+      sdsId: product.sdsId,
+      sds: product.sds ? {
+        id: product.sds.id,
+        isDG: product.sds.isDG,
+        dgClass: product.sds.dgClass,
+        supplier: product.sds.supplier,
+        packingGroup: product.sds.packingGroup
+      } : undefined
+    };
+    
+    setSelectedProduct(completeProduct);
     handleFieldChange("product_id", product.id);
   };
 
