@@ -56,9 +56,9 @@ const adminItems = [
 ]
 
 export function AdminMenu() {
-  const { data: userData, isLoading } = useUserRole();
+  const { data: userRole, isLoading } = useUserRole();
 
-  console.log('Admin menu - User role:', userData?.role);
+  console.log('Admin menu - User role:', userRole);
 
   if (isLoading) {
     return (
@@ -68,11 +68,11 @@ export function AdminMenu() {
     );
   }
 
-  if (!userData?.role) return null;
+  if (!userRole) return null;
 
   // Only show admin section if user has access to at least one item
   const visibleItems = adminItems.filter(item => 
-    item.allowedRoles.includes(userData.role.toLowerCase())
+    item.allowedRoles.includes(userRole.toLowerCase())
   );
 
   console.log('Admin menu - Visible items:', visibleItems);

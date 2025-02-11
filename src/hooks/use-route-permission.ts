@@ -16,7 +16,7 @@ const routePermissions: Record<string, string[]> = {
 };
 
 export function useRoutePermission(path: string) {
-  const { data: userData, isLoading } = useUserRole();
+  const { data: userRole, isLoading } = useUserRole();
   
   if (isLoading) return { isLoading, hasPermission: false };
   
@@ -24,7 +24,7 @@ export function useRoutePermission(path: string) {
   const basePath = "/" + path.split("/")[1];
   
   const allowedRoles = routePermissions[basePath] || [];
-  const hasPermission = userData?.role ? allowedRoles.includes(userData.role.toLowerCase()) : false;
+  const hasPermission = userRole ? allowedRoles.includes(userRole.toLowerCase()) : false;
 
   return { isLoading, hasPermission };
 }
