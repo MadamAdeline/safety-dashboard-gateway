@@ -24,12 +24,21 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
 
   const handleAddNew = async () => {
     try {
+      console.log('Starting handleAddNew...');
+      
       // Get the current session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log('Fetching current session...');
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      console.log('Session data:', sessionData);
+      console.log('Session error:', sessionError);
       
-      if (sessionError) throw sessionError;
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        throw sessionError;
+      }
       
-      if (!session?.user) {
+      if (!sessionData?.session?.user) {
+        console.error('No user in session:', sessionData);
         toast({
           title: "Error",
           description: "You must be logged in to perform this action",
@@ -37,6 +46,17 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
         });
         return;
       }
+
+      console.log('User found:', sessionData.session.user.id);
+      console.log('Preparing to insert stock movement with data:', {
+        site_register_id: siteRegisterId,
+        movement_date: new Date(newMovement.movement_date).toISOString(),
+        action: newMovement.action,
+        reason_id: newMovement.reason_id,
+        quantity: parseFloat(newMovement.quantity),
+        comments: newMovement.comments,
+        updated_by: sessionData.session.user.id,
+      });
 
       const { error } = await supabase
         .from('stock_movements')
@@ -47,7 +67,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
           reason_id: newMovement.reason_id,
           quantity: parseFloat(newMovement.quantity),
           comments: newMovement.comments,
-          updated_by: session.user.id,
+          updated_by: sessionData.session.user.id,
         });
 
       if (error) {
@@ -60,6 +80,7 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
         return;
       }
 
+      console.log('Stock movement added successfully');
       toast({
         title: "Success",
         description: "Stock movement added successfully",
