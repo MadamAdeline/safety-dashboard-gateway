@@ -100,10 +100,10 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
 
   // Set the user's location when it's loaded
   React.useEffect(() => {
-    if (userLocation) {
+    if (userLocation && userRole?.toLowerCase() === 'standard') {
       setSelectedLocation(userLocation);
     }
-  }, [userLocation]);
+  }, [userLocation, userRole]);
 
   const { data: siteRegisters, isLoading, refetch } = useQuery({
     queryKey: ['site-registers', selectedLocation?.id],
@@ -181,7 +181,7 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     );
   });
 
-  const isLocationReadOnly = ['manager', 'standard'].includes(userRole?.toLowerCase() || '');
+  const isLocationReadOnly = userRole?.toLowerCase() === 'standard';
 
   if (isLoading) {
     return <div>Loading...</div>;
