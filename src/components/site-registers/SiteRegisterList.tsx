@@ -148,6 +148,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
 
   const handleClearLocation = () => {
     setSelectedLocation(null);
+    setSearchTerm(""); // Clear the search term when location is cleared
   };
 
   const filteredRegisters = siteRegisters?.filter(register => {
