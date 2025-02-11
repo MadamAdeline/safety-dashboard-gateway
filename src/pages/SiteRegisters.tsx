@@ -66,10 +66,6 @@ export default function SiteRegisters() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             </div>
             <div className="flex items-center gap-2">
-              <SiteRegisterActions
-                onExport={handleExport}
-                onRefresh={handleRefresh}
-              />
               <Button
                 onClick={() => setIsFormOpen(true)}
                 className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
@@ -77,6 +73,10 @@ export default function SiteRegisters() {
                 <Plus className="h-4 w-4 mr-2" />
                 Add to Site Register
               </Button>
+              <SiteRegisterActions
+                onExport={handleExport}
+                onRefresh={handleRefresh}
+              />
             </div>
           </div>
         </div>
