@@ -119,7 +119,7 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
               label
             )
           ),
-          locations (
+          locations:location_id (
             id,
             name,
             full_path
@@ -137,6 +137,7 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
         throw error;
       }
 
+      console.log('Site registers data:', data); // Debug log
       return data;
     },
   });
@@ -221,33 +222,38 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredRegisters?.map((register) => (
-              <TableRow key={register.id}>
-                <TableCell>{register.products?.product_name || '-'}</TableCell>
-                <TableCell>{register.override_product_name || '-'}</TableCell>
-                <TableCell>{register.locations?.full_path || '-'}</TableCell>
-                <TableCell>{register.products?.uom?.label || '-'}</TableCell>
-                <TableCell>{register.current_stock_level?.toString() || '0'}</TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onEdit(register)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(register.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+            {filteredRegisters?.map((register) => {
+              // Debug log for location path
+              console.log('Register location full path:', register.locations?.full_path);
+              
+              return (
+                <TableRow key={register.id}>
+                  <TableCell>{register.products?.product_name || '-'}</TableCell>
+                  <TableCell>{register.override_product_name || '-'}</TableCell>
+                  <TableCell>{register.locations?.full_path || '-'}</TableCell>
+                  <TableCell>{register.products?.uom?.label || '-'}</TableCell>
+                  <TableCell>{register.current_stock_level?.toString() || '0'}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onEdit(register)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(register.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
