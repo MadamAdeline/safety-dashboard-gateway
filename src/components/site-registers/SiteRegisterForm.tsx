@@ -21,7 +21,9 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     status_id: initialData?.status_id || "",
   });
 
+  // Change this to store the complete product object
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  console.log("SiteRegisterForm - Selected Product:", selectedProduct);
 
   const handleSave = async () => {
     // TODO: Implement save functionality
@@ -30,6 +32,11 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
 
   const handleFieldChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleProductSelect = (product: Product) => {
+    console.log("SiteRegisterForm - Handling product selection:", product);
+    setSelectedProduct(product);
   };
 
   return (
@@ -51,7 +58,7 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
             <SiteRegisterDetailsTab
               formData={formData}
               onChange={handleFieldChange}
-              onProductSelect={setSelectedProduct}
+              onProductSelect={handleProductSelect}
             />
           </TabsContent>
 
@@ -63,4 +70,3 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     </div>
   );
 }
-
