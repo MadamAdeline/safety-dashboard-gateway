@@ -38,7 +38,7 @@ export function SiteRegisterDetailsTab({
 }: SiteRegisterDetailsTabProps) {
   console.log('SiteRegisterDetailsTab rendering with:', {
     isEditing,
-    formDataId: formData.id,
+    formDataId: formData?.id,
     hasFormData: !!formData
   });
 
@@ -61,6 +61,8 @@ export function SiteRegisterDetailsTab({
       return data;
     }
   });
+
+  const showStockMovements = isEditing && formData?.id;
 
   return (
     <div className="space-y-6">
@@ -153,16 +155,10 @@ export function SiteRegisterDetailsTab({
             </div>
           </div>
 
-          {formData.id && (
-            <>
-              <div className="pt-8">
-                {/* Log before rendering the grid */}
-                {(() => {
-                  console.log('About to render StockMovementsGrid with ID:', formData.id);
-                  return <StockMovementsGrid siteRegisterId={formData.id} />;
-                })()}
-              </div>
-            </>
+          {showStockMovements && (
+            <div className="pt-8">
+              <StockMovementsGrid siteRegisterId={formData.id} />
+            </div>
           )}
         </>
       )}
