@@ -17,7 +17,6 @@ import { LocationSearch } from "@/components/locations/LocationSearch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Location } from "@/types/location";
-import { useUserRole } from "@/hooks/use-user-role";
 
 interface SiteRegisterListProps {
   searchTerm: string;
@@ -25,89 +24,10 @@ interface SiteRegisterListProps {
 }
 
 export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) {
-  const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(null);
-  const { data: userRole } = useUserRole();
-  
-  // Fetch user's location if they are a Manager or Standard user
-  const { data: userLocation } = useQuery({
-    queryKey: ['userLocation'],
-    queryFn: async () => {
-      if (!['manager', 'standard'].includes(userRole?.toLowerCase() || '')) {
-        return null;
-      }
-
-      const userEmail = localStorage.getItem('userEmail');
-      if (!userEmail) return null;
-
-      const { data, error } = await supabase
-        .from('users')
-        .select(`
-          locations (
-            id,
-            name,
-            full_path,
-            type_id,
-            parent_location_id,
-            status_id,
-            coordinates,
-            master_data (
-              id,
-              label
-            ),
-            status_lookup (
-              id,
-              status_name
-            )
-          )
-        `)
-        .eq('email', userEmail)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching user location:', error);
-        return null;
-      }
-
-      if (data?.locations) {
-        const locationData = data.locations;
-        let coordinates = null;
-        
-        if (locationData.coordinates && 
-            typeof locationData.coordinates === 'object' && 
-            'lat' in locationData.coordinates && 
-            'lng' in locationData.coordinates) {
-          coordinates = {
-            lat: Number(locationData.coordinates.lat) || 0,
-            lng: Number(locationData.coordinates.lng) || 0
-          };
-        }
-
-        return {
-          ...locationData,
-          coordinates,
-          parent_location_id: locationData.parent_location_id || null,
-          full_path: locationData.full_path || null,
-          master_data: locationData.master_data || undefined,
-          status_lookup: locationData.status_lookup || undefined
-        } as Location;
-      }
-
-      return null;
-    },
-    enabled: ['manager', 'standard'].includes(userRole?.toLowerCase() || '')
-  });
-
-  // Set the user's location when it's loaded
-  React.useEffect(() => {
-    if (userLocation) {
-      setSelectedLocation(userLocation);
-    }
-  }, [userLocation]);
-
   const { data: siteRegisters, isLoading, refetch } = useQuery({
-    queryKey: ['site-registers', selectedLocation?.id],
+    queryKey: ['site-registers'],
     queryFn: async () => {
-      const query = supabase
+      const { data, error } = await supabase
         .from('site_registers')
         .select(`
           *,
@@ -119,25 +39,18 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
               label
             )
           ),
-          locations:location_id (
+          locations (
             id,
             name,
             full_path
           )
         `);
 
-      if (selectedLocation?.id) {
-        query.eq('location_id', selectedLocation.id);
-      }
-
-      const { data, error } = await query;
-
       if (error) {
         console.error('Error fetching site registers:', error);
         throw error;
       }
 
-      console.log('Site registers data:', data);
       return data;
     },
   });
@@ -167,6 +80,14 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
     }
   };
 
+  const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(null);
+
+  const handleLocationSelect = (location: Location) => {
+    console.log('Selected location:', location);
+    setSelectedLocation(location);
+    // We'll implement location filtering in a future update
+  };
+
   const filteredRegisters = siteRegisters?.filter(register => {
     if (!searchTerm) return true;
     
@@ -176,8 +97,6 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
       register.override_product_name?.toLowerCase().includes(searchLower)
     );
   });
-
-  const isLocationReadOnly = true; // Always readonly for both Manager and Standard users
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -193,9 +112,8 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
               <LocationSearch
                 selectedLocationId={selectedLocation?.id || null}
                 initialLocation={selectedLocation}
-                onLocationSelect={setSelectedLocation}
+                onLocationSelect={handleLocationSelect}
                 className="w-full"
-                disabled={isLocationReadOnly}
               />
             </div>
             {selectedLocation?.full_path && (
@@ -222,38 +140,33 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredRegisters?.map((register) => {
-              // Debug log for location path
-              console.log('Register location full path:', register.locations?.full_path);
-              
-              return (
-                <TableRow key={register.id}>
-                  <TableCell>{register.products?.product_name || '-'}</TableCell>
-                  <TableCell>{register.override_product_name || '-'}</TableCell>
-                  <TableCell>{String(register.locations?.full_path || '-')}</TableCell>
-                  <TableCell>{register.products?.uom?.label || '-'}</TableCell>
-                  <TableCell>{String(register.current_stock_level || '0')}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onEdit(register)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(register.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {filteredRegisters?.map((register) => (
+              <TableRow key={register.id}>
+                <TableCell>{register.products?.product_name}</TableCell>
+                <TableCell>{register.override_product_name}</TableCell>
+                <TableCell>{register.locations?.full_path}</TableCell>
+                <TableCell>{register.products?.uom?.label}</TableCell>
+                <TableCell>{register.current_stock_level}</TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onEdit(register)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(register.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>
