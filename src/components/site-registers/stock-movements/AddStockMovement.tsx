@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,21 +101,21 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
   };
 
   return (
-    <div className="grid grid-cols-[120px_150px_200px_120px_1fr_100px] gap-4 px-4 py-2">
-      <div>
+    <div className="grid grid-cols-6 gap-4 px-4 py-2">
+      <div className="flex items-center">
         <Input
           type="date"
           value={newMovement.movement_date}
           onChange={(e) => setNewMovement({ ...newMovement, movement_date: e.target.value })}
-          className="w-28"
+          className="w-32"
         />
       </div>
-      <div>
+      <div className="flex items-center">
         <Select
           value={newMovement.action}
           onValueChange={(value) => setNewMovement({ ...newMovement, action: value })}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Action" />
           </SelectTrigger>
           <SelectContent>
@@ -124,12 +125,12 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
           </SelectContent>
         </Select>
       </div>
-      <div>
+      <div className="flex items-center">
         <Select
           value={newMovement.reason_id}
           onValueChange={(value) => setNewMovement({ ...newMovement, reason_id: value })}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Reason" />
           </SelectTrigger>
           <SelectContent>
@@ -141,26 +142,29 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
           </SelectContent>
         </Select>
       </div>
-      <div>
+      <div className="flex items-center">
         <Input
           type="number"
           placeholder="Quantity"
           value={newMovement.quantity}
           onChange={(e) => setNewMovement({ ...newMovement, quantity: e.target.value })}
+          className="w-full"
         />
       </div>
-      <div>
+      <div className="flex items-center">
         <Input
           placeholder="Comments"
           value={newMovement.comments}
           onChange={(e) => setNewMovement({ ...newMovement, comments: e.target.value })}
+          className="w-full"
         />
       </div>
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between w-full">
+        <div className="text-gray-400 text-sm"></div>
         <Button 
           onClick={handleAddNew} 
           size="icon" 
-          variant="ghost"
+          className="ml-auto"
         >
           <Check className="h-4 w-4" />
         </Button>
@@ -168,3 +172,4 @@ export function AddStockMovement({ siteRegisterId, stockReasons, onSuccess }: Ad
     </div>
   );
 }
+
