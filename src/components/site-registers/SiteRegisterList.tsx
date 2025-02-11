@@ -99,7 +99,7 @@ export function SiteRegisterList({ searchTerm, onEdit }: SiteRegisterListProps) 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <div className="flex-1">
+        <div className="w-[300px]">
           <LocationSearch
             selectedLocationId={null}
             initialLocation={null}
