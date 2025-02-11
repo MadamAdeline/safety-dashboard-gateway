@@ -49,6 +49,7 @@ export function StockMovementsGrid({ siteRegisterId }: StockMovementsGridProps) 
       if (error) throw error;
       return data;
     },
+    enabled: !!siteRegisterId,
   });
 
   // Fetch stock reasons from master_data
@@ -130,6 +131,10 @@ export function StockMovementsGrid({ siteRegisterId }: StockMovementsGridProps) 
     });
     refetch();
   };
+
+  if (!siteRegisterId) {
+    return null;
+  }
 
   return (
     <div className="space-y-4">

@@ -147,11 +147,9 @@ export function SiteRegisterDetailsTab({
             </div>
           </div>
 
-          {formData.id && (
-            <div className="pt-4">
-              <StockMovementsGrid siteRegisterId={formData.id} />
-            </div>
-          )}
+          <div className="pt-4">
+            <StockMovementsGrid siteRegisterId={formData.id || ''} />
+          </div>
         </>
       )}
     </div>
