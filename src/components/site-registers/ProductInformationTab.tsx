@@ -26,13 +26,13 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
       </div>
 
       <div className="space-y-2">
-        <Label>Product Code</Label>
-        <Input value={product.code} readOnly className="bg-gray-50" />
+        <Label>Brand Name</Label>
+        <Input value={product.brandName} readOnly className="bg-gray-50" />
       </div>
 
       <div className="space-y-2">
-        <Label>Brand Name</Label>
-        <Input value={product.brandName || ''} readOnly className="bg-gray-50" />
+        <Label>Product Code</Label>
+        <Input value={product.code} readOnly className="bg-gray-50" />
       </div>
 
       <div className="space-y-2">
