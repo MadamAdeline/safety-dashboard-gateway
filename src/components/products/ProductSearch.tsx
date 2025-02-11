@@ -8,19 +8,26 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface ProductSearchProps {
+  value?: string;
+  onChange?: (value: string) => void;
   selectedProductId?: string;
-  onProductSelect: (product: Product) => void;
+  onProductSelect?: (product: Product) => void;
   className?: string;
 }
 
-export function ProductSearch({ selectedProductId, onProductSelect, className }: ProductSearchProps) {
+export function ProductSearch({ value, onChange, selectedProductId, onProductSelect, className }: ProductSearchProps) {
   const [open, setOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState(value || "");
   const { data: products, isLoading } = useProducts();
+
+  useEffect(() => {
+    if (value !== undefined) {
+      setSearchValue(value);
+    }
+  }, [value]);
 
   const selectedProduct = products?.find(p => p.id === selectedProductId);
 
-  // Handle undefined products
   const filteredProducts = products?.filter(product => {
     if (!searchValue) return true;
     return (
@@ -33,13 +40,18 @@ export function ProductSearch({ selectedProductId, onProductSelect, className }:
   console.log('ProductSearch - Filtered Products:', filteredProducts);
   console.log('ProductSearch - Selected Product:', selectedProduct);
 
+  const handleSearchChange = (newValue: string) => {
+    setSearchValue(newValue);
+    onChange?.(newValue);
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <div className={`relative ${className}`}>
           <Input
             value={selectedProduct ? selectedProduct.name : searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search products..."
             className="pl-10"
           />
@@ -51,7 +63,7 @@ export function ProductSearch({ selectedProductId, onProductSelect, className }:
           <CommandInput 
             placeholder="Search products..." 
             value={searchValue}
-            onValueChange={setSearchValue}
+            onValueChange={handleSearchChange}
           />
           {isLoading ? (
             <div className="py-6 text-center text-sm text-gray-500">
@@ -65,7 +77,7 @@ export function ProductSearch({ selectedProductId, onProductSelect, className }:
                   <CommandItem
                     key={product.id}
                     onSelect={() => {
-                      onProductSelect(product);
+                      onProductSelect?.(product);
                       setOpen(false);
                       setSearchValue("");
                     }}
