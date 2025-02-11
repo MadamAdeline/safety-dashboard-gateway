@@ -17,6 +17,7 @@ interface SiteRegisterFormProps {
 export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
+    id: initialData?.id || undefined,
     location_id: initialData?.location_id || "",
     product_id: initialData?.product_id || "",
     override_product_name: initialData?.override_product_name || "",
@@ -26,6 +27,12 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     current_stock_level: initialData?.current_stock_level || null,
     max_stock_level: initialData?.max_stock_level || null,
     uom_id: initialData?.uom_id || null,
+  });
+
+  console.log('SiteRegisterForm initializing with:', {
+    hasInitialData: !!initialData,
+    initialDataId: initialData?.id,
+    formDataId: formData.id
   });
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -81,9 +88,9 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
 
         if (error) throw error;
 
-        // Update initialData with the newly created record
+        // Update formData with the newly created record's ID
         if (data && data[0]) {
-          initialData = data[0];
+          setFormData(prev => ({ ...prev, id: data[0].id }));
         }
 
         toast({
@@ -104,6 +111,7 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
   };
 
   const handleFieldChange = (field: string, value: string | number) => {
+    console.log('Updating form field:', { field, value });
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
