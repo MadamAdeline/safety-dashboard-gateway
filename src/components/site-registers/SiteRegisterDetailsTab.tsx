@@ -38,7 +38,7 @@ export function SiteRegisterDetailsTab({
 }: SiteRegisterDetailsTabProps) {
   console.log('SiteRegisterDetailsTab rendering with:', {
     isEditing,
-    formDataId: formData?.id,
+    formDataId: formData.id,
     hasFormData: !!formData,
     fullFormData: formData
   });
@@ -63,14 +63,14 @@ export function SiteRegisterDetailsTab({
     }
   });
 
-  // Only show stock movements if we're in edit mode and have a valid ID
-  const showStockMovements = isEditing && typeof formData.id === 'string';
+  // Only show stock movements if we're in edit mode and the form has an ID
+  const showStockMovements = isEditing && formData?.id && formData.id !== '';
 
   console.log('Stock movements visibility check:', {
     isEditing,
     formDataId: formData?.id,
     showStockMovements,
-    typeofId: typeof formData.id
+    hasId: !!formData?.id
   });
 
   return (
