@@ -21,6 +21,7 @@ export function SDSPreview({ onUploadClick, initialData, selectedFile, readOnly 
       if (initialData?.currentFilePath) {
         console.log('Fetching PDF URL for path:', initialData.currentFilePath);
         try {
+          // Get current file path from SDS data
           const { data } = supabase.storage
             .from('sds_documents')
             .getPublicUrl(initialData.currentFilePath);
