@@ -82,6 +82,7 @@ export default function SiteRegisters() {
         <SiteRegisterList
           searchTerm={searchTerm}
           onEdit={handleEdit}
+          setSearchTerm={setSearchTerm}
         />
       </div>
     </DashboardLayout>
