@@ -60,6 +60,9 @@ export function LocationSearch({
     if (initialLocation) {
       console.log('Setting initial search term from location:', initialLocation.name);
       setSearchTerm(initialLocation.name);
+    } else {
+      // Clear the search term when initialLocation is null
+      setSearchTerm("");
     }
   }, [initialLocation]);
 
