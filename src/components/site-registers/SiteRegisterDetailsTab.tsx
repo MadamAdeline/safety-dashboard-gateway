@@ -24,6 +24,7 @@ interface SiteRegisterDetailsTabProps {
     current_stock_level?: number;
     max_stock_level?: number;
     uom_id?: string;
+    total_qty?: number;
   };
   onChange: (field: string, value: string | number) => void;
   onProductSelect: (product: Product) => void;
