@@ -73,8 +73,10 @@ export function useProductDetails(productId: string) {
       if (!data) return null;
       
       console.log("Raw data from DB:", data);
-      console.log("SDS data specifically:", data.sds);
-      console.log("Raw expiry_date value:", data.sds?.expiry_date);
+      console.log("Raw SDS data:", data.sds);
+      if (data.sds) {
+        console.log("Direct expiry_date value:", data.sds.expiry_date);
+      }
 
       const product: Product = {
         id: data.id,
@@ -105,9 +107,9 @@ export function useProductDetails(productId: string) {
           currentFileName: data.sds.current_file_name,
           currentFileSize: data.sds.current_file_size,
           currentContentType: data.sds.current_content_type,
-          expiryDate: data.sds.expiry_date,
-          issueDate: data.sds.issue_date,
-          revisionDate: data.sds.revision_date,
+          expiryDate: data.sds.expiry_date || undefined,
+          issueDate: data.sds.issue_date || undefined,
+          revisionDate: data.sds.revision_date || undefined,
           dgClass: data.sds.dg_class ? {
             id: data.sds.dg_class.id,
             label: data.sds.dg_class.label
@@ -127,8 +129,10 @@ export function useProductDetails(productId: string) {
         } : undefined
       };
 
-      console.log("Final mapped product with SDS:", product);
-      console.log("Mapped expiry_date value:", product.sds?.expiryDate);
+      console.log("Final mapped SDS data:", product.sds);
+      if (product.sds) {
+        console.log("Mapped expiry_date value:", product.sds.expiryDate);
+      }
       
       return product;
     },
