@@ -9,6 +9,7 @@ export function useProductDetails(productId: string) {
     queryFn: async () => {
       if (!productId) return null;
       
+      console.log("=== START: Product Details Query ===");
       console.log("Fetching product with ID:", productId);
       
       const { data, error } = await supabase
@@ -70,12 +71,20 @@ export function useProductDetails(productId: string) {
         throw error;
       }
       
-      if (!data) return null;
+      if (!data) {
+        console.log("No data returned from query");
+        return null;
+      }
       
-      console.log("Raw data from DB:", data);
-      console.log("Raw SDS data:", data.sds);
+      console.log("=== Raw Data ===");
+      console.log("Complete data object:", data);
+      console.log("SDS data:", data.sds);
+      
       if (data.sds) {
-        console.log("Direct expiry_date value:", data.sds.expiry_date);
+        console.log("=== SDS Date Fields ===");
+        console.log("Expiry date:", data.sds.expiry_date);
+        console.log("Issue date:", data.sds.issue_date);
+        console.log("Revision date:", data.sds.revision_date);
       }
 
       const product: Product = {
@@ -129,11 +138,17 @@ export function useProductDetails(productId: string) {
         } : undefined
       };
 
-      console.log("Final mapped SDS data:", product.sds);
+      console.log("=== Mapped Data ===");
+      console.log("Final product object:", product);
       if (product.sds) {
-        console.log("Mapped expiry_date value:", product.sds.expiryDate);
+        console.log("Mapped SDS dates:", {
+          expiryDate: product.sds.expiryDate,
+          issueDate: product.sds.issueDate,
+          revisionDate: product.sds.revisionDate
+        });
       }
       
+      console.log("=== END: Product Details Query ===");
       return product;
     },
     enabled: !!productId
