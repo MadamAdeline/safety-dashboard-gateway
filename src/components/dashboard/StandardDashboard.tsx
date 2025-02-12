@@ -1,4 +1,3 @@
-
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
@@ -73,7 +72,8 @@ export function StandardDashboard() {
         return [];
       }
 
-      let query = supabase
+      // Search for override_product_name
+      const { data: overrideResults, error: overrideError } = await supabase
         .from('site_registers')
         .select(`
           id,
@@ -89,12 +89,7 @@ export function StandardDashboard() {
           )
         `)
         .in('location_id', locationHierarchy)
-        .textSearch('override_product_name', searchTerm, {
-          type: 'plain',
-          config: 'english'
-        });
-
-      const { data: overrideResults, error: overrideError } = await query;
+        .ilike('override_product_name', `%${searchTerm}%`);
 
       // Search in products table
       const { data: productResults, error: productError } = await supabase
@@ -113,10 +108,7 @@ export function StandardDashboard() {
           )
         `)
         .in('location_id', locationHierarchy)
-        .textSearch('products.product_name', searchTerm, {
-          type: 'plain',
-          config: 'english'
-        });
+        .ilike('products.product_name', `%${searchTerm}%`);
 
       if (overrideError || productError) {
         console.error('Error searching site registers:', overrideError || productError);
