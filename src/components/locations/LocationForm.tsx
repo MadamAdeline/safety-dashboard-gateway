@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Input } from "@/components/ui/input";
@@ -6,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import type { Location, LocationType, LocationStatus } from "@/types/location";
 import { LocationMap } from "./LocationMap";
 import { useLocations } from "@/hooks/use-locations";
@@ -39,6 +38,19 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
 
   const { createLocation, updateLocation } = useLocations();
   const { toast } = useToast();
+
+  const validateForm = (): string[] => {
+    const errors: string[] = [];
+    
+    if (!formData.name.trim()) {
+      errors.push("Location Name");
+    }
+    if (!formData.type) {
+      errors.push("Location Type");
+    }
+
+    return errors;
+  };
 
   // Fetch status IDs for locations
   useEffect(() => {
@@ -151,8 +163,18 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
 
   const handleSave = async () => {
     console.log('Saving location with data:', formData);
-    console.log('Using status map:', statusMap);
     try {
+      // Validate required fields
+      const missingFields = validateForm();
+      if (missingFields.length > 0) {
+        toast({
+          title: "Required Fields Missing",
+          description: `Please fill in the following required fields: ${missingFields.join(", ")}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
       const locationData = {
         name: formData.name,
         type_id: formData.typeId,
@@ -217,7 +239,9 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name">Location Name *</Label>
+                <Label htmlFor="name" className="flex items-center">
+                  Location Name <span className="text-red-500 ml-1">*</span>
+                </Label>
                 <Input
                   id="name"
                   value={formData.name}
@@ -227,7 +251,9 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="type">Location Type *</Label>
+                <Label htmlFor="type" className="flex items-center">
+                  Location Type <span className="text-red-500 ml-1">*</span>
+                </Label>
                 <Select 
                   value={formData.type} 
                   onValueChange={(value: LocationType) => 
@@ -267,7 +293,7 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="status">Status *</Label>
+                <Label htmlFor="status">Status</Label>
                 <Select 
                   value={formData.status}
                   onValueChange={(value: LocationStatus) => 
@@ -286,7 +312,7 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
             </div>
 
             <div className="space-y-4">
-              <Label>GPS Location *</Label>
+              <Label>GPS Location</Label>
               <LocationMap 
                 coordinates={formData.coordinates}
                 onCoordinatesChange={(coords) => 
