@@ -23,7 +23,7 @@ export function UserSearch({ value, onChange }: UserSearchProps) {
   };
 
   return (
-    <div className="flex-1 max-w-md relative">
+    <div className="flex-1 w-1/2 relative">
       <Input
         placeholder="Search Users by Name..."
         value={value}
