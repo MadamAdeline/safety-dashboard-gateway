@@ -121,6 +121,8 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
         status_id: 1, // Default to ACTIVE
         coordinates: newLocation.coordinates || { lat: -37.8136, lng: 144.9631 },
         full_path: null, // This will be computed by the trigger
+        is_storage_location: false, // Default value
+        storage_type_id: null // Default value
       });
 
       toast({

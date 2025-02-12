@@ -146,7 +146,11 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
       console.log('Fetching available locations...');
       const { data, error } = await supabase
         .from('locations')
-        .select('id, name, master_data!inner(label)')
+        .select(`
+          id,
+          name,
+          master_data:master_data!type_id (label)
+        `)
         .order('name');
 
       if (error) {
@@ -154,8 +158,14 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
         return;
       }
 
-      console.log('Available locations fetched:', data);
-      setAvailableLocations(data || []);
+      const transformedData = (data || []).map(location => ({
+        id: location.id,
+        name: location.name,
+        master_data: location.master_data || { label: 'Unknown' }
+      }));
+
+      console.log('Available locations fetched:', transformedData);
+      setAvailableLocations(transformedData);
     };
 
     fetchLocations();

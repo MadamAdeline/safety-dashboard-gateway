@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -68,17 +67,23 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
           status_id,
           coordinates,
           full_path,
-          master_data (id, label),
+          is_storage_location,
+          storage_type_id,
+          master_data!type_id (id, label),
+          storage_type:master_data!storage_type_id (id, label),
           status_lookup (id, status_name)
         `)
         .eq('id', formData.location_id)
         .single();
       
       if (error) throw error;
+      
       return data ? {
         ...data,
         coordinates: data.coordinates || null,
         parent_location_id: data.parent_location_id || null,
+        is_storage_location: data.is_storage_location || false,
+        storage_type_id: data.storage_type_id || null,
       } as Location : null;
     },
     enabled: !!formData.location_id
