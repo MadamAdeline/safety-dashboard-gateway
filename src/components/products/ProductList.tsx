@@ -1,3 +1,4 @@
+
 import { Table, TableBody } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import type { Product, ProductFilters } from "@/types/product";
@@ -12,10 +13,11 @@ interface ProductListProps {
   data: Product[];
   filters: ProductFilters;
   onEdit: (product: Product) => void;
+  onView: (product: Product) => void;
   onDelete?: (product: Product) => void;
 }
 
-export function ProductList({ data, filters, onEdit }: ProductListProps) {
+export function ProductList({ data, filters, onEdit, onView }: ProductListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -126,6 +128,7 @@ export function ProductList({ data, filters, onEdit }: ProductListProps) {
                 isSelected={selectedItems.includes(item.id)}
                 onSelect={toggleSelectItem}
                 onEdit={onEdit}
+                onView={onView}
                 onDelete={handleDelete}
                 isDeleting={isDeleting}
               />

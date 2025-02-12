@@ -1,6 +1,8 @@
+
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProductForm } from "@/components/products/ProductForm";
+import { ProductReadOnlyForm } from "@/components/products/ProductReadOnlyForm";
 import type { Product, ProductFilters as ProductFiltersType } from "@/types/product";
 import { exportProductsToExcel } from "@/utils/exportUtils";
 import { useLocation } from "react-router-dom";
@@ -25,6 +27,7 @@ export default function Products() {
   
   const [showFilters, setShowFilters] = useState(false);
   const [showForm, setShowForm] = useState(showFormFromState);
+  const [showViewForm, setShowViewForm] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -45,7 +48,6 @@ export default function Products() {
     console.log('Starting export process');
     setIsExporting(true);
     try {
-      // Get the filtered data from the ProductList component
       const filteredData = products?.filter((item) => {
         if (filters.search) {
           const searchTerm = filters.search.toLowerCase();
@@ -114,12 +116,16 @@ export default function Products() {
     setShowForm(true);
   };
 
+  const handleView = (product: Product) => {
+    setSelectedProduct(product);
+    setShowViewForm(true);
+  };
+
   const handleFormClose = () => {
     setShowForm(false);
+    setShowViewForm(false);
     setSelectedProduct(null);
-    // Clear the state from the URL
     window.history.replaceState({}, document.title);
-    // Refresh the products list
     refetch();
   };
 
@@ -152,6 +158,17 @@ export default function Products() {
     );
   }
 
+  if (showViewForm && selectedProduct) {
+    return (
+      <DashboardLayout>
+        <ProductReadOnlyForm 
+          onClose={handleFormClose}
+          data={selectedProduct}
+        />
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-4 max-w-full">
@@ -177,6 +194,7 @@ export default function Products() {
             filters={filters}
             showFilters={showFilters}
             onEdit={handleEdit}
+            onView={handleView}
             onFiltersChange={setFilters}
           />
         </div>
