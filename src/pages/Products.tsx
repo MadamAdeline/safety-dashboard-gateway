@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProductForm } from "@/components/products/ProductForm";
@@ -53,17 +52,17 @@ export default function Products() {
           const searchableFields = [
             item.name,
             item.code,
-            item.brandName,
-            item.unit,
-            item.description,
-            item.otherNames,
-            item.uses,
-            item.sds?.supplier?.supplier_name,
-            item.sds?.dgClass?.label,
-          ].filter(Boolean);
+            item.brandName || '',
+            item.unit || '',
+            item.description || '',
+            item.otherNames || '',
+            item.uses || '',
+            item.sds?.supplier?.supplier_name || '',
+            item.sds?.dgClass?.label || '',
+          ];
 
           const matchesSearch = searchableFields.some(
-            field => field?.toLowerCase().includes(searchTerm)
+            field => field.toLowerCase().includes(searchTerm)
           );
 
           if (!matchesSearch) return false;

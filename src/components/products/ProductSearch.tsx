@@ -147,8 +147,9 @@ export function ProductSearch({
     const searchLower = searchTerm.toLowerCase();
     const nameMatch = product.name.toLowerCase().includes(searchLower);
     const codeMatch = product.code.toLowerCase().includes(searchLower);
+    const brandMatch = product.brandName?.toLowerCase().includes(searchLower);
     
-    return nameMatch || codeMatch;
+    return nameMatch || codeMatch || brandMatch;
   });
 
   console.log('ProductSearch rendering with:', {
@@ -188,7 +189,7 @@ export function ProductSearch({
               >
                 <div className="font-medium">{product.name}</div>
                 <div className="text-sm text-gray-500">
-                  {product.code}
+                  {product.code} {product.brandName && `- ${product.brandName}`}
                 </div>
               </div>
             ))}
