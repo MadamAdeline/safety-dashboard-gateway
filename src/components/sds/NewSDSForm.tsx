@@ -110,6 +110,23 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     }
   };
 
+  const validateForm = (): string[] => {
+    const missingFields: string[] = [];
+    if (!formData.productName) missingFields.push("Product Name");
+    if (!formData.productId) missingFields.push("Product ID");
+    if (!formData.issueDate) missingFields.push("Issue Date");
+    if (!formData.expiryDate) missingFields.push("Expiry Date");
+    
+    // Only validate DG-related fields if isDG is true
+    if (isDG) {
+      if (!formData.unNumber) missingFields.push("UN Number");
+      if (!formData.unProperShippingName) missingFields.push("UN Proper Shipping Name");
+      if (!formData.hazchemCode) missingFields.push("Hazchem Code");
+    }
+    
+    return missingFields;
+  };
+
   const handleSave = async () => {
     if (isManager) {
       toast({
@@ -209,23 +226,6 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         variant: "destructive"
       });
     }
-  };
-
-  const validateForm = () => {
-    const missingFields: string[] = [];
-    if (!formData.productName) missingFields.push("Product Name");
-    if (!formData.productId) missingFields.push("Product ID");
-    if (!formData.issueDate) missingFields.push("Issue Date");
-    if (!formData.expiryDate) missingFields.push("Expiry Date");
-    if (!formData.unNumber) missingFields.push("UN Number");
-    if (!formData.unProperShippingName) missingFields.push("UN Proper Shipping Name");
-    if (!formData.hazchemCode) missingFields.push("Hazchem Code");
-    if (!formData.requestSupplierName) missingFields.push("Request Supplier Name");
-    if (!formData.requestSupplierDetails) missingFields.push("Request Supplier Details");
-    if (!formData.requestInformation) missingFields.push("Request Information");
-    if (!formData.requestDate) missingFields.push("Request Date");
-    if (!formData.requestedBy) missingFields.push("Requested By");
-    return missingFields;
   };
 
   return (
