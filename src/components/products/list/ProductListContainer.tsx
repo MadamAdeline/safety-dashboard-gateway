@@ -8,6 +8,7 @@ interface ProductListContainerProps {
   filters: ProductFiltersType;
   showFilters: boolean;
   onEdit: (product: Product) => void;
+  onView: (product: Product) => void;
   onFiltersChange: (filters: ProductFiltersType) => void;
 }
 
@@ -16,6 +17,7 @@ export function ProductListContainer({
   filters,
   showFilters,
   onEdit,
+  onView,
   onFiltersChange
 }: ProductListContainerProps) {
   return (
@@ -27,6 +29,7 @@ export function ProductListContainer({
         data={data} 
         filters={filters} 
         onEdit={onEdit}
+        onView={onView}
       />
     </div>
   );
