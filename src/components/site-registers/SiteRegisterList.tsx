@@ -19,6 +19,14 @@ import { Label } from "@/components/ui/label";
 import type { Location } from "@/types/location";
 import { SiteRegisterActions } from "@/components/site-registers/SiteRegisterActions";
 import { useUserRole } from "@/hooks/use-user-role";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface SiteRegisterListProps {
   searchTerm: string;
@@ -36,8 +44,9 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
       full_path: userData.location.full_path,
     } as Location : null
   );
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const itemsPerPage = 10;
 
-  // Query to fetch all child locations for the selected location
   const { data: locationHierarchy, isLoading: isLoadingLocations } = useQuery({
     queryKey: ['locationHierarchy', selectedLocation?.id],
     queryFn: async () => {
@@ -161,6 +170,12 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
     );
   });
 
+  const totalItems = filteredRegisters?.length || 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+  const paginatedRegisters = filteredRegisters?.slice(startIndex, startIndex + itemsPerPage);
+
   if (isLoadingLocations || isLoadingRegisters) {
     return <div>Loading...</div>;
   }
@@ -238,7 +253,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredRegisters?.map((register) => (
+            {paginatedRegisters?.map((register) => (
               <TableRow key={register.id}>
                 <TableCell>{register.products?.product_name}</TableCell>
                 <TableCell>{register.override_product_name || '-'}</TableCell>
@@ -267,6 +282,46 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
             ))}
           </TableBody>
         </Table>
+      </div>
+
+      <div className="flex flex-col space-y-4">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-gray-500">
+            Showing {startIndex + 1} to {endIndex} of {totalItems} results
+          </p>
+        </div>
+        
+        <div className="flex justify-center">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(page)}
+                    isActive={currentPage === page}
+                    className={currentPage === page ? "bg-purple-600 text-white hover:bg-purple-500" : ""}
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </div>
     </div>
   );
