@@ -88,23 +88,46 @@ export function StandardDashboard() {
             full_path
           )
         `)
-        .in('location_id', locationHierarchy);
+        .in('location_id', locationHierarchy)
+        .textSearch('override_product_name', searchTerm, {
+          type: 'plain',
+          config: 'english'
+        });
 
-      // Add search conditions
-      if (searchTerm) {
-        query = query.or(
-          `override_product_name.ilike.%${searchTerm}%,products(product_name.ilike.%${searchTerm}%)`
-        );
-      }
+      const { data: overrideResults, error: overrideError } = await query;
 
-      const { data, error } = await query;
+      // Search in products table
+      const { data: productResults, error: productError } = await supabase
+        .from('site_registers')
+        .select(`
+          id,
+          location_id,
+          product_id,
+          override_product_name,
+          products!inner (
+            product_name
+          ),
+          locations (
+            name,
+            full_path
+          )
+        `)
+        .in('location_id', locationHierarchy)
+        .textSearch('products.product_name', searchTerm, {
+          type: 'plain',
+          config: 'english'
+        });
 
-      if (error) {
-        console.error('Error searching site registers:', error);
+      if (overrideError || productError) {
+        console.error('Error searching site registers:', overrideError || productError);
         return [];
       }
 
-      return data;
+      // Combine and deduplicate results
+      const combinedResults = [...(overrideResults || []), ...(productResults || [])];
+      const uniqueResults = Array.from(new Map(combinedResults.map(item => [item.id, item])).values());
+
+      return uniqueResults;
     },
     enabled: searchTerm.length > 2 && Array.isArray(locationHierarchy) && locationHierarchy.length > 0
   });
