@@ -89,7 +89,7 @@ export function StandardDashboard() {
           )
         `)
         .in('location_id', locationHierarchy)
-        .or(`products.product_name.ilike.%${searchTerm}%,override_product_name.ilike.%${searchTerm}%`);
+        .or(`override_product_name.ilike.%${searchTerm}%,products!inner(product_name.ilike.%${searchTerm}%)`);
 
       if (error) {
         console.error('Error searching site registers:', error);
