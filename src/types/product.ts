@@ -24,6 +24,7 @@ export interface Product {
   sds?: {
     id: string;
     isDG: boolean;
+    status?: string;
     currentFilePath?: string;
     currentFileName?: string;
     currentFileSize?: number;
@@ -32,11 +33,19 @@ export interface Product {
       id: string;
       label: string;
     };
+    subsidiaryDgClass?: {
+      id: string;
+      label: string;
+    };
     supplier?: {
       id: string;
       supplier_name: string;
     };
     packingGroup?: {
+      id: string;
+      label: string;
+    };
+    dgSubDivision?: {
       id: string;
       label: string;
     };
