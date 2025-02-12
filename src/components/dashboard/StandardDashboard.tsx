@@ -73,7 +73,7 @@ export function StandardDashboard() {
         return [];
       }
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('site_registers')
         .select(`
           id,
@@ -88,8 +88,16 @@ export function StandardDashboard() {
             full_path
           )
         `)
-        .in('location_id', locationHierarchy)
-        .or(`override_product_name.ilike.%${searchTerm}%,override_product_name.is.null,products.product_name.ilike.%${searchTerm}%`);
+        .in('location_id', locationHierarchy);
+
+      // Add search conditions
+      if (searchTerm) {
+        query = query.or(
+          `override_product_name.ilike.%${searchTerm}%,products(product_name.ilike.%${searchTerm}%)`
+        );
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error searching site registers:', error);
