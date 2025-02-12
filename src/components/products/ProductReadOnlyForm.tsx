@@ -1,10 +1,9 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import type { Product } from "@/types/product";
 import { Label } from "@/components/ui/label";
-import { SDSDetailsDisplay } from "./sds/SDSDetailsDisplay";
+import { format } from "date-fns";
 
 interface ProductReadOnlyFormProps {
   onClose: () => void;
@@ -12,6 +11,16 @@ interface ProductReadOnlyFormProps {
 }
 
 export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps) {
+  const formatExpiryDate = (dateString?: string) => {
+    if (!dateString) return "-";
+    try {
+      return format(new Date(dateString), "dd/MM/yyyy");
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return dateString;
+    }
+  };
+
   return (
     <div className="max-w-full">
       <div className="flex items-center justify-between mb-6">
@@ -131,7 +140,7 @@ export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps)
                   <div className="space-y-2">
                     <Label>SDS Expiry Date</Label>
                     <div className="p-2 bg-gray-50 rounded border">
-                      {data.sds?.expiryDate || "-"}
+                      {formatExpiryDate(data.sds?.expiryDate)}
                     </div>
                   </div>
                 </div>
