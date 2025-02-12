@@ -73,6 +73,9 @@ export function StandardDashboard() {
         return [];
       }
 
+      // Create the filter conditions
+      const termFilter = `or.(override_product_name.ilike.%${searchTerm}%,products.product_name.ilike.%${searchTerm}%)`;
+
       const { data, error } = await supabase
         .from('site_registers')
         .select(`
@@ -89,7 +92,7 @@ export function StandardDashboard() {
           )
         `)
         .in('location_id', locationHierarchy)
-        .or(`override_product_name.ilike.%${searchTerm}%,products!inner(product_name.ilike.%${searchTerm}%)`);
+        .filter(termFilter);
 
       if (error) {
         console.error('Error searching site registers:', error);
