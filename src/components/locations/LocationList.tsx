@@ -252,7 +252,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
         <div className="relative w-1/2">
           <Input
             type="text"
-            placeholder="Search locations..."
+            placeholder="Search Locations by Location Name or Parent Name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
