@@ -37,8 +37,8 @@ export function SDSDetailsTab(props: SDSDetailsTabProps) {
   const isRequested = props.status === "REQUESTED";
   const source = props.initialData?.sdsSource || "Customer";
 
-  const validateForm = () => {
-    const missingFields = [];
+  const validateForm = (): string[] => {
+    const missingFields: string[] = [];
     
     // Validate product name
     if (!props.formData.productName?.trim()) {

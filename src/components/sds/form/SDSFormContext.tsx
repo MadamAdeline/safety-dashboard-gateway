@@ -21,7 +21,7 @@ interface SDSFormContextType {
   setDgSubDivisionId: Dispatch<SetStateAction<string>>;
   initialData?: SDS | null;
   readOnly?: boolean;
-  validateForm?: () => boolean;
+  validateForm?: () => string[];
 }
 
 export const SDSFormContext = createContext<SDSFormContextType | undefined>(undefined);
