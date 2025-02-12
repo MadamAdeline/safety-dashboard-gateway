@@ -116,9 +116,9 @@ export function useProductDetails(productId: string) {
           currentFileName: data.sds.current_file_name,
           currentFileSize: data.sds.current_file_size,
           currentContentType: data.sds.current_content_type,
-          expiryDate: data.sds.expiry_date || undefined,
-          issueDate: data.sds.issue_date || undefined,
-          revisionDate: data.sds.revision_date || undefined,
+          expiryDate: data.sds.expiry_date,  // Changed from camelCase to snake_case
+          issueDate: data.sds.issue_date,    // Changed from camelCase to snake_case
+          revisionDate: data.sds.revision_date, // Changed from camelCase to snake_case
           dgClass: data.sds.dg_class ? {
             id: data.sds.dg_class.id,
             label: data.sds.dg_class.label
