@@ -31,13 +31,6 @@ export default function Suppliers() {
     queryFn: getSuppliers,
   });
 
-  const handleExport = () => {
-    toast({
-      title: "Export Started",
-      description: "Your supplier data is being exported to Excel..."
-    });
-  };
-
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ['suppliers'] });
     toast({
@@ -81,8 +74,8 @@ export default function Suppliers() {
             />
             <SupplierActions 
               onToggleFilters={() => setShowFilters(!showFilters)}
-              onExport={handleExport}
               onRefresh={handleRefresh}
+              data={suppliers}
             />
           </div>
           
