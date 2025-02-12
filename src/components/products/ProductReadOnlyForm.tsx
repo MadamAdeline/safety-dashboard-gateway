@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import type { Product } from "@/types/product";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
+import { SDSPreview } from "@/components/sds/SDSPreview";
 
 interface ProductReadOnlyFormProps {
   onClose: () => void;
@@ -219,20 +220,12 @@ export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps)
               </div>
 
               <div className="space-y-4">
-                <Label>PDF Preview</Label>
-                <div className="h-[calc(100vh-24rem)] border rounded-lg overflow-hidden">
-                  {data.sds?.currentFilePath ? (
-                    <iframe
-                      src={data.sds.currentFilePath}
-                      className="w-full h-full"
-                      title="SDS PDF Preview"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                      <p className="text-gray-600">No PDF available</p>
-                    </div>
-                  )}
-                </div>
+                <SDSPreview 
+                  onUploadClick={() => {}}
+                  initialData={data.sds}
+                  selectedFile={null}
+                  readOnly={true}
+                />
               </div>
             </div>
           </TabsContent>
