@@ -1,3 +1,4 @@
+
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,21 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const validateForm = () => {
+    const requiredFields = ['name', 'contactPerson', 'email'];
+    const missingFields = requiredFields.filter(field => !formData[field as keyof Supplier]);
+    
+    if (missingFields.length > 0) {
+      toast({
+        title: "Required Fields Missing",
+        description: "Please fill in all required fields: Supplier Name, Contact Person, and Email Address",
+        variant: "destructive"
+      });
+      return false;
+    }
+    return true;
+  };
 
   const createMutation = useMutation({
     mutationFn: createSupplier,
@@ -78,6 +94,8 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
   });
 
   const handleSave = () => {
+    if (!validateForm()) return;
+
     if (initialData?.id) {
       updateMutation.mutate({ id: initialData.id, data: formData });
     } else {
@@ -112,7 +130,9 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
         <div className="bg-white rounded-lg shadow p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Supplier Name</Label>
+              <Label htmlFor="name" className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                Supplier Name
+              </Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -121,7 +141,9 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="contactPerson">Contact Person</Label>
+              <Label htmlFor="contactPerson" className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                Contact Person
+              </Label>
               <Input
                 id="contactPerson"
                 value={formData.contactPerson}
@@ -130,7 +152,9 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email" className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                Email Address
+              </Label>
               <Input
                 id="email"
                 type="email"
