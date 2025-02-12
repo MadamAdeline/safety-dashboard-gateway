@@ -483,6 +483,7 @@ export type Database = {
           product_id: string
           status_id: number
           storage_conditions: string | null
+          total_qty: number | null
           uom_id: string | null
           updated_at: string | null
         }
@@ -500,6 +501,7 @@ export type Database = {
           product_id: string
           status_id: number
           storage_conditions?: string | null
+          total_qty?: number | null
           uom_id?: string | null
           updated_at?: string | null
         }
@@ -517,6 +519,7 @@ export type Database = {
           product_id?: string
           status_id?: number
           storage_conditions?: string | null
+          total_qty?: number | null
           uom_id?: string | null
           updated_at?: string | null
         }

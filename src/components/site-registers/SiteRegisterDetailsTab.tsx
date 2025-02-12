@@ -153,13 +153,24 @@ export function SiteRegisterDetailsTab({
             <Label className="text-lg font-semibold">Stock Information</Label>
           </div>
 
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-5 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="current_stock_level">Current Stock Level</Label>
+              <Label htmlFor="current_stock_level">Current Stock Level (# of Units)</Label>
               <Input
                 id="current_stock_level"
                 type="number"
                 value={formData.current_stock_level || ''}
+                readOnly
+                className="bg-gray-100"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="total_qty">Total Quantity</Label>
+              <Input
+                id="total_qty"
+                type="number"
+                value={formData.total_qty || ''}
                 readOnly
                 className="bg-gray-100"
               />
