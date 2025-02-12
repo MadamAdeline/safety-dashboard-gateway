@@ -1,4 +1,3 @@
-
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -28,8 +27,8 @@ const InfoCard = ({ title, image, link }: { title: string; image: string; link: 
 export function AdminManagerDashboard() {
   const navigate = useNavigate();
   
-  const { data: userLocation, isLoading: isLoadingLocation } = useQuery({
-    queryKey: ['userLocation'],
+  const { data: userData, isLoading: isLoadingUser } = useQuery({
+    queryKey: ['adminUserData'],
     queryFn: async () => {
       const userEmail = localStorage.getItem('userEmail');
       if (!userEmail) return null;
@@ -37,7 +36,7 @@ export function AdminManagerDashboard() {
       const { data, error } = await supabase
         .from('users')
         .select(`
-          location_id,
+          first_name,
           locations (
             id,
             full_path
@@ -47,11 +46,11 @@ export function AdminManagerDashboard() {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching user location:', error);
+        console.error('Error fetching user data:', error);
         return null;
       }
 
-      return data?.locations?.full_path || null;
+      return data;
     }
   });
 
@@ -96,21 +95,23 @@ export function AdminManagerDashboard() {
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Hero Section */}
         <div className="bg-gradient-to-r from-dgxprt-navy to-dgxprt-purple rounded-2xl p-8 mb-12 text-white shadow-xl">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-              {!isLoadingLocation && userLocation && (
+              <h1 className="text-3xl font-bold mb-2">
+                {!isLoadingUser && userData?.first_name 
+                  ? `Welcome back, ${userData.first_name}` 
+                  : 'Admin Dashboard'}
+              </h1>
+              {!isLoadingUser && userData?.locations?.full_path && (
                 <p className="text-white/80">
-                  Location: {userLocation}
+                  Location: {userData.locations.full_path}
                 </p>
               )}
             </div>
           </div>
         </div>
 
-        {/* Metrics Section */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-dgxprt-navy mb-8 flex items-center">
             <span className="bg-dgxprt-purple/10 px-4 py-2 rounded-lg">Key Metrics</span>
@@ -144,7 +145,6 @@ export function AdminManagerDashboard() {
           </div>
         </div>
 
-        {/* Resources Section */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-dgxprt-navy mb-8 flex items-center">
             <span className="bg-dgxprt-purple/10 px-4 py-2 rounded-lg">Resources & Training</span>
