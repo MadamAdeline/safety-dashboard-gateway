@@ -1,4 +1,3 @@
-
 import { Table, TableBody } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import type { Product, ProductFilters } from "@/types/product";
@@ -23,8 +22,6 @@ export function ProductList({ data, filters, onEdit, onView }: ProductListProps)
   const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 10;
   const { toast } = useToast();
-  
-  const { data: products, isLoading, error } = useProducts();
 
   const handleDelete = async (product: Product) => {
     if (!product.id) return;
