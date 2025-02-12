@@ -41,6 +41,7 @@ export function useProductDetails(productId: string) {
             current_file_name,
             current_file_size,
             current_content_type,
+            expiry_date,
             dg_class:master_data!sds_dg_class_id_fkey (
               id,
               label
@@ -50,6 +51,10 @@ export function useProductDetails(productId: string) {
               supplier_name
             ),
             packing_group:master_data!sds_packing_group_id_fkey (
+              id,
+              label
+            ),
+            dg_subdivision:master_data!sds_dg_subdivision_id_fkey (
               id,
               label
             )
@@ -96,6 +101,7 @@ export function useProductDetails(productId: string) {
           currentFileName: data.sds.current_file_name,
           currentFileSize: data.sds.current_file_size,
           currentContentType: data.sds.current_content_type,
+          expiryDate: data.sds.expiry_date,
           dgClass: data.sds.dg_class ? {
             id: data.sds.dg_class.id,
             label: data.sds.dg_class.label
@@ -107,6 +113,10 @@ export function useProductDetails(productId: string) {
           packingGroup: data.sds.packing_group ? {
             id: data.sds.packing_group.id,
             label: data.sds.packing_group.label
+          } : undefined,
+          dgSubDivision: data.sds.dg_subdivision ? {
+            id: data.sds.dg_subdivision.id,
+            label: data.sds.dg_subdivision.label
           } : undefined
         } : undefined
       };
