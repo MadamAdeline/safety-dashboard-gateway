@@ -109,7 +109,7 @@ export function LocationSearch({
     <div className={className}>
       <div className="relative">
         <Input
-          placeholder="Search locations..."
+          placeholder="Search to Select a Location..."
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={handleInputFocus}
