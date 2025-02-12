@@ -62,7 +62,7 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
   } : null;
 
   return (
-    <div className="grid grid-cols-[2fr,1fr] gap-6">
+    <div className="grid grid-cols-[1fr,1fr] gap-6">
       <div className="space-y-6">
         <div className="space-y-2">
           <Label>Product Code</Label>
