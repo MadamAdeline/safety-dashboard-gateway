@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MetricCard } from "./MetricCard";
 import { Card } from "@/components/ui/card";
+import { useUserRole } from "@/hooks/use-user-role";
 
 const InfoCard = ({ title, image, link }: { title: string; image: string; link: string }) => (
   <a 
@@ -26,6 +27,8 @@ const InfoCard = ({ title, image, link }: { title: string; image: string; link: 
 
 export function AdminManagerDashboard() {
   const navigate = useNavigate();
+  const { data: roleData } = useUserRole();
+  const isManager = roleData?.role?.toLowerCase() === 'manager';
   
   const { data: userData, isLoading: isLoadingUser } = useQuery({
     queryKey: ['adminUserData'],
@@ -120,19 +123,19 @@ export function AdminManagerDashboard() {
             <MetricCard
               title="Products"
               value={String(productsCount || 0)}
-              action={() => navigate("/products", { state: { showForm: true } })}
-              actionLabel="+ Add New Product"
-              secondaryAction={() => navigate("/products")}
-              secondaryActionLabel="View All Products"
+              action={isManager ? () => navigate("/products") : () => navigate("/products", { state: { showForm: true } })}
+              actionLabel={isManager ? "View All Products" : "+ Add New Product"}
+              secondaryAction={isManager ? undefined : () => navigate("/products")}
+              secondaryActionLabel={isManager ? undefined : "View All Products"}
               isLoading={isLoadingProducts}
             />
             <MetricCard
               title="Safety Data Sheets"
               value={String(sdsCount || 0)}
-              action={() => navigate("/sds-library/new")}
-              actionLabel="+ Add New SDS"
-              secondaryAction={() => navigate("/sds-library")}
-              secondaryActionLabel="View All SDS's"
+              action={isManager ? () => navigate("/sds-library") : () => navigate("/sds-library/new")}
+              actionLabel={isManager ? "View All SDS's" : "+ Add New SDS"}
+              secondaryAction={isManager ? undefined : () => navigate("/sds-library")}
+              secondaryActionLabel={isManager ? undefined : "View All SDS's"}
               isLoading={isLoadingSDS}
             />
             <MetricCard
