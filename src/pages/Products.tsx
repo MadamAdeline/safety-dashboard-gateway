@@ -7,6 +7,7 @@ import type { Product, ProductFilters as ProductFiltersType } from "@/types/prod
 import { exportProductsToExcel } from "@/utils/exportUtils";
 import { useLocation } from "react-router-dom";
 import { useProducts } from "@/hooks/use-products";
+import { useProductDetails } from "@/hooks/use-product-details"; // Add this import
 import { useToast } from "@/hooks/use-toast";
 import { ProductHeader } from "@/components/products/header/ProductHeader";
 import { ProductSearchBar } from "@/components/products/header/ProductSearchBar";
@@ -32,6 +33,7 @@ export default function Products() {
   const [isExporting, setIsExporting] = useState(false);
 
   const { data: products = [], isLoading, error, refetch } = useProducts();
+  const { data: productDetails } = useProductDetails(selectedProduct?.id || "");
 
   useEffect(() => {
     if (error) {
@@ -158,12 +160,12 @@ export default function Products() {
     );
   }
 
-  if (showViewForm && selectedProduct) {
+  if (showViewForm && productDetails) {
     return (
       <DashboardLayout>
         <ProductReadOnlyForm 
           onClose={handleFormClose}
-          data={selectedProduct}
+          data={productDetails}
         />
       </DashboardLayout>
     );
