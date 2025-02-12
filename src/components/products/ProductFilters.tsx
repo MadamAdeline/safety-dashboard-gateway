@@ -1,5 +1,4 @@
 
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -18,28 +17,7 @@ interface ProductFiltersProps {
 export function ProductFilters({ filters, onFiltersChange }: ProductFiltersProps) {
   return (
     <div className="bg-white p-4 rounded-lg shadow space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <Label>Supplier</Label>
-          <Select
-            value={filters.supplier[0] || ""}
-            onValueChange={(value) =>
-              onFiltersChange({
-                ...filters,
-                supplier: value ? [value] : [],
-              })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select supplier" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="AUSTRALIAN CHEMICAL REAGENTS">AUSTRALIAN CHEMICAL REAGENTS</SelectItem>
-              <SelectItem value="SIGMA ALDRICH">SIGMA ALDRICH</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label>Status</Label>
           <Select
