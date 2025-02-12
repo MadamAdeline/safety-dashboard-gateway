@@ -32,7 +32,7 @@ export function SDSLibrarySearch({
         <div className="relative w-1/2">
           <Input
             type="text"
-            placeholder="Search SDS..."
+            placeholder="Search SDS by Product Name, Product Code, Supplier or Source..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
