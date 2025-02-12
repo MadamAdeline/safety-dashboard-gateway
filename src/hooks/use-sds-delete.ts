@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { SDS } from "@/types/sds";
@@ -7,7 +8,30 @@ export const useSDSDelete = (onDelete?: (sds: SDS) => void) => {
 
   const handleDelete = async (item: SDS) => {
     try {
-      console.log('Deleting SDS:', item);
+      console.log('Checking for related products before deleting SDS:', item);
+
+      // First check if there are any related products
+      const { data: relatedProducts, error: checkError } = await supabase
+        .from('products')
+        .select('id')
+        .eq('sds_id', item.id);
+
+      if (checkError) {
+        console.error('Error checking related products:', checkError);
+        throw checkError;
+      }
+
+      if (relatedProducts && relatedProducts.length > 0) {
+        console.log('Found related products:', relatedProducts);
+        toast({
+          title: "Cannot Delete SDS",
+          description: "Cannot delete the SDS as it has related Products",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      console.log('No related products found, proceeding with deletion');
 
       if (item.currentFilePath) {
         console.log('Deleting file from storage:', item.currentFilePath);
