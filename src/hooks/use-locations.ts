@@ -21,7 +21,10 @@ export const useLocations = () => {
           status_id,
           coordinates,
           full_path,
-          master_data (id, label),
+          is_storage_location,
+          storage_type_id,
+          master_data!type_id (id, label),
+          storage_type:master_data!storage_type_id (id, label),
           status_lookup (id, status_name)
         `);
 
@@ -56,7 +59,10 @@ export const useLocations = () => {
           coordinates: parsedCoordinates,
           parent_location_id: location.parent_location_id || null,
           full_path: location.full_path || null,
+          is_storage_location: location.is_storage_location || false,
+          storage_type_id: location.storage_type_id || null,
           master_data: location.master_data || undefined,
+          storage_type: location.storage_type || undefined,
           status_lookup: location.status_lookup || undefined
         };
       });
@@ -99,7 +105,9 @@ export const useLocations = () => {
         coordinates: newLocation.coordinates ? {
           lat: newLocation.coordinates.lat,
           lng: newLocation.coordinates.lng
-        } : null
+        } : null,
+        is_storage_location: newLocation.is_storage_location || false,
+        storage_type_id: newLocation.storage_type_id || null
       };
 
       console.log('Creating new location:', locationData);

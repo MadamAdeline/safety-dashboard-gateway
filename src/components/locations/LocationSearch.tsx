@@ -31,27 +31,31 @@ export function LocationSearch({
         .select(`
           id,
           name,
-          full_path,
           type_id,
           parent_location_id,
           status_id,
           coordinates,
-          master_data (id, label),
+          full_path,
+          is_storage_location,
+          storage_type_id,
+          master_data!type_id (id, label),
+          storage_type:master_data!storage_type_id (id, label),
           status_lookup (id, status_name)
         `)
-        .eq('status_id', 1); // Filter by ACTIVE status (status_id = 1)
+        .eq('status_id', 1);
 
       if (error) {
         console.error('Error fetching locations:', error);
         throw error;
       }
 
-      console.log('Fetched locations:', data);
       return (data || []).map(location => ({
         ...location,
         coordinates: location.coordinates || null,
         parent_location_id: location.parent_location_id || null,
-        full_path: location.full_path || null
+        full_path: location.full_path || null,
+        is_storage_location: location.is_storage_location || false,
+        storage_type_id: location.storage_type_id || null,
       })) as Location[];
     },
   });
