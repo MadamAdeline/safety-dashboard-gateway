@@ -37,11 +37,13 @@ export function useProductDetails(productId: string) {
           sds:sds!products_sds_id_fkey (
             id,
             is_dg,
+            expiry_date,
             current_file_path,
             current_file_name,
             current_file_size,
             current_content_type,
-            expiry_date,
+            issue_date,
+            revision_date,
             dg_class:master_data!sds_dg_class_id_fkey (
               id,
               label
@@ -106,6 +108,8 @@ export function useProductDetails(productId: string) {
           currentFileSize: data.sds.current_file_size,
           currentContentType: data.sds.current_content_type,
           expiryDate: data.sds.expiry_date,
+          issueDate: data.sds.issue_date,
+          revisionDate: data.sds.revision_date,
           dgClass: data.sds.dg_class ? {
             id: data.sds.dg_class.id,
             label: data.sds.dg_class.label
