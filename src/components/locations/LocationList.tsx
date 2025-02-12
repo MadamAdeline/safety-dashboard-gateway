@@ -1,3 +1,4 @@
+
 import { Table, TableBody } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Plus, Check, X } from "lucide-react";
@@ -248,7 +249,7 @@ export function LocationList({ filters, onEdit, onFiltersChange }: LocationListP
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-        <div className="relative flex-1 max-w-md">
+        <div className="relative w-1/2">
           <Input
             type="text"
             placeholder="Search locations..."
