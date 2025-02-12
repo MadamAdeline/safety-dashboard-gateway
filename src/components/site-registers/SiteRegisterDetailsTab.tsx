@@ -102,7 +102,7 @@ export function SiteRegisterDetailsTab({
             <div className="space-y-2">
               <Label>Product</Label>
               <Input
-                value={selectedProduct?.product_name || ''}
+                value={selectedProduct?.name || ''}
                 readOnly
                 className="bg-gray-100"
               />
@@ -121,7 +121,7 @@ export function SiteRegisterDetailsTab({
             id="override_product_name"
             value={formData.override_product_name}
             onChange={(e) => onChange("override_product_name", e.target.value)}
-            placeholder={selectedProduct?.product_name || ""}
+            placeholder={selectedProduct?.name || ""}
           />
         </div>
       </div>
