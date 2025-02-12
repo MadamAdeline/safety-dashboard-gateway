@@ -101,30 +101,22 @@ export function useSDSRequest(onRequestComplete?: () => void) {
 
       if (sdsError) throw sdsError;
 
-      // Send email notification
-      const emailResponse = await fetch(
-        'https://aejuqvqbcxqsxnlomkwx.supabase.co/functions/v1/send-sds-request-email',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            productName: formData.productName,
-            productCode: formData.productCode,
-            otherProductName: formData.otherProductName,
-            supplierName: formData.supplierName,
-            otherSupplierDetails: formData.otherSupplierDetails,
-            requestInfo: formData.requestInfo,
-            requestDate: format(new Date(), 'yyyy-MM-dd'),
-            toEmail: supplierEmail
-          }),
-        }
-      );
+      // Send email notification using supabase.functions.invoke
+      const { error: emailError } = await supabase.functions.invoke('send-sds-request-email', {
+        body: {
+          productName: formData.productName,
+          productCode: formData.productCode,
+          otherProductName: formData.otherProductName,
+          supplierName: formData.supplierName,
+          otherSupplierDetails: formData.otherSupplierDetails,
+          requestInfo: formData.requestInfo,
+          requestDate: format(new Date(), 'yyyy-MM-dd'),
+          toEmail: supplierEmail
+        },
+      });
 
-      if (!emailResponse.ok) {
-        console.error('Failed to send email notification');
+      if (emailError) {
+        console.error('Failed to send email notification:', emailError);
       }
 
       toast({
