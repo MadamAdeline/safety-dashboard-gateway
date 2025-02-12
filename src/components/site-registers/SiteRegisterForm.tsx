@@ -33,7 +33,9 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
   console.log('SiteRegisterForm initializing with:', {
     hasInitialData: !!initialData,
     initialDataId: initialData?.id,
-    formDataId: formData.id
+    formDataId: formData.id,
+    initialTotal: initialData?.total_qty,
+    formDataTotal: formData.total_qty
   });
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -48,6 +50,28 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
       setSelectedProduct(productData);
     }
   }, [productData]);
+
+  // Fetch full site register data when editing
+  useEffect(() => {
+    const fetchSiteRegisterData = async () => {
+      if (initialData?.id) {
+        const { data, error } = await supabase
+          .from('site_registers')
+          .select('*')
+          .eq('id', initialData.id)
+          .single();
+
+        if (!error && data) {
+          setFormData(prev => ({
+            ...prev,
+            ...data
+          }));
+        }
+      }
+    };
+
+    fetchSiteRegisterData();
+  }, [initialData?.id]);
 
   const refreshFormData = async () => {
     if (formData.id) {
