@@ -72,7 +72,7 @@ export function StandardDashboard() {
         )}
       </div>
 
-      <div className="flex justify-end mb-6">
+      <div className="flex justify-center mb-6">
         <Button 
           onClick={handleSiteRegisterClick}
           className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
