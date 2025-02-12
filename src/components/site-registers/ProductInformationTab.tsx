@@ -148,14 +148,16 @@ export function ProductInformationTab({ product }: ProductInformationTabProps) {
         )}
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 h-full sticky top-0">
         <Label>SDS Document</Label>
-        <SDSPreview
-          initialData={sdsData}
-          selectedFile={null}
-          onUploadClick={() => {}}
-          readOnly={true}
-        />
+        <div className="h-[calc(100vh-12rem)]">
+          <SDSPreview
+            initialData={sdsData}
+            selectedFile={null}
+            onUploadClick={() => {}}
+            readOnly={true}
+          />
+        </div>
       </div>
     </div>
   );
