@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -27,6 +26,9 @@ export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps)
 
   console.log("Product data in ReadOnlyForm:", data);
   console.log("SDS data in ReadOnlyForm:", data.sds);
+  if (data.sds) {
+    console.log("Raw expiry_date in ReadOnlyForm:", data.sds.expiryDate);
+  }
 
   return (
     <div className="max-w-full">
