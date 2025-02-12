@@ -70,7 +70,7 @@ export function useProductDetails(productId: string) {
       
       if (!data) return null;
       
-      console.log("Raw product data from DB:", data);
+      console.log("Raw data from DB:", data);
 
       const product: Product = {
         id: data.id,
@@ -101,7 +101,7 @@ export function useProductDetails(productId: string) {
           currentFileName: data.sds.current_file_name,
           currentFileSize: data.sds.current_file_size,
           currentContentType: data.sds.current_content_type,
-          expiryDate: data.sds.expiry_date,
+          expiryDate: data.sds.expiry_date,  // Make sure this matches the database column name
           dgClass: data.sds.dg_class ? {
             id: data.sds.dg_class.id,
             label: data.sds.dg_class.label
@@ -121,7 +121,7 @@ export function useProductDetails(productId: string) {
         } : undefined
       };
 
-      console.log("Mapped product object:", product);
+      console.log("Mapped product object with SDS:", product);
       return product;
     },
     enabled: !!productId
