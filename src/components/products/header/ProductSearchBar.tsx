@@ -22,10 +22,13 @@ export function ProductSearchBar({
 }: ProductSearchBarProps) {
   return (
     <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-      <ProductListSearch 
-        value={filters.search}
-        onChange={(value) => onFiltersChange({ ...filters, search: value })}
-      />
+      <div className="w-1/2">
+        <ProductListSearch 
+          value={filters.search}
+          onChange={(value) => onFiltersChange({ ...filters, search: value })}
+          className="w-full"
+        />
+      </div>
       <ProductActions 
         onToggleFilters={onToggleFilters}
         onExport={onExport}

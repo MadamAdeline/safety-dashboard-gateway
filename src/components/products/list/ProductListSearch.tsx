@@ -23,4 +23,3 @@ export function ProductListSearch({ value, onChange, className }: ProductListSea
     </div>
   );
 }
-
