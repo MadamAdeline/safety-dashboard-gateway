@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import React from "react";
 import { StockMovementsGrid } from "./StockMovementsGrid";
+import { useLocationDetails } from "@/hooks/use-location-details";
 
 interface SiteRegisterDetailsTabProps {
   formData: {
@@ -61,6 +62,9 @@ export function SiteRegisterDetailsTab({
     enabled: !!formData.id
   });
 
+  // Get location details
+  const { data: currentLocation } = useLocationDetails(formData.location_id);
+
   // If editing and has stock movements, make location and product read-only
   const isReadOnly = isEditing && hasStockMovements;
 
@@ -73,10 +77,17 @@ export function SiteRegisterDetailsTab({
             <div className="space-y-2">
               <Label>Location</Label>
               <Input
-                value={formData.location_id}
+                value={currentLocation?.name || ''}
                 readOnly
                 className="bg-gray-100"
               />
+              {currentLocation?.full_path && (
+                <Input
+                  value={currentLocation.full_path}
+                  readOnly
+                  className="mt-2 bg-gray-50 text-gray-600"
+                />
+              )}
             </div>
           ) : (
             <LocationSelection
