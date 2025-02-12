@@ -153,7 +153,7 @@ export function SiteRegisterDetailsTab({
             <Label className="text-lg font-semibold">Stock Information</Label>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="current_stock_level">Current Stock Level</Label>
               <Input
@@ -172,6 +172,16 @@ export function SiteRegisterDetailsTab({
                 type="number"
                 value={formData.max_stock_level || ''}
                 onChange={(e) => onChange("max_stock_level", parseFloat(e.target.value))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="unit_size">Unit Size</Label>
+              <Input
+                id="unit_size"
+                value={selectedProduct?.unitSize || ''}
+                readOnly
+                className="bg-gray-100"
               />
             </div>
 

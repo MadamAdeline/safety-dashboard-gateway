@@ -1,3 +1,4 @@
+
 import { format } from "date-fns";
 import { Check } from "lucide-react";
 import { AddStockMovement } from "./AddStockMovement";
@@ -38,7 +39,7 @@ export function StockMovementsTable({
         <div className="w-full">Date</div>
         <div className="w-full">Action</div>
         <div className="w-full">Reason</div>
-        <div className="w-full">Quantity</div>
+        <div className="w-full">Qty (# of Units)</div>
         <div className="w-full">Comments</div>
         <div className="w-full">Updated By</div>
       </div>
