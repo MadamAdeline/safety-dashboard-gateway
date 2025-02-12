@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
 import type { Supplier, SupplierFilters } from "@/types/supplier";
 import { useState } from "react";
+import { useSupplierDelete } from "@/hooks/use-supplier-delete";
 
 interface SupplierListProps {
   data: Supplier[];
@@ -41,6 +42,7 @@ export function SupplierList({
 }: SupplierListProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const itemsPerPage = 10;
+  const { handleDelete } = useSupplierDelete();
 
   const filteredData = data.filter((item) => {
     if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) {
@@ -147,6 +149,7 @@ export function SupplierList({
                       variant="ghost" 
                       size="icon"
                       className="hover:bg-dgxprt-hover text-dgxprt-navy"
+                      onClick={() => handleDelete(item)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
