@@ -49,13 +49,15 @@ export function useSDSRequest(onRequestComplete?: () => void) {
       // Get or create the DGXprt supplier
       const { data: supplierData, error: supplierError } = await supabase
         .from('suppliers')
-        .select('id')
+        .select('id, email')
         .eq('supplier_name', 'DGXprt')
         .maybeSingle();
 
       if (supplierError) throw supplierError;
 
       let supplierId;
+      let supplierEmail;
+      
       if (!supplierData) {
         // Create DGXprt supplier if it doesn't exist
         const { data: newSupplier, error: createError } = await supabase
@@ -67,13 +69,15 @@ export function useSDSRequest(onRequestComplete?: () => void) {
             address: 'DGXprt HQ',
             status_id: statusData.id
           })
-          .select('id')
+          .select('id, email')
           .single();
 
         if (createError) throw createError;
         supplierId = newSupplier.id;
+        supplierEmail = newSupplier.email;
       } else {
         supplierId = supplierData.id;
+        supplierEmail = supplierData.email;
       }
 
       // Create new SDS record
@@ -96,6 +100,32 @@ export function useSDSRequest(onRequestComplete?: () => void) {
         .single();
 
       if (sdsError) throw sdsError;
+
+      // Send email notification
+      const emailResponse = await fetch(
+        'https://aejuqvqbcxqsxnlomkwx.supabase.co/functions/v1/send-sds-request-email',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            productName: formData.productName,
+            productCode: formData.productCode,
+            otherProductName: formData.otherProductName,
+            supplierName: formData.supplierName,
+            otherSupplierDetails: formData.otherSupplierDetails,
+            requestInfo: formData.requestInfo,
+            requestDate: format(new Date(), 'yyyy-MM-dd'),
+            toEmail: supplierEmail
+          }),
+        }
+      );
+
+      if (!emailResponse.ok) {
+        console.error('Failed to send email notification');
+      }
 
       toast({
         title: "Request Submitted",
