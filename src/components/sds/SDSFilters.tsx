@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -27,17 +27,6 @@ export function SDSFilters({ filters, onFiltersChange }: SDSFiltersProps) {
   return (
     <div className="bg-white p-4 rounded-lg shadow space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <Label>Search</Label>
-          <Input
-            placeholder="Search products..."
-            value={filters.search}
-            onChange={(e) =>
-              onFiltersChange({ ...filters, search: e.target.value })
-            }
-          />
-        </div>
-
         <div>
           <Label>Date Field</Label>
           <Select
