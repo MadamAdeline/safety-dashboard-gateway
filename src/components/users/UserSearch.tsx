@@ -25,7 +25,7 @@ export function UserSearch({ value, onChange }: UserSearchProps) {
   return (
     <div className="flex-1 max-w-md relative">
       <Input
-        placeholder="Search users..."
+        placeholder="Search Users by Name..."
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onFocus={handleInputFocus}
