@@ -30,6 +30,11 @@ export function SDSFilteredList({
   const filteredData = sdsData.filter((item) => {
     const today = new Date().toISOString().split('T')[0];
     
+    // Status filter
+    if (filters.status.length > 0 && !filters.status.includes(item.status)) {
+      return false;
+    }
+    
     if (filters.dateField === "expiryDate" && filters.dateType === "before" && item.expiryDate) {
       if (item.expiryDate > today) {
         return false;

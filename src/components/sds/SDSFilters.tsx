@@ -54,6 +54,28 @@ export function SDSFilters({ filters, onFiltersChange }: SDSFiltersProps) {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
+          <Label>Status</Label>
+          <Select
+            value={filters.status[0] || ""}
+            onValueChange={(value) =>
+              onFiltersChange({
+                ...filters,
+                status: value ? [value] : [],
+              })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ACTIVE">Active</SelectItem>
+              <SelectItem value="INACTIVE">Inactive</SelectItem>
+              <SelectItem value="REQUESTED">Requested</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
           <Label>Date Field</Label>
           <Select
             value={filters.dateField || ""}
