@@ -1,5 +1,6 @@
 
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -15,8 +16,26 @@ interface ProductFiltersProps {
 }
 
 export function ProductFilters({ filters, onFiltersChange }: ProductFiltersProps) {
+  const handleClearFilters = () => {
+    onFiltersChange({
+      ...filters,
+      status: [],
+      isDG: null,
+    });
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg shadow space-y-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-medium">Filters</h3>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleClearFilters}
+        >
+          Clear
+        </Button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label>Status</Label>
