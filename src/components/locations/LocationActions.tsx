@@ -17,7 +17,7 @@ interface LocationActionsProps {
 export function LocationActions({ onToggleFilters, onExport, onRefresh, filteredData }: LocationActionsProps) {
   const { toast } = useToast();
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!filteredData || filteredData.length === 0) {
       toast({
         title: "No data to export",
@@ -27,11 +27,25 @@ export function LocationActions({ onToggleFilters, onExport, onRefresh, filtered
       return;
     }
 
+    // Create a map of location IDs to names
+    const locationIds = filteredData
+      .map(location => location.parent_location_id)
+      .filter(id => id !== null) as string[];
+
+    const { data: parentLocations } = await supabase
+      .from('locations')
+      .select('id, name')
+      .in('id', locationIds);
+
+    const parentLocationMap = new Map(
+      parentLocations?.map(loc => [loc.id, loc.name]) || []
+    );
+
     // Transform the data for export
     const exportData = filteredData.map(location => ({
       'Location Name': location.name,
       'Type': location.master_data?.label || 'Unknown',
-      'Parent Location': location.parent_location_id || '-',
+      'Parent Location': location.parent_location_id ? parentLocationMap.get(location.parent_location_id) || '-' : '-',
       'Status': location.status_lookup?.status_name || (location.status_id === 1 ? 'Active' : 'Inactive'),
       'Coordinates': location.coordinates ? JSON.stringify(location.coordinates) : '-'
     }));
