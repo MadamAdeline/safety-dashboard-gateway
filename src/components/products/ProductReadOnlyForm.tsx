@@ -79,40 +79,73 @@ export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps)
           <TabsContent value="details">
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label>Name</Label>
+                <Label>Product Name *</Label>
                 <div className="p-2 bg-gray-50 rounded border">{data.name}</div>
               </div>
               <div className="space-y-2">
-                <Label>Code</Label>
+                <Label>Product Code *</Label>
                 <div className="p-2 bg-gray-50 rounded border">{data.code}</div>
               </div>
               <div className="space-y-2">
                 <Label>Brand Name</Label>
                 <div className="p-2 bg-gray-50 rounded border">{data.brandName || "-"}</div>
               </div>
-              <div className="space-y-2">
-                <Label>Unit Size</Label>
-                <div className="p-2 bg-gray-50 rounded border">{data.unitSize || "-"}</div>
+              <div className="grid grid-cols-2 gap-4 col-span-1">
+                <div className="space-y-2">
+                  <Label>Unit of Measure *</Label>
+                  <div className="p-2 bg-gray-50 rounded border">{data.uom?.label || "-"}</div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Unit Size</Label>
+                  <div className="p-2 bg-gray-50 rounded border">{data.unitSize || "-"}</div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label>Unit of Measure</Label>
-                <div className="p-2 bg-gray-50 rounded border">{data.uom?.label || "-"}</div>
-              </div>
-              <div className="space-y-2">
+              <div className="space-y-2 col-span-2">
                 <Label>Description</Label>
                 <div className="p-2 bg-gray-50 rounded border">{data.description || "-"}</div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4 col-span-2">
+                <h3 className="text-lg font-semibold">Product Characteristics</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Product Set</Label>
+                    <div className="p-2 bg-gray-50 rounded border">
+                      {data.productSet ? "Yes" : "No"}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Aerosol</Label>
+                    <div className="p-2 bg-gray-50 rounded border">
+                      {data.aerosol ? "Yes" : "No"}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Cryogenic Fluid</Label>
+                    <div className="p-2 bg-gray-50 rounded border">
+                      {data.cryogenicFluid ? "Yes" : "No"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-2 col-span-2">
                 <Label>Other Names</Label>
                 <div className="p-2 bg-gray-50 rounded border">{data.otherNames || "-"}</div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 col-span-2">
                 <Label>Uses</Label>
                 <div className="p-2 bg-gray-50 rounded border">{data.uses || "-"}</div>
               </div>
-              <div className="space-y-2">
-                <Label>Status</Label>
-                <div className="p-2 bg-gray-50 rounded border">{data.status}</div>
+              <div className="grid grid-cols-2 gap-4 col-span-2">
+                <div className="space-y-2">
+                  <Label>Approval Status *</Label>
+                  <div className="p-2 bg-gray-50 rounded border">
+                    {data.approvalStatusId ? "Approved" : "Pending"}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Product Status *</Label>
+                  <div className="p-2 bg-gray-50 rounded border">{data.status}</div>
+                </div>
               </div>
             </div>
           </TabsContent>
