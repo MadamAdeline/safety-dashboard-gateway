@@ -104,6 +104,7 @@ export default function Users() {
           <UserList 
             onEdit={setSelectedUser}
             searchTerm={searchTerm}
+            onNewUser={() => setShowNewUserForm(true)}
           />
         </div>
       )}
