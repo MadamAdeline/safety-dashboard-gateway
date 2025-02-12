@@ -1,5 +1,7 @@
 
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { FilterX } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -7,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -24,8 +25,33 @@ interface SDSFiltersProps {
 }
 
 export function SDSFilters({ filters, onFiltersChange }: SDSFiltersProps) {
+  const handleClearFilters = () => {
+    onFiltersChange({
+      ...filters,
+      dateField: null,
+      dateType: null,
+      dateFrom: "",
+      dateTo: "",
+      status: [],
+      dgClass: [],
+      isDG: null,
+      search: ""
+    });
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg shadow space-y-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-medium">Filters</h3>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleClearFilters}
+        >
+          <FilterX className="h-4 w-4" />
+          Clear Filter
+        </Button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label>Date Field</Label>
