@@ -9,11 +9,10 @@ import { useToast } from "@/hooks/use-toast";
 import { ProductActions } from "@/components/products/ProductActions";
 import { ProductForm } from "@/components/products/ProductForm";
 import type { Product, ProductFilters as ProductFiltersType } from "@/types/product";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { exportProductsToExcel } from "@/utils/exportUtils";
 import { useLocation } from "react-router-dom";
 import { ProductListSearch } from "@/components/products/list/ProductListSearch";
+import { useProducts } from "@/hooks/use-products";
 
 export default function Products() {
   const location = useLocation();
@@ -33,90 +32,7 @@ export default function Products() {
   const [isExporting, setIsExporting] = useState(false);
   const { toast } = useToast();
 
-  const { data: products = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['products'],
-    queryFn: async () => {
-      console.log('Fetching products from Supabase...');
-      
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          id,
-          product_name,
-          product_code,
-          brand_name,
-          unit,
-          unit_size,
-          description,
-          product_set,
-          aerosol,
-          cryogenic_fluid,
-          other_names,
-          uses,
-          product_status_id,
-          approval_status_id,
-          sds_id,
-          sds!products_sds_id_fkey (
-            id,
-            is_dg,
-            dg_class:master_data!sds_dg_class_id_fkey (
-              id,
-              label
-            ),
-            supplier:suppliers!sds_supplier_id_fkey (
-              id,
-              name:supplier_name
-            ),
-            packing_group:master_data!sds_packing_group_id_fkey (
-              id,
-              label
-            )
-          )
-        `);
-
-      if (error) {
-        console.error('Error fetching products:', error);
-        throw error;
-      }
-
-      console.log('Raw products data:', data);
-
-      return data.map(item => ({
-        id: item.id,
-        name: item.product_name,
-        code: item.product_code,
-        brandName: item.brand_name,
-        unit: item.unit,
-        unitSize: item.unit_size,
-        description: item.description,
-        productSet: item.product_set,
-        aerosol: item.aerosol,
-        cryogenicFluid: item.cryogenic_fluid,
-        otherNames: item.other_names,
-        uses: item.uses,
-        status: (item.product_status_id === 16 ? "ACTIVE" : "INACTIVE") as "ACTIVE" | "INACTIVE", // Fixed: Changed from 12 to 16 for ACTIVE status
-        approvalStatusId: item.approval_status_id,
-        productStatusId: item.product_status_id,
-        sdsId: item.sds_id,
-        sds: item.sds ? {
-          id: item.sds.id,
-          isDG: item.sds.is_dg,
-          dgClass: item.sds.dg_class ? {
-            id: item.sds.dg_class.id,
-            label: item.sds.dg_class.label
-          } : undefined,
-          supplier: item.sds.supplier ? {
-            id: item.sds.supplier.id,
-            supplier_name: item.sds.supplier.name
-          } : undefined,
-          packingGroup: item.sds.packing_group ? {
-            id: item.sds.packing_group.id,
-            label: item.sds.packing_group.label
-          } : undefined
-        } : undefined
-      })) as Product[];
-    }
-  });
+  const { data: products = [], isLoading, error, refetch } = useProducts();
 
   useEffect(() => {
     if (error) {
@@ -207,6 +123,8 @@ export default function Products() {
     setSelectedProduct(null);
     // Clear the state from the URL
     window.history.replaceState({}, document.title);
+    // Refresh the products list
+    refetch();
   };
 
   const handleFormSave = () => {
@@ -282,4 +200,3 @@ export default function Products() {
     </DashboardLayout>
   );
 }
-
