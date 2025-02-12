@@ -1,3 +1,4 @@
+
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,15 @@ export function LocationTableRow({
         >
           {location.status_lookup?.status_name || (location.status_id === 1 ? "Active" : "Inactive")}
         </Badge>
+      </TableCell>
+      <TableCell>
+        {location.is_storage_location ? (
+          <Badge variant="outline" className="bg-blue-100 text-blue-800">
+            {location.storage_type?.label || 'Storage'}
+          </Badge>
+        ) : (
+          "-"
+        )}
       </TableCell>
       <TableCell>
         <div className="flex space-x-2">

@@ -13,9 +13,15 @@ export interface Location {
     lat: number;
     lng: number;
   } | null;
+  is_storage_location: boolean;
+  storage_type_id: string | null;
   created_at?: string | null;
   updated_at?: string | null;
   master_data?: {
+    id: string;
+    label: string;
+  };
+  storage_type?: {
     id: string;
     label: string;
   };

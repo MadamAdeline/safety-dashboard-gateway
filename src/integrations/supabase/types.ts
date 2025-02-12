@@ -15,9 +15,11 @@ export type Database = {
           created_at: string | null
           full_path: string | null
           id: string
+          is_storage_location: boolean | null
           name: string
           parent_location_id: string | null
           status_id: number
+          storage_type_id: string | null
           type_id: string
           updated_at: string | null
         }
@@ -26,9 +28,11 @@ export type Database = {
           created_at?: string | null
           full_path?: string | null
           id?: string
+          is_storage_location?: boolean | null
           name: string
           parent_location_id?: string | null
           status_id: number
+          storage_type_id?: string | null
           type_id: string
           updated_at?: string | null
         }
@@ -37,9 +41,11 @@ export type Database = {
           created_at?: string | null
           full_path?: string | null
           id?: string
+          is_storage_location?: boolean | null
           name?: string
           parent_location_id?: string | null
           status_id?: number
+          storage_type_id?: string | null
           type_id?: string
           updated_at?: string | null
         }
@@ -56,6 +62,13 @@ export type Database = {
             columns: ["status_id"]
             isOneToOne: false
             referencedRelation: "status_lookup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "locations_storage_type_id_fkey"
+            columns: ["storage_type_id"]
+            isOneToOne: false
+            referencedRelation: "master_data"
             referencedColumns: ["id"]
           },
           {

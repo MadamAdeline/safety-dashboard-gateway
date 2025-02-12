@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Location, LocationType, LocationStatus } from "@/types/location";
@@ -23,7 +24,9 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     typeId: initialData?.type_id ?? "",
     parentLocationId: initialData?.parent_location_id ?? null,
     status: "ACTIVE" as LocationStatus,
-    coordinates: initialData?.coordinates ?? { lat: -37.8136, lng: 144.9631 }
+    coordinates: initialData?.coordinates ?? { lat: -37.8136, lng: 144.9631 },
+    isStorageLocation: initialData?.is_storage_location ?? false,
+    storageTypeId: initialData?.storage_type_id ?? null
   });
 
   const [availableLocations, setAvailableLocations] = useState<Array<{
@@ -33,6 +36,7 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
   }>>([]);
 
   const [locationTypes, setLocationTypes] = useState<LocationType[]>([]);
+  const [storageTypes, setStorageTypes] = useState<Array<{ id: string; label: string }>>([]);
   const [statusMap, setStatusMap] = useState<{ [key: string]: number }>({});
   const [reverseStatusMap, setReverseStatusMap] = useState<{ [key: number]: LocationStatus }>({});
 
@@ -52,7 +56,6 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     return errors;
   };
 
-  // Fetch status IDs for locations
   useEffect(() => {
     const fetchStatusIds = async () => {
       console.log('Fetching status IDs for locations...');
@@ -94,7 +97,6 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     fetchStatusIds();
   }, [initialData]);
 
-  // Fetch location types from master_data
   useEffect(() => {
     const fetchLocationTypes = async () => {
       console.log('Fetching location types from master_data...');
@@ -115,6 +117,28 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
     };
 
     fetchLocationTypes();
+  }, []);
+
+  useEffect(() => {
+    const fetchStorageTypes = async () => {
+      console.log('Fetching storage types from master_data...');
+      const { data, error } = await supabase
+        .from('master_data')
+        .select('id, label')
+        .eq('category', 'STORAGE_TYPE')
+        .eq('status', 'ACTIVE')
+        .order('sort_order');
+
+      if (error) {
+        console.error('Error fetching storage types:', error);
+        return;
+      }
+
+      console.log('Storage types fetched:', data);
+      setStorageTypes(data || []);
+    };
+
+    fetchStorageTypes();
   }, []);
 
   useEffect(() => {
@@ -181,6 +205,8 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
         parent_location_id: formData.parentLocationId,
         status_id: statusMap[formData.status],
         coordinates: formData.coordinates,
+        is_storage_location: formData.isStorageLocation,
+        storage_type_id: formData.isStorageLocation ? formData.storageTypeId : null,
         full_path: null, // This will be computed by the trigger
       };
 
@@ -291,6 +317,46 @@ export function LocationForm({ onClose, initialData }: LocationFormProps) {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="isStorage"
+                    checked={formData.isStorageLocation}
+                    onCheckedChange={(checked) => 
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        isStorageLocation: checked,
+                        storageTypeId: checked ? prev.storageTypeId || (storageTypes[0]?.id ?? null) : null 
+                      }))
+                    }
+                  />
+                  <Label htmlFor="isStorage">Is Storage Location</Label>
+                </div>
+              </div>
+
+              {formData.isStorageLocation && (
+                <div className="space-y-2">
+                  <Label htmlFor="storageType">Storage Type</Label>
+                  <Select 
+                    value={formData.storageTypeId || undefined}
+                    onValueChange={(value) => 
+                      setFormData(prev => ({ ...prev, storageTypeId: value }))
+                    }
+                  >
+                    <SelectTrigger id="storageType">
+                      <SelectValue placeholder="Select storage type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {storageTypes.map((type) => (
+                        <SelectItem key={type.id} value={type.id}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
