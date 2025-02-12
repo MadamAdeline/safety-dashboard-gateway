@@ -12,7 +12,7 @@ interface ProductReadOnlyFormProps {
 }
 
 export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps) {
-  const formatExpiryDate = (dateString?: string) => {
+  const formatDate = (dateString?: string) => {
     console.log("Formatting date string:", dateString);
     if (!dateString) return "-";
     try {
@@ -147,7 +147,22 @@ export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps)
                   <div className="space-y-2">
                     <Label>SDS Expiry Date</Label>
                     <div className="p-2 bg-gray-50 rounded border">
-                      {formatExpiryDate(data.sds?.expiryDate)}
+                      {formatDate(data.sds?.expiryDate)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Issue Date</Label>
+                    <div className="p-2 bg-gray-50 rounded border">
+                      {formatDate(data.sds?.issueDate)}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Revision Date</Label>
+                    <div className="p-2 bg-gray-50 rounded border">
+                      {formatDate(data.sds?.revisionDate)}
                     </div>
                   </div>
                 </div>

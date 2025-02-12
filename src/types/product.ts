@@ -30,6 +30,8 @@ export interface Product {
     currentFileSize?: number;
     currentContentType?: string;
     expiryDate?: string;
+    issueDate?: string;
+    revisionDate?: string;
     dgClass?: {
       id: string;
       label: string;
