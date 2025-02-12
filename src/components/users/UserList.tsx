@@ -14,6 +14,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@/types/user";
 import { useToast } from "@/components/ui/use-toast";
+import { LocationPagination } from "@/components/locations/table/LocationPagination";
+import { useState } from "react";
 
 type UserWithRelations = Omit<User, 'manager'> & {
   user_roles?: {
@@ -35,6 +37,9 @@ interface UserListProps {
 
 export function UserList({ onEdit, searchTerm }: UserListProps) {
   const { toast } = useToast();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
@@ -101,8 +106,12 @@ export function UserList({ onEdit, searchTerm }: UserListProps) {
     return fullName.includes(searchLower) || email.includes(searchLower);
   });
 
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedUsers = filteredUsers?.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil((filteredUsers?.length || 0) / itemsPerPage);
+
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="bg-white rounded-lg shadow overflow-hidden space-y-4">
       <Table>
         <TableHeader>
           <TableRow className="bg-[#F1F0FB] border-b border-gray-200">
@@ -115,7 +124,7 @@ export function UserList({ onEdit, searchTerm }: UserListProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredUsers?.map((user) => (
+          {paginatedUsers?.map((user) => (
             <TableRow 
               key={user.id}
               className="hover:bg-[#F1F0FB] transition-colors"
@@ -160,6 +169,14 @@ export function UserList({ onEdit, searchTerm }: UserListProps) {
           ))}
         </TableBody>
       </Table>
+
+      <div className="p-4">
+        <LocationPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
     </div>
   );
 }
