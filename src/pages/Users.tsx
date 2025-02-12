@@ -11,7 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { exportUsersToExcel } from "@/utils/userExport";
 import type { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { Plus, Download, RefreshCw, LogIn } from "lucide-react";
+import { Plus, Download, RefreshCw } from "lucide-react";
 
 export default function Users() {
   const [showNewUserForm, setShowNewUserForm] = useState(false);
@@ -65,21 +65,12 @@ export default function Users() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Users & Roles</h1>
-            <div className="flex items-center gap-2">
-              <Button 
-                onClick={() => setShowLoginDialog(true)}
-                variant="outline"
-                className="gap-2"
-              >
-                <LogIn className="h-4 w-4" /> Login
-              </Button>
-              <Button 
-                onClick={() => setShowNewUserForm(true)}
-                className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
-              >
-                <Plus className="h-4 w-4" /> New User
-              </Button>
-            </div>
+            <Button 
+              onClick={() => setShowNewUserForm(true)}
+              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
+            >
+              <Plus className="h-4 w-4" /> New User
+            </Button>
           </div>
           
           <div className="bg-white p-4 rounded-lg shadow flex items-center justify-between">
