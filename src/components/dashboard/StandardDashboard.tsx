@@ -1,3 +1,4 @@
+
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
@@ -68,60 +69,77 @@ export function StandardDashboard() {
   const { data: searchResults = [], isLoading: isSearching } = useQuery({
     queryKey: ['siteRegisterSearch', searchTerm, locationHierarchy],
     queryFn: async () => {
-      if (!searchTerm || !locationHierarchy || locationHierarchy.length === 0) {
+      if (!searchTerm || searchTerm.length < 3) {
         return [];
       }
 
-      // Search for override_product_name
-      const { data: overrideResults, error: overrideError } = await supabase
-        .from('site_registers')
-        .select(`
-          id,
-          location_id,
-          product_id,
-          override_product_name,
-          products (
-            product_name
-          ),
-          locations (
-            name,
-            full_path
-          )
-        `)
-        .in('location_id', locationHierarchy)
-        .ilike('override_product_name', `%${searchTerm}%`);
-
-      // Search in products table
-      const { data: productResults, error: productError } = await supabase
-        .from('site_registers')
-        .select(`
-          id,
-          location_id,
-          product_id,
-          override_product_name,
-          products!inner (
-            product_name
-          ),
-          locations (
-            name,
-            full_path
-          )
-        `)
-        .in('location_id', locationHierarchy)
-        .ilike('products.product_name', `%${searchTerm}%`);
-
-      if (overrideError || productError) {
-        console.error('Error searching site registers:', overrideError || productError);
+      // Validate locationHierarchy
+      if (!Array.isArray(locationHierarchy) || locationHierarchy.length === 0) {
+        console.log('No location hierarchy available for search');
         return [];
       }
 
-      // Combine and deduplicate results
-      const combinedResults = [...(overrideResults || []), ...(productResults || [])];
-      const uniqueResults = Array.from(new Map(combinedResults.map(item => [item.id, item])).values());
+      // Ensure all location IDs are valid UUIDs
+      const validLocationIds = locationHierarchy.filter(id => id && typeof id === 'string');
+      if (validLocationIds.length === 0) {
+        console.log('No valid location IDs available for search');
+        return [];
+      }
 
-      return uniqueResults;
+      try {
+        // Search for override_product_name
+        const { data: overrideResults, error: overrideError } = await supabase
+          .from('site_registers')
+          .select(`
+            id,
+            location_id,
+            product_id,
+            override_product_name,
+            products (
+              product_name
+            ),
+            locations (
+              name,
+              full_path
+            )
+          `)
+          .in('location_id', validLocationIds)
+          .ilike('override_product_name', `%${searchTerm}%`);
+
+        if (overrideError) throw overrideError;
+
+        // Search in products table
+        const { data: productResults, error: productError } = await supabase
+          .from('site_registers')
+          .select(`
+            id,
+            location_id,
+            product_id,
+            override_product_name,
+            products!inner (
+              product_name
+            ),
+            locations (
+              name,
+              full_path
+            )
+          `)
+          .in('location_id', validLocationIds)
+          .ilike('products.product_name', `%${searchTerm}%`);
+
+        if (productError) throw productError;
+
+        // Combine and deduplicate results
+        const combinedResults = [...(overrideResults || []), ...(productResults || [])];
+        const uniqueResults = Array.from(new Map(combinedResults.map(item => [item.id, item])).values());
+
+        return uniqueResults;
+      } catch (error) {
+        console.error('Error searching site registers:', error);
+        return [];
+      }
     },
-    enabled: searchTerm.length > 2 && Array.isArray(locationHierarchy) && locationHierarchy.length > 0
+    enabled: searchTerm.length > 2
   });
 
   const handleSearchClick = (siteRegisterId: string) => {
