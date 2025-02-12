@@ -73,12 +73,14 @@ export default function Users() {
             </Button>
           </div>
           
-          <div className="bg-white p-4 rounded-lg shadow flex items-center justify-between">
-            <UserSearch 
-              value={searchTerm}
-              onChange={setSearchTerm}
-            />
-            <div className="flex items-center gap-2">
+          <div className="bg-white p-4 rounded-lg shadow flex items-center gap-4">
+            <div className="w-1/2">
+              <UserSearch 
+                value={searchTerm}
+                onChange={setSearchTerm}
+              />
+            </div>
+            <div className="flex items-center gap-2 ml-auto">
               <Button
                 variant="outline"
                 onClick={handleExport}
