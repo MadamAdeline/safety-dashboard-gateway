@@ -28,16 +28,48 @@ export function SDSFilteredList({
   onPageChange
 }: SDSFilteredListProps) {
   const filteredData = sdsData.filter((item) => {
-    const today = new Date().toISOString().split('T')[0];
-    
     // Status filter
     if (filters.status.length > 0 && !filters.status.includes(item.status)) {
       return false;
     }
-    
-    if (filters.dateField === "expiryDate" && filters.dateType === "before" && item.expiryDate) {
-      if (item.expiryDate > today) {
-        return false;
+
+    // Date filtering
+    if (filters.dateField && filters.dateType && filters.dateFrom) {
+      const itemDate = item[filters.dateField];
+      if (!itemDate) return false;
+
+      const filterDate = new Date(filters.dateFrom);
+      const date = new Date(itemDate);
+      
+      // Reset times to midnight for accurate date comparison
+      filterDate.setHours(0, 0, 0, 0);
+      date.setHours(0, 0, 0, 0);
+
+      switch (filters.dateType) {
+        case "on":
+          if (date.getTime() !== filterDate.getTime()) {
+            return false;
+          }
+          break;
+        case "before":
+          if (date.getTime() >= filterDate.getTime()) {
+            return false;
+          }
+          break;
+        case "after":
+          if (date.getTime() <= filterDate.getTime()) {
+            return false;
+          }
+          break;
+        case "between":
+          if (filters.dateTo) {
+            const toDate = new Date(filters.dateTo);
+            toDate.setHours(0, 0, 0, 0);
+            if (date.getTime() < filterDate.getTime() || date.getTime() > toDate.getTime()) {
+              return false;
+            }
+          }
+          break;
       }
     }
 
