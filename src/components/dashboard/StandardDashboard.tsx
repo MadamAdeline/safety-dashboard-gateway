@@ -55,7 +55,8 @@ export function StandardDashboard() {
         return [];
       }
 
-      return data;
+      // Extract just the IDs from the location hierarchy objects
+      return data.map(item => item.id);
     },
     enabled: !!userData?.locations?.id
   });
