@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -16,7 +17,7 @@ import type { Location } from "@/types/location";
 
 interface UserFormFieldsProps {
   formData: {
-    id?: string; // Added id as optional since it won't exist for new users
+    id?: string;
     first_name: string;
     last_name: string;
     email: string;
@@ -33,6 +34,8 @@ interface UserFormFieldsProps {
 }
 
 export function UserFormFields({ formData, roles, isEditing, onChange }: UserFormFieldsProps) {
+  const isAdministrator = roles?.find(role => role.id === formData.role_id)?.role_name.toLowerCase() === 'administrator';
+
   // Fetch current manager if manager_id exists
   const { data: currentManager } = useQuery({
     queryKey: ['user', 'manager', formData.manager_id],
@@ -100,7 +103,9 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="space-y-2">
-        <Label htmlFor="first_name">First Name</Label>
+        <Label htmlFor="first_name" className="flex items-center">
+          First Name <span className="text-red-500 ml-1">*</span>
+        </Label>
         <Input
           id="first_name"
           value={formData.first_name}
@@ -109,7 +114,9 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="last_name">Last Name</Label>
+        <Label htmlFor="last_name" className="flex items-center">
+          Last Name <span className="text-red-500 ml-1">*</span>
+        </Label>
         <Input
           id="last_name"
           value={formData.last_name}
@@ -118,7 +125,9 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email" className="flex items-center">
+          Email <span className="text-red-500 ml-1">*</span>
+        </Label>
         <Input
           id="email"
           type="email"
@@ -137,7 +146,9 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password" className="flex items-center">
+          Password {!isEditing && <span className="text-red-500 ml-1">*</span>}
+        </Label>
         <Input
           id="password"
           type="password"
@@ -148,7 +159,7 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
       </div>
 
       <div className="space-y-2">
-        <Label>Role</Label>
+        <Label htmlFor="role">Role</Label>
         <Select
           value={formData.role_id || "unassigned"}
           onValueChange={(value) => onChange("role_id", value === "unassigned" ? "" : value)}
@@ -178,22 +189,26 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
         />
       </div>
 
-      <div className="space-y-2">
-        <Label>Location</Label>
-        <LocationSearch
-          selectedLocationId={formData.location_id}
-          initialLocation={currentLocation}
-          onLocationSelect={handleLocationSelect}
-          className="w-full"
-        />
-        {currentLocation?.full_path && (
-          <Input
-            value={currentLocation.full_path}
-            readOnly
-            className="mt-2 bg-gray-50 text-gray-600"
+      {!isAdministrator && (
+        <div className="space-y-2">
+          <Label className="flex items-center">
+            Location {!isAdministrator && <span className="text-red-500 ml-1">*</span>}
+          </Label>
+          <LocationSearch
+            selectedLocationId={formData.location_id}
+            initialLocation={currentLocation}
+            onLocationSelect={handleLocationSelect}
+            className="w-full"
           />
-        )}
-      </div>
+          {currentLocation?.full_path && (
+            <Input
+              value={currentLocation.full_path}
+              readOnly
+              className="mt-2 bg-gray-50 text-gray-600"
+            />
+          )}
+        </div>
+      )}
 
       <div className="space-y-2">
         <Label>Status</Label>
