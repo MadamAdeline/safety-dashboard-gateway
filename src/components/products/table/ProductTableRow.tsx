@@ -3,7 +3,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2, Trash2, Eye } from "lucide-react";
 import type { Product } from "@/types/product";
 
 interface ProductTableRowProps {
@@ -12,6 +12,7 @@ interface ProductTableRowProps {
   onSelect: (id: string) => void;
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
+  onView: (product: Product) => void;
   isDeleting: boolean;
 }
 
@@ -21,6 +22,7 @@ export function ProductTableRow({
   onSelect,
   onEdit,
   onDelete,
+  onView,
   isDeleting
 }: ProductTableRowProps) {
   return (
@@ -61,6 +63,14 @@ export function ProductTableRow({
       </TableCell>
       <TableCell>
         <div className="flex space-x-2">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="hover:bg-dgxprt-hover text-dgxprt-navy"
+            onClick={() => onView(product)}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
           <Button 
             variant="ghost" 
             size="icon"
