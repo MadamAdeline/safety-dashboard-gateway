@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -122,10 +121,12 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
     }
 
     try {
-      if (!supplier) {
+      // Validate form
+      const missingFields = validateForm();
+      if (missingFields && missingFields.length > 0) {
         toast({
-          title: "Error",
-          description: "Please select a supplier",
+          title: "Required Fields Missing",
+          description: `Please fill in the following required fields:\n${missingFields.join(', ')}`,
           variant: "destructive"
         });
         return;
@@ -208,6 +209,23 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
         variant: "destructive"
       });
     }
+  };
+
+  const validateForm = () => {
+    const missingFields: string[] = [];
+    if (!formData.productName) missingFields.push("Product Name");
+    if (!formData.productId) missingFields.push("Product ID");
+    if (!formData.issueDate) missingFields.push("Issue Date");
+    if (!formData.expiryDate) missingFields.push("Expiry Date");
+    if (!formData.unNumber) missingFields.push("UN Number");
+    if (!formData.unProperShippingName) missingFields.push("UN Proper Shipping Name");
+    if (!formData.hazchemCode) missingFields.push("Hazchem Code");
+    if (!formData.requestSupplierName) missingFields.push("Request Supplier Name");
+    if (!formData.requestSupplierDetails) missingFields.push("Request Supplier Details");
+    if (!formData.requestInformation) missingFields.push("Request Information");
+    if (!formData.requestDate) missingFields.push("Request Date");
+    if (!formData.requestedBy) missingFields.push("Requested By");
+    return missingFields;
   };
 
   return (

@@ -37,8 +37,35 @@ export function SDSDetailsTab(props: SDSDetailsTabProps) {
   const isRequested = props.status === "REQUESTED";
   const source = props.initialData?.sdsSource || "Customer";
 
+  const validateForm = () => {
+    const missingFields = [];
+    
+    // Validate product name
+    if (!props.formData.productName?.trim()) {
+      const input = document.getElementById('productName');
+      if (input) input.classList.add('border-red-500');
+      missingFields.push('SDS Product Name');
+    }
+
+    // Validate product code
+    if (!props.formData.productId?.trim()) {
+      const input = document.getElementById('productId');
+      if (input) input.classList.add('border-red-500');
+      missingFields.push('SDS Product Code');
+    }
+
+    // Validate supplier
+    if (!props.supplier) {
+      const select = document.getElementById('supplier-select');
+      if (select) select.classList.add('border-red-500');
+      missingFields.push('Supplier Name');
+    }
+
+    return missingFields;
+  };
+
   return (
-    <SDSFormContext.Provider value={{ ...props, readOnly: props.readOnly }}>
+    <SDSFormContext.Provider value={{ ...props, readOnly: props.readOnly, validateForm }}>
       <div className="space-y-4">
         {isRequested && (
           <div className="p-4 bg-yellow-50 text-yellow-700 rounded-md mb-4">
