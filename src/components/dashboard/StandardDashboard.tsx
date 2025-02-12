@@ -41,7 +41,7 @@ export function StandardDashboard() {
   });
 
   // Query to fetch location hierarchy for the user's location
-  const { data: locationHierarchy } = useQuery({
+  const { data: locationHierarchy = [] } = useQuery({
     queryKey: ['locationHierarchy', userData?.locations?.id],
     queryFn: async () => {
       if (!userData?.locations?.id) return [];
@@ -55,19 +55,25 @@ export function StandardDashboard() {
         return [];
       }
 
-      // Extract just the IDs from the location hierarchy objects
-      return data.map(item => item.id);
+      // Extract just the IDs from the location hierarchy objects and include the user's location
+      const locationIds = data.map(item => item.id);
+      if (userData.locations.id) {
+        locationIds.push(userData.locations.id);
+      }
+      return locationIds;
     },
     enabled: !!userData?.locations?.id
   });
 
   // Query for searching site registers
-  const { data: searchResults, isLoading: isSearching } = useQuery({
+  const { data: searchResults = [], isLoading: isSearching } = useQuery({
     queryKey: ['siteRegisterSearch', searchTerm, locationHierarchy],
     queryFn: async () => {
-      if (!searchTerm || !locationHierarchy) return [];
+      if (!searchTerm || !locationHierarchy || locationHierarchy.length === 0) {
+        return [];
+      }
 
-      const query = supabase
+      const { data, error } = await supabase
         .from('site_registers')
         .select(`
           id,
@@ -83,9 +89,7 @@ export function StandardDashboard() {
           )
         `)
         .in('location_id', locationHierarchy)
-        .or(`product_name.ilike.%${searchTerm}%,override_product_name.ilike.%${searchTerm}%`);
-
-      const { data, error } = await query;
+        .or(`products.product_name.ilike.%${searchTerm}%,override_product_name.ilike.%${searchTerm}%`);
 
       if (error) {
         console.error('Error searching site registers:', error);
@@ -94,7 +98,7 @@ export function StandardDashboard() {
 
       return data;
     },
-    enabled: searchTerm.length > 2 && !!locationHierarchy
+    enabled: searchTerm.length > 2 && Array.isArray(locationHierarchy) && locationHierarchy.length > 0
   });
 
   const handleSearchClick = (siteRegisterId: string) => {
