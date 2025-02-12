@@ -41,10 +41,13 @@ export function StandardDashboard() {
   });
 
   // Query to fetch location hierarchy for the user's location
-  const { data: locationHierarchy = [] } = useQuery({
+  const { data: locationHierarchy = [], isLoading: isLoadingHierarchy } = useQuery({
     queryKey: ['locationHierarchy', userData?.locations?.id],
     queryFn: async () => {
-      if (!userData?.locations?.id) return [];
+      if (!userData?.locations?.id) {
+        console.log('No user location ID available');
+        return [];
+      }
 
       const { data, error } = await supabase.rpc('get_location_hierarchy', {
         selected_location_id: userData.locations.id
@@ -60,6 +63,7 @@ export function StandardDashboard() {
       if (userData.locations.id) {
         locationIds.push(userData.locations.id);
       }
+      console.log('Location hierarchy loaded:', locationIds);
       return locationIds;
     },
     enabled: !!userData?.locations?.id
@@ -85,6 +89,8 @@ export function StandardDashboard() {
         console.log('No valid location IDs available for search');
         return [];
       }
+
+      console.log('Searching with location IDs:', validLocationIds);
 
       try {
         // Search for override_product_name
@@ -139,7 +145,7 @@ export function StandardDashboard() {
         return [];
       }
     },
-    enabled: searchTerm.length > 2
+    enabled: searchTerm.length > 2 && !isLoadingHierarchy && locationHierarchy.length > 0
   });
 
   const handleSearchClick = (siteRegisterId: string) => {
@@ -196,7 +202,7 @@ export function StandardDashboard() {
 
           {searchTerm.length > 2 && (
             <div className="mt-6 space-y-6">
-              {isSearching ? (
+              {isSearching || isLoadingHierarchy ? (
                 <p className="text-gray-600">Searching...</p>
               ) : searchResults && searchResults.length > 0 ? (
                 searchResults.map((result) => (
