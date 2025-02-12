@@ -1,9 +1,10 @@
-
+import { StandardDashboard } from "@/components/dashboard/StandardDashboard";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserRole } from "@/hooks/use-user-role";
 
 const MetricCard = ({ 
   title, 
@@ -69,20 +70,26 @@ const InfoCard = ({ title, image, link }: { title: string; image: string; link: 
 );
 
 const Index = () => {
-  console.log("Rendering Index page");
-  const navigate = useNavigate();
+  const { data: userData, isLoading } = useUserRole();
+  
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
+  const isStandardUser = userData?.role?.toLowerCase() === 'standard';
+  
+  return isStandardUser ? <StandardDashboard /> : <AdminManagerDashboard />;
+};
+
+const AdminManagerDashboard = () => {
+  const navigate = useNavigate();
+  
   const { data: userLocation, isLoading: isLoadingLocation } = useQuery({
     queryKey: ['userLocation'],
     queryFn: async () => {
-      console.log('Fetching user location...');
       const userEmail = localStorage.getItem('userEmail');
-      if (!userEmail) {
-        console.log('No user email found');
-        return null;
-      }
+      if (!userEmail) return null;
 
-      console.log('Fetching location for user:', userEmail);
       const { data, error } = await supabase
         .from('users')
         .select(`
@@ -100,7 +107,6 @@ const Index = () => {
         return null;
       }
 
-      console.log('Location data received:', data);
       return data?.locations?.full_path || null;
     }
   });
@@ -142,7 +148,7 @@ const Index = () => {
       return count || 0;
     }
   });
-  
+
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-8">
