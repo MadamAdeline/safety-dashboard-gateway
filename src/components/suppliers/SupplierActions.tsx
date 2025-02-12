@@ -1,18 +1,19 @@
-
 import { Button } from "@/components/ui/button";
 import { Filter, Download, Upload, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Papa from 'papaparse';
 import { supabase } from "@/integrations/supabase/client";
 import type { Supplier } from "@/types/supplier";
+import * as XLSX from 'xlsx';
 
 interface SupplierActionsProps {
   onToggleFilters: () => void;
   onExport: () => void;
   onRefresh: () => void;
+  filteredData?: Supplier[];
 }
 
-export function SupplierActions({ onToggleFilters, onExport, onRefresh }: SupplierActionsProps) {
+export function SupplierActions({ onToggleFilters, onExport, onRefresh, filteredData }: SupplierActionsProps) {
   const { toast } = useToast();
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,6 +100,40 @@ export function SupplierActions({ onToggleFilters, onExport, onRefresh }: Suppli
     event.target.value = '';
   };
 
+  const handleExport = () => {
+    if (!filteredData || filteredData.length === 0) {
+      toast({
+        title: "No data to export",
+        description: "There are no suppliers matching your current filters",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Transform the data for export
+    const exportData = filteredData.map(supplier => ({
+      'Supplier Name': supplier.name,
+      'Contact Person': supplier.contactPerson,
+      'Email': supplier.email,
+      'Phone Number': supplier.phone || '-',
+      'Address': supplier.address || '-',
+      'Status': supplier.status
+    }));
+
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Suppliers");
+
+    // Generate and download file
+    XLSX.writeFile(wb, `suppliers_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+    toast({
+      title: "Export Successful",
+      description: "Your suppliers data has been exported to Excel"
+    });
+  };
+
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -111,7 +146,7 @@ export function SupplierActions({ onToggleFilters, onExport, onRefresh }: Suppli
       </Button>
       <Button
         variant="outline"
-        onClick={onExport}
+        onClick={handleExport}
         className="gap-2"
       >
         <Download className="h-4 w-4" />
