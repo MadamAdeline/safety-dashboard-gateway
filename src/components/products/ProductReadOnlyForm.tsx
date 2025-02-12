@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -12,14 +13,20 @@ interface ProductReadOnlyFormProps {
 
 export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps) {
   const formatExpiryDate = (dateString?: string) => {
+    console.log("Formatting date string:", dateString);
     if (!dateString) return "-";
     try {
-      return format(new Date(dateString), "dd/MM/yyyy");
+      const formattedDate = format(new Date(dateString), "dd/MM/yyyy");
+      console.log("Formatted date:", formattedDate);
+      return formattedDate;
     } catch (error) {
       console.error("Error formatting date:", error);
       return dateString;
     }
   };
+
+  console.log("Product data in ReadOnlyForm:", data);
+  console.log("SDS data in ReadOnlyForm:", data.sds);
 
   return (
     <div className="max-w-full">
