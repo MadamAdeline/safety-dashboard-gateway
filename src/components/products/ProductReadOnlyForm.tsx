@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import type { Product } from "@/types/product";
+import type { SDS } from "@/types/sds";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { SDSPreview } from "@/components/sds/SDSPreview";
@@ -23,6 +24,44 @@ export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps)
       revisionDate: data.sds.revisionDate
     });
   }
+
+  // Map the product's SDS data to match the required SDS type
+  const mappedSDS: SDS | null = data.sds ? {
+    id: data.sds.id,
+    productId: data.id,
+    productName: data.name,
+    isDG: data.sds.isDG,
+    supplier: data.sds.supplier?.supplier_name || '',
+    supplierId: data.sds.supplier?.id || '',
+    issueDate: data.sds.issueDate || '',
+    expiryDate: data.sds.expiryDate || '',
+    revisionDate: data.sds.revisionDate || '',
+    dgClassId: data.sds.dgClass?.id || null,
+    dgClass: data.sds.dgClass || null,
+    subsidiaryDgClassId: null,
+    subsidiaryDgClass: null,
+    packingGroupId: data.sds.packingGroup?.id || null,
+    packingGroup: data.sds.packingGroup || null,
+    dgSubDivisionId: data.sds.dgSubDivision?.id || null,
+    dgSubDivision: data.sds.dgSubDivision || null,
+    status: 'ACTIVE',
+    sdsSource: null,
+    source: null,
+    currentFilePath: data.sds.currentFilePath || null,
+    currentFileName: data.sds.currentFileName || null,
+    currentFileSize: data.sds.currentFileSize || null,
+    currentContentType: data.sds.currentContentType || null,
+    unNumber: null,
+    unProperShippingName: null,
+    hazchemCode: null,
+    otherNames: null,
+    emergencyPhone: null,
+    requestSupplierName: null,
+    requestSupplierDetails: null,
+    requestInformation: null,
+    requestDate: null,
+    requestedBy: null
+  } : null;
 
   const formatDate = (dateString?: string) => {
     console.log("Formatting date string:", dateString);
@@ -222,7 +261,7 @@ export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps)
               <div className="space-y-4">
                 <SDSPreview 
                   onUploadClick={() => {}}
-                  initialData={data.sds}
+                  initialData={mappedSDS}
                   selectedFile={null}
                   readOnly={true}
                 />
