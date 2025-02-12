@@ -8,12 +8,11 @@ import * as XLSX from 'xlsx';
 
 interface SupplierActionsProps {
   onToggleFilters: () => void;
-  onExport: () => void;
   onRefresh: () => void;
-  filteredData?: Supplier[];
+  data?: Supplier[];
 }
 
-export function SupplierActions({ onToggleFilters, onExport, onRefresh, filteredData }: SupplierActionsProps) {
+export function SupplierActions({ onToggleFilters, onRefresh, data }: SupplierActionsProps) {
   const { toast } = useToast();
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,17 +100,17 @@ export function SupplierActions({ onToggleFilters, onExport, onRefresh, filtered
   };
 
   const handleExport = () => {
-    if (!filteredData || filteredData.length === 0) {
+    if (!data || data.length === 0) {
       toast({
         title: "No data to export",
-        description: "There are no suppliers matching your current filters",
+        description: "There are no suppliers to export",
         variant: "destructive"
       });
       return;
     }
 
     // Transform the data for export
-    const exportData = filteredData.map(supplier => ({
+    const exportData = data.map(supplier => ({
       'Supplier Name': supplier.name,
       'Contact Person': supplier.contactPerson,
       'Email': supplier.email,
