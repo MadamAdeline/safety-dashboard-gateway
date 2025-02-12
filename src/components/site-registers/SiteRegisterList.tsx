@@ -225,7 +225,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
       </div>
 
       <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-        <div className="relative flex-1 max-w-md">
+        <div className="w-1/2 relative">
           <Input
             type="text"
             placeholder="Search Site Register by Product Name or Override Product Name..."
