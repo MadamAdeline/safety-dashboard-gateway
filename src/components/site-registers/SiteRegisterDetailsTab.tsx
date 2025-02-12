@@ -9,8 +9,8 @@ import { LocationSelection } from "./LocationSelection";
 import { ProductSelection } from "./ProductSelection";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { StockMovementsGrid } from "./StockMovementsGrid";
 import React from "react";
+import { StockMovementsGrid } from "./StockMovementsGrid";
 
 interface SiteRegisterDetailsTabProps {
   formData: {
@@ -39,52 +39,51 @@ export function SiteRegisterDetailsTab({
   isEditing,
   onStockUpdate
 }: SiteRegisterDetailsTabProps) {
-  console.log('SiteRegisterDetailsTab rendering with:', {
-    isEditing,
-    formDataId: formData.id,
-    hasFormData: !!formData,
-    fullFormData: formData
-  });
 
-  const handleLocationSelect = (location: Location) => {
-    onChange("location_id", location.id);
-  };
-
-  // Fetch UOM options from master_data
-  const { data: uomOptions } = useQuery({
-    queryKey: ['uomOptions'],
+  // Query to check if the site register has any stock movements
+  const { data: hasStockMovements } = useQuery({
+    queryKey: ['hasStockMovements', formData.id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('master_data')
-        .select('id, label')
-        .eq('category', 'UOM')
-        .eq('status', 'ACTIVE')
-        .order('sort_order');
-      
-      if (error) throw error;
-      return data;
-    }
+      if (!formData.id) return false;
+
+      const { count, error } = await supabase
+        .from('stock_movements')
+        .select('*', { count: 'exact', head: true })
+        .eq('site_register_id', formData.id);
+
+      if (error) {
+        console.error('Error checking stock movements:', error);
+        return false;
+      }
+
+      return (count || 0) > 0;
+    },
+    enabled: !!formData.id
   });
 
-  // Only show stock movements if we're in edit mode and the form has an ID
-  const showStockMovements = isEditing && formData?.id && formData.id !== '';
-
-  console.log('Stock movements visibility check:', {
-    isEditing,
-    formDataId: formData?.id,
-    showStockMovements,
-    hasId: !!formData?.id
-  });
+  // If editing and has stock movements, make location and product read-only
+  const isReadOnly = isEditing && hasStockMovements;
 
   return (
     <div className="space-y-6">
       {/* Location Row */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <LocationSelection
-            locationId={formData.location_id}
-            onLocationSelect={handleLocationSelect}
-          />
+          {isReadOnly ? (
+            <div className="space-y-2">
+              <Label>Location</Label>
+              <Input
+                value={formData.location_id}
+                readOnly
+                className="bg-gray-100"
+              />
+            </div>
+          ) : (
+            <LocationSelection
+              locationId={formData.location_id}
+              onLocationSelect={(location: Location) => onChange("location_id", location.id)}
+            />
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="exact_location">Exact Location (Free Text)</Label>
@@ -99,11 +98,22 @@ export function SiteRegisterDetailsTab({
       {/* Product Row */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <ProductSelection
-            productId={formData.product_id}
-            selectedProduct={selectedProduct}
-            onProductSelect={onProductSelect}
-          />
+          {isReadOnly ? (
+            <div className="space-y-2">
+              <Label>Product</Label>
+              <Input
+                value={selectedProduct?.product_name || ''}
+                readOnly
+                className="bg-gray-100"
+              />
+            </div>
+          ) : (
+            <ProductSelection
+              productId={formData.product_id}
+              selectedProduct={selectedProduct}
+              onProductSelect={onProductSelect}
+            />
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="override_product_name">Override Product Name</Label>
@@ -111,7 +121,7 @@ export function SiteRegisterDetailsTab({
             id="override_product_name"
             value={formData.override_product_name}
             onChange={(e) => onChange("override_product_name", e.target.value)}
-            placeholder={selectedProduct?.name || ""}
+            placeholder={selectedProduct?.product_name || ""}
           />
         </div>
       </div>
@@ -156,29 +166,19 @@ export function SiteRegisterDetailsTab({
 
             <div className="space-y-2">
               <Label htmlFor="uom_id">Unit of Measure</Label>
-              <Select
-                value={formData.uom_id || selectedProduct?.uomId || ''}
-                onValueChange={(value) => onChange("uom_id", value)}
-                disabled={true}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select unit of measure" />
-                </SelectTrigger>
-                <SelectContent>
-                  {uomOptions?.map((uom) => (
-                    <SelectItem key={uom.id} value={uom.id}>
-                      {uom.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                id="uom_id"
+                value={selectedProduct?.uom?.label || ''}
+                readOnly
+                className="bg-gray-100"
+              />
             </div>
           </div>
 
-          {showStockMovements && (
+          {formData.id && (
             <div className="pt-8">
               <StockMovementsGrid 
-                siteRegisterId={formData.id!}
+                siteRegisterId={formData.id}
                 onStockUpdate={onStockUpdate}
               />
             </div>
