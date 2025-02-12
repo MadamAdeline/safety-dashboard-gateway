@@ -11,7 +11,7 @@ export function SupplierSearch({ value, onChange }: SupplierSearchProps) {
   return (
     <div className="relative w-1/2">
       <Input
-        placeholder="Search suppliers..."
+        placeholder="Search Suppliers by Supplier Name..."
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="pl-10"
