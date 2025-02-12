@@ -71,6 +71,10 @@ export function useProductDetails(productId: string) {
       if (!data) return null;
       
       console.log("Raw data from DB:", data);
+      console.log("SDS data specifically:", data.sds);
+      if (data.sds) {
+        console.log("Expiry date from DB:", data.sds.expiry_date);
+      }
 
       const product: Product = {
         id: data.id,
@@ -101,7 +105,7 @@ export function useProductDetails(productId: string) {
           currentFileName: data.sds.current_file_name,
           currentFileSize: data.sds.current_file_size,
           currentContentType: data.sds.current_content_type,
-          expiryDate: data.sds.expiry_date,  // Make sure this matches the database column name
+          expiryDate: data.sds.expiry_date,
           dgClass: data.sds.dg_class ? {
             id: data.sds.dg_class.id,
             label: data.sds.dg_class.label
@@ -121,7 +125,11 @@ export function useProductDetails(productId: string) {
         } : undefined
       };
 
-      console.log("Mapped product object with SDS:", product);
+      console.log("Final mapped product with SDS:", product);
+      if (product.sds) {
+        console.log("Expiry date in final product:", product.sds.expiryDate);
+      }
+      
       return product;
     },
     enabled: !!productId
