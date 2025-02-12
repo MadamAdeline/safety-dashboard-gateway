@@ -74,9 +74,7 @@ export function useProductDetails(productId: string) {
       
       console.log("Raw data from DB:", data);
       console.log("SDS data specifically:", data.sds);
-      if (data.sds) {
-        console.log("Expiry date from DB:", data.sds.expiry_date);
-      }
+      console.log("Raw expiry_date value:", data.sds?.expiry_date);
 
       const product: Product = {
         id: data.id,
@@ -130,9 +128,7 @@ export function useProductDetails(productId: string) {
       };
 
       console.log("Final mapped product with SDS:", product);
-      if (product.sds) {
-        console.log("Expiry date in final product:", product.sds.expiryDate);
-      }
+      console.log("Mapped expiry_date value:", product.sds?.expiryDate);
       
       return product;
     },
