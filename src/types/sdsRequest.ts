@@ -2,8 +2,8 @@
 export interface SDSRequestFormData {
   productName: string;
   productCode: string;
-  otherProductName: string;
+  otherProductName?: string;
   supplierName: string;
-  otherSupplierDetails: string;
-  requestInfo: string;
+  otherSupplierDetails?: string;
+  requestInfo?: string;
 }

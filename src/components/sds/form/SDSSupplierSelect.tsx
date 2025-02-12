@@ -6,9 +6,12 @@ import { Label } from "@/components/ui/label";
 import { useSDSForm } from "./SDSFormContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export function SDSSupplierSelect() {
   const { supplier, setSupplier, initialData, status, readOnly } = useSDSForm();
+  const { toast } = useToast();
+  
   console.log("SDSSupplierSelect - Initial supplier:", supplier);
   console.log("SDSSupplierSelect - Initial data:", initialData);
   
@@ -38,16 +41,44 @@ export function SDSSupplierSelect() {
     }
   });
 
+  const handleSupplierChange = (value: string) => {
+    const select = document.getElementById('supplier-select');
+    if (select) {
+      select.classList.remove('border-red-500');
+    }
+    setSupplier(value);
+  };
+
+  const handleBlur = () => {
+    if (!supplier) {
+      const select = document.getElementById('supplier-select');
+      if (select) {
+        select.classList.add('border-red-500');
+      }
+      toast({
+        title: "Required Field",
+        description: "Supplier Name is required",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="space-y-2">
-      <Label htmlFor="supplier">Supplier Name *</Label>
+      <Label htmlFor="supplier" className="after:content-['*'] after:ml-0.5 after:text-red-500">
+        Supplier Name
+      </Label>
       <div className="flex gap-2">
         <Select 
           value={supplier} 
-          onValueChange={setSupplier}
+          onValueChange={handleSupplierChange}
+          onOpenChange={(open) => !open && handleBlur()}
           disabled={isReadOnly}
         >
-          <SelectTrigger className={`w-full ${isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}`}>
+          <SelectTrigger 
+            id="supplier-select"
+            className={`w-full ${isReadOnly ? "bg-gray-100 cursor-not-allowed text-gray-600" : ""}`}
+          >
             <SelectValue placeholder="Select supplier" />
           </SelectTrigger>
           <SelectContent>
