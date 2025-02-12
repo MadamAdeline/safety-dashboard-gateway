@@ -38,12 +38,12 @@ export function useProductDetails(productId: string) {
             id,
             is_dg,
             expiry_date,
+            issue_date,
+            revision_date,
             current_file_path,
             current_file_name,
             current_file_size,
             current_content_type,
-            issue_date,
-            revision_date,
             dg_class:master_data!sds_dg_class_id_fkey (
               id,
               label
