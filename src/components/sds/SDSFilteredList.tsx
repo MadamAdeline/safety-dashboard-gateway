@@ -36,7 +36,10 @@ export function SDSFilteredList({
     // Date filtering
     if (filters.dateField && filters.dateType && filters.dateFrom) {
       const itemDate = item[filters.dateField];
-      if (!itemDate) return false;
+      // Exclude records with no dates when date filter is active
+      if (!itemDate) {
+        return false;
+      }
 
       const filterDate = new Date(filters.dateFrom);
       const date = new Date(itemDate);
