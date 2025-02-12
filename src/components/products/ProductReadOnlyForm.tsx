@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -153,31 +152,66 @@ export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps)
           <TabsContent value="sds">
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
-                    <Label>Dangerous Goods</Label>
+                    <Label>Associated SDS</Label>
                     <div className="p-2 bg-gray-50 rounded border">
-                      {data.sds?.isDG ? "Yes" : "No"}
+                      {data.sds ? `${data.name} - ${data.sds.id}` : "No SDS Associated"}
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label>DG Class</Label>
-                    <div className="p-2 bg-gray-50 rounded border">
-                      {data.sds?.dgClass?.label || "-"}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Supplier</Label>
-                    <div className="p-2 bg-gray-50 rounded border">
-                      {data.sds?.supplier?.supplier_name || "-"}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Packing Group</Label>
-                    <div className="p-2 bg-gray-50 rounded border">
-                      {data.sds?.packingGroup?.label || "-"}
-                    </div>
-                  </div>
+
+                  {data.sds && (
+                    <>
+                      <div className="space-y-2">
+                        <Label>SDS Status</Label>
+                        <div className="p-2 bg-gray-50 rounded border">
+                          {data.sds.status || "-"}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Dangerous Goods Status</Label>
+                        <div className="p-2 bg-gray-50 rounded border">
+                          {data.sds.isDG ? "Yes" : "No"}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Supplier</Label>
+                        <div className="p-2 bg-gray-50 rounded border">
+                          {data.sds.supplier?.supplier_name || "-"}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>DG Class</Label>
+                        <div className="p-2 bg-gray-50 rounded border">
+                          {data.sds.dgClass?.label || "-"}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Subsidiary DG Class</Label>
+                        <div className="p-2 bg-gray-50 rounded border">
+                          {data.sds.subsidiaryDgClass?.label || "-"}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Packing Group</Label>
+                        <div className="p-2 bg-gray-50 rounded border">
+                          {data.sds.packingGroup?.label || "-"}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>DG Sub Division</Label>
+                        <div className="p-2 bg-gray-50 rounded border">
+                          {data.sds.dgSubDivision?.label || "-"}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
