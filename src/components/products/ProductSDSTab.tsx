@@ -185,7 +185,7 @@ export function ProductSDSTab({ sdsId, onSDSSelect }: ProductSDSTabProps) {
   }
 
   return (
-    <div className="grid grid-cols-[2fr,1fr] gap-6 h-full">
+    <div className="grid grid-cols-[1fr,1fr] gap-6 h-full">
       <div className="space-y-6">
         <SDSSearchSection
           sdsId={sdsId}
