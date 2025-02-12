@@ -3,26 +3,16 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
-const InfoCard = ({ title, image, link }: { title: string; image: string; link: string }) => (
-  <a 
-    href={link} 
-    target="_blank" 
-    rel="noopener noreferrer" 
-    className="block"
-  >
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="h-48 overflow-hidden">
-        <img src={image} alt={title} className="w-full h-full object-cover" />
-      </div>
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-dgxprt-navy">{title}</h3>
-      </div>
-    </Card>
-  </a>
-);
+import { InfoCard } from "./InfoCard";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function StandardDashboard() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+
   const { data: userData, isLoading: isLoadingUser } = useQuery({
     queryKey: ['standardUserData'],
     queryFn: async () => {
@@ -49,6 +39,66 @@ export function StandardDashboard() {
       return data;
     }
   });
+
+  // Query to fetch location hierarchy for the user's location
+  const { data: locationHierarchy } = useQuery({
+    queryKey: ['locationHierarchy', userData?.locations?.id],
+    queryFn: async () => {
+      if (!userData?.locations?.id) return [];
+
+      const { data, error } = await supabase.rpc('get_location_hierarchy', {
+        selected_location_id: userData.locations.id
+      });
+
+      if (error) {
+        console.error("Error fetching child locations:", error);
+        return [];
+      }
+
+      return data;
+    },
+    enabled: !!userData?.locations?.id
+  });
+
+  // Query for searching site registers
+  const { data: searchResults, isLoading: isSearching } = useQuery({
+    queryKey: ['siteRegisterSearch', searchTerm, locationHierarchy],
+    queryFn: async () => {
+      if (!searchTerm || !locationHierarchy) return [];
+
+      const query = supabase
+        .from('site_registers')
+        .select(`
+          id,
+          location_id,
+          product_id,
+          override_product_name,
+          products (
+            product_name
+          ),
+          locations (
+            name,
+            full_path
+          )
+        `)
+        .in('location_id', locationHierarchy)
+        .or(`product_name.ilike.%${searchTerm}%,override_product_name.ilike.%${searchTerm}%`);
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error searching site registers:', error);
+        return [];
+      }
+
+      return data;
+    },
+    enabled: searchTerm.length > 2 && !!locationHierarchy
+  });
+
+  const handleSearchClick = (siteRegisterId: string) => {
+    navigate(`/site-registers`, { state: { editId: siteRegisterId } });
+  };
 
   return (
     <DashboardLayout>
@@ -82,6 +132,46 @@ export function StandardDashboard() {
             image="/lovable-uploads/f225c5bc-284e-4810-baf5-47efe7e77623.png"
             link="https://www2.education.vic.gov.au/pal/chemical-management/policy"
           />
+        </div>
+      </div>
+
+      <div className="mt-12">
+        <div className="max-w-2xl mx-auto">
+          <div className="relative">
+            <Input
+              type="search"
+              placeholder="Search site registers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-12 text-lg"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          </div>
+
+          {searchTerm.length > 2 && (
+            <div className="mt-6 space-y-6">
+              {isSearching ? (
+                <p className="text-gray-600">Searching...</p>
+              ) : searchResults && searchResults.length > 0 ? (
+                searchResults.map((result) => (
+                  <div
+                    key={result.id}
+                    className="cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-colors"
+                    onClick={() => handleSearchClick(result.id)}
+                  >
+                    <h3 className="text-lg font-medium text-dgxprt-navy mb-1">
+                      {result.override_product_name || result.products?.product_name}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Location: {result.locations?.full_path}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-600">No results found</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>
