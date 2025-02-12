@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -227,7 +228,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
         <div className="relative flex-1 max-w-md">
           <Input
             type="text"
-            placeholder="Search site registers..."
+            placeholder="Search Site Register by Product Name or Override Product Name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
