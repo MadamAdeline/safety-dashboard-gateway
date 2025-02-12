@@ -47,6 +47,28 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
   const [statusOptions, setStatusOptions] = useState<{ id: number; name: string; category: string }[]>([]);
   const { toast } = useToast();
 
+  const validateForm = (): string[] => {
+    const errors: string[] = [];
+    
+    if (!formData.name) {
+      errors.push("Product Name");
+    }
+    if (!formData.code) {
+      errors.push("Product Code");
+    }
+    if (!formData.uomId) {
+      errors.push("Unit of Measure");
+    }
+    if (!formData.unitSize || formData.unitSize <= 0) {
+      errors.push("Unit Size");
+    }
+    if (!formData.sdsId) {
+      errors.push("Associated SDS");
+    }
+
+    return errors;
+  };
+
   useEffect(() => {
     const fetchStatusOptions = async () => {
       try {
@@ -148,6 +170,17 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
   const handleSave = async () => {
     try {
+      // Validate required fields
+      const missingFields = validateForm();
+      if (missingFields.length > 0) {
+        toast({
+          title: "Required Fields Missing",
+          description: `Please fill in the following required fields: ${missingFields.join(", ")}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Check for duplicates before saving
       const isDuplicate = await checkForDuplicate();
       if (isDuplicate) return;

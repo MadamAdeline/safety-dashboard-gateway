@@ -55,7 +55,9 @@ export function ProductDetailsTab({
       <div className="grid grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
-            <Label htmlFor="name">Product Name *</Label>
+            <Label htmlFor="name" className="flex items-center">
+              Product Name <span className="text-red-500 ml-1">*</span>
+            </Label>
             <Input
               id="name"
               value={formData.name}
@@ -84,7 +86,9 @@ export function ProductDetailsTab({
 
         <div className="space-y-4">
           <div>
-            <Label htmlFor="code">Product Code *</Label>
+            <Label htmlFor="code" className="flex items-center">
+              Product Code <span className="text-red-500 ml-1">*</span>
+            </Label>
             <Input
               id="code"
               value={formData.code}
@@ -94,7 +98,9 @@ export function ProductDetailsTab({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="uom">Unit of Measure *</Label>
+              <Label htmlFor="uom" className="flex items-center">
+                Unit of Measure <span className="text-red-500 ml-1">*</span>
+              </Label>
               <Select 
                 value={formData.uomId || ""}
                 onValueChange={(value) => setFormData({ ...formData, uomId: value })}
@@ -113,7 +119,9 @@ export function ProductDetailsTab({
             </div>
 
             <div>
-              <Label htmlFor="unitSize">Unit Size</Label>
+              <Label htmlFor="unitSize" className="flex items-center">
+                Unit Size <span className="text-red-500 ml-1">*</span>
+              </Label>
               <Input
                 id="unitSize"
                 type="number"
@@ -176,7 +184,7 @@ export function ProductDetailsTab({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="approvalStatus">Approval Status *</Label>
+            <Label htmlFor="approvalStatus">Approval Status</Label>
             <Select
               value={formData.approvalStatusId?.toString()}
               onValueChange={(value) => setFormData({ ...formData, approvalStatusId: parseInt(value) })}
@@ -195,7 +203,7 @@ export function ProductDetailsTab({
           </div>
 
           <div>
-            <Label htmlFor="productStatus">Product Status *</Label>
+            <Label htmlFor="productStatus">Product Status</Label>
             <Select
               value={formData.productStatusId?.toString()}
               onValueChange={(value) => setFormData({ ...formData, productStatusId: parseInt(value) })}
