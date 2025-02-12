@@ -3,6 +3,8 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const InfoCard = ({ title, image, link }: { title: string; image: string; link: string }) => (
   <a 
@@ -23,6 +25,8 @@ const InfoCard = ({ title, image, link }: { title: string; image: string; link: 
 );
 
 export function StandardDashboard() {
+  const navigate = useNavigate();
+
   const { data: userData, isLoading: isLoadingUser } = useQuery({
     queryKey: ['standardUserData'],
     queryFn: async () => {
@@ -50,6 +54,10 @@ export function StandardDashboard() {
     }
   });
 
+  const handleSiteRegisterClick = () => {
+    navigate('/site-registers');
+  };
+
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-8">
@@ -62,6 +70,15 @@ export function StandardDashboard() {
             <p className="text-md font-medium text-dgxprt-navy">{userData.locations.full_path}</p>
           </div>
         )}
+      </div>
+
+      <div className="flex justify-end mb-6">
+        <Button 
+          onClick={handleSiteRegisterClick}
+          className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+        >
+          Search Site Register
+        </Button>
       </div>
 
       <div className="mt-12">
