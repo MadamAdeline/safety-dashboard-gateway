@@ -13,7 +13,7 @@ export function ProductListSearch({ value, onChange, className }: ProductListSea
     <div className={className}>
       <div className="relative">
         <Input
-          placeholder="Search products by name, code, brand or supplier..."
+          placeholder="Search Products by Product Name, Product Code, Brand Name or Supplier"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="pl-10"
