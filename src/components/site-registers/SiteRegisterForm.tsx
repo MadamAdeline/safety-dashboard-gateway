@@ -27,6 +27,7 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     current_stock_level: initialData?.current_stock_level || null,
     max_stock_level: initialData?.max_stock_level || null,
     uom_id: initialData?.uom_id || null,
+    total_qty: initialData?.total_qty || null,
   });
 
   console.log('SiteRegisterForm initializing with:', {
@@ -59,7 +60,8 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
       if (!error && data) {
         setFormData(prev => ({
           ...prev,
-          current_stock_level: data.current_stock_level
+          current_stock_level: data.current_stock_level,
+          total_qty: data.total_qty
         }));
       }
     }
