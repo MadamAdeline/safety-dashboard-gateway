@@ -1,5 +1,6 @@
+
 import { Button } from "@/components/ui/button";
-import { Filter, Download, Upload, RefreshCw } from "lucide-react";
+import { Download, Upload, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Papa from 'papaparse';
@@ -166,14 +167,6 @@ export function LocationActions({ onToggleFilters, onExport, onRefresh, filtered
 
   return (
     <div className="flex items-center gap-2">
-      <Button
-        variant="outline"
-        onClick={onToggleFilters}
-        className="gap-2"
-      >
-        <Filter className="h-4 w-4" />
-        Filters
-      </Button>
       <Button
         variant="outline"
         onClick={handleExport}
