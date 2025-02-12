@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Edit2, Trash2, Eye } from "lucide-react";
 import type { Product } from "@/types/product";
+import { useUserRole } from "@/hooks/use-user-role";
 
 interface ProductTableRowProps {
   product: Product;
@@ -25,6 +26,12 @@ export function ProductTableRow({
   onView,
   isDeleting
 }: ProductTableRowProps) {
+  const { data: userData } = useUserRole();
+  const isAdmin = userData?.role?.toLowerCase() === 'administrator';
+  const isManager = userData?.role?.toLowerCase() === 'manager';
+
+  console.log('User role:', userData?.role);
+
   return (
     <TableRow className="hover:bg-[#F1F0FB] transition-colors">
       <TableCell>
@@ -63,31 +70,40 @@ export function ProductTableRow({
       </TableCell>
       <TableCell>
         <div className="flex space-x-2">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hover:bg-dgxprt-hover text-dgxprt-navy"
-            onClick={() => onView(product)}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hover:bg-dgxprt-hover text-dgxprt-navy"
-            onClick={() => onEdit(product)}
-          >
-            <Edit2 className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hover:bg-red-100 text-red-600"
-            onClick={() => onDelete(product)}
-            disabled={isDeleting}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {/* Show View button only for Managers */}
+          {isManager && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="hover:bg-dgxprt-hover text-dgxprt-navy"
+              onClick={() => onView(product)}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+          )}
+          
+          {/* Show Edit and Delete buttons only for Administrators */}
+          {isAdmin && (
+            <>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="hover:bg-dgxprt-hover text-dgxprt-navy"
+                onClick={() => onEdit(product)}
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="hover:bg-red-100 text-red-600"
+                onClick={() => onDelete(product)}
+                disabled={isDeleting}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </>
+          )}
         </div>
       </TableCell>
     </TableRow>
