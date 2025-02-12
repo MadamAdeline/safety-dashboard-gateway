@@ -1,4 +1,7 @@
+
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { FilterX } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -14,8 +17,26 @@ interface SupplierFiltersProps {
 }
 
 export function SupplierFilters({ filters, onFiltersChange }: SupplierFiltersProps) {
+  const handleClearFilters = () => {
+    onFiltersChange({
+      ...filters,
+      status: [],
+    });
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg shadow space-y-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-medium">Filters</h3>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleClearFilters}
+        >
+          <FilterX className="h-4 w-4 mr-2" />
+          Clear Filter
+        </Button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label>Status</Label>
