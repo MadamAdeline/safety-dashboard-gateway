@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -8,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit2 } from "lucide-react";
+import { Edit2, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@/types/user";
@@ -39,9 +40,10 @@ type UserWithRelations = Omit<User, 'manager'> & {
 interface UserListProps {
   onEdit: (user: UserWithRelations) => void;
   searchTerm: string;
+  onNewUser: () => void;
 }
 
-export function UserList({ onEdit, searchTerm }: UserListProps) {
+export function UserList({ onEdit, searchTerm, onNewUser }: UserListProps) {
   const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -188,7 +190,7 @@ export function UserList({ onEdit, searchTerm }: UserListProps) {
           
           <div className="flex gap-2">
             <Button
-              onClick={() => setShowNewUserForm(true)}
+              onClick={onNewUser}
               className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
             >
               <Plus className="h-4 w-4 mr-2" />
