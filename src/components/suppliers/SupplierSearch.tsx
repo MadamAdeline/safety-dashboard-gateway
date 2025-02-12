@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
@@ -8,7 +9,7 @@ interface SupplierSearchProps {
 
 export function SupplierSearch({ value, onChange }: SupplierSearchProps) {
   return (
-    <div className="flex-1 max-w-md relative">
+    <div className="relative w-1/2">
       <Input
         placeholder="Search suppliers..."
         value={value}
