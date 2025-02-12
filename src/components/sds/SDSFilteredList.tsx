@@ -42,6 +42,7 @@ export function SDSFilteredList({
         (item.productName?.toLowerCase().includes(searchLower) ?? false) ||
         (item.productId?.toLowerCase().includes(searchLower) ?? false) ||
         (item.supplier?.toLowerCase().includes(searchLower) ?? false) ||
+        (item.source?.toLowerCase().includes(searchLower) ?? false) ||
         (item.status?.toLowerCase().includes(searchLower) ?? false) ||
         (item.unNumber?.toLowerCase().includes(searchLower) ?? false) ||
         (item.unProperShippingName?.toLowerCase().includes(searchLower) ?? false) ||
