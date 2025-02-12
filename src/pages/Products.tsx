@@ -1,22 +1,20 @@
 
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { ProductList } from "@/components/products/ProductList";
-import { ProductFilters } from "@/components/products/ProductFilters";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { ProductActions } from "@/components/products/ProductActions";
 import { ProductForm } from "@/components/products/ProductForm";
 import type { Product, ProductFilters as ProductFiltersType } from "@/types/product";
 import { exportProductsToExcel } from "@/utils/exportUtils";
 import { useLocation } from "react-router-dom";
-import { ProductListSearch } from "@/components/products/list/ProductListSearch";
 import { useProducts } from "@/hooks/use-products";
+import { useToast } from "@/hooks/use-toast";
+import { ProductHeader } from "@/components/products/header/ProductHeader";
+import { ProductSearchBar } from "@/components/products/header/ProductSearchBar";
+import { ProductListContainer } from "@/components/products/list/ProductListContainer";
 
 export default function Products() {
   const location = useLocation();
   const showFormFromState = location.state?.showForm ?? false;
+  const { toast } = useToast();
   
   const [filters, setFilters] = useState<ProductFiltersType>({
     search: "",
@@ -30,7 +28,6 @@ export default function Products() {
   const [showForm, setShowForm] = useState(showFormFromState);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isExporting, setIsExporting] = useState(false);
-  const { toast } = useToast();
 
   const { data: products = [], isLoading, error, refetch } = useProducts();
 
@@ -159,41 +156,29 @@ export default function Products() {
   return (
     <DashboardLayout>
       <div className="space-y-4 max-w-full">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Products</h1>
-          <Button 
-            onClick={() => {
-              setSelectedProduct(null);
-              setShowForm(true);
-            }} 
-            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-          >
-            <Plus className="mr-2 h-4 w-4" /> New Product
-          </Button>
-        </div>
+        <ProductHeader 
+          onNewProduct={() => {
+            setSelectedProduct(null);
+            setShowForm(true);
+          }}
+        />
         
         <div className="space-y-4">
-          <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-            <ProductListSearch 
-              value={filters.search}
-              onChange={(value) => setFilters({ ...filters, search: value })}
-            />
-            <ProductActions 
-              onToggleFilters={() => setShowFilters(!showFilters)}
-              onExport={handleExport}
-              onRefresh={handleRefresh}
-              isExporting={isExporting}
-            />
-          </div>
+          <ProductSearchBar 
+            filters={filters}
+            onFiltersChange={setFilters}
+            onToggleFilters={() => setShowFilters(!showFilters)}
+            onExport={handleExport}
+            onRefresh={handleRefresh}
+            isExporting={isExporting}
+          />
           
-          {showFilters && (
-            <ProductFilters filters={filters} onFiltersChange={setFilters} />
-          )}
-          
-          <ProductList 
-            data={products} 
-            filters={filters} 
+          <ProductListContainer 
+            data={products}
+            filters={filters}
+            showFilters={showFilters}
             onEdit={handleEdit}
+            onFiltersChange={setFilters}
           />
         </div>
       </div>
