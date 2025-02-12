@@ -1,6 +1,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { FilterX } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -33,7 +34,8 @@ export function ProductFilters({ filters, onFiltersChange }: ProductFiltersProps
           size="sm"
           onClick={handleClearFilters}
         >
-          Clear
+          <FilterX className="h-4 w-4" />
+          Clear Filter
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
