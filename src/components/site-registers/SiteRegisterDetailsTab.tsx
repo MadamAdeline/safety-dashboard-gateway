@@ -69,6 +69,12 @@ export function SiteRegisterDetailsTab({
   // If editing and has stock movements, make location and product read-only
   const isReadOnly = isEditing && hasStockMovements;
 
+  // Format number with thousand separators
+  const formatNumber = (value: number | undefined | null): string => {
+    if (value === undefined || value === null) return '';
+    return value.toLocaleString();
+  };
+
   return (
     <div className="space-y-6">
       {/* Location Row */}
@@ -159,8 +165,8 @@ export function SiteRegisterDetailsTab({
               <Label htmlFor="current_stock_level">Current Stock Level (# of Units)</Label>
               <Input
                 id="current_stock_level"
-                type="number"
-                value={formData.current_stock_level || ''}
+                type="text"
+                value={formatNumber(formData.current_stock_level)}
                 readOnly
                 className="bg-gray-100"
               />
@@ -170,8 +176,8 @@ export function SiteRegisterDetailsTab({
               <Label htmlFor="total_qty">Total Quantity</Label>
               <Input
                 id="total_qty"
-                type="number"
-                value={formData.total_qty || ''}
+                type="text"
+                value={formatNumber(formData.total_qty)}
                 readOnly
                 className="bg-gray-100"
               />
