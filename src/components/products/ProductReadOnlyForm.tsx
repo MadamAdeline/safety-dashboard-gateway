@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -11,24 +12,34 @@ interface ProductReadOnlyFormProps {
 }
 
 export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps) {
+  console.log("=== START: ProductReadOnlyForm Render ===");
+  console.log("Full product data:", data);
+  console.log("SDS object:", data.sds);
+  if (data.sds) {
+    console.log("SDS dates:", {
+      expiryDate: data.sds.expiryDate,
+      issueDate: data.sds.issueDate,
+      revisionDate: data.sds.revisionDate
+    });
+  }
+
   const formatDate = (dateString?: string) => {
     console.log("Formatting date string:", dateString);
-    if (!dateString) return "-";
+    if (!dateString) {
+      console.log("Date string is empty or undefined");
+      return "-";
+    }
     try {
-      const formattedDate = format(new Date(dateString), "dd/MM/yyyy");
-      console.log("Formatted date:", formattedDate);
+      const date = new Date(dateString);
+      console.log("Parsed date object:", date);
+      const formattedDate = format(date, "dd/MM/yyyy");
+      console.log("Formatted date result:", formattedDate);
       return formattedDate;
     } catch (error) {
       console.error("Error formatting date:", error);
       return dateString;
     }
   };
-
-  console.log("Product data in ReadOnlyForm:", data);
-  console.log("SDS data in ReadOnlyForm:", data.sds);
-  if (data.sds) {
-    console.log("Raw expiry_date in ReadOnlyForm:", data.sds.expiryDate);
-  }
 
   return (
     <div className="max-w-full">
