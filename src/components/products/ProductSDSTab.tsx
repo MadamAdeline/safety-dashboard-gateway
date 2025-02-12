@@ -1,9 +1,11 @@
+
 import { useEffect, useState } from "react";
 import { NewSDSForm } from "@/components/sds/NewSDSForm";
 import type { SDS } from "@/types/sds";
 import { supabase } from "@/integrations/supabase/client";
 import { SDSSearchSection } from "./sds/SDSSearchSection";
 import { SDSDetailsDisplay } from "./sds/SDSDetailsDisplay";
+import { SDSPreview } from "@/components/sds/SDSPreview";
 
 interface ProductSDSTabProps {
   sdsId: string | null;
@@ -183,15 +185,28 @@ export function ProductSDSTab({ sdsId, onSDSSelect }: ProductSDSTabProps) {
   }
 
   return (
-    <div className="space-y-6 w-full">
-      <SDSSearchSection
-        sdsId={sdsId}
-        initialSDS={initialSDS}
-        onSDSSelect={onSDSSelect}
-        onNewSDSClick={() => setShowNewSDS(true)}
-      />
+    <div className="grid grid-cols-[2fr,1fr] gap-6 h-full">
+      <div className="space-y-6">
+        <SDSSearchSection
+          sdsId={sdsId}
+          initialSDS={initialSDS}
+          onSDSSelect={onSDSSelect}
+          onNewSDSClick={() => setShowNewSDS(true)}
+        />
 
-      {initialSDS && <SDSDetailsDisplay sds={initialSDS} />}
+        {initialSDS && <SDSDetailsDisplay sds={initialSDS} />}
+      </div>
+
+      <div className="space-y-4 h-full sticky top-0">
+        <div className="h-[calc(100vh-12rem)]">
+          <SDSPreview
+            initialData={initialSDS}
+            selectedFile={null}
+            onUploadClick={() => {}}
+            readOnly={true}
+          />
+        </div>
+      </div>
     </div>
   );
 }
