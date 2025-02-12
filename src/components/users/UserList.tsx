@@ -14,7 +14,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@/types/user";
 import { useToast } from "@/components/ui/use-toast";
-import { LocationPagination } from "@/components/locations/table/LocationPagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { useState } from "react";
 
 type UserWithRelations = Omit<User, 'manager'> & {
@@ -107,8 +114,10 @@ export function UserList({ onEdit, searchTerm }: UserListProps) {
   });
 
   const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredUsers?.length || 0);
   const paginatedUsers = filteredUsers?.slice(startIndex, startIndex + itemsPerPage);
   const totalPages = Math.ceil((filteredUsers?.length || 0) / itemsPerPage);
+  const totalItems = filteredUsers?.length || 0;
 
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden space-y-4">
@@ -170,12 +179,40 @@ export function UserList({ onEdit, searchTerm }: UserListProps) {
         </TableBody>
       </Table>
 
-      <div className="p-4">
-        <LocationPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+      <div className="p-4 flex items-center justify-between">
+        <p className="text-sm text-gray-500">
+          Showing {startIndex + 1} to {endIndex} of {totalItems} results
+        </p>
+        
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+              />
+            </PaginationItem>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <PaginationItem key={page}>
+                <PaginationLink
+                  onClick={() => setCurrentPage(page)}
+                  isActive={currentPage === page}
+                  className={currentPage === page ? "bg-purple-600 text-white hover:bg-purple-500" : ""}
+                >
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext 
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );
