@@ -29,6 +29,7 @@ export interface Product {
     currentFileName?: string;
     currentFileSize?: number;
     currentContentType?: string;
+    expiryDate?: string;
     dgClass?: {
       id: string;
       label: string;
