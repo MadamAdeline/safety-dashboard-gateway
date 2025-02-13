@@ -89,6 +89,7 @@ export type Database = {
           sort_order: number
           status: string
           updated_at: string | null
+          value: string | null
         }
         Insert: {
           category: string
@@ -98,6 +99,7 @@ export type Database = {
           sort_order?: number
           status?: string
           updated_at?: string | null
+          value?: string | null
         }
         Update: {
           category?: string
@@ -107,6 +109,7 @@ export type Database = {
           sort_order?: number
           status?: string
           updated_at?: string | null
+          value?: string | null
         }
         Relationships: []
       }

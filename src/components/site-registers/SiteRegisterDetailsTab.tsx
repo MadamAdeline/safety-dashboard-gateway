@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,6 +24,7 @@ interface SiteRegisterDetailsTabProps {
     max_stock_level?: number;
     uom_id?: string;
     total_qty?: number;
+    status_id: number;
   };
   onChange: (field: string, value: string | number) => void;
   onProductSelect: (product: Product) => void;
@@ -68,6 +68,21 @@ export function SiteRegisterDetailsTab({
 
   // If editing and has stock movements, make location and product read-only
   const isReadOnly = isEditing && hasStockMovements;
+
+  // Query for status options
+  const { data: statusOptions } = useQuery({
+    queryKey: ['site-register-statuses'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('status_lookup')
+        .select('*')
+        .eq('category', 'SITE_REGISTER')
+        .order('id');
+
+      if (error) throw error;
+      return data;
+    }
+  });
 
   // Format number with thousand separators
   const formatNumber = (value: number | undefined | null): string => {
@@ -152,6 +167,27 @@ export function SiteRegisterDetailsTab({
           onChange={(e) => onChange("storage_conditions", e.target.value)}
           rows={4}
         />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="status_id">Status</Label>
+          <Select
+            value={formData.status_id?.toString()}
+            onValueChange={(value) => onChange("status_id", parseInt(value))}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions?.map((status) => (
+                <SelectItem key={status.id} value={status.id.toString()}>
+                  {status.status_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {isEditing && (

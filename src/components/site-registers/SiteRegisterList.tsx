@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +27,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Badge } from "@/components/ui/badge";
 
 interface SiteRegisterListProps {
   searchTerm: string;
@@ -82,6 +82,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
           storage_conditions,
           max_stock_level,
           uom_id,
+          status_id,
           products (
             id,
             product_name,
@@ -94,6 +95,10 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
             id,
             name,
             full_path
+          ),
+          status:status_lookup (
+            id,
+            status_name
           )
         `);
 
@@ -248,8 +253,9 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
               <TableHead>Product Name</TableHead>
               <TableHead>Override Product Name</TableHead>
               <TableHead>Location</TableHead>
-              <TableHead>Unit of Measure</TableHead>
               <TableHead>Current Stock Level</TableHead>
+              <TableHead>Unit of Measure</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -258,9 +264,21 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
               <TableRow key={register.id}>
                 <TableCell>{register.products?.product_name}</TableCell>
                 <TableCell>{register.override_product_name || '-'}</TableCell>
-                <TableCell>{register.locations?.name}</TableCell>
+                <TableCell>{register.locations?.full_path}</TableCell>
+                <TableCell>{register.current_stock_level?.toLocaleString() || '-'}</TableCell>
                 <TableCell>{register.products?.uom?.label}</TableCell>
-                <TableCell>{register.current_stock_level}</TableCell>
+                <TableCell>
+                  <Badge 
+                    variant={register.status?.status_name === 'ACTIVE' ? "default" : "destructive"}
+                    className={
+                      register.status?.status_name === 'ACTIVE'
+                        ? "bg-green-100 text-green-800" 
+                        : "bg-red-100 text-red-800"
+                    }
+                  >
+                    {register.status?.status_name || 'Unknown'}
+                  </Badge>
+                </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button

@@ -23,7 +23,7 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     override_product_name: initialData?.override_product_name || "",
     exact_location: initialData?.exact_location || "",
     storage_conditions: initialData?.storage_conditions || "",
-    status_id: initialData?.status_id || 16, // Default to ACTIVE status
+    status_id: initialData?.status_id || 1, // Default to ACTIVE status (assuming 1 is ACTIVE)
     current_stock_level: initialData?.current_stock_level || null,
     max_stock_level: initialData?.max_stock_level || null,
     uom_id: initialData?.uom_id || null,
@@ -105,6 +105,7 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     const dataToSave = {
       ...formData,
       uom_id: selectedProduct?.uomId || formData.uom_id,
+      status_id: formData.status_id
     };
 
     setIsSaving(true);
