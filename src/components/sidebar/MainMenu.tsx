@@ -65,13 +65,13 @@ export function MainMenu() {
   );
 
   return (
-    <div className="flex flex-col space-y-0">
+    <div className="flex flex-col space-y-1">
       {visibleItems.map((item) => (
-        <SidebarMenuItem key={item.label} className="py-0.5">
+        <SidebarMenuItem key={item.label} className="py-1">
           <SidebarMenuButton asChild>
             <Link 
               to={item.path} 
-              className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar aria-[current=page]:bg-dgxprt-selected px-4 py-1.5"
+              className="flex items-center gap-2 text-white hover:bg-dgxprt-hover hover:text-dgxprt-sidebar aria-[current=page]:bg-dgxprt-selected px-4 py-1.5"
             >
               <item.icon className="h-4 w-4" />
               <span>{item.label}</span>

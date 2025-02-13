@@ -44,18 +44,18 @@ export function ConfigMenu() {
   if (visibleItems.length === 0) return null;
 
   return (
-    <div className="flex flex-col space-y-0">
-      <SidebarMenuItem className="py-0.5">
-        <SidebarMenuButton className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar text-lg px-4 py-1.5">
+    <div className="flex flex-col space-y-1">
+      <SidebarMenuItem className="py-1">
+        <SidebarMenuButton className="flex items-center gap-2 text-white text-lg hover:bg-dgxprt-hover hover:text-dgxprt-sidebar px-4 py-1.5">
           <span>Configuration</span>
         </SidebarMenuButton>
-        <div className="flex flex-col space-y-0 pl-4">
+        <div className="flex flex-col space-y-1 pl-4">
           {visibleItems.map((item) => (
-            <SidebarMenuItem key={item.label} className="py-0.5">
+            <SidebarMenuItem key={item.label} className="py-1">
               <SidebarMenuButton asChild>
                 <Link 
                   to={item.path} 
-                  className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar aria-[current=page]:bg-dgxprt-selected px-4 py-1.5"
+                  className="flex items-center gap-2 text-white hover:bg-dgxprt-hover hover:text-dgxprt-sidebar aria-[current=page]:bg-dgxprt-selected px-4 py-1.5"
                 >
                   <item.icon className="h-4 w-4" />
                   <span>{item.label}</span>
