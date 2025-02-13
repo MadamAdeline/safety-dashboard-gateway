@@ -2,6 +2,20 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Supplier } from '@/types/supplier';
 
+const setUserContext = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.id) {
+    throw new Error('User must be authenticated to perform this action');
+  }
+  
+  // Set the user ID in the PostgreSQL session
+  await supabase.rpc('set_config', {
+    parameter: 'app.current_user',
+    value: user.id,
+    is_local: false
+  });
+};
+
 export async function getSuppliers() {
   console.log('Fetching suppliers from Supabase');
   try {
@@ -46,6 +60,9 @@ export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
       console.error('Supabase client not initialized');
       throw new Error('Supabase client not initialized');
     }
+
+    // Set user context before operation
+    await setUserContext();
 
     const { data, error } = await supabase
       .from('suppliers')
@@ -92,6 +109,9 @@ export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
       throw new Error('Supabase client not initialized');
     }
 
+    // Set user context before operation
+    await setUserContext();
+
     const { data, error } = await supabase
       .from('suppliers')
       .update({
@@ -137,6 +157,9 @@ export async function deleteSupplier(id: string) {
       console.error('Supabase client not initialized');
       throw new Error('Supabase client not initialized');
     }
+
+    // Set user context before operation
+    await setUserContext();
 
     const { error } = await supabase
       .from('suppliers')
