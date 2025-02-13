@@ -19,31 +19,31 @@ const mainMenuItems = [
     label: "Home",
     path: "/dashboard",
     icon: Home,
-    allowedRoles: ['standard', 'manager', 'administrator'],
+    allowedRoles: ['standard', 'manager', 'administrator', 'poweruser'],
   },
   {
     label: "Site Registers",
     path: "/site-registers",
     icon: ClipboardList,
-    allowedRoles: ['standard', 'manager', 'administrator'],
+    allowedRoles: ['standard', 'manager', 'administrator', 'poweruser'],
   },
   {
     label: "Risk Assessments",
     path: "/risk-assessments",
     icon: AlertTriangle,
-    allowedRoles: ['standard', 'manager', 'administrator'],
+    allowedRoles: ['standard', 'manager', 'administrator', 'poweruser'],
   },
   {
     label: "Waste Tracking",
     path: "/waste-tracking",
     icon: Trash2,
-    allowedRoles: ['standard', 'manager', 'administrator'],
+    allowedRoles: ['standard', 'manager', 'administrator', 'poweruser'],
   },
   {
     label: "Compliance Dashboard",
     path: "/compliance",
     icon: LineChart,
-    allowedRoles: ['manager', 'administrator'],
+    allowedRoles: ['manager', 'administrator', 'poweruser'],
   },
 ]
 
@@ -80,5 +80,5 @@ export function MainMenu() {
         </SidebarMenuItem>
       ))}
     </div>
-  )
+  );
 }

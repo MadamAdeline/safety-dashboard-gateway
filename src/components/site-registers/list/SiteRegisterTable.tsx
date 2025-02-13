@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
+import { useUserRole } from "@/hooks/use-user-role";
 
 interface SiteRegisterTableProps {
   registers: any[];
@@ -11,6 +12,11 @@ interface SiteRegisterTableProps {
 }
 
 export function SiteRegisterTable({ registers, onEdit, onDelete }: SiteRegisterTableProps) {
+  const { data: userData } = useUserRole();
+  const isAdmin = userData?.role?.toLowerCase() === 'administrator';
+  const isPowerUser = userData?.role?.toLowerCase() === 'poweruser';
+  const hasEditPermissions = isAdmin || isPowerUser;
+
   return (
     <div className="bg-white rounded-lg shadow">
       <Table>
@@ -52,22 +58,24 @@ export function SiteRegisterTable({ registers, onEdit, onDelete }: SiteRegisterT
                 </Badge>
               </TableCell>
               <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onEdit(register)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onDelete(register.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                {hasEditPermissions && (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onEdit(register)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onDelete(register.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </TableCell>
             </TableRow>
           ))}
