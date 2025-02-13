@@ -1,6 +1,30 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import type { SDS } from "@/types/sds";
+import type { SDS } from '@/types/sds';
+
+const getUserId = async () => {
+  try {
+    const userEmail = localStorage.getItem('userEmail');
+    if (!userEmail) {
+      throw new Error('User must be authenticated to perform this action');
+    }
+
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', userEmail)
+      .single();
+
+    if (userError || !userData) {
+      console.error('Error fetching user:', userError);
+      throw new Error('Could not find user');
+    }
+
+    return userData.id;
+  } catch (error) {
+    console.error('Error in getUserId:', error);
+    throw error;
+  }
+};
 
 export async function createSDS(data: {
   productName: string;
@@ -33,72 +57,81 @@ export async function createSDS(data: {
 }) {
   console.log("Creating SDS with data:", data);
   
-  const formattedData = {
-    product_name: data.productName,
-    product_id: data.productId,
-    other_names: data.otherNames || null,
-    emergency_phone: data.emergencyPhone || null,
-    supplier_id: data.supplierId,
-    is_dg: data.isDG,
-    issue_date: data.issueDate || null,
-    revision_date: data.revisionDate || null,
-    expiry_date: data.expiryDate || null,
-    status_id: data.statusId,
-    current_file_path: data.currentFilePath || null,
-    current_file_name: data.currentFileName || null,
-    current_file_size: data.currentFileSize || null,
-    current_content_type: data.currentContentType || null,
-    un_number: data.unNumber || null,
-    un_proper_shipping_name: data.unProperShippingName || null,
-    hazchem_code: data.hazchemCode || null,
-    dg_class_id: data.dgClassId || null,
-    subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
-    packing_group_id: data.packingGroupId || null,
-    dg_subdivision_id: data.dgSubDivisionId || null,
-    request_supplier_name: data.requestSupplierName || null,
-    request_supplier_details: data.requestSupplierDetails || null,
-    request_information: data.requestInformation || null,
-    request_date: data.requestDate || null,
-    requested_by: data.requestedBy || null,
-    source: data.source || null
-  };
+  try {
+    const userId = await getUserId();
+    console.log('Current user ID:', userId);
 
-  console.log("Formatted data for Supabase:", formattedData);
+    const formattedData = {
+      product_name: data.productName,
+      product_id: data.productId,
+      other_names: data.otherNames || null,
+      emergency_phone: data.emergencyPhone || null,
+      supplier_id: data.supplierId,
+      is_dg: data.isDG,
+      issue_date: data.issueDate || null,
+      revision_date: data.revisionDate || null,
+      expiry_date: data.expiryDate || null,
+      status_id: data.statusId,
+      current_file_path: data.currentFilePath || null,
+      current_file_name: data.currentFileName || null,
+      current_file_size: data.currentFileSize || null,
+      current_content_type: data.currentContentType || null,
+      un_number: data.unNumber || null,
+      un_proper_shipping_name: data.unProperShippingName || null,
+      hazchem_code: data.hazchemCode || null,
+      dg_class_id: data.dgClassId || null,
+      subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
+      packing_group_id: data.packingGroupId || null,
+      dg_subdivision_id: data.dgSubDivisionId || null,
+      request_supplier_name: data.requestSupplierName || null,
+      request_supplier_details: data.requestSupplierDetails || null,
+      request_information: data.requestInformation || null,
+      request_date: data.requestDate || null,
+      requested_by: data.requestedBy || null,
+      source: data.source || null,
+      updated_by: userId
+    };
 
-  const { data: result, error } = await supabase
-    .from('sds')
-    .insert(formattedData)
-    .select(`
-      *,
-      suppliers!sds_supplier_id_fkey(supplier_name),
-      status:status_lookup!inner (status_name),
-      dg_class:master_data!sds_dg_class_id_fkey (label),
-      subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
-      packing_group:master_data!sds_packing_group_id_fkey (label),
-      dg_subdivision:master_data!sds_dg_subdivision_id_fkey (label)
-    `)
-    .single();
+    console.log("Formatted data for Supabase:", formattedData);
 
-  if (error) {
+    const { data: result, error } = await supabase
+      .from('sds')
+      .insert(formattedData)
+      .select(`
+        *,
+        suppliers!sds_supplier_id_fkey(supplier_name),
+        status:status_lookup!inner (status_name),
+        dg_class:master_data!sds_dg_class_id_fkey (label),
+        subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
+        packing_group:master_data!sds_packing_group_id_fkey (label),
+        dg_subdivision:master_data!sds_dg_subdivision_id_fkey (label)
+      `)
+      .single();
+
+    if (error) {
+      console.error("Error creating SDS:", error);
+      throw error;
+    }
+
+    console.log("Successfully created SDS:", result);
+    return {
+      ...result,
+      supplier: result.suppliers?.supplier_name,
+      status: result.status.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
+      dgClass: result.dg_class ? { id: result.dg_class_id, label: result.dg_class.label } : null,
+      subsidiaryDgClass: result.subsidiary_dg_class ? { id: result.subsidiary_dg_class_id, label: result.subsidiary_dg_class.label } : null,
+      packingGroup: result.packing_group ? { id: result.packing_group_id, label: result.packing_group.label } : null,
+      dgSubDivision: result.dg_subdivision ? { id: result.dg_subdivision_id, label: result.dg_subdivision.label } : null,
+      requestSupplierName: result.request_supplier_name,
+      requestSupplierDetails: result.request_supplier_details,
+      requestInformation: result.request_information,
+      requestDate: result.request_date,
+      requestedBy: result.requested_by
+    };
+  } catch (error) {
     console.error("Error creating SDS:", error);
     throw error;
   }
-
-  console.log("Successfully created SDS:", result);
-  return {
-    ...result,
-    supplier: result.suppliers?.supplier_name,
-    status: result.status.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
-    dgClass: result.dg_class ? { id: result.dg_class_id, label: result.dg_class.label } : null,
-    subsidiaryDgClass: result.subsidiary_dg_class ? { id: result.subsidiary_dg_class_id, label: result.subsidiary_dg_class.label } : null,
-    packingGroup: result.packing_group ? { id: result.packing_group_id, label: result.packing_group.label } : null,
-    dgSubDivision: result.dg_subdivision ? { id: result.dg_subdivision_id, label: result.dg_subdivision.label } : null,
-    requestSupplierName: result.request_supplier_name,
-    requestSupplierDetails: result.request_supplier_details,
-    requestInformation: result.request_information,
-    requestDate: result.request_date,
-    requestedBy: result.requested_by
-  };
 }
 
 export async function updateSDS(id: string, data: {
@@ -130,75 +163,82 @@ export async function updateSDS(id: string, data: {
   requestedBy?: string;
   source?: string;
 }) {
-  console.log("Updating SDS with ID:", id, "and data:", data);
-  
-  const formattedData = {
-    product_name: data.productName,
-    product_id: data.productId,
-    other_names: data.otherNames || null,
-    emergency_phone: data.emergencyPhone || null,
-    supplier_id: data.supplierId,
-    is_dg: data.isDG,
-    issue_date: data.issueDate || null,
-    revision_date: data.revisionDate || null,
-    expiry_date: data.expiryDate || null,
-    status_id: data.statusId,
-    current_file_path: data.currentFilePath || null,
-    current_file_name: data.currentFileName || null,
-    current_file_size: data.currentFileSize || null,
-    current_content_type: data.currentContentType || null,
-    un_number: data.unNumber || null,
-    un_proper_shipping_name: data.unProperShippingName || null,
-    hazchem_code: data.hazchemCode || null,
-    dg_class_id: data.dgClassId || null,
-    subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
-    packing_group_id: data.packingGroupId || null,
-    dg_subdivision_id: data.dgSubDivisionId || null,
-    request_supplier_name: data.requestSupplierName || null,
-    request_supplier_details: data.requestSupplierDetails || null,
-    request_information: data.requestInformation || null,
-    request_date: data.requestDate || null,
-    requested_by: data.requestedBy || null,
-    source: data.source || null
-  };
+  try {
+    const userId = await getUserId();
+    console.log('Current user ID for update:', userId);
 
-  console.log("Formatted data for Supabase:", formattedData);
+    const formattedData = {
+      product_name: data.productName,
+      product_id: data.productId,
+      other_names: data.otherNames || null,
+      emergency_phone: data.emergencyPhone || null,
+      supplier_id: data.supplierId,
+      is_dg: data.isDG,
+      issue_date: data.issueDate || null,
+      revision_date: data.revisionDate || null,
+      expiry_date: data.expiryDate || null,
+      status_id: data.statusId,
+      current_file_path: data.currentFilePath || null,
+      current_file_name: data.currentFileName || null,
+      current_file_size: data.currentFileSize || null,
+      current_content_type: data.currentContentType || null,
+      un_number: data.unNumber || null,
+      un_proper_shipping_name: data.unProperShippingName || null,
+      hazchem_code: data.hazchemCode || null,
+      dg_class_id: data.dgClassId || null,
+      subsidiary_dg_class_id: data.subsidiaryDgClassId || null,
+      packing_group_id: data.packingGroupId || null,
+      dg_subdivision_id: data.dgSubDivisionId || null,
+      request_supplier_name: data.requestSupplierName || null,
+      request_supplier_details: data.requestSupplierDetails || null,
+      request_information: data.requestInformation || null,
+      request_date: data.requestDate || null,
+      requested_by: data.requestedBy || null,
+      source: data.source || null,
+      updated_by: userId
+    };
 
-  const { data: result, error } = await supabase
-    .from('sds')
-    .update(formattedData)
-    .eq('id', id)
-    .select(`
-      *,
-      suppliers!sds_supplier_id_fkey(supplier_name),
-      status:status_lookup!inner (status_name),
-      dg_class:master_data!sds_dg_class_id_fkey (label),
-      subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
-      packing_group:master_data!sds_packing_group_id_fkey (label),
-      dg_subdivision:master_data!sds_dg_subdivision_id_fkey (label)
-    `)
-    .single();
+    console.log("Formatted data for Supabase:", formattedData);
 
-  if (error) {
+    const { data: result, error } = await supabase
+      .from('sds')
+      .update(formattedData)
+      .eq('id', id)
+      .select(`
+        *,
+        suppliers!sds_supplier_id_fkey(supplier_name),
+        status:status_lookup!inner (status_name),
+        dg_class:master_data!sds_dg_class_id_fkey (label),
+        subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (label),
+        packing_group:master_data!sds_packing_group_id_fkey (label),
+        dg_subdivision:master_data!sds_dg_subdivision_id_fkey (label)
+      `)
+      .single();
+
+    if (error) {
+      console.error("Error updating SDS:", error);
+      throw error;
+    }
+
+    console.log("Successfully updated SDS:", result);
+    return {
+      ...result,
+      supplier: result.suppliers?.supplier_name,
+      status: result.status.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
+      dgClass: result.dg_class ? { id: result.dg_class_id, label: result.dg_class.label } : null,
+      subsidiaryDgClass: result.subsidiary_dg_class ? { id: result.subsidiary_dg_class_id, label: result.subsidiary_dg_class.label } : null,
+      packingGroup: result.packing_group ? { id: result.packing_group_id, label: result.packing_group.label } : null,
+      dgSubDivision: result.dg_subdivision ? { id: result.dg_subdivision_id, label: result.dg_subdivision.label } : null,
+      requestSupplierName: result.request_supplier_name,
+      requestSupplierDetails: result.request_supplier_details,
+      requestInformation: result.request_information,
+      requestDate: result.request_date,
+      requestedBy: result.requested_by
+    };
+  } catch (error) {
     console.error("Error updating SDS:", error);
     throw error;
   }
-
-  console.log("Successfully updated SDS:", result);
-  return {
-    ...result,
-    supplier: result.suppliers?.supplier_name,
-    status: result.status.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
-    dgClass: result.dg_class ? { id: result.dg_class_id, label: result.dg_class.label } : null,
-    subsidiaryDgClass: result.subsidiary_dg_class ? { id: result.subsidiary_dg_class_id, label: result.subsidiary_dg_class.label } : null,
-    packingGroup: result.packing_group ? { id: result.packing_group_id, label: result.packing_group.label } : null,
-    dgSubDivision: result.dg_subdivision ? { id: result.dg_subdivision_id, label: result.dg_subdivision.label } : null,
-    requestSupplierName: result.request_supplier_name,
-    requestSupplierDetails: result.request_supplier_details,
-    requestInformation: result.request_information,
-    requestDate: result.request_date,
-    requestedBy: result.requested_by
-  };
 }
 
 export async function uploadSDSFile(file: File) {

@@ -213,6 +213,7 @@ export type Database = {
           unit_size: number | null
           uom_id: string | null
           updated_at: string | null
+          updated_by: string | null
           uses: string | null
         }
         Insert: {
@@ -233,6 +234,7 @@ export type Database = {
           unit_size?: number | null
           uom_id?: string | null
           updated_at?: string | null
+          updated_by?: string | null
           uses?: string | null
         }
         Update: {
@@ -253,6 +255,7 @@ export type Database = {
           unit_size?: number | null
           uom_id?: string | null
           updated_at?: string | null
+          updated_by?: string | null
           uses?: string | null
         }
         Relationships: [
@@ -289,6 +292,13 @@ export type Database = {
             columns: ["uom_id"]
             isOneToOne: false
             referencedRelation: "master_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -346,6 +356,7 @@ export type Database = {
           un_number: string | null
           un_proper_shipping_name: string | null
           updated_at: string | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
@@ -378,6 +389,7 @@ export type Database = {
           un_number?: string | null
           un_proper_shipping_name?: string | null
           updated_at?: string | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
@@ -410,6 +422,7 @@ export type Database = {
           un_number?: string | null
           un_proper_shipping_name?: string | null
           updated_at?: string | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -452,6 +465,13 @@ export type Database = {
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sds_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -521,6 +541,7 @@ export type Database = {
           total_qty: number | null
           uom_id: string | null
           updated_at: string | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
@@ -539,6 +560,7 @@ export type Database = {
           total_qty?: number | null
           uom_id?: string | null
           updated_at?: string | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
@@ -557,6 +579,7 @@ export type Database = {
           total_qty?: number | null
           uom_id?: string | null
           updated_at?: string | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -585,6 +608,13 @@ export type Database = {
             columns: ["uom_id"]
             isOneToOne: false
             referencedRelation: "master_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_registers_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
