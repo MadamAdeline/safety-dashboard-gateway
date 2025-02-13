@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Check, X } from "lucide-react";
+import { Check, X, Save } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { LocationSelection } from "../LocationSelection";
 import { ProductSelection } from "../ProductSelection";
@@ -63,39 +62,68 @@ export function SiteRegisterGrid({ onClose, defaultLocationId, onSave }: SiteReg
     return !!(row.locationId && row.productId && row.currentStockLevel >= 0);
   };
 
-  const handleSaveRow = async (row: GridRow) => {
-    if (!validateRow(row)) {
+  const handleSaveAll = async () => {
+    const validRows = rows.filter(validateRow);
+    
+    if (validRows.length === 0) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
+        title: "No Valid Entries",
+        description: "Please fill in all required fields for at least one row",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      await createSiteRegister({
-        location_id: row.locationId,
-        product_id: row.productId,
-        exact_location: row.exactLocation,
-        current_stock_level: row.currentStockLevel,
-        total_qty: row.currentStockLevel * (row.unitSize || 0),
-        uom_id: row.uomId,
-        status_id: 1,
-      });
+      // Save all valid rows in parallel
+      await Promise.all(
+        validRows.map(row =>
+          createSiteRegister({
+            location_id: row.locationId,
+            product_id: row.productId,
+            exact_location: row.exactLocation,
+            current_stock_level: row.currentStockLevel,
+            total_qty: row.currentStockLevel * (row.unitSize || 0),
+            uom_id: row.uomId,
+            status_id: 1,
+          })
+        )
+      );
 
       toast({
         title: "Success",
-        description: "Site register entry saved successfully",
+        description: `Successfully saved ${validRows.length} entries`,
       });
 
-      // Trigger the list refresh
+      // Refresh the parent list
       onSave?.();
 
-      // Instead of clearing fields, add a new empty row and remove the current one
-      setRows(prev => [
-        ...prev.filter(r => r.id !== row.id),
-        {
+      // Reset the grid with a single empty row
+      setRows([{
+        id: crypto.randomUUID(),
+        locationId: defaultLocationId || '',
+        exactLocation: '',
+        productId: '',
+        currentStockLevel: 0,
+        product: null,
+        location: null,
+      }]);
+    } catch (error) {
+      console.error('Error saving site registers:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save entries",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const removeRow = (id: string) => {
+    setRows(prev => {
+      const filtered = prev.filter(r => r.id !== id);
+      // Always keep at least one row
+      if (filtered.length === 0) {
+        return [{
           id: crypto.randomUUID(),
           locationId: defaultLocationId || '',
           exactLocation: '',
@@ -103,16 +131,10 @@ export function SiteRegisterGrid({ onClose, defaultLocationId, onSave }: SiteReg
           currentStockLevel: 0,
           product: null,
           location: null,
-        }
-      ]);
-    } catch (error) {
-      console.error('Error saving site register:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save site register entry",
-        variant: "destructive",
-      });
-    }
+        }];
+      }
+      return filtered;
+    });
   };
 
   const handleClose = () => {
@@ -200,16 +222,8 @@ export function SiteRegisterGrid({ onClose, defaultLocationId, onSave }: SiteReg
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-8 w-8 text-green-600"
-                    onClick={() => handleSaveRow(row)}
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
                     className="h-8 w-8 text-red-600"
-                    onClick={() => setRows(prev => prev.filter(r => r.id !== row.id))}
+                    onClick={() => removeRow(row.id)}
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -219,8 +233,15 @@ export function SiteRegisterGrid({ onClose, defaultLocationId, onSave }: SiteReg
           </div>
         </div>
 
-        <div className="p-6 border-t">
+        <div className="p-6 border-t flex justify-between">
           <Button onClick={addNewRow}>Add Row</Button>
+          <Button 
+            onClick={handleSaveAll}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            Save All
+          </Button>
         </div>
       </div>
     </div>
