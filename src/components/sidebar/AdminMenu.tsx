@@ -4,7 +4,6 @@ import {
   Settings,
   FileText,
   Package,
-  MapPin,
   Building2,
   Loader,
 } from "lucide-react"
@@ -19,25 +18,19 @@ const adminItems = [
     label: "SDS Library",
     path: "/sds-library",
     icon: FileText,
-    allowedRoles: ['manager', 'administrator'],
+    allowedRoles: ['manager', 'administrator', 'poweruser'],
   },
   {
     label: "Products",
     path: "/products",
     icon: Package,
-    allowedRoles: ['manager', 'administrator'],
-  },
-  {
-    label: "Locations",
-    path: "/locations",
-    icon: MapPin,
-    allowedRoles: ['administrator'],
+    allowedRoles: ['manager', 'administrator', 'poweruser'],
   },
   {
     label: "Suppliers",
     path: "/suppliers",
     icon: Building2,
-    allowedRoles: ['administrator'],
+    allowedRoles: ['administrator', 'poweruser'],
   },
 ]
 

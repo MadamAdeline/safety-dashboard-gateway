@@ -2,15 +2,15 @@
 import { useUserRole } from "./use-user-role";
 
 const routePermissions: Record<string, string[]> = {
-  "/dashboard": ["standard", "manager", "administrator"],
-  "/site-registers": ["standard", "manager", "administrator"],
-  "/risk-assessments": ["standard", "manager", "administrator"],
-  "/waste-tracking": ["standard", "manager", "administrator"],
-  "/compliance": ["manager", "administrator"],
-  "/sds-library": ["manager", "administrator"],
-  "/products": ["manager", "administrator"],
+  "/dashboard": ["standard", "manager", "administrator", "poweruser"],
+  "/site-registers": ["standard", "manager", "administrator", "poweruser"],
+  "/risk-assessments": ["standard", "manager", "administrator", "poweruser"],
+  "/waste-tracking": ["standard", "manager", "administrator", "poweruser"],
+  "/compliance": ["manager", "administrator", "poweruser"],
+  "/sds-library": ["manager", "administrator", "poweruser"],
+  "/products": ["manager", "administrator", "poweruser"],
   "/locations": ["administrator"],
-  "/suppliers": ["administrator"],
+  "/suppliers": ["administrator", "poweruser"],
   "/users": ["administrator"],
   "/master-data": ["administrator"],
   "/system-config": ["administrator"],

@@ -4,6 +4,7 @@ import {
   Users,
   Database,
   Cog,
+  MapPin,
 } from "lucide-react"
 import {
   SidebarMenuItem,
@@ -12,6 +13,12 @@ import {
 import { useUserRole } from "@/hooks/use-user-role"
 
 const configItems = [
+  {
+    label: "Locations",
+    path: "/locations",
+    icon: MapPin,
+    allowedRoles: ['administrator'],
+  },
   {
     label: "Users & Roles",
     path: "/users",
