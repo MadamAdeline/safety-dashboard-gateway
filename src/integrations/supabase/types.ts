@@ -678,6 +678,7 @@ export type Database = {
           phone_number: string | null
           status_id: number | null
           supplier_name: string
+          updated_by: string | null
         }
         Insert: {
           address: string
@@ -688,6 +689,7 @@ export type Database = {
           phone_number?: string | null
           status_id?: number | null
           supplier_name: string
+          updated_by?: string | null
         }
         Update: {
           address?: string
@@ -698,6 +700,7 @@ export type Database = {
           phone_number?: string | null
           status_id?: number | null
           supplier_name?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -705,6 +708,13 @@ export type Database = {
             columns: ["status_id"]
             isOneToOne: false
             referencedRelation: "status_lookup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suppliers_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
