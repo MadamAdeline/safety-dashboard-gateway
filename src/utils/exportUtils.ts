@@ -45,10 +45,15 @@ export const exportSiteRegistersToExcel = (siteRegisters: any[]) => {
   
   // Transform the data for export
   const exportData = siteRegisters.map(register => ({
-    'Location': register.location?.name || '',
-    'Product': register.product?.name || '',
-    'Created At': register.created_at || '',
-    'Updated At': register.updated_at || ''
+    'Product Name': register.products?.product_name || '',
+    'Override Product Name': register.override_product_name || '',
+    'Location': register.locations?.full_path || '',
+    'Current Stock Level': register.current_stock_level?.toLocaleString() || '',
+    'Unit of Measure': register.products?.uom?.label || '',
+    'Status': register.status?.status_name || '',
+    'Exact Location': register.exact_location || '',
+    'Storage Conditions': register.storage_conditions || '',
+    'Max Stock Level': register.max_stock_level?.toLocaleString() || ''
   }));
 
   console.log('Transformed data for export:', exportData);

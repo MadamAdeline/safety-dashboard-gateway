@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { LocationSearch } from "@/components/locations/LocationSearch";
 import type { Location } from "@/types/location";
+import { SiteRegisterActions } from "@/components/site-registers/SiteRegisterActions";
 
 interface SiteRegisterSearchProps {
   searchTerm: string;
@@ -12,6 +13,8 @@ interface SiteRegisterSearchProps {
   selectedLocation: Location | null;
   onLocationSelect: (location: Location | null) => void;
   isRestrictedRole: boolean;
+  onExport: () => void;
+  onRefresh: () => void;
 }
 
 export function SiteRegisterSearch({
@@ -20,6 +23,8 @@ export function SiteRegisterSearch({
   selectedLocation,
   onLocationSelect,
   isRestrictedRole,
+  onExport,
+  onRefresh,
 }: SiteRegisterSearchProps) {
   const handleClearLocation = () => {
     onLocationSelect(null);
@@ -80,6 +85,7 @@ export function SiteRegisterSearch({
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>
+        <SiteRegisterActions onExport={onExport} onRefresh={onRefresh} />
       </div>
     </div>
   );

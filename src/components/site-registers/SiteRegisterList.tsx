@@ -1,14 +1,13 @@
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Location } from "@/types/location";
-import { SiteRegisterActions } from "@/components/site-registers/SiteRegisterActions";
 import { useUserRole } from "@/hooks/use-user-role";
 import { SiteRegisterSearch } from "./list/SiteRegisterSearch";
 import { SiteRegisterTable } from "./list/SiteRegisterTable";
 import { SiteRegisterPagination } from "./list/SiteRegisterPagination";
+import { exportSiteRegistersToExcel } from "@/utils/exportUtils";
 
 interface SiteRegisterListProps {
   searchTerm: string;
@@ -132,7 +131,19 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
   };
 
   const handleExport = () => {
-    console.log("Export functionality to be implemented");
+    if (filteredRegisters && filteredRegisters.length > 0) {
+      exportSiteRegistersToExcel(filteredRegisters);
+      toast({
+        title: "Success",
+        description: "Site registers exported successfully",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "No data to export",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleRefresh = () => {
@@ -167,14 +178,9 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
         selectedLocation={selectedLocation}
         onLocationSelect={handleLocationSelect}
         isRestrictedRole={isRestrictedRole}
+        onExport={handleExport}
+        onRefresh={handleRefresh}
       />
-
-      <div className="flex justify-end">
-        <SiteRegisterActions
-          onExport={handleExport}
-          onRefresh={handleRefresh}
-        />
-      </div>
 
       <SiteRegisterTable
         registers={paginatedRegisters || []}
