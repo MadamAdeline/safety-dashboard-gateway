@@ -751,29 +751,38 @@ export type Database = {
       }
       system_settings: {
         Row: {
+          accent_color: string | null
           auto_update_sds: boolean | null
           customer_email: string
           customer_name: string
           id: string
           logo_path: string | null
+          primary_color: string | null
+          secondary_color: string | null
           updated_at: string | null
           updated_by: string | null
         }
         Insert: {
+          accent_color?: string | null
           auto_update_sds?: boolean | null
           customer_email: string
           customer_name: string
           id?: string
           logo_path?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Update: {
+          accent_color?: string | null
           auto_update_sds?: boolean | null
           customer_email?: string
           customer_name?: string
           id?: string
           logo_path?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }

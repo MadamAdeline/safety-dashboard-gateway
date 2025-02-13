@@ -47,6 +47,9 @@ export function SystemConfigForm() {
     customer_name: '',
     customer_email: '',
     auto_update_sds: false,
+    primary_color: '#9747FF',
+    secondary_color: '#14162D',
+    accent_color: '#F1F0FB',
   });
 
   useEffect(() => {
@@ -88,6 +91,11 @@ export function SystemConfigForm() {
         id: settings?.id,
         logo_path: logoPath,
       });
+
+      // Update CSS variables after successful update
+      document.documentElement.style.setProperty('--primary-color', formData.primary_color);
+      document.documentElement.style.setProperty('--secondary-color', formData.secondary_color);
+      document.documentElement.style.setProperty('--accent-color', formData.accent_color);
     } catch (error) {
       console.error('Error updating settings:', error);
     }
@@ -151,6 +159,68 @@ export function SystemConfigForm() {
                 onChange={handleLogoChange}
                 className="mt-2"
               />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="font-medium">Theme Colors</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="primary_color">Primary Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="primary_color"
+                    type="color"
+                    value={formData.primary_color}
+                    onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
+                    className="w-24 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={formData.primary_color}
+                    onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="secondary_color">Secondary Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="secondary_color"
+                    type="color"
+                    value={formData.secondary_color}
+                    onChange={(e) => setFormData({ ...formData, secondary_color: e.target.value })}
+                    className="w-24 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={formData.secondary_color}
+                    onChange={(e) => setFormData({ ...formData, secondary_color: e.target.value })}
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="accent_color">Accent Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="accent_color"
+                    type="color"
+                    value={formData.accent_color}
+                    onChange={(e) => setFormData({ ...formData, accent_color: e.target.value })}
+                    className="w-24 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={formData.accent_color}
+                    onChange={(e) => setFormData({ ...formData, accent_color: e.target.value })}
+                    className="flex-1"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
