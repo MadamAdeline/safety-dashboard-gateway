@@ -36,8 +36,8 @@ export function AppSidebar() {
           </span>
         )}
       </div>
-      <SidebarContent className="overflow-y-auto">
-        <SidebarGroup>
+      <SidebarContent className="overflow-y-auto [&>*]:list-none">
+        <SidebarGroup className="[&>*]:list-none">
           <MainMenu />
           <AdminMenu />
           <ConfigMenu />
