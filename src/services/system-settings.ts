@@ -59,6 +59,9 @@ export async function updateSystemSettings(settings: Partial<SystemSettings>) {
         customer_email: settings.customer_email,
         auto_update_sds: settings.auto_update_sds ?? false,
         logo_path: settings.logo_path,
+        primary_color: settings.primary_color,
+        secondary_color: settings.secondary_color,
+        accent_color: settings.accent_color,
         updated_by: userId
       })
       .select()
@@ -72,15 +75,14 @@ export async function updateSystemSettings(settings: Partial<SystemSettings>) {
     return newSettings;
   }
 
-  // For updates, only update the fields that are provided
-  const updateData: any = {
-    updated_by: userId
+  // For updates, ensure we include all color values
+  const updateData = {
+    ...settings,
+    updated_by: userId,
+    primary_color: settings.primary_color,
+    secondary_color: settings.secondary_color,
+    accent_color: settings.accent_color,
   };
-
-  if (settings.customer_name !== undefined) updateData.customer_name = settings.customer_name;
-  if (settings.customer_email !== undefined) updateData.customer_email = settings.customer_email;
-  if (settings.auto_update_sds !== undefined) updateData.auto_update_sds = settings.auto_update_sds;
-  if (settings.logo_path !== undefined) updateData.logo_path = settings.logo_path;
 
   const { data, error } = await supabase
     .from('system_settings')
