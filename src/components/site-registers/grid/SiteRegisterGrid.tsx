@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Check, X, Save } from "lucide-react";
+import { X, Save } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { LocationSelection } from "../LocationSelection";
 import { ProductSelection } from "../ProductSelection";
@@ -8,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import type { Location } from "@/types/location";
 import type { Product } from "@/types/product";
 import { createSiteRegister } from "@/services/site-registers";
+import { useUserRole } from "@/hooks/use-user-role";
 
 interface GridRow {
   id: string;
@@ -28,6 +30,9 @@ interface SiteRegisterGridProps {
 }
 
 export function SiteRegisterGrid({ onClose, defaultLocationId, onSave }: SiteRegisterGridProps) {
+  const { data: userData } = useUserRole();
+  const isRestrictedUser = userData?.role?.toLowerCase() === 'manager' || userData?.role?.toLowerCase() === 'standard';
+
   const [rows, setRows] = useState<GridRow[]>([
     {
       id: crypto.randomUUID(),
@@ -53,6 +58,11 @@ export function SiteRegisterGrid({ onClose, defaultLocationId, onSave }: SiteReg
   };
 
   const updateRow = (id: string, updates: Partial<GridRow>) => {
+    // If user is restricted, don't allow location updates
+    if (isRestrictedUser && 'locationId' in updates) {
+      return;
+    }
+    
     setRows(prev => prev.map(row => 
       row.id === id ? { ...row, ...updates } : row
     ));
@@ -170,14 +180,22 @@ export function SiteRegisterGrid({ onClose, defaultLocationId, onSave }: SiteReg
 
             {rows.map((row) => (
               <div key={row.id} className="grid grid-cols-[2fr_1fr_2fr_1fr_1fr_1fr_0.5fr] gap-4 items-start min-h-[150px] p-4 border rounded-lg">
-                <LocationSelection
-                  locationId={row.locationId}
-                  onLocationSelect={(location) => updateRow(row.id, {
-                    locationId: location.id,
-                    location
-                  })}
-                  hideLabel={true}
-                />
+                {isRestrictedUser ? (
+                  <Input 
+                    value={row.location?.name || ''}
+                    readOnly
+                    className="bg-gray-50"
+                  />
+                ) : (
+                  <LocationSelection
+                    locationId={row.locationId}
+                    onLocationSelect={(location) => updateRow(row.id, {
+                      locationId: location.id,
+                      location
+                    })}
+                    hideLabel={true}
+                  />
+                )}
                 
                 <Input
                   value={row.exactLocation}
