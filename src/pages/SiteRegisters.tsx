@@ -71,6 +71,7 @@ export default function SiteRegisters() {
           <SiteRegisterGrid
             onClose={() => setIsGridOpen(false)}
             defaultLocationId={userData?.location?.id}
+            onSave={() => setSearchTerm(searchTerm)} // Trigger a refresh by updating the search term
           />
         )}
       </div>

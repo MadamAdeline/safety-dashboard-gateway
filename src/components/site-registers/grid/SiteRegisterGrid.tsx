@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
@@ -25,9 +24,10 @@ interface GridRow {
 interface SiteRegisterGridProps {
   onClose: () => void;
   defaultLocationId?: string;
+  onSave?: () => void;
 }
 
-export function SiteRegisterGrid({ onClose, defaultLocationId }: SiteRegisterGridProps) {
+export function SiteRegisterGrid({ onClose, defaultLocationId, onSave }: SiteRegisterGridProps) {
   const [rows, setRows] = useState<GridRow[]>([
     {
       id: crypto.randomUUID(),
@@ -88,21 +88,17 @@ export function SiteRegisterGrid({ onClose, defaultLocationId }: SiteRegisterGri
         description: "Site register entry saved successfully",
       });
 
-      // Remove the saved row and add a new empty one
-      setRows(prev => {
-        const filtered = prev.filter(r => r.id !== row.id);
-        if (filtered.length === 0) {
-          filtered.push({
-            id: crypto.randomUUID(),
-            locationId: defaultLocationId || '',
-            exactLocation: '',
-            productId: '',
-            currentStockLevel: 0,
-            product: null,
-            location: null,
-          });
-        }
-        return filtered;
+      // Call the onSave callback to refresh the list
+      onSave?.();
+
+      // Clear the fields but keep the row
+      updateRow(row.id, {
+        exactLocation: '',
+        productId: '',
+        currentStockLevel: 0,
+        product: null,
+        // Keep the location if it was defaulted
+        ...(defaultLocationId ? {} : { locationId: '', location: null }),
       });
     } catch (error) {
       console.error('Error saving site register:', error);
@@ -114,12 +110,17 @@ export function SiteRegisterGrid({ onClose, defaultLocationId }: SiteRegisterGri
     }
   };
 
+  const handleClose = () => {
+    onSave?.(); // Refresh the list before closing
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-[90%] max-w-6xl max-h-[90vh] overflow-auto">
+      <div className="bg-white rounded-lg p-6 w-[95%] max-w-7xl max-h-[90vh] overflow-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Quick Entry Grid</h2>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={handleClose}>
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -136,13 +137,14 @@ export function SiteRegisterGrid({ onClose, defaultLocationId }: SiteRegisterGri
           </div>
 
           {rows.map((row) => (
-            <div key={row.id} className="grid grid-cols-[2fr_1fr_2fr_1fr_1fr_1fr_0.5fr] gap-4 items-center">
+            <div key={row.id} className="grid grid-cols-[2fr_1fr_2fr_1fr_1fr_1fr_0.5fr] gap-4 items-center min-h-[80px]">
               <LocationSelection
                 locationId={row.locationId}
                 onLocationSelect={(location) => updateRow(row.id, {
                   locationId: location.id,
                   location
                 })}
+                hideLabel={true}
               />
               
               <Input
@@ -160,6 +162,7 @@ export function SiteRegisterGrid({ onClose, defaultLocationId }: SiteRegisterGri
                   unitSize: product.unitSize,
                   uomId: product.uomId
                 })}
+                hideLabel={true}
               />
 
               <Input
