@@ -45,6 +45,9 @@ export async function getSuppliers() {
       throw new Error('Supabase client not initialized');
     }
 
+    // Set user context before fetching suppliers
+    await setUserContext();
+
     const { data, error } = await supabase
       .from('suppliers')
       .select('*')
