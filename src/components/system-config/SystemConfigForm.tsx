@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
@@ -10,6 +9,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getSystemSettings, updateSystemSettings, uploadLogo } from "@/services/system-settings";
 import type { SystemSettings } from "@/types/system-settings";
 import { Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export function SystemConfigForm() {
   const { toast } = useToast();
