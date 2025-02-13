@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import type { SystemSettings } from '@/types/system-settings';
 
@@ -31,7 +30,8 @@ export async function getSystemSettings() {
   const { data, error } = await supabase
     .from('system_settings')
     .select('*')
-    .single();
+    .limit(1)
+    .maybeSingle();
 
   if (error) {
     console.error('Error fetching system settings:', error);
@@ -44,9 +44,32 @@ export async function getSystemSettings() {
 export async function updateSystemSettings(settings: Partial<SystemSettings>) {
   const userId = await getUserId();
 
+  // If no settings exist yet, create a new record
+  if (!settings.id) {
+    const { data: newSettings, error: insertError } = await supabase
+      .from('system_settings')
+      .insert({ 
+        ...settings,
+        updated_by: userId,
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('Error creating system settings:', insertError);
+      throw insertError;
+    }
+
+    return newSettings;
+  }
+
+  // Otherwise update existing settings
   const { data, error } = await supabase
     .from('system_settings')
-    .update({ ...settings, updated_by: userId })
+    .update({ 
+      ...settings,
+      updated_by: userId,
+    })
     .eq('id', settings.id)
     .select()
     .single();
