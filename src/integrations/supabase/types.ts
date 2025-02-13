@@ -9,6 +9,38 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      audit_trail: {
+        Row: {
+          component_updated: string
+          id: number
+          timestamp: string | null
+          update_summary: string
+          user_id: string
+        }
+        Insert: {
+          component_updated: string
+          id?: number
+          timestamp?: string | null
+          update_summary: string
+          user_id: string
+        }
+        Update: {
+          component_updated?: string
+          id?: number
+          timestamp?: string | null
+          update_summary?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_trail_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       locations: {
         Row: {
           coordinates: Json | null
