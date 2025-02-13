@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
@@ -8,11 +9,13 @@ import { Card } from "@/components/ui/card";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getSystemSettings, updateSystemSettings, uploadLogo } from "@/services/system-settings";
 import type { SystemSettings } from "@/types/system-settings";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 export function SystemConfigForm() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -99,7 +102,15 @@ export function SystemConfigForm() {
   }
 
   return (
-    <Card className="p-6">
+    <Card className="p-6 relative">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute right-4 top-4"
+        onClick={() => navigate(-1)}
+      >
+        <X className="h-4 w-4" />
+      </Button>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
           <div>
