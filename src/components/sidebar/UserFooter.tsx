@@ -1,6 +1,6 @@
 
 import { useNavigate } from "react-router-dom"
-import { LogOut, User } from "lucide-react"
+import { LogOut, User, Copyright } from "lucide-react"
 import { SidebarFooter } from "@/components/ui/sidebar"
 import { supabase } from "@/integrations/supabase/client"
 import { useQuery } from "@tanstack/react-query"
@@ -63,6 +63,10 @@ export function UserFooter() {
         <LogOut className="h-4 w-4" />
         <span>Logout</span>
       </button>
+      <div className="flex items-center justify-center gap-1 mt-2 text-white/60 text-[10px]">
+        <Copyright className="h-3 w-3" />
+        <span>Powered by DGXPRT</span>
+      </div>
     </SidebarFooter>
   );
 }
