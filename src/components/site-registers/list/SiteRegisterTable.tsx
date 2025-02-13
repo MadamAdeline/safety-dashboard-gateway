@@ -20,8 +20,10 @@ export function SiteRegisterTable({ registers, onEdit, onDelete }: SiteRegisterT
             <TableHead>Override Product Name</TableHead>
             <TableHead>Location</TableHead>
             <TableHead className="text-right"># of Units</TableHead>
+            <TableHead className="text-right">Unit Size</TableHead>
             <TableHead className="text-right">Total Quantity</TableHead>
             <TableHead>Unit of Measure</TableHead>
+            <TableHead>DG Class</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -33,8 +35,10 @@ export function SiteRegisterTable({ registers, onEdit, onDelete }: SiteRegisterT
               <TableCell>{register.override_product_name || '-'}</TableCell>
               <TableCell>{register.locations?.full_path}</TableCell>
               <TableCell className="text-right">{register.current_stock_level?.toLocaleString() || '-'}</TableCell>
+              <TableCell className="text-right">{register.products?.unit_size?.toLocaleString() || '-'}</TableCell>
               <TableCell className="text-right">{register.total_qty?.toLocaleString() || '-'}</TableCell>
               <TableCell>{register.products?.uom?.label}</TableCell>
+              <TableCell>{register.products?.sds?.dg_class?.label || '-'}</TableCell>
               <TableCell>
                 <Badge 
                   variant={register.status?.status_name === 'ACTIVE' ? "default" : "destructive"}

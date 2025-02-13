@@ -69,6 +69,13 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
           products (
             id,
             product_name,
+            unit_size,
+            sds (
+              dg_class:master_data!sds_dg_class_id_fkey (
+                id,
+                label
+              )
+            ),
             uom:master_data!products_uom_id_fkey (
               id,
               label
