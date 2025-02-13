@@ -15,17 +15,17 @@ export function SiteRegisterTable({ registers, onEdit, onDelete }: SiteRegisterT
     <div className="bg-white rounded-lg shadow">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>Product Name</TableHead>
-            <TableHead>Override Product Name</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead className="text-right"># of Units</TableHead>
-            <TableHead className="text-right">Unit Size</TableHead>
-            <TableHead className="text-right">Total Quantity</TableHead>
-            <TableHead>Unit of Measure</TableHead>
-            <TableHead>DG Class</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
+          <TableRow className="bg-[#F1F0FB] border-b border-gray-200">
+            <TableHead className="text-dgxprt-navy font-semibold">Product Name</TableHead>
+            <TableHead className="text-dgxprt-navy font-semibold">Override Product Name</TableHead>
+            <TableHead className="text-dgxprt-navy font-semibold">Location</TableHead>
+            <TableHead className="text-dgxprt-navy font-semibold text-right"># of Units</TableHead>
+            <TableHead className="text-dgxprt-navy font-semibold text-right">Unit Size</TableHead>
+            <TableHead className="text-dgxprt-navy font-semibold text-right">Total Quantity</TableHead>
+            <TableHead className="text-dgxprt-navy font-semibold">Unit of Measure</TableHead>
+            <TableHead className="text-dgxprt-navy font-semibold">DG Class</TableHead>
+            <TableHead className="text-dgxprt-navy font-semibold">Status</TableHead>
+            <TableHead className="text-dgxprt-navy font-semibold">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
