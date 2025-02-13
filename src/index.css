@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -33,6 +34,11 @@
     --ring: 222.2 84% 4.9%;
  
     --radius: 0.5rem;
+
+    /* System Theme Colors */
+    --primary-color: #9747FF;
+    --secondary-color: #14162D;
+    --accent-color: #F1F0FB;
   }
  
   .dark {
@@ -72,5 +78,27 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Apply system theme colors to table headers */
+  .bg-\[\#F1F0FB\] {
+    background-color: var(--accent-color) !important;
+  }
+
+  /* Apply system theme colors to buttons */
+  .bg-dgxprt-purple {
+    background-color: var(--primary-color) !important;
+  }
+
+  .text-dgxprt-navy {
+    color: var(--secondary-color) !important;
+  }
+
+  .hover\:bg-dgxprt-purple\/90:hover {
+    background-color: color-mix(in srgb, var(--primary-color) 90%, transparent) !important;
+  }
+
+  .hover\:bg-dgxprt-hover:hover {
+    background-color: color-mix(in srgb, var(--accent-color) 80%, transparent) !important;
   }
 }

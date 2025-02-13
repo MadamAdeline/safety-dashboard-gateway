@@ -25,12 +25,16 @@ export function SystemConfigForm() {
     queryFn: getSystemSettings
   });
 
-  // Use useEffect to handle setting CSS variables when settings change
+  // Set CSS variables when settings change
   useEffect(() => {
     if (settings) {
+      // Update CSS variables
       document.documentElement.style.setProperty('--primary-color', settings.primary_color);
       document.documentElement.style.setProperty('--secondary-color', settings.secondary_color);
       document.documentElement.style.setProperty('--accent-color', settings.accent_color);
+
+      // Force a re-render of styled elements
+      document.documentElement.style.setProperty('--force-refresh', Date.now().toString());
     }
   }, [settings]);
 
