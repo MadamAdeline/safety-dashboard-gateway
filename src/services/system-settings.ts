@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import type { SystemSettings } from '@/types/system-settings';
 
@@ -46,11 +47,19 @@ export async function updateSystemSettings(settings: Partial<SystemSettings>) {
 
   // If no settings exist yet, create a new record
   if (!settings.id) {
+    // Ensure required fields are present for new records
+    if (!settings.customer_name || !settings.customer_email) {
+      throw new Error('Customer name and email are required for new settings');
+    }
+
     const { data: newSettings, error: insertError } = await supabase
       .from('system_settings')
-      .insert({ 
-        ...settings,
-        updated_by: userId,
+      .insert({
+        customer_name: settings.customer_name,
+        customer_email: settings.customer_email,
+        auto_update_sds: settings.auto_update_sds ?? false,
+        logo_path: settings.logo_path,
+        updated_by: userId
       })
       .select()
       .single();
@@ -63,13 +72,19 @@ export async function updateSystemSettings(settings: Partial<SystemSettings>) {
     return newSettings;
   }
 
-  // Otherwise update existing settings
+  // For updates, only update the fields that are provided
+  const updateData: any = {
+    updated_by: userId
+  };
+
+  if (settings.customer_name !== undefined) updateData.customer_name = settings.customer_name;
+  if (settings.customer_email !== undefined) updateData.customer_email = settings.customer_email;
+  if (settings.auto_update_sds !== undefined) updateData.auto_update_sds = settings.auto_update_sds;
+  if (settings.logo_path !== undefined) updateData.logo_path = settings.logo_path;
+
   const { data, error } = await supabase
     .from('system_settings')
-    .update({ 
-      ...settings,
-      updated_by: userId,
-    })
+    .update(updateData)
     .eq('id', settings.id)
     .select()
     .single();

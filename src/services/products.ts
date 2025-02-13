@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import type { Product } from '@/types/product';
 
@@ -33,10 +34,24 @@ export async function createProduct(product: Omit<Product, 'id'>) {
 
     const { data, error } = await supabase
       .from('products')
-      .insert([{
-        ...product,
+      .insert({
+        product_name: product.name,
+        product_code: product.code,
+        brand_name: product.brandName,
+        unit: product.unit,
+        uom_id: product.uomId,
+        unit_size: product.unitSize,
+        description: product.description,
+        product_set: product.productSet,
+        aerosol: product.aerosol,
+        cryogenic_fluid: product.cryogenicFluid,
+        other_names: product.otherNames,
+        uses: product.uses,
+        product_status_id: product.productStatusId,
+        approval_status_id: product.approvalStatusId,
+        sds_id: product.sdsId,
         updated_by: userId
-      }])
+      })
       .select(`
         *,
         uom:master_data!products_uom_id_fkey (
