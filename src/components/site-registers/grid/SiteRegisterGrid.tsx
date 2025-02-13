@@ -117,7 +117,7 @@ export function SiteRegisterGrid({ onClose, defaultLocationId, onSave }: SiteReg
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-[95%] max-w-7xl max-h-[90vh] overflow-auto">
+      <div className="bg-white rounded-lg p-6 w-[95%] max-w-7xl max-h-[95vh] overflow-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Quick Entry Grid</h2>
           <Button variant="ghost" size="icon" onClick={handleClose}>
@@ -127,17 +127,21 @@ export function SiteRegisterGrid({ onClose, defaultLocationId, onSave }: SiteReg
 
         <div className="space-y-4">
           <div className="grid grid-cols-[2fr_1fr_2fr_1fr_1fr_1fr_0.5fr] gap-4 bg-gray-100 p-2 rounded">
-            <div>Location</div>
+            <div className="font-bold">
+              Location <span className="text-red-500">*</span>
+            </div>
             <div>Exact Location</div>
-            <div>Product</div>
-            <div>Current Stock Level</div>
+            <div className="font-bold">
+              Product <span className="text-red-500">*</span>
+            </div>
+            <div># of Units</div>
             <div>Unit Size</div>
             <div>UOM</div>
             <div>Actions</div>
           </div>
 
           {rows.map((row) => (
-            <div key={row.id} className="grid grid-cols-[2fr_1fr_2fr_1fr_1fr_1fr_0.5fr] gap-4 items-center min-h-[80px]">
+            <div key={row.id} className="grid grid-cols-[2fr_1fr_2fr_1fr_1fr_1fr_0.5fr] gap-4 items-start min-h-[120px] py-4">
               <LocationSelection
                 locationId={row.locationId}
                 onLocationSelect={(location) => updateRow(row.id, {
