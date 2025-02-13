@@ -8,14 +8,15 @@ import { useLocationDetails } from "@/hooks/use-location-details";
 interface LocationSelectionProps {
   locationId: string;
   onLocationSelect: (location: Location) => void;
+  hideLabel?: boolean;
 }
 
-export function LocationSelection({ locationId, onLocationSelect }: LocationSelectionProps) {
+export function LocationSelection({ locationId, onLocationSelect, hideLabel }: LocationSelectionProps) {
   const { data: currentLocation } = useLocationDetails(locationId);
 
   return (
     <div className="space-y-2">
-      <Label>Location</Label>
+      {!hideLabel && <Label>Location</Label>}
       <LocationSearch
         selectedLocationId={locationId}
         initialLocation={currentLocation}
