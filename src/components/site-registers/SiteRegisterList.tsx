@@ -73,7 +73,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
             sds_id,
             sds!fk_product_sds (
               dg_class_id,
-              dg_class:master_data!inner (
+              dg_class:master_data!sds_dg_class_id_fkey (
                 id,
                 label
               )
