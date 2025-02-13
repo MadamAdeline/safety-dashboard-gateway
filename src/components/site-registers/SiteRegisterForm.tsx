@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Product } from "@/types/product";
 import { useProductDetails } from "@/hooks/use-product-details";
+import { useUserRole } from "@/hooks/use-user-role";
+import { Input } from "@/components/ui/input";
 
 interface SiteRegisterFormProps {
   onClose: () => void;
@@ -16,9 +18,12 @@ interface SiteRegisterFormProps {
 
 export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps) {
   const { toast } = useToast();
+  const { data: userData } = useUserRole();
+  const isRestrictedRole = userData?.role && ["standard", "manager"].includes(userData.role.toLowerCase());
+
   const [formData, setFormData] = useState({
     id: initialData?.id || undefined,
-    location_id: initialData?.location_id || "",
+    location_id: initialData?.location_id || (isRestrictedRole ? userData?.location?.id : ""),
     product_id: initialData?.product_id || "",
     override_product_name: initialData?.override_product_name || "",
     exact_location: initialData?.exact_location || "",
@@ -35,7 +40,9 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     initialDataId: initialData?.id,
     formDataId: formData.id,
     initialTotal: initialData?.total_qty,
-    formDataTotal: formData.total_qty
+    formDataTotal: formData.total_qty,
+    userRole: userData?.role,
+    userLocation: userData?.location
   });
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -105,7 +112,8 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
     const dataToSave = {
       ...formData,
       uom_id: selectedProduct?.uomId || formData.uom_id,
-      status_id: formData.status_id
+      status_id: formData.status_id,
+      location_id: isRestrictedRole ? userData?.location?.id : formData.location_id // Ensure restricted users can only use their assigned location
     };
 
     setIsSaving(true);
@@ -193,6 +201,8 @@ export function SiteRegisterForm({ onClose, initialData }: SiteRegisterFormProps
               selectedProduct={selectedProduct}
               isEditing={!!initialData}
               onStockUpdate={refreshFormData}
+              isRestrictedRole={isRestrictedRole}
+              userLocation={userData?.location}
             />
           </TabsContent>
 

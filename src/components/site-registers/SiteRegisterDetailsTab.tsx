@@ -31,6 +31,8 @@ interface SiteRegisterDetailsTabProps {
   selectedProduct: Product | null;
   isEditing: boolean;
   onStockUpdate?: () => void;
+  isRestrictedRole: boolean;
+  userLocation?: { id: string; full_path: string } | null;
 }
 
 export function SiteRegisterDetailsTab({ 
@@ -39,7 +41,9 @@ export function SiteRegisterDetailsTab({
   onProductSelect,
   selectedProduct,
   isEditing,
-  onStockUpdate
+  onStockUpdate,
+  isRestrictedRole,
+  userLocation
 }: SiteRegisterDetailsTabProps) {
 
   // Query to check if the site register has any stock movements
@@ -95,7 +99,7 @@ export function SiteRegisterDetailsTab({
       {/* Location Row */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          {isReadOnly ? (
+          {isRestrictedRole ? (
             <div className="space-y-2">
               <Label>Location</Label>
               <Input
@@ -103,9 +107,9 @@ export function SiteRegisterDetailsTab({
                 readOnly
                 className="bg-gray-100"
               />
-              {currentLocation?.full_path && (
+              {userLocation?.full_path && (
                 <Input
-                  value={currentLocation.full_path}
+                  value={userLocation.full_path}
                   readOnly
                   className="mt-2 bg-gray-50 text-gray-600"
                 />
