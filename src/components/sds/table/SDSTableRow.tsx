@@ -7,6 +7,7 @@ import { Edit2, Trash2, Eye } from "lucide-react";
 import type { SDS } from "@/types/sds";
 import { useSDSSelection } from "./SDSSelectionContext";
 import { useSDSDelete } from "@/hooks/use-sds-delete";
+import { useUserRole } from "@/hooks/use-user-role";
 
 interface SDSTableRowProps {
   item: SDS;
@@ -29,6 +30,12 @@ export function SDSTableRow({
 }: SDSTableRowProps) {
   const { selectedItems, toggleSelectItem } = useSDSSelection();
   const { handleDelete } = useSDSDelete(onDelete);
+  const { data: userData } = useUserRole();
+  
+  const isAdmin = userData?.role?.toLowerCase() === 'administrator';
+  const isPowerUser = userData?.role?.toLowerCase() === 'poweruser';
+  const isManager = userData?.role?.toLowerCase() === 'manager';
+  const hasEditPermissions = isAdmin || isPowerUser;
 
   return (
     <TableRow className="hover:bg-[#F1F0FB] transition-colors">
@@ -80,7 +87,8 @@ export function SDSTableRow({
       </TableCell>
       <TableCell>
         <div className="flex space-x-2">
-          {showViewButton && (
+          {/* Show View button only for Managers */}
+          {isManager && (
             <Button 
               variant="ghost" 
               size="icon"
@@ -90,25 +98,29 @@ export function SDSTableRow({
               <Eye className="h-4 w-4" />
             </Button>
           )}
-          {showEditButton && (
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="hover:bg-dgxprt-hover text-dgxprt-navy"
-              onClick={() => onEdit(item)}
-            >
-              <Edit2 className="h-4 w-4" />
-            </Button>
-          )}
-          {allowDelete && (
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="hover:bg-red-100 text-red-600"
-              onClick={() => handleDelete(item)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+          
+          {/* Show Edit and Delete buttons for Administrators and PowerUsers */}
+          {hasEditPermissions && (
+            <>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="hover:bg-dgxprt-hover text-dgxprt-navy"
+                onClick={() => onEdit(item)}
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
+              {allowDelete && (
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="hover:bg-red-100 text-red-600"
+                  onClick={() => handleDelete(item)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </>
           )}
         </div>
       </TableCell>
