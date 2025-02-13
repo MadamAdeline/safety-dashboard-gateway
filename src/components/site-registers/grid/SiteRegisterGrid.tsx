@@ -80,6 +80,7 @@ export function SiteRegisterGrid({ onClose, defaultLocationId }: SiteRegisterGri
         current_stock_level: row.currentStockLevel,
         total_qty: row.currentStockLevel * (row.unitSize || 0),
         uom_id: row.uomId,
+        status_id: 1, // Adding status_id with default value 1 (active)
       });
 
       toast({
