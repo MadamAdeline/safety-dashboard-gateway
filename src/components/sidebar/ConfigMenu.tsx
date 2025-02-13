@@ -1,12 +1,9 @@
 
 import { Link } from "react-router-dom"
 import { 
-  Settings,
-  FileText,
-  Package,
-  MapPin,
-  Building2,
-  Loader,
+  Users,
+  Database,
+  Cog,
 } from "lucide-react"
 import {
   SidebarMenuItem,
@@ -14,47 +11,33 @@ import {
 } from "@/components/ui/sidebar"
 import { useUserRole } from "@/hooks/use-user-role"
 
-const adminItems = [
+const configItems = [
   {
-    label: "SDS Library",
-    path: "/sds-library",
-    icon: FileText,
-    allowedRoles: ['manager', 'administrator'],
-  },
-  {
-    label: "Products",
-    path: "/products",
-    icon: Package,
-    allowedRoles: ['manager', 'administrator'],
-  },
-  {
-    label: "Locations",
-    path: "/locations",
-    icon: MapPin,
+    label: "Users & Roles",
+    path: "/users",
+    icon: Users,
     allowedRoles: ['administrator'],
   },
   {
-    label: "Suppliers",
-    path: "/suppliers",
-    icon: Building2,
+    label: "Master Data",
+    path: "/master-data",
+    icon: Database,
+    allowedRoles: ['administrator'],
+  },
+  {
+    label: "System Config",
+    path: "/system-config",
+    icon: Cog,
     allowedRoles: ['administrator'],
   },
 ]
 
-export function AdminMenu() {
+export function ConfigMenu() {
   const { data: userData, isLoading } = useUserRole();
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-4 text-white">
-        <Loader className="h-4 w-4 animate-spin" />
-      </div>
-    );
-  }
+  if (isLoading || !userData?.role) return null;
 
-  if (!userData?.role) return null;
-
-  const visibleItems = adminItems.filter(item => 
+  const visibleItems = configItems.filter(item => 
     item.allowedRoles.includes(userData.role.toLowerCase())
   );
 
@@ -63,8 +46,7 @@ export function AdminMenu() {
   return (
     <SidebarMenuItem>
       <SidebarMenuButton className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar text-lg">
-        <Settings className="h-4 w-4" />
-        <span>Administration</span>
+        <span>Configuration</span>
       </SidebarMenuButton>
       <div className="pl-4">
         {visibleItems.map((item) => (

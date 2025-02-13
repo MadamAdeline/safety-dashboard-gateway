@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/sidebar"
 import { MainMenu } from "./sidebar/MainMenu"
 import { AdminMenu } from "./sidebar/AdminMenu"
+import { ConfigMenu } from "./sidebar/ConfigMenu"
 import { UserFooter } from "./sidebar/UserFooter"
 import { useQuery } from "@tanstack/react-query"
 import { getSystemSettings } from "@/services/system-settings"
@@ -23,17 +24,23 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="border-r border-gray-200 bg-dgxprt-sidebar">
-      <div className="flex justify-center p-6">
+      <div className="flex flex-col items-center p-6 space-y-2">
         <img 
           src={logoUrl}
           alt="Company Logo" 
           className="h-12 object-contain" 
         />
+        {settings?.customer_name && (
+          <span className="text-white/80 text-sm font-medium">
+            {settings.customer_name}
+          </span>
+        )}
       </div>
       <SidebarContent className="overflow-y-auto">
         <SidebarGroup>
           <MainMenu />
           <AdminMenu />
+          <ConfigMenu />
         </SidebarGroup>
       </SidebarContent>
       <UserFooter />
