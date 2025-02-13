@@ -19,7 +19,8 @@ export function SiteRegisterTable({ registers, onEdit, onDelete }: SiteRegisterT
             <TableHead>Product Name</TableHead>
             <TableHead>Override Product Name</TableHead>
             <TableHead>Location</TableHead>
-            <TableHead>Current Stock Level</TableHead>
+            <TableHead># of Units</TableHead>
+            <TableHead>Total Quantity</TableHead>
             <TableHead>Unit of Measure</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
@@ -32,6 +33,7 @@ export function SiteRegisterTable({ registers, onEdit, onDelete }: SiteRegisterT
               <TableCell>{register.override_product_name || '-'}</TableCell>
               <TableCell>{register.locations?.full_path}</TableCell>
               <TableCell>{register.current_stock_level?.toLocaleString() || '-'}</TableCell>
+              <TableCell>{register.total_qty?.toLocaleString() || '-'}</TableCell>
               <TableCell>{register.products?.uom?.label}</TableCell>
               <TableCell>
                 <Badge 
