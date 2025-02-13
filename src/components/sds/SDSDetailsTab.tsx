@@ -1,4 +1,3 @@
-
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,26 +74,24 @@ export function SDSDetailsTab(props: SDSDetailsTabProps) {
 
         <SDSBasicDetails />
         
-        <div className="grid grid-cols-2 gap-4">
-          <SDSSupplierSelect />
+        <SDSSupplierSelect />
 
-          <div className="space-y-2">
-            <Label htmlFor="status">Status *</Label>
-            <Select 
-              value={props.status} 
-              onValueChange={(value: "ACTIVE" | "INACTIVE" | "REQUESTED") => props.setStatus(value)}
-              disabled={isRequested || props.readOnly}
-            >
-              <SelectTrigger id="status" className={isRequested || props.readOnly ? "bg-gray-100" : ""}>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ACTIVE">Active</SelectItem>
-                <SelectItem value="INACTIVE">Inactive</SelectItem>
-                <SelectItem value="REQUESTED">Requested</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="status">Status *</Label>
+          <Select 
+            value={props.status} 
+            onValueChange={(value: "ACTIVE" | "INACTIVE" | "REQUESTED") => props.setStatus(value)}
+            disabled={isRequested || props.readOnly}
+          >
+            <SelectTrigger id="status" className={isRequested || props.readOnly ? "bg-gray-100 w-full" : "w-full"}>
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ACTIVE">Active</SelectItem>
+              <SelectItem value="INACTIVE">Inactive</SelectItem>
+              <SelectItem value="REQUESTED">Requested</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">

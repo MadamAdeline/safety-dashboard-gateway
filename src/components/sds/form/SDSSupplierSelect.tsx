@@ -26,7 +26,8 @@ export function SDSSupplierSelect() {
       const { data, error } = await supabase
         .from('suppliers')
         .select('*')
-        .eq('status_id', 1);
+        .eq('status_id', 1)
+        .order('supplier_name', { ascending: true });
 
       if (error) {
         console.error('Error fetching suppliers:', error);
