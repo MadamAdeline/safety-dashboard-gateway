@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { X, Save } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
@@ -10,6 +10,7 @@ import type { Location } from "@/types/location";
 import type { Product } from "@/types/product";
 import { createSiteRegister } from "@/services/site-registers";
 import { useUserRole } from "@/hooks/use-user-role";
+import { useLocationDetails } from "@/hooks/use-location-details";
 
 interface GridRow {
   id: string;
@@ -31,30 +32,33 @@ interface SiteRegisterGridProps {
 
 export function SiteRegisterGrid({ onClose, defaultLocationId, onSave }: SiteRegisterGridProps) {
   const { data: userData } = useUserRole();
+  const { data: defaultLocation } = useLocationDetails(defaultLocationId || '');
   const isRestrictedUser = userData?.role?.toLowerCase() === 'manager' || userData?.role?.toLowerCase() === 'standard';
 
-  const [rows, setRows] = useState<GridRow[]>([
-    {
-      id: crypto.randomUUID(),
-      locationId: defaultLocationId || '',
-      exactLocation: '',
-      productId: '',
-      currentStockLevel: 0,
-      product: null,
-      location: null,
-    },
-  ]);
+  const createEmptyRow = () => ({
+    id: crypto.randomUUID(),
+    locationId: defaultLocationId || '',
+    exactLocation: '',
+    productId: '',
+    currentStockLevel: 0,
+    product: null,
+    location: defaultLocation || null,
+  });
+
+  const [rows, setRows] = useState<GridRow[]>([createEmptyRow()]);
+
+  // Update rows when default location is loaded
+  useEffect(() => {
+    if (defaultLocation) {
+      setRows(prev => prev.map(row => ({
+        ...row,
+        location: defaultLocation
+      })));
+    }
+  }, [defaultLocation]);
 
   const addNewRow = () => {
-    setRows(prev => [...prev, {
-      id: crypto.randomUUID(),
-      locationId: defaultLocationId || '',
-      exactLocation: '',
-      productId: '',
-      currentStockLevel: 0,
-      product: null,
-      location: null,
-    }]);
+    setRows(prev => [...prev, createEmptyRow()]);
   };
 
   const updateRow = (id: string, updates: Partial<GridRow>) => {
@@ -182,7 +186,7 @@ export function SiteRegisterGrid({ onClose, defaultLocationId, onSave }: SiteReg
               <div key={row.id} className="grid grid-cols-[2fr_1fr_2fr_1fr_1fr_1fr_0.5fr] gap-4 items-start min-h-[150px] p-4 border rounded-lg">
                 {isRestrictedUser ? (
                   <Input 
-                    value={row.location?.name || ''}
+                    value={row.location?.name || defaultLocation?.name || ''}
                     readOnly
                     className="bg-gray-50"
                   />
