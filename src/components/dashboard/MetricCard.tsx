@@ -32,14 +32,14 @@ export function MetricCard({
       </p>
       <button
         onClick={action}
-        className="w-full py-2 text-center rounded-md bg-dgxprt-navy text-white hover:bg-dgxprt-navy/90 mb-2"
+        className="w-full py-2 text-center rounded-md bg-dgxprt-purple text-white hover:bg-dgxprt-purple/90 mb-2"
       >
         {actionLabel}
       </button>
       {secondaryAction && secondaryActionLabel && (
         <button
           onClick={secondaryAction}
-          className="w-full py-2 text-center rounded-md bg-dgxprt-navy text-white font-bold hover:bg-dgxprt-navy/90"
+          className="w-full py-2 text-center rounded-md bg-dgxprt-purple text-white font-bold hover:bg-dgxprt-purple/90"
         >
           {secondaryActionLabel}
         </button>
