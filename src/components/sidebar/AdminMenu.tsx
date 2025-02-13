@@ -9,6 +9,7 @@ import {
   Users,
   Database,
   Loader,
+  Cog,
 } from "lucide-react"
 import {
   SidebarMenuItem,
@@ -53,6 +54,12 @@ const adminItems = [
     icon: Database,
     allowedRoles: ['administrator'],
   },
+  {
+    label: "System Config",
+    path: "/system-config",
+    icon: Cog,
+    allowedRoles: ['administrator'],
+  },
 ]
 
 export function AdminMenu() {
@@ -70,14 +77,11 @@ export function AdminMenu() {
 
   if (!userData?.role) return null;
 
-  // Only show admin section if user has access to at least one item
   const visibleItems = adminItems.filter(item => 
     item.allowedRoles.includes(userData.role.toLowerCase())
   );
 
   console.log('Admin menu - Visible items:', visibleItems);
-
-  if (visibleItems.length === 0) return null;
 
   return (
     <SidebarMenuItem>

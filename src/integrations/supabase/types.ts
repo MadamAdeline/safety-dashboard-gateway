@@ -749,6 +749,44 @@ export type Database = {
           },
         ]
       }
+      system_settings: {
+        Row: {
+          auto_update_sds: boolean | null
+          customer_email: string
+          customer_name: string
+          id: string
+          logo_path: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          auto_update_sds?: boolean | null
+          customer_email: string
+          customer_name: string
+          id?: string
+          logo_path?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          auto_update_sds?: boolean | null
+          customer_email?: string
+          customer_name?: string
+          id?: string
+          logo_path?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null

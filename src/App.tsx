@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,7 @@ import RiskAssessments from "./pages/RiskAssessments";
 import WasteTracking from "./pages/WasteTracking";
 import { AccessDeniedDialog } from "./components/auth/AccessDeniedDialog";
 import { useRoutePermission } from "./hooks/use-route-permission";
+import SystemConfig from "./pages/SystemConfig";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -77,6 +77,7 @@ const App = () => (
             <Route path="/site-registers" element={<PrivateRoute><SiteRegisters /></PrivateRoute>} />
             <Route path="/risk-assessments" element={<PrivateRoute><RiskAssessments /></PrivateRoute>} />
             <Route path="/waste-tracking" element={<PrivateRoute><WasteTracking /></PrivateRoute>} />
+            <Route path="/system-config" element={<PrivateRoute><SystemConfig /></PrivateRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
