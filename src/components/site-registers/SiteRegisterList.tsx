@@ -70,8 +70,10 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
             id,
             product_name,
             unit_size,
+            sds_id,
             sds (
-              dg_class:master_data!sds_dg_class_id_fkey (
+              dg_class_id,
+              dg_class:master_data!inner (
                 id,
                 label
               )
@@ -104,6 +106,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
         throw error;
       }
 
+      console.log('Site registers data:', data); // Debug log
       return data;
     },
     enabled: !isLoadingLocations
