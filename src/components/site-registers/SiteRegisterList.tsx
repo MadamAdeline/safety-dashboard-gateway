@@ -1,33 +1,14 @@
+
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, X } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
-import { LocationSearch } from "@/components/locations/LocationSearch";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import type { Location } from "@/types/location";
 import { SiteRegisterActions } from "@/components/site-registers/SiteRegisterActions";
 import { useUserRole } from "@/hooks/use-user-role";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Badge } from "@/components/ui/badge";
+import { SiteRegisterSearch } from "./list/SiteRegisterSearch";
+import { SiteRegisterTable } from "./list/SiteRegisterTable";
+import { SiteRegisterPagination } from "./list/SiteRegisterPagination";
 
 interface SiteRegisterListProps {
   searchTerm: string;
@@ -37,6 +18,7 @@ interface SiteRegisterListProps {
 
 export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegisterListProps) {
   const { data: userData } = useUserRole();
+  const { toast } = useToast();
   const isRestrictedRole = userData?.role && ["standard", "manager"].includes(userData.role.toLowerCase());
   const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(
     userData?.location ? {
@@ -102,9 +84,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
           )
         `);
 
-      // Use location hierarchy for both restricted and admin users
       if (locationHierarchy && locationHierarchy.length > 0) {
-        // Extract just the IDs from the location hierarchy and include them in the query
         const locationIds = locationHierarchy.map(loc => loc.id);
         query.in('location_id', locationIds);
       }
@@ -116,7 +96,6 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
         throw error;
       }
 
-      console.log('Fetched site registers:', data);
       return data;
     },
     enabled: !isLoadingLocations
@@ -147,23 +126,17 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
     }
   };
 
-  const handleLocationSelect = (location: Location) => {
+  const handleLocationSelect = (location: Location | null) => {
     console.log('Selected location:', location);
     setSelectedLocation(location);
   };
 
   const handleExport = () => {
-    // Implement export functionality
     console.log("Export functionality to be implemented");
   };
 
   const handleRefresh = () => {
     refetch();
-  };
-
-  const handleClearLocation = () => {
-    setSelectedLocation(null);
-    setSearchTerm(""); // Clear the search term when location is cleared
   };
 
   const filteredRegisters = siteRegisters?.filter(register => {
@@ -188,160 +161,35 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col space-y-4">
-        <Label>Location</Label>
-        <div className="flex items-center gap-4">
-          <div className="w-1/2 relative">
-            {isRestrictedRole ? (
-              <Input
-                value={selectedLocation?.name || ''}
-                readOnly
-                className="bg-gray-100 text-gray-600"
-              />
-            ) : (
-              <>
-                <LocationSearch
-                  selectedLocationId={selectedLocation?.id || null}
-                  initialLocation={selectedLocation}
-                  onLocationSelect={handleLocationSelect}
-                  className="w-full"
-                />
-                {selectedLocation && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2"
-                    onClick={handleClearLocation}
-                  >
-                    <X className="h-4 w-4 text-gray-500" />
-                  </Button>
-                )}
-              </>
-            )}
-          </div>
-          {selectedLocation?.full_path && (
-            <Input
-              value={selectedLocation.full_path}
-              readOnly
-              className="bg-gray-50 text-gray-600 flex-1"
-            />
-          )}
-        </div>
-      </div>
+      <SiteRegisterSearch
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        selectedLocation={selectedLocation}
+        onLocationSelect={handleLocationSelect}
+        isRestrictedRole={isRestrictedRole}
+      />
 
-      <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-        <div className="w-1/2 relative">
-          <Input
-            type="text"
-            placeholder="Search Site Register by Product Name or Override Product Name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-        </div>
+      <div className="flex justify-end">
         <SiteRegisterActions
           onExport={handleExport}
           onRefresh={handleRefresh}
         />
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Product Name</TableHead>
-              <TableHead>Override Product Name</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Current Stock Level</TableHead>
-              <TableHead>Unit of Measure</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedRegisters?.map((register) => (
-              <TableRow key={register.id}>
-                <TableCell>{register.products?.product_name}</TableCell>
-                <TableCell>{register.override_product_name || '-'}</TableCell>
-                <TableCell>{register.locations?.full_path}</TableCell>
-                <TableCell>{register.current_stock_level?.toLocaleString() || '-'}</TableCell>
-                <TableCell>{register.products?.uom?.label}</TableCell>
-                <TableCell>
-                  <Badge 
-                    variant={register.status?.status_name === 'ACTIVE' ? "default" : "destructive"}
-                    className={
-                      register.status?.status_name === 'ACTIVE'
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-red-100 text-red-800"
-                    }
-                  >
-                    {register.status?.status_name || 'Unknown'}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onEdit(register)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(register.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <SiteRegisterTable
+        registers={paginatedRegisters || []}
+        onEdit={onEdit}
+        onDelete={handleDelete}
+      />
 
-      <div className="flex flex-col space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">
-            Showing {startIndex + 1} to {endIndex} of {totalItems} results
-          </p>
-        </div>
-        
-        <div className="flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious 
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(page)}
-                    isActive={currentPage === page}
-                    className={currentPage === page ? "bg-purple-600 text-white hover:bg-purple-500" : ""}
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-
-              <PaginationItem>
-                <PaginationNext 
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      </div>
+      <SiteRegisterPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        totalItems={totalItems}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }
