@@ -44,25 +44,27 @@ export function ConfigMenu() {
   if (visibleItems.length === 0) return null;
 
   return (
-    <SidebarMenuItem>
-      <SidebarMenuButton className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar text-lg">
-        <span>Configuration</span>
-      </SidebarMenuButton>
-      <div className="pl-4">
-        {visibleItems.map((item) => (
-          <SidebarMenuItem key={item.label}>
-            <SidebarMenuButton asChild>
-              <Link 
-                to={item.path} 
-                className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar aria-[current=page]:bg-dgxprt-selected"
-              >
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        ))}
-      </div>
-    </SidebarMenuItem>
+    <div className="flex flex-col space-y-0">
+      <SidebarMenuItem className="py-0.5">
+        <SidebarMenuButton className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar text-lg px-4 py-1.5">
+          <span>Configuration</span>
+        </SidebarMenuButton>
+        <div className="flex flex-col space-y-0 pl-4">
+          {visibleItems.map((item) => (
+            <SidebarMenuItem key={item.label} className="py-0.5">
+              <SidebarMenuButton asChild>
+                <Link 
+                  to={item.path} 
+                  className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar aria-[current=page]:bg-dgxprt-selected px-4 py-1.5"
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </div>
+      </SidebarMenuItem>
+    </div>
   )
 }

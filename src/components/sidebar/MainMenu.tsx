@@ -50,10 +50,6 @@ const mainMenuItems = [
 export function MainMenu() {
   const { data: userData, isLoading, error } = useUserRole();
 
-  console.log('User role:', userData?.role);
-  console.log('Is loading:', isLoading);
-  console.log('Error:', error);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-4 text-white">
@@ -62,25 +58,20 @@ export function MainMenu() {
     );
   }
 
-  if (!userData?.role) {
-    console.log('No user role found');
-    return null;
-  }
+  if (!userData?.role) return null;
 
   const visibleItems = mainMenuItems.filter(item => 
     item.allowedRoles.includes(userData.role.toLowerCase())
   );
 
-  console.log('Visible items:', visibleItems);
-
   return (
-    <>
+    <div className="flex flex-col space-y-0">
       {visibleItems.map((item) => (
-        <SidebarMenuItem key={item.label}>
+        <SidebarMenuItem key={item.label} className="py-0.5">
           <SidebarMenuButton asChild>
             <Link 
               to={item.path} 
-              className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar aria-[current=page]:bg-dgxprt-selected"
+              className="flex items-center gap-2 text-white font-bold hover:bg-dgxprt-hover hover:text-dgxprt-sidebar aria-[current=page]:bg-dgxprt-selected px-4 py-1.5"
             >
               <item.icon className="h-4 w-4" />
               <span>{item.label}</span>
@@ -88,6 +79,6 @@ export function MainMenu() {
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
-    </>
+    </div>
   )
 }
