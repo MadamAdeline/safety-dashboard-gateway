@@ -66,12 +66,12 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
           max_stock_level,
           uom_id,
           status_id,
-          products (
+          products!fk_product_sds (
             id,
             product_name,
             unit_size,
             sds_id,
-            sds (
+            sds!fk_sds_dg_class (
               dg_class_id,
               dg_class:master_data!inner (
                 id,
@@ -106,7 +106,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
         throw error;
       }
 
-      console.log('Site registers data:', data); // Debug log
+      console.log('Site registers data:', data);
       return data;
     },
     enabled: !isLoadingLocations
