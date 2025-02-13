@@ -1,8 +1,15 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+}
+
+:root {
+  --primary-color: #9747FF;
+  --secondary-color: #14162D;
+  --accent-color: #F1F0FB;
 }
 
 .logo {

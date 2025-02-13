@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -20,10 +21,10 @@ export default {
     extend: {
       colors: {
         dgxprt: {
-          navy: "#0A0B42",
-          purple: "#9747FF",
-          sidebar: "#14162D",
-          hover: "#F1F0FB",
+          navy: "var(--secondary-color, #0A0B42)",
+          purple: "var(--primary-color, #9747FF)",
+          sidebar: "var(--secondary-color, #14162D)",
+          hover: "var(--accent-color, #F1F0FB)",
           selected: "#895AB7",
         },
         border: "hsl(var(--border))",
