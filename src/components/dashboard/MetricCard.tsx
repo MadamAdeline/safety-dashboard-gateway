@@ -24,7 +24,7 @@ export function MetricCard({
   
   return (
     <Card className="p-6">
-      <div className="bg-[#00005B] rounded-t-md -mx-6 -mt-6 p-4 mb-4">
+      <div className="bg-dgxprt-navy rounded-t-md -mx-6 -mt-6 p-4 mb-4">
         <h3 className="text-lg font-bold text-white text-center">{title}</h3>
       </div>
       <p className="text-4xl font-bold text-dgxprt-navy mb-4 text-center">
@@ -32,14 +32,14 @@ export function MetricCard({
       </p>
       <button
         onClick={action}
-        className="w-full py-2 text-center rounded-md bg-dgxprt-purple text-white hover:bg-opacity-90 mb-2"
+        className="w-full py-2 text-center rounded-md bg-dgxprt-navy text-white hover:bg-dgxprt-navy/90 mb-2"
       >
         {actionLabel}
       </button>
       {secondaryAction && secondaryActionLabel && (
         <button
           onClick={secondaryAction}
-          className="w-full py-2 text-center rounded-md bg-[#00005B] text-white font-bold hover:bg-opacity-90"
+          className="w-full py-2 text-center rounded-md bg-dgxprt-navy text-white font-bold hover:bg-dgxprt-navy/90"
         >
           {secondaryActionLabel}
         </button>
