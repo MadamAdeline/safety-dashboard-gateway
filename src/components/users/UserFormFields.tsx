@@ -34,7 +34,10 @@ interface UserFormFieldsProps {
 }
 
 export function UserFormFields({ formData, roles, isEditing, onChange }: UserFormFieldsProps) {
-  const isAdministrator = roles?.find(role => role.id === formData.role_id)?.role_name.toLowerCase() === 'administrator';
+  const selectedRole = roles?.find(role => role.id === formData.role_id);
+  const isAdministrator = selectedRole?.role_name.toLowerCase() === 'administrator';
+  const isPowerUser = selectedRole?.role_name.toLowerCase() === 'poweruser';
+  const requiresLocation = !isAdministrator && !isPowerUser;
 
   // Fetch current manager if manager_id exists
   const { data: currentManager } = useQuery({
@@ -192,7 +195,7 @@ export function UserFormFields({ formData, roles, isEditing, onChange }: UserFor
       {!isAdministrator && (
         <div className="space-y-2">
           <Label className="flex items-center">
-            Location {!isAdministrator && <span className="text-red-500 ml-1">*</span>}
+            Location {requiresLocation && <span className="text-red-500 ml-1">*</span>}
           </Label>
           <LocationSearch
             selectedLocationId={formData.location_id}
