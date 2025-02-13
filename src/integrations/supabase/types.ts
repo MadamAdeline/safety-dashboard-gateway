@@ -815,6 +815,12 @@ export type Database = {
           id: string
         }[]
       }
+      set_user_context: {
+        Args: {
+          user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       stock_action: "INCREASE" | "DECREASE" | "OVERRIDE"

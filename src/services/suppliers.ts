@@ -9,10 +9,8 @@ const setUserContext = async () => {
   }
   
   // Set the user ID in the PostgreSQL session
-  await supabase.rpc('set_config', {
-    parameter: 'app.current_user',
-    value: user.id,
-    is_local: false
+  await supabase.rpc('set_user_context', {
+    user_id: user.id
   });
 };
 
