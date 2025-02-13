@@ -27,11 +27,11 @@ export function ProductTableHeader({ onSelectAll, isAllSelected, hasItems }: Pro
         <TableHead className="text-dgxprt-navy font-semibold">Brand Name</TableHead>
         <TableHead className="text-dgxprt-navy font-semibold">Unit Size</TableHead>
         <TableHead className="text-dgxprt-navy font-semibold">Unit of Measure</TableHead>
-        <TableHead className="text-dgxprt-navy font-semibold">Supplier</TableHead>
-        <TableHead className="text-dgxprt-navy font-semibold w-full">Status</TableHead>
         <TableHead className="text-dgxprt-navy font-semibold">DG</TableHead>
         <TableHead className="text-dgxprt-navy font-semibold">DG Class</TableHead>
+        <TableHead className="text-dgxprt-navy font-semibold">Supplier</TableHead>
         <TableHead className="text-dgxprt-navy font-semibold">Packing Group</TableHead>
+        <TableHead className="text-dgxprt-navy font-semibold">Status</TableHead>
         <TableHead className="w-24 text-dgxprt-navy font-semibold">Actions</TableHead>
       </TableRow>
     </TableHeader>
