@@ -28,7 +28,9 @@ export function ProductTableRow({
 }: ProductTableRowProps) {
   const { data: userData } = useUserRole();
   const isAdmin = userData?.role?.toLowerCase() === 'administrator';
+  const isPowerUser = userData?.role?.toLowerCase() === 'poweruser';
   const isManager = userData?.role?.toLowerCase() === 'manager';
+  const hasEditPermissions = isAdmin || isPowerUser;
 
   console.log('User role:', userData?.role);
 
@@ -82,8 +84,8 @@ export function ProductTableRow({
             </Button>
           )}
           
-          {/* Show Edit and Delete buttons only for Administrators */}
-          {isAdmin && (
+          {/* Show Edit and Delete buttons for Administrators and PowerUsers */}
+          {hasEditPermissions && (
             <>
               <Button 
                 variant="ghost" 

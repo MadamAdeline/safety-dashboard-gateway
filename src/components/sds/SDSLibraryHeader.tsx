@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { useUserRole } from "@/hooks/use-user-role";
 
 interface SDSLibraryHeaderProps {
   isAdmin: boolean;
@@ -9,11 +10,15 @@ interface SDSLibraryHeaderProps {
 }
 
 export function SDSLibraryHeader({ isAdmin, onNewSDS, onGlobalSearch }: SDSLibraryHeaderProps) {
+  const { data: userData } = useUserRole();
+  const isPowerUser = userData?.role?.toLowerCase() === 'poweruser';
+  const hasEditPermissions = isAdmin || isPowerUser;
+
   return (
     <div className="flex items-center justify-between mb-6">
       <h1 className="text-2xl font-bold">SDS Library</h1>
       <div className="flex gap-2">
-        {isAdmin && (
+        {hasEditPermissions && (
           <>
             <Button 
               onClick={onGlobalSearch}
