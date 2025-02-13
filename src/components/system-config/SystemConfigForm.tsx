@@ -22,7 +22,15 @@ export function SystemConfigForm() {
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ['systemSettings'],
-    queryFn: getSystemSettings
+    queryFn: getSystemSettings,
+    onSuccess: (data) => {
+      // Set CSS variables when settings are loaded
+      if (data) {
+        document.documentElement.style.setProperty('--primary-color', data.primary_color);
+        document.documentElement.style.setProperty('--secondary-color', data.secondary_color);
+        document.documentElement.style.setProperty('--accent-color', data.accent_color);
+      }
+    }
   });
 
   const updateMutation = useMutation({
@@ -91,11 +99,6 @@ export function SystemConfigForm() {
         id: settings?.id,
         logo_path: logoPath,
       });
-
-      // Update CSS variables after successful update
-      document.documentElement.style.setProperty('--primary-color', formData.primary_color);
-      document.documentElement.style.setProperty('--secondary-color', formData.secondary_color);
-      document.documentElement.style.setProperty('--accent-color', formData.accent_color);
     } catch (error) {
       console.error('Error updating settings:', error);
     }
