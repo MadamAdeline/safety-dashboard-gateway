@@ -67,7 +67,12 @@ export function SystemConfigForm() {
 
   useEffect(() => {
     if (settings) {
-      setFormData(settings);
+      setFormData({
+        ...settings,
+        primary_color: settings.primary_color || '#9747FF',
+        secondary_color: settings.secondary_color || '#14162D',
+        accent_color: settings.accent_color || '#F1F0FB',
+      });
       if (settings.logo_path) {
         const { data: { publicUrl } } = supabase.storage
           .from('logos')
@@ -99,10 +104,14 @@ export function SystemConfigForm() {
         logoPath = filePath;
       }
 
+      // Make sure we include all the color values in the update
       await updateMutation.mutateAsync({
         ...formData,
         id: settings?.id,
         logo_path: logoPath,
+        primary_color: formData.primary_color,
+        secondary_color: formData.secondary_color,
+        accent_color: formData.accent_color,
       });
     } catch (error) {
       console.error('Error updating settings:', error);
