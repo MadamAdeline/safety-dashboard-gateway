@@ -13,6 +13,7 @@ const routePermissions: Record<string, string[]> = {
   "/suppliers": ["administrator"],
   "/users": ["administrator"],
   "/master-data": ["administrator"],
+  "/system-config": ["administrator"],
 };
 
 export function useRoutePermission(path: string) {
