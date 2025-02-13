@@ -22,16 +22,17 @@ export function SystemConfigForm() {
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ['systemSettings'],
-    queryFn: getSystemSettings,
-    onSuccess: (data) => {
-      // Set CSS variables when settings are loaded
-      if (data) {
-        document.documentElement.style.setProperty('--primary-color', data.primary_color);
-        document.documentElement.style.setProperty('--secondary-color', data.secondary_color);
-        document.documentElement.style.setProperty('--accent-color', data.accent_color);
-      }
-    }
+    queryFn: getSystemSettings
   });
+
+  // Use useEffect to handle setting CSS variables when settings change
+  useEffect(() => {
+    if (settings) {
+      document.documentElement.style.setProperty('--primary-color', settings.primary_color);
+      document.documentElement.style.setProperty('--secondary-color', settings.secondary_color);
+      document.documentElement.style.setProperty('--accent-color', settings.accent_color);
+    }
+  }, [settings]);
 
   const updateMutation = useMutation({
     mutationFn: updateSystemSettings,
