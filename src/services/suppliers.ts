@@ -2,14 +2,13 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Supplier } from '@/types/supplier';
 
-const setUserContext = async () => {
+const getUserId = async () => {
   try {
     const userEmail = localStorage.getItem('userEmail');
     if (!userEmail) {
       throw new Error('User must be authenticated to perform this action');
     }
 
-    // Get user ID from our custom users table
     const { data: userData, error: userError } = await supabase
       .from('users')
       .select('id')
@@ -21,18 +20,9 @@ const setUserContext = async () => {
       throw new Error('Could not find user');
     }
 
-    const { error } = await supabase.rpc('set_user_context', {
-      user_id: userData.id
-    });
-
-    if (error) {
-      console.error('Error setting user context:', error);
-      throw error;
-    }
-
-    console.log('Successfully set user context for:', userData.id);
+    return userData.id;
   } catch (error) {
-    console.error('Failed to set user context:', error);
+    console.error('Error in getUserId:', error);
     throw error;
   }
 };
@@ -44,9 +34,6 @@ export async function getSuppliers() {
       console.error('Supabase client not initialized');
       throw new Error('Supabase client not initialized');
     }
-
-    // Set user context before fetching suppliers
-    await setUserContext();
 
     const { data, error } = await supabase
       .from('suppliers')
@@ -85,8 +72,9 @@ export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
       throw new Error('Supabase client not initialized');
     }
 
-    // Set user context before operation
-    await setUserContext();
+    // Get the current user's ID
+    const userId = await getUserId();
+    console.log('Current user ID:', userId);
 
     const { data, error } = await supabase
       .from('suppliers')
@@ -96,7 +84,8 @@ export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
         email: supplier.email,
         phone_number: supplier.phone,
         address: supplier.address,
-        status_id: supplier.status === 'ACTIVE' ? 1 : 2
+        status_id: supplier.status === 'ACTIVE' ? 1 : 2,
+        updated_by: userId  // Set the updated_by field
       }])
       .select()
       .single();
@@ -137,11 +126,14 @@ export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
       throw new Error('Supabase client not initialized');
     }
 
-    // Set user context before operation
-    await setUserContext();
+    // Get the current user's ID
+    const userId = await getUserId();
+    console.log('Current user ID for update:', userId);
 
     // Build update object only with provided fields
-    const updateData: any = {};
+    const updateData: any = {
+      updated_by: userId  // Always include updated_by
+    };
     if (supplier.name !== undefined) updateData.supplier_name = supplier.name;
     if (supplier.contactPerson !== undefined) updateData.contact_person = supplier.contactPerson;
     if (supplier.email !== undefined) updateData.email = supplier.email;
@@ -191,9 +183,6 @@ export async function deleteSupplier(id: string) {
       console.error('Supabase client not initialized');
       throw new Error('Supabase client not initialized');
     }
-
-    // Set user context before operation
-    await setUserContext();
 
     const { error } = await supabase
       .from('suppliers')
