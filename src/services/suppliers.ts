@@ -4,13 +4,25 @@ import type { Supplier } from '@/types/supplier';
 
 const setUserContext = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user?.id) {
+    const userEmail = localStorage.getItem('userEmail');
+    if (!userEmail) {
       throw new Error('User must be authenticated to perform this action');
     }
-    
+
+    // Get user ID from our custom users table
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', userEmail)
+      .single();
+
+    if (userError || !userData) {
+      console.error('Error fetching user:', userError);
+      throw new Error('Could not find user');
+    }
+
     const { error } = await supabase.rpc('set_user_context', {
-      user_id: user.id
+      user_id: userData.id
     });
 
     if (error) {
@@ -18,7 +30,7 @@ const setUserContext = async () => {
       throw error;
     }
 
-    console.log('Successfully set user context for:', user.id);
+    console.log('Successfully set user context for:', userData.id);
   } catch (error) {
     console.error('Failed to set user context:', error);
     throw error;
