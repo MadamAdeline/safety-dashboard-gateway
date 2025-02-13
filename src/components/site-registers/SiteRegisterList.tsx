@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -59,6 +60,7 @@ export function SiteRegisterList({ searchTerm, onEdit, setSearchTerm }: SiteRegi
           product_id,
           override_product_name,
           current_stock_level,
+          total_qty,
           exact_location,
           storage_conditions,
           max_stock_level,
