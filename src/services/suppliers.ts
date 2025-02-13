@@ -3,15 +3,26 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Supplier } from '@/types/supplier';
 
 const setUserContext = async () => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user?.id) {
-    throw new Error('User must be authenticated to perform this action');
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) {
+      throw new Error('User must be authenticated to perform this action');
+    }
+    
+    const { error } = await supabase.rpc('set_user_context', {
+      user_id: user.id
+    });
+
+    if (error) {
+      console.error('Error setting user context:', error);
+      throw error;
+    }
+
+    console.log('Successfully set user context for:', user.id);
+  } catch (error) {
+    console.error('Failed to set user context:', error);
+    throw error;
   }
-  
-  // Set the user ID in the PostgreSQL session
-  await supabase.rpc('set_user_context', {
-    user_id: user.id
-  });
 };
 
 export async function getSuppliers() {
@@ -80,6 +91,10 @@ export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
       throw error;
     }
 
+    if (!data) {
+      throw new Error('No data returned after creating supplier');
+    }
+
     // Transform the response data to match our frontend Supplier type
     const transformedData: Supplier = {
       id: data.id,
@@ -110,16 +125,18 @@ export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
     // Set user context before operation
     await setUserContext();
 
+    // Build update object only with provided fields
+    const updateData: any = {};
+    if (supplier.name !== undefined) updateData.supplier_name = supplier.name;
+    if (supplier.contactPerson !== undefined) updateData.contact_person = supplier.contactPerson;
+    if (supplier.email !== undefined) updateData.email = supplier.email;
+    if (supplier.phone !== undefined) updateData.phone_number = supplier.phone;
+    if (supplier.address !== undefined) updateData.address = supplier.address;
+    if (supplier.status !== undefined) updateData.status_id = supplier.status === 'ACTIVE' ? 1 : 2;
+
     const { data, error } = await supabase
       .from('suppliers')
-      .update({
-        supplier_name: supplier.name,
-        contact_person: supplier.contactPerson,
-        email: supplier.email,
-        phone_number: supplier.phone,
-        address: supplier.address,
-        status_id: supplier.status === 'ACTIVE' ? 1 : 2
-      })
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
@@ -127,6 +144,10 @@ export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
     if (error) {
       console.error('Error updating supplier:', error);
       throw error;
+    }
+
+    if (!data) {
+      throw new Error('No data returned after updating supplier');
     }
 
     // Transform the response data to match our frontend Supplier type
