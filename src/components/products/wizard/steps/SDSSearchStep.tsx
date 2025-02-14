@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
@@ -24,7 +23,7 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
   const { data: sdsList = [] } = useQuery({
     queryKey: ['sds', search],
     queryFn: async () => {
-      const query = supabase
+      let query = supabase
         .from('sds')
         .select(`
           *,
@@ -37,11 +36,7 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
         .eq('status_id', 1);
 
       if (search) {
-        query.or(`
-          product_name.ilike.%${search}%,
-          product_id.ilike.%${search}%,
-          suppliers.supplier_name.ilike.%${search}%
-        `);
+        query = query.or(`product_name.ilike.%${search}%,product_id.ilike.%${search}%,suppliers.supplier_name.ilike.%${search}%`);
       }
 
       const { data, error } = await query;
