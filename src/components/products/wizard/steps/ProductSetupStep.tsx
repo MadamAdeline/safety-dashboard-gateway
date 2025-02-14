@@ -31,7 +31,26 @@ export function ProductSetupStep({ supplier, sds, onComplete }: ProductSetupStep
           status: "ACTIVE",
           productStatusId: 16,
           sdsId: sds.id,
-          sds: sds
+          sds: {
+            id: sds.id,
+            isDG: sds.isDG,
+            status: sds.status,
+            currentFilePath: sds.currentFilePath,
+            currentFileName: sds.currentFileName,
+            currentFileSize: sds.currentFileSize,
+            currentContentType: sds.currentContentType,
+            expiryDate: sds.expiryDate,
+            issueDate: sds.issueDate,
+            revisionDate: sds.revisionDate,
+            dgClass: sds.dgClass,
+            subsidiaryDgClass: sds.subsidiaryDgClass,
+            supplier: {
+              id: supplier.id,
+              supplier_name: supplier.name
+            },
+            packingGroup: sds.packingGroup,
+            dgSubDivision: sds.dgSubDivision
+          }
         }}
       />
     </div>
