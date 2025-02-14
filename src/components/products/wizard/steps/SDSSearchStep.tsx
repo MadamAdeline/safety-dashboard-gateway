@@ -28,7 +28,11 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
         .from('sds')
         .select(`
           *,
-          suppliers!inner(supplier_name)
+          suppliers!inner(supplier_name),
+          dg_class:master_data!sds_dg_class_id_fkey (id, label),
+          subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (id, label),
+          packing_group:master_data!sds_packing_group_id_fkey (id, label),
+          dg_subdivision:master_data!sds_dg_subdivision_id_fkey (id, label)
         `)
         .eq('status_id', 1);
 
@@ -50,7 +54,7 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
         supplier: item.suppliers?.supplier_name || "",
         supplierId: item.supplier_id,
         isDG: item.is_dg,
-        status: "ACTIVE",
+        status: "ACTIVE" as const,
         currentFilePath: item.current_file_path,
         currentFileName: item.current_file_name,
         currentFileSize: item.current_file_size,
@@ -58,10 +62,26 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
         issueDate: item.issue_date,
         expiryDate: item.expiry_date,
         revisionDate: item.revision_date,
-        dgClass: null,
-        subsidiaryDgClass: null,
-        packingGroup: null,
-        dgSubDivision: null
+        dgClassId: item.dg_class_id,
+        dgClass: item.dg_class,
+        subsidiaryDgClassId: item.subsidiary_dg_class_id,
+        subsidiaryDgClass: item.subsidiary_dg_class,
+        packingGroupId: item.packing_group_id,
+        packingGroup: item.packing_group,
+        dgSubDivisionId: item.dg_subdivision_id,
+        dgSubDivision: item.dg_subdivision,
+        sdsSource: item.source,
+        source: item.source,
+        unNumber: item.un_number,
+        unProperShippingName: item.un_proper_shipping_name,
+        hazchemCode: item.hazchem_code,
+        otherNames: item.other_names,
+        emergencyPhone: item.emergency_phone,
+        requestSupplierName: item.request_supplier_name,
+        requestSupplierDetails: item.request_supplier_details,
+        requestInformation: item.request_information,
+        requestDate: item.request_date,
+        requestedBy: item.requested_by
       }));
     }
   });
