@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Supplier } from "@/types/supplier";
 import type { SDS } from "@/types/sds";
+import { format } from "date-fns";
 
 interface SDSSearchStepProps {
   supplier: Supplier | null;
@@ -41,6 +42,7 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
           issue_date,
           expiry_date,
           revision_date,
+          status_id,
           dg_class_id,
           dg_class:master_data!sds_dg_class_id_fkey (id, label),
           subsidiary_dg_class_id,
@@ -60,15 +62,14 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
           request_information,
           request_date,
           requested_by,
-          suppliers:suppliers!inner(supplier_name)
+          suppliers:suppliers!inner(supplier_name),
+          status:status_lookup!inner(status_name)
         `)
         .eq('status_id', 1);
 
       if (searchTerm) {
         query = query
-          .or(`product_name.ilike.%${searchTerm}%`)
-          .or(`product_id.ilike.%${searchTerm}%`)
-          .or(`suppliers.supplier_name.ilike.%${searchTerm}%`);
+          .or(`product_name.ilike.%${searchTerm}%,product_id.ilike.%${searchTerm}%`);
       }
 
       const { data, error } = await query;
@@ -81,7 +82,7 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
         supplier: item.suppliers?.supplier_name || "",
         supplierId: item.supplier_id,
         isDG: item.is_dg,
-        status: "ACTIVE" as const,
+        status: item.status.status_name as 'ACTIVE' | 'INACTIVE' | 'REQUESTED',
         currentFilePath: item.current_file_path,
         currentFileName: item.current_file_name,
         currentFileSize: item.current_file_size,
@@ -135,7 +136,7 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
       <div className="flex gap-4">
         <div className="relative flex-1">
           <Input
-            placeholder="Search SDS..."
+            placeholder="Search by product name or code..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
@@ -157,17 +158,19 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
       </div>
 
       <div className="border rounded-lg overflow-hidden">
-        <div className="grid grid-cols-4 gap-4 p-4 bg-gray-50 border-b">
+        <div className="grid grid-cols-6 gap-4 p-4 bg-gray-50 border-b">
           <div className="font-semibold">Product Name</div>
           <div className="font-semibold">Product Code</div>
           <div className="font-semibold">Supplier</div>
           <div className="font-semibold">Expiry Date</div>
+          <div className="font-semibold">DG Class</div>
+          <div className="font-semibold">Status</div>
         </div>
         <div className="divide-y">
           {sdsList.map((sds) => (
             <div 
               key={sds.id}
-              className={`grid grid-cols-4 gap-4 p-4 cursor-pointer hover:bg-gray-50 ${
+              className={`grid grid-cols-6 gap-4 p-4 cursor-pointer hover:bg-gray-50 ${
                 selectedSDS?.id === sds.id ? 'bg-dgxprt-purple/10' : ''
               }`}
               onClick={() => onSDSSelect(sds)}
@@ -175,7 +178,9 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
               <div>{sds.productName}</div>
               <div>{sds.productId}</div>
               <div>{sds.supplier}</div>
-              <div>{sds.expiryDate}</div>
+              <div>{sds.expiryDate ? format(new Date(sds.expiryDate), 'dd/MM/yyyy') : 'N/A'}</div>
+              <div>{sds.dgClass?.label || 'N/A'}</div>
+              <div>{sds.status}</div>
             </div>
           ))}
         </div>
