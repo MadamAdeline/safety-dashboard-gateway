@@ -37,10 +37,11 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
         .eq('status_id', 1);
 
       if (search) {
-        query = query
-          .or(`product_name.ilike.%${search}%`)
-          .or(`product_id.ilike.%${search}%`)
-          .or(`suppliers.supplier_name.ilike.%${search}%`);
+        query = query.or([
+          { product_name: { ilike: `%${search}%` } },
+          { product_id: { ilike: `%${search}%` } },
+          { "suppliers.supplier_name": { ilike: `%${search}%` } }
+        ].map(condition => JSON.stringify(condition)).join(','));
       }
 
       const { data, error } = await query;
