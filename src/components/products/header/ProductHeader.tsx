@@ -1,6 +1,8 @@
 
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Wand2 } from "lucide-react";
+import { useState } from "react";
+import { ProductWizard } from "../wizard/ProductWizard";
 import { useUserRole } from "@/hooks/use-user-role";
 
 interface ProductHeaderProps {
@@ -8,23 +10,35 @@ interface ProductHeaderProps {
 }
 
 export function ProductHeader({ onNewProduct }: ProductHeaderProps) {
+  const [showWizard, setShowWizard] = useState(false);
   const { data: userData } = useUserRole();
-  const isManager = userData?.role?.toLowerCase() === 'manager';
   const isAdmin = userData?.role?.toLowerCase() === 'administrator';
-  const isPowerUser = userData?.role?.toLowerCase() === 'poweruser';
-  const hasAddPermission = isAdmin || isPowerUser;
 
   return (
     <div className="flex items-center justify-between mb-6">
       <h1 className="text-2xl font-bold">Products</h1>
-      {hasAddPermission && (
+      <div className="flex gap-2">
+        {isAdmin && (
+          <Button 
+            onClick={() => setShowWizard(true)}
+            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+          >
+            <Wand2 className="mr-2 h-4 w-4" />
+            Product Setup Wizard
+          </Button>
+        )}
         <Button 
-          onClick={onNewProduct} 
+          onClick={onNewProduct}
           className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
         >
           <Plus className="mr-2 h-4 w-4" /> New Product
         </Button>
-      )}
+      </div>
+
+      <ProductWizard
+        open={showWizard}
+        onClose={() => setShowWizard(false)}
+      />
     </div>
   );
 }
