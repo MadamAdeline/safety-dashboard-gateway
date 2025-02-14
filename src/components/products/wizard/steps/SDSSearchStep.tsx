@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { GlobalSDSSearchDialog } from "@/components/sds/GlobalSDSSearchDialog";
 import { NewSDSForm } from "@/components/sds/NewSDSForm";
@@ -37,11 +37,7 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
         .eq('status_id', 1);
 
       if (search) {
-        query = query.or([
-          { product_name: { ilike: `%${search}%` } },
-          { product_id: { ilike: `%${search}%` } },
-          { "suppliers.supplier_name": { ilike: `%${search}%` } }
-        ].map(condition => JSON.stringify(condition)).join(','));
+        query = query.or('product_name.ilike.%' + search + '%,product_id.ilike.%' + search + '%');
       }
 
       const { data, error } = await query;
@@ -90,14 +86,41 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
 
   if (showNewForm) {
     return (
-      <NewSDSForm 
-        onClose={() => setShowNewForm(false)}
-      />
+      <div className="space-y-6 w-full">
+        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+          <div className="font-medium">Selected Supplier</div>
+          <div className="flex items-center gap-2">
+            <User className="h-5 w-5 text-gray-500" />
+            <div>
+              <div className="font-medium">{supplier.name}</div>
+              <div className="text-sm text-gray-500">
+                {supplier.contactPerson} • {supplier.email}
+              </div>
+            </div>
+          </div>
+        </div>
+        <NewSDSForm 
+          onClose={() => setShowNewForm(false)}
+        />
+      </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+        <div className="font-medium">Selected Supplier</div>
+        <div className="flex items-center gap-2">
+          <User className="h-5 w-5 text-gray-500" />
+          <div>
+            <div className="font-medium">{supplier.name}</div>
+            <div className="text-sm text-gray-500">
+              {supplier.contactPerson} • {supplier.email}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="text-center">
         <h3 className="text-lg font-semibold mb-2">Step 2: Find or Create SDS</h3>
         <p className="text-gray-600">
