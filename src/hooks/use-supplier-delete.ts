@@ -45,7 +45,7 @@ export const useSupplierDelete = (onDelete?: (supplier: Supplier) => void) => {
 
       toast({
         title: "Supplier Deleted",
-        description: `${supplier.name} has been successfully deleted.`
+        description: `${supplier.supplier_name} has been successfully deleted.`
       });
 
       if (onDelete) {

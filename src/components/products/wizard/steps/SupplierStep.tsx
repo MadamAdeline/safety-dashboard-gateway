@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -34,10 +33,10 @@ export function SupplierStep({ onSupplierSelect, selectedSupplier }: SupplierSte
 
       return data.map(supplier => ({
         id: supplier.id,
-        name: supplier.supplier_name,
-        contactPerson: supplier.contact_person,
+        supplier_name: supplier.supplier_name,
+        contact_person: supplier.contact_person,
         email: supplier.email,
-        phone: supplier.phone_number || '',
+        phone_number: supplier.phone_number || '',
         address: supplier.address,
         status: supplier.status_id === 1 ? 'ACTIVE' as const : 'INACTIVE' as const
       }));
@@ -94,8 +93,8 @@ export function SupplierStep({ onSupplierSelect, selectedSupplier }: SupplierSte
               }`}
               onClick={() => onSupplierSelect(supplier)}
             >
-              <div>{supplier.name}</div>
-              <div>{supplier.contactPerson}</div>
+              <div>{supplier.supplier_name}</div>
+              <div>{supplier.contact_person}</div>
               <div>{supplier.email}</div>
             </div>
           ))}

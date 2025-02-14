@@ -35,10 +35,10 @@ export function SupplierTableRow({
           onCheckedChange={() => onToggleSelect(supplier.id)}
         />
       </TableCell>
-      <TableCell className="font-medium text-dgxprt-navy">{supplier.name}</TableCell>
-      <TableCell>{supplier.contactPerson}</TableCell>
+      <TableCell className="font-medium text-dgxprt-navy">{supplier.supplier_name}</TableCell>
+      <TableCell>{supplier.contact_person}</TableCell>
       <TableCell>{supplier.email}</TableCell>
-      <TableCell>{supplier.phone}</TableCell>
+      <TableCell>{supplier.phone_number}</TableCell>
       <TableCell>{supplier.address}</TableCell>
       <TableCell>
         <Badge 

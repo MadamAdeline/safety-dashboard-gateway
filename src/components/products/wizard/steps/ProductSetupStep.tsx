@@ -46,7 +46,7 @@ export function ProductSetupStep({ supplier, sds, onComplete }: ProductSetupStep
             subsidiaryDgClass: sds.subsidiaryDgClass,
             supplier: {
               id: supplier.id,
-              supplier_name: supplier.name
+              supplier_name: supplier.supplier_name
             },
             packingGroup: sds.packingGroup,
             dgSubDivision: sds.dgSubDivision

@@ -48,10 +48,10 @@ export async function getSuppliers() {
     // Transform the data to match our frontend Supplier type
     const transformedData: Supplier[] = data.map(item => ({
       id: item.id,
-      name: item.supplier_name,
-      contactPerson: item.contact_person,
+      supplier_name: item.supplier_name,
+      contact_person: item.contact_person,
       email: item.email,
-      phone: item.phone_number || '',
+      phone_number: item.phone_number || '',
       address: item.address,
       status: item.status_id === 1 ? 'ACTIVE' : 'INACTIVE',
     }));
@@ -79,13 +79,13 @@ export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
     const { data, error } = await supabase
       .from('suppliers')
       .insert([{
-        supplier_name: supplier.name,
-        contact_person: supplier.contactPerson,
+        supplier_name: supplier.supplier_name,
+        contact_person: supplier.contact_person,
         email: supplier.email,
-        phone_number: supplier.phone,
+        phone_number: supplier.phone_number,
         address: supplier.address,
         status_id: supplier.status === 'ACTIVE' ? 1 : 2,
-        updated_by: userId  // Set the updated_by field
+        updated_by: userId
       }])
       .select()
       .single();
@@ -102,10 +102,10 @@ export async function createSupplier(supplier: Omit<Supplier, 'id'>) {
     // Transform the response data to match our frontend Supplier type
     const transformedData: Supplier = {
       id: data.id,
-      name: data.supplier_name,
-      contactPerson: data.contact_person,
+      supplier_name: data.supplier_name,
+      contact_person: data.contact_person,
       email: data.email,
-      phone: data.phone_number || '',
+      phone_number: data.phone_number || '',
       address: data.address,
       status: data.status_id === 1 ? 'ACTIVE' : 'INACTIVE',
     };
@@ -134,10 +134,10 @@ export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
     const updateData: any = {
       updated_by: userId  // Always include updated_by
     };
-    if (supplier.name !== undefined) updateData.supplier_name = supplier.name;
-    if (supplier.contactPerson !== undefined) updateData.contact_person = supplier.contactPerson;
+    if (supplier.supplier_name !== undefined) updateData.supplier_name = supplier.supplier_name;
+    if (supplier.contact_person !== undefined) updateData.contact_person = supplier.contact_person;
     if (supplier.email !== undefined) updateData.email = supplier.email;
-    if (supplier.phone !== undefined) updateData.phone_number = supplier.phone;
+    if (supplier.phone_number !== undefined) updateData.phone_number = supplier.phone_number;
     if (supplier.address !== undefined) updateData.address = supplier.address;
     if (supplier.status !== undefined) updateData.status_id = supplier.status === 'ACTIVE' ? 1 : 2;
 
@@ -160,10 +160,10 @@ export async function updateSupplier(id: string, supplier: Partial<Supplier>) {
     // Transform the response data to match our frontend Supplier type
     const transformedData: Supplier = {
       id: data.id,
-      name: data.supplier_name,
-      contactPerson: data.contact_person,
+      supplier_name: data.supplier_name,
+      contact_person: data.contact_person,
       email: data.email,
-      phone: data.phone_number || '',
+      phone_number: data.phone_number || '',
       address: data.address,
       status: data.status_id === 1 ? 'ACTIVE' : 'INACTIVE',
     };
