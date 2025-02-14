@@ -129,11 +129,27 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
+      <div className="text-center space-y-4">
         <h3 className="text-lg font-semibold mb-2">Step 2: Find or Create SDS</h3>
         <p className="text-gray-600">
           Search for an existing SDS in our global library or create a new one.
         </p>
+        <div className="flex items-center justify-center gap-6">
+          <div className="flex items-center gap-2">
+            <span className="font-medium">Supplier:</span>
+            <span className="bg-dgxprt-purple/10 px-3 py-1 rounded">
+              {supplier.name}
+            </span>
+          </div>
+          {selectedSDS && (
+            <div className="flex items-center gap-2">
+              <span className="font-medium">SDS:</span>
+              <span className="bg-dgxprt-purple/10 px-3 py-1 rounded">
+                {selectedSDS.productName}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex gap-4">
