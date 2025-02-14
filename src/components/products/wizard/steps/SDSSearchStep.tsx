@@ -138,7 +138,7 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
           <div className="flex items-center gap-2">
             <span className="font-medium">Supplier:</span>
             <span className="bg-dgxprt-purple/10 px-3 py-1 rounded">
-              {supplier.name}
+              {supplier.supplier_name}
             </span>
           </div>
           {selectedSDS && (
