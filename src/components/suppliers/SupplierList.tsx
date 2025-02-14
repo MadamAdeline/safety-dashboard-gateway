@@ -32,7 +32,7 @@ export function SupplierList({
   const { handleDelete } = useSupplierDelete();
 
   const filteredData = data.filter((item) => {
-    if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) {
+    if (filters.search && !item.supplier_name.toLowerCase().includes(filters.search.toLowerCase())) {
       return false;
     }
     if (filters.status.length > 0 && !filters.status.includes(item.status)) {

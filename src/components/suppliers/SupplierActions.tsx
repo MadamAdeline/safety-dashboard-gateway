@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Filter, Download, Upload, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -111,10 +112,10 @@ export function SupplierActions({ onToggleFilters, onRefresh, data }: SupplierAc
 
     // Transform the data for export
     const exportData = data.map(supplier => ({
-      'Supplier Name': supplier.name,
-      'Contact Person': supplier.contactPerson,
+      'Supplier Name': supplier.supplier_name,
+      'Contact Person': supplier.contact_person,
       'Email': supplier.email,
-      'Phone Number': supplier.phone || '-',
+      'Phone Number': supplier.phone_number || '-',
       'Address': supplier.address || '-',
       'Status': supplier.status
     }));

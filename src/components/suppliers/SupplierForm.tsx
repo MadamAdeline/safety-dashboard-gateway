@@ -25,10 +25,10 @@ interface SupplierFormProps {
 export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
   const [formData, setFormData] = useState<Partial<Supplier>>(
     initialData || {
-      name: "",
-      contactPerson: "",
+      supplier_name: "",
+      contact_person: "",
       email: "",
-      phone: "",
+      phone_number: "",
       address: "",
       status: "ACTIVE",
     }
@@ -38,7 +38,7 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
   const queryClient = useQueryClient();
 
   const validateForm = () => {
-    const requiredFields = ['name', 'contactPerson', 'email'];
+    const requiredFields = ['supplier_name', 'contact_person', 'email'];
     const missingFields = requiredFields.filter(field => !formData[field as keyof Supplier]);
     
     if (missingFields.length > 0) {
@@ -130,24 +130,24 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
         <div className="bg-white rounded-lg shadow p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="name" className="after:content-['*'] after:ml-0.5 after:text-red-500">
+              <Label htmlFor="supplier_name" className="after:content-['*'] after:ml-0.5 after:text-red-500">
                 Supplier Name
               </Label>
               <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                id="supplier_name"
+                value={formData.supplier_name}
+                onChange={(e) => setFormData({ ...formData, supplier_name: e.target.value })}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="contactPerson" className="after:content-['*'] after:ml-0.5 after:text-red-500">
+              <Label htmlFor="contact_person" className="after:content-['*'] after:ml-0.5 after:text-red-500">
                 Contact Person
               </Label>
               <Input
-                id="contactPerson"
-                value={formData.contactPerson}
-                onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
+                id="contact_person"
+                value={formData.contact_person}
+                onChange={(e) => setFormData({ ...formData, contact_person: e.target.value })}
               />
             </div>
 
@@ -164,11 +164,11 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone_number">Phone Number</Label>
               <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                id="phone_number"
+                value={formData.phone_number}
+                onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
               />
             </div>
 
