@@ -1,13 +1,14 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProductForm } from "@/components/products/ProductForm";
 import { ProductReadOnlyForm } from "@/components/products/ProductReadOnlyForm";
+import { ProductWizard } from "@/components/products/wizard/ProductWizard";
 import type { Product, ProductFilters as ProductFiltersType } from "@/types/product";
 import { exportProductsToExcel } from "@/utils/exportUtils";
 import { useLocation } from "react-router-dom";
 import { useProducts } from "@/hooks/use-products";
-import { useProductDetails } from "@/hooks/use-product-details"; // Add this import
+import { useProductDetails } from "@/hooks/use-product-details";
 import { useToast } from "@/hooks/use-toast";
 import { ProductHeader } from "@/components/products/header/ProductHeader";
 import { ProductSearchBar } from "@/components/products/header/ProductSearchBar";
@@ -29,22 +30,12 @@ export default function Products() {
   const [showFilters, setShowFilters] = useState(false);
   const [showForm, setShowForm] = useState(showFormFromState);
   const [showViewForm, setShowViewForm] = useState(false);
+  const [showWizard, setShowWizard] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isExporting, setIsExporting] = useState(false);
 
   const { data: products = [], isLoading, error, refetch } = useProducts();
   const { data: productDetails } = useProductDetails(selectedProduct?.id || "");
-
-  useEffect(() => {
-    if (error) {
-      console.error('Query error:', error);
-      toast({
-        title: "Error loading products",
-        description: "There was a problem loading the products list. Please try again.",
-        variant: "destructive"
-      });
-    }
-  }, [error, toast]);
 
   const handleExport = async () => {
     console.log('Starting export process');
@@ -126,6 +117,7 @@ export default function Products() {
   const handleFormClose = () => {
     setShowForm(false);
     setShowViewForm(false);
+    setShowWizard(false);
     setSelectedProduct(null);
     window.history.replaceState({}, document.title);
     refetch();
@@ -171,6 +163,14 @@ export default function Products() {
     );
   }
 
+  if (showWizard) {
+    return (
+      <DashboardLayout>
+        <ProductWizard onClose={handleFormClose} />
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-4 max-w-full">
@@ -179,6 +179,7 @@ export default function Products() {
             setSelectedProduct(null);
             setShowForm(true);
           }}
+          onWizard={() => setShowWizard(true)}
         />
         
         <div className="space-y-4">
