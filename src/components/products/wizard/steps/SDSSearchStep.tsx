@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, User } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { GlobalSDSSearchDialog } from "@/components/sds/GlobalSDSSearchDialog";
 import { NewSDSForm } from "@/components/sds/NewSDSForm";
@@ -22,11 +22,11 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
   const [search, setSearch] = useState("");
 
   const { data: sdsList = [] } = useQuery({
-    queryKey: ['sds', search],
+    queryKey: ['wizard-sds', search],
     queryFn: async () => {
       const searchTerm = search.trim().toLowerCase();
       
-      const { data, error } = await supabase
+      let query = supabase
         .from('sds')
         .select(`
           id,
@@ -62,9 +62,13 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
           requested_by,
           suppliers:suppliers!inner(supplier_name)
         `)
-        .eq('status_id', 1)
-        .ilike('product_name', `%${searchTerm}%`);
+        .eq('status_id', 1);
 
+      if (searchTerm) {
+        query = query.or(`product_name.ilike.%${searchTerm}%,product_id.ilike.%${searchTerm}%,suppliers.supplier_name.ilike.%${searchTerm}%`);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
 
       return data.map(item => ({
@@ -108,84 +112,71 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
 
   if (!supplier) return null;
 
+  if (showNewForm) {
+    return (
+      <div className="w-full">
+        <NewSDSForm onClose={() => setShowNewForm(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-2xl font-bold mb-2">Product Setup Wizard</h3>
+        <h3 className="text-lg font-semibold mb-2">Step 2: Find or Create SDS</h3>
         <p className="text-gray-600">
           Search for an existing SDS in our global library or create a new one.
         </p>
       </div>
 
-      <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-        <div className="font-medium">Selected Supplier</div>
-        <div className="flex items-center gap-2">
-          <User className="h-5 w-5 text-gray-500" />
-          <div>
-            <div className="font-medium">{supplier.name}</div>
-            <div className="text-sm text-gray-500">
-              {supplier.contactPerson} • {supplier.email}
-            </div>
-          </div>
+      <div className="flex gap-4">
+        <div className="relative flex-1">
+          <Input
+            placeholder="Search SDS..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>
+        <Button
+          onClick={() => setShowNewForm(true)}
+          className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+        >
+          <Plus className="mr-2 h-4 w-4" /> New SDS
+        </Button>
+        <Button
+          onClick={() => setShowGlobalSearch(true)}
+          variant="outline"
+        >
+          <Plus className="mr-2 h-4 w-4" /> Add from Global Library
+        </Button>
       </div>
 
-      {!showNewForm ? (
-        <>
-          <div className="flex gap-4">
-            <div className="relative flex-1">
-              <Input
-                placeholder="Search SDS..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            </div>
-            <Button
-              onClick={() => setShowNewForm(true)}
-              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-            >
-              <Plus className="mr-2 h-4 w-4" /> New SDS
-            </Button>
-            <Button
-              onClick={() => setShowGlobalSearch(true)}
-              variant="outline"
-            >
-              <Plus className="mr-2 h-4 w-4" /> Add from Global Library
-            </Button>
-          </div>
-
-          <div className="border rounded-lg overflow-hidden">
-            <div className="grid grid-cols-4 gap-4 p-4 bg-gray-50 border-b">
-              <div className="font-semibold">Product Name</div>
-              <div className="font-semibold">Product Code</div>
-              <div className="font-semibold">Supplier</div>
-              <div className="font-semibold">Expiry Date</div>
-            </div>
-            <div className="divide-y">
-              {sdsList.map((sds) => (
-                <div 
-                  key={sds.id}
-                  className={`grid grid-cols-4 gap-4 p-4 cursor-pointer hover:bg-gray-50 ${
-                    selectedSDS?.id === sds.id ? 'bg-dgxprt-purple/10' : ''
-                  }`}
-                  onClick={() => onSDSSelect(sds)}
-                >
-                  <div>{sds.productName}</div>
-                  <div>{sds.productId}</div>
-                  <div>{sds.supplier}</div>
-                  <div>{sds.expiryDate}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      ) : (
-        <div className="w-full">
-          <NewSDSForm onClose={() => setShowNewForm(false)} />
+      <div className="border rounded-lg overflow-hidden">
+        <div className="grid grid-cols-4 gap-4 p-4 bg-gray-50 border-b">
+          <div className="font-semibold">Product Name</div>
+          <div className="font-semibold">Product Code</div>
+          <div className="font-semibold">Supplier</div>
+          <div className="font-semibold">Expiry Date</div>
         </div>
-      )}
+        <div className="divide-y">
+          {sdsList.map((sds) => (
+            <div 
+              key={sds.id}
+              className={`grid grid-cols-4 gap-4 p-4 cursor-pointer hover:bg-gray-50 ${
+                selectedSDS?.id === sds.id ? 'bg-dgxprt-purple/10' : ''
+              }`}
+              onClick={() => onSDSSelect(sds)}
+            >
+              <div>{sds.productName}</div>
+              <div>{sds.productId}</div>
+              <div>{sds.supplier}</div>
+              <div>{sds.expiryDate}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <GlobalSDSSearchDialog
         open={showGlobalSearch}
