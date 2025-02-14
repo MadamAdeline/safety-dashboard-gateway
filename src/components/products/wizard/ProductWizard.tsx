@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, User } from "lucide-react";
 import { SupplierStep } from "./steps/SupplierStep";
 import { SDSSearchStep } from "./steps/SDSSearchStep";
 import { ProductSetupStep } from "./steps/ProductSetupStep";
@@ -38,14 +38,28 @@ export function ProductWizard({ open, onClose }: ProductWizardProps) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[80vh]">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Product Setup Wizard</h2>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold">Product Setup Wizard</h2>
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {selectedSupplier && (
+            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+              <User className="h-5 w-5 text-gray-500" />
+              <div>
+                <div className="font-medium">{selectedSupplier.name}</div>
+                <div className="text-sm text-gray-500">
+                  {selectedSupplier.contactPerson} • {selectedSupplier.email}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between my-8">
           <div className="flex items-center w-full">
             <div className={`flex-1 h-2 ${step >= 1 ? 'bg-dgxprt-purple' : 'bg-gray-200'}`} />
             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
