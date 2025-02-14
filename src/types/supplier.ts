@@ -1,9 +1,10 @@
+
 export type Supplier = {
   id: string;
-  name: string;
-  contactPerson: string;
+  supplier_name: string;
+  contact_person: string;
   email: string;
-  phone: string;
+  phone_number: string;
   address: string;
   status: "ACTIVE" | "INACTIVE";
 };
