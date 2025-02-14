@@ -65,7 +65,10 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
         .eq('status_id', 1);
 
       if (searchTerm) {
-        query = query.or(`product_name.ilike.%${searchTerm}%,product_id.ilike.%${searchTerm}%,suppliers.supplier_name.ilike.%${searchTerm}%`);
+        query = query
+          .or(`product_name.ilike.%${searchTerm}%`)
+          .or(`product_id.ilike.%${searchTerm}%`)
+          .or(`suppliers.supplier_name.ilike.%${searchTerm}%`);
       }
 
       const { data, error } = await query;
