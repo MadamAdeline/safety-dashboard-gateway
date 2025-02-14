@@ -43,6 +43,26 @@ export function ProductWizard({ onClose }: ProductWizardProps) {
         </Button>
       </div>
 
+      {/* Selection Summary */}
+      <div className="flex flex-wrap gap-4 items-center">
+        {selectedSupplier && (
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-600">Supplier:</span>
+            <span className="bg-dgxprt-purple/10 px-3 py-1 rounded">
+              {selectedSupplier.supplier_name}
+            </span>
+          </div>
+        )}
+        {selectedSDS && (
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-600">SDS:</span>
+            <span className="bg-dgxprt-purple/10 px-3 py-1 rounded">
+              {selectedSDS.productName}
+            </span>
+          </div>
+        )}
+      </div>
+
       <div className="flex items-center justify-between my-8">
         <div className="flex items-center w-full">
           <div className={`flex-1 h-2 ${step >= 1 ? 'bg-dgxprt-purple' : 'bg-gray-200'}`} />

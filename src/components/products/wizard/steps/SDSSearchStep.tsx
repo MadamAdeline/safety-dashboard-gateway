@@ -23,7 +23,7 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
   const [search, setSearch] = useState("");
 
   const { data: sdsList = [] } = useQuery({
-    queryKey: ['wizard-sds', search],
+    queryKey: ['wizard-sds', search, supplier?.id],
     queryFn: async () => {
       const searchTerm = search.trim().toLowerCase();
       
@@ -65,6 +65,11 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
           suppliers:suppliers!inner(supplier_name),
           status:status_lookup!inner(status_name)
         `);
+
+      // Add supplier filter
+      if (supplier?.id) {
+        query = query.eq('supplier_id', supplier.id);
+      }
 
       if (searchTerm) {
         query = query.or('product_name.ilike.%' + searchTerm + '%,product_id.ilike.%' + searchTerm + '%');
@@ -129,27 +134,11 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
 
   return (
     <div className="space-y-6">
-      <div className="text-center space-y-4">
+      <div className="text-center">
         <h3 className="text-lg font-semibold mb-2">Step 2: Find or Create SDS</h3>
         <p className="text-gray-600">
           Search for an existing SDS in our global library or create a new one.
         </p>
-        <div className="flex items-center justify-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className="font-medium">Supplier:</span>
-            <span className="bg-dgxprt-purple/10 px-3 py-1 rounded">
-              {supplier.supplier_name}
-            </span>
-          </div>
-          {selectedSDS && (
-            <div className="flex items-center gap-2">
-              <span className="font-medium">SDS:</span>
-              <span className="bg-dgxprt-purple/10 px-3 py-1 rounded">
-                {selectedSDS.productName}
-              </span>
-            </div>
-          )}
-        </div>
       </div>
 
       <div className="flex gap-4">
