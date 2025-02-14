@@ -64,16 +64,19 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
           requested_by,
           suppliers:suppliers!inner(supplier_name),
           status:status_lookup!inner(status_name)
-        `)
-        .eq('status_id', 1);
+        `);
 
       if (searchTerm) {
-        query = query
-          .or(`product_name.ilike.%${searchTerm}%,product_id.ilike.%${searchTerm}%`);
+        query = query.or('product_name.ilike.%' + searchTerm + '%,product_id.ilike.%' + searchTerm + '%');
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching SDS:', error);
+        throw error;
+      }
+
+      console.log('Retrieved SDS data:', data);
 
       return data.map(item => ({
         id: item.id,
