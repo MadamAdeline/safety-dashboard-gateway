@@ -23,7 +23,6 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
     return (
       <NewSDSForm 
         onClose={() => setShowNewForm(false)}
-        initialSupplier={supplier}
       />
     );
   }

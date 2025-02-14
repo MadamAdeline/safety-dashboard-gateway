@@ -39,7 +39,7 @@ export function SupplierStep({ onSupplierSelect, selectedSupplier }: SupplierSte
         email: supplier.email,
         phone: supplier.phone_number || '',
         address: supplier.address,
-        status: supplier.status_id === 1 ? 'ACTIVE' : 'INACTIVE',
+        status: supplier.status_id === 1 ? 'ACTIVE' as const : 'INACTIVE' as const
       }));
     }
   });
@@ -48,10 +48,6 @@ export function SupplierStep({ onSupplierSelect, selectedSupplier }: SupplierSte
     return (
       <SupplierForm 
         onClose={() => setShowForm(false)}
-        onSave={(supplier) => {
-          setShowForm(false);
-          onSupplierSelect(supplier);
-        }}
       />
     );
   }

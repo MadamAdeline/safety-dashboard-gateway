@@ -25,11 +25,13 @@ export function ProductSetupStep({ supplier, sds, onComplete }: ProductSetupStep
         onClose={onComplete}
         onSave={onComplete}
         initialData={{
+          id: "",
           name: "",
           code: "",
-          sdsId: sds.id,
           status: "ACTIVE",
           productStatusId: 16,
+          sdsId: sds.id,
+          sds: sds
         }}
       />
     </div>
