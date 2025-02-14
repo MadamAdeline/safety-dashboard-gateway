@@ -24,23 +24,47 @@ export function SDSSearchStep({ supplier, onSDSSelect, selectedSDS }: SDSSearchS
   const { data: sdsList = [] } = useQuery({
     queryKey: ['sds', search],
     queryFn: async () => {
-      let query = supabase
+      const searchTerm = search.trim().toLowerCase();
+      
+      const { data, error } = await supabase
         .from('sds')
         .select(`
-          *,
-          suppliers!inner(supplier_name),
+          id,
+          product_name,
+          product_id,
+          supplier_id,
+          is_dg,
+          current_file_path,
+          current_file_name,
+          current_file_size,
+          current_content_type,
+          issue_date,
+          expiry_date,
+          revision_date,
+          dg_class_id,
           dg_class:master_data!sds_dg_class_id_fkey (id, label),
+          subsidiary_dg_class_id,
           subsidiary_dg_class:master_data!sds_subsidiary_dg_class_id_fkey (id, label),
+          packing_group_id,
           packing_group:master_data!sds_packing_group_id_fkey (id, label),
-          dg_subdivision:master_data!sds_dg_subdivision_id_fkey (id, label)
+          dg_subdivision_id,
+          dg_subdivision:master_data!sds_dg_subdivision_id_fkey (id, label),
+          source,
+          un_number,
+          un_proper_shipping_name,
+          hazchem_code,
+          other_names,
+          emergency_phone,
+          request_supplier_name,
+          request_supplier_details,
+          request_information,
+          request_date,
+          requested_by,
+          suppliers:suppliers!inner(supplier_name)
         `)
-        .eq('status_id', 1);
+        .eq('status_id', 1)
+        .filter('product_name', 'ilike', `%${searchTerm}%`);
 
-      if (search) {
-        query = query.or('product_name.ilike.%' + search + '%,product_id.ilike.%' + search + '%');
-      }
-
-      const { data, error } = await query;
       if (error) throw error;
 
       return data.map(item => ({
