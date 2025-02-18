@@ -1,5 +1,5 @@
 
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -415,22 +415,23 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         <TableHeader>
           <TableRow>
             <TableHead className="w-[30px]"></TableHead>
-            <TableHead className="w-[200px]">Type</TableHead>
-            <TableHead className="w-[300px]">Hazard</TableHead>
-            <TableHead className="w-[300px]">Control</TableHead>
-            <TableHead className="w-[120px]">Risk Level</TableHead>
-            {!readOnly && <TableHead className="w-[50px]"></TableHead>}
+            <TableHead className="w-[200px] text-left">Type</TableHead>
+            <TableHead className="w-[300px] text-left">Hazard</TableHead>
+            <TableHead className="w-[300px] text-left">Control</TableHead>
+            <TableHead className="w-[150px] text-center">Risk Level</TableHead>
+            {!readOnly && <TableHead className="w-[50px] text-center"></TableHead>}
           </TableRow>
         </TableHeader>
+
         <TableBody>
           {hazards.map((hazard) => (
-            <Collapsible key={hazard.id}>
+            <React.Fragment key={hazard.id}>
               <TableRow 
-                className="cursor-pointer hover:bg-gray-50"
+                className="cursor-pointer hover:bg-gray-50" 
                 onClick={() => toggleItem(hazard.id)}
               >
-                <TableCell className="py-4">
-                  <CollapsibleTrigger className="flex items-center">
+                <TableCell className="p-2 text-center">
+                  <CollapsibleTrigger>
                     {openItems.includes(hazard.id) ? (
                       <ChevronDown className="h-4 w-4" />
                     ) : (
@@ -438,23 +439,26 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                     )}
                   </CollapsibleTrigger>
                 </TableCell>
-                <TableCell className="font-medium">{hazard.hazard_type?.label || '-'}</TableCell>
+
+                <TableCell className="font-semibold">{hazard.hazard_type?.label || '-'}</TableCell>
                 <TableCell className="truncate max-w-[300px]">{hazard.hazard || '-'}</TableCell>
                 <TableCell className="truncate max-w-[300px]">{hazard.control || '-'}</TableCell>
-                <TableCell>
+                <TableCell className="text-center">
                   {hazard.risk_score && (
                     <Badge
                       style={{
                         backgroundColor: hazard.risk_score.risk_color || '#gray-400',
                         color: '#FFFFFF'
                       }}
+                      className="px-2 py-1 text-sm font-semibold rounded"
                     >
                       {hazard.risk_score.risk_label}
                     </Badge>
                   )}
                 </TableCell>
+
                 {!readOnly && (
-                  <TableCell>
+                  <TableCell className="text-center">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -462,168 +466,165 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                         e.stopPropagation();
                         handleDelete(hazard.id);
                       }}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      className="text-red-500 hover:text-red-700"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </TableCell>
                 )}
               </TableRow>
-              <CollapsibleContent>
+
+              {openItems.includes(hazard.id) && (
                 <TableRow>
-                  <TableCell colSpan={6} className="p-4 border-t">
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-4 gap-4">
-                        <div className="space-y-2">
-                          <Label>Hazard Type</Label>
-                          {readOnly ? (
-                            <div className="p-2 bg-gray-50 rounded border">
-                              {hazard.hazard_type?.label || '-'}
-                            </div>
-                          ) : (
-                            <Select
-                              value={hazard.hazard_type_id}
-                              onValueChange={(value) => handleUpdate(hazard.id, 'hazard_type_id', value)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select hazard type" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {hazardTypes?.map((type) => (
-                                  <SelectItem key={type.id} value={type.id}>
-                                    {type.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Hazard</Label>
-                          {readOnly ? (
-                            <div className="p-2 bg-gray-50 rounded border min-h-[80px] overflow-y-auto">
-                              {hazard.hazard}
-                            </div>
-                          ) : (
-                            <Textarea
-                              value={hazard.hazard}
-                              onChange={(e) => handleUpdate(hazard.id, 'hazard', e.target.value)}
-                              placeholder="Enter hazard description"
-                              className="min-h-[80px] resize-none"
-                            />
-                          )}
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Control</Label>
-                          {readOnly ? (
-                            <div className="p-2 bg-gray-50 rounded border min-h-[80px] overflow-y-auto">
-                              {hazard.control}
-                            </div>
-                          ) : (
-                            <Textarea
-                              value={hazard.control}
-                              onChange={(e) => handleUpdate(hazard.id, 'control', e.target.value)}
-                              placeholder="Enter control measures"
-                              className="min-h-[80px] resize-none"
-                            />
-                          )}
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Control In Place</Label>
-                          <div className="flex items-center space-x-2 pt-2">
-                            <Checkbox
-                              id={`control-in-place-${hazard.id}`}
-                              checked={hazard.control_in_place}
-                              onCheckedChange={(checked) => 
-                                handleUpdate(hazard.id, 'control_in_place', checked)
-                              }
-                              disabled={readOnly}
-                            />
-                            <label
-                              htmlFor={`control-in-place-${hazard.id}`}
-                              className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            >
-                              Yes
-                            </label>
+                  <TableCell colSpan={6} className="p-4 border-t bg-gray-50">
+                    <div className="grid grid-cols-4 gap-4">
+                      <div className="space-y-2">
+                        <Label>Hazard Type</Label>
+                        {readOnly ? (
+                          <div className="p-2 bg-gray-100 rounded border">
+                            {hazard.hazard_type?.label || '-'}
                           </div>
+                        ) : (
+                          <Select
+                            value={hazard.hazard_type_id}
+                            onValueChange={(value) => handleUpdate(hazard.id, 'hazard_type_id', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select hazard type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {hazardTypes?.map((type) => (
+                                <SelectItem key={type.id} value={type.id}>
+                                  {type.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Hazard</Label>
+                        {readOnly ? (
+                          <div className="p-2 bg-gray-100 rounded border min-h-[80px] overflow-y-auto">
+                            {hazard.hazard}
+                          </div>
+                        ) : (
+                          <Textarea
+                            value={hazard.hazard}
+                            onChange={(e) => handleUpdate(hazard.id, 'hazard', e.target.value)}
+                            placeholder="Enter hazard description"
+                            className="min-h-[80px] resize-none"
+                          />
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Control</Label>
+                        {readOnly ? (
+                          <div className="p-2 bg-gray-100 rounded border min-h-[80px] overflow-y-auto">
+                            {hazard.control}
+                          </div>
+                        ) : (
+                          <Textarea
+                            value={hazard.control}
+                            onChange={(e) => handleUpdate(hazard.id, 'control', e.target.value)}
+                            placeholder="Enter control measures"
+                            className="min-h-[80px] resize-none"
+                          />
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Control In Place</Label>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`control-in-place-${hazard.id}`}
+                            checked={hazard.control_in_place}
+                            onCheckedChange={(checked) => 
+                              handleUpdate(hazard.id, 'control_in_place', checked)
+                            }
+                            disabled={readOnly}
+                          />
+                          <Label 
+                            htmlFor={`control-in-place-${hazard.id}`} 
+                            className="text-sm"
+                          >
+                            Yes
+                          </Label>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-4 gap-4">
-                        <div className="space-y-2">
-                          <Label>Likelihood</Label>
-                          {readOnly ? (
-                            <div className="p-2 bg-gray-50 rounded border">
-                              {likelihoodOptions?.find(l => l.id === hazard.likelihood_id)?.name || '-'}
-                            </div>
-                          ) : (
-                            <Select
-                              value={hazard.likelihood_id?.toString()}
-                              onValueChange={(value) => handleUpdate(hazard.id, 'likelihood_id', parseInt(value))}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select likelihood" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {likelihoodOptions?.map((option) => (
-                                  <SelectItem key={option.id} value={option.id.toString()}>
-                                    {option.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Consequence</Label>
-                          {readOnly ? (
-                            <div className="p-2 bg-gray-50 rounded border">
-                              {consequenceOptions?.find(c => c.id === hazard.consequence_id)?.name || '-'}
-                            </div>
-                          ) : (
-                            <Select
-                              value={hazard.consequence_id?.toString()}
-                              onValueChange={(value) => handleUpdate(hazard.id, 'consequence_id', parseInt(value))}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select consequence" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {consequenceOptions?.map((option) => (
-                                  <SelectItem key={option.id} value={option.id.toString()}>
-                                    {option.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Risk Level</Label>
-                          <div className="h-[38px] flex items-center">
-                            {hazard.risk_score && (
-                              <Badge
-                                style={{
-                                  backgroundColor: hazard.risk_score.risk_color || '#gray-400',
-                                  color: '#FFFFFF'
-                                }}
-                              >
-                                {hazard.risk_score.risk_label}
-                              </Badge>
-                            )}
+                      <div className="space-y-2">
+                        <Label>Likelihood</Label>
+                        {readOnly ? (
+                          <div className="p-2 bg-gray-100 rounded border">
+                            {likelihoodOptions?.find(l => l.id === hazard.likelihood_id)?.name || '-'}
                           </div>
+                        ) : (
+                          <Select
+                            value={hazard.likelihood_id?.toString()}
+                            onValueChange={(value) => handleUpdate(hazard.id, 'likelihood_id', parseInt(value))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select likelihood" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {likelihoodOptions?.map((option) => (
+                                <SelectItem key={option.id} value={option.id.toString()}>
+                                  {option.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Consequence</Label>
+                        {readOnly ? (
+                          <div className="p-2 bg-gray-100 rounded border">
+                            {consequenceOptions?.find(c => c.id === hazard.consequence_id)?.name || '-'}
+                          </div>
+                        ) : (
+                          <Select
+                            value={hazard.consequence_id?.toString()}
+                            onValueChange={(value) => handleUpdate(hazard.id, 'consequence_id', parseInt(value))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select consequence" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {consequenceOptions?.map((option) => (
+                                <SelectItem key={option.id} value={option.id.toString()}>
+                                  {option.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Risk Level</Label>
+                        <div className="h-[38px] flex items-center">
+                          {hazard.risk_score && (
+                            <Badge
+                              style={{
+                                backgroundColor: hazard.risk_score.risk_color || '#gray-400',
+                                color: '#FFFFFF'
+                              }}
+                            >
+                              {hazard.risk_score.risk_label}
+                            </Badge>
+                          )}
                         </div>
                       </div>
                     </div>
                   </TableCell>
                 </TableRow>
-              </CollapsibleContent>
-            </Collapsible>
+              )}
+            </React.Fragment>
           ))}
         </TableBody>
       </Table>
