@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -6,6 +5,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Table,
   TableBody,
@@ -23,7 +32,7 @@ import {
 } from "@/components/ui/select";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface RiskHazardsAndControlsProps {
   riskAssessmentId: string | null;
@@ -41,6 +50,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
   const queryClient = useQueryClient();
   const [hazards, setHazards] = useState<any[]>([]);
   const [openItems, setOpenItems] = useState<string[]>([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [hazardToDelete, setHazardToDelete] = useState<string | null>(null);
 
   const { data: hazardTypes } = useQuery({
     queryKey: ['hazardTypes'],
@@ -293,6 +304,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         title: "Success",
         description: "Hazard and control deleted successfully",
       });
+      setDeleteDialogOpen(false);
+      setHazardToDelete(null);
     },
     onError: (error) => {
       console.error('Delete mutation error:', error);
@@ -301,6 +314,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         description: "Failed to delete hazard and control",
         variant: "destructive",
       });
+      setDeleteDialogOpen(false);
+      setHazardToDelete(null);
     }
   });
 
@@ -386,11 +401,16 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this hazard and control?')) {
-      await deleteMutation.mutate(id);
-      setHazards(hazards.filter(h => h.id !== id));
-      setOpenItems(openItems.filter(item => item !== id));
+  const handleDeleteClick = (id: string) => {
+    setHazardToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (hazardToDelete) {
+      await deleteMutation.mutate(hazardToDelete);
+      setHazards(hazards.filter(h => h.id !== hazardToDelete));
+      setOpenItems(openItems.filter(item => item !== hazardToDelete));
     }
   };
 
@@ -487,7 +507,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                       size="icon"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDelete(hazard.id);
+                        handleDeleteClick(hazard.id);
                       }}
                       className="text-red-500 hover:text-red-700"
                     >
@@ -647,6 +667,21 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           ))}
         </TableBody>
       </Table>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Hazard & Control</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this hazard and control? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {hazards.length === 0 && !readOnly && (
         <div className="text-center py-6 text-gray-500">
