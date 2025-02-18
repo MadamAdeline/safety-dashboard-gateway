@@ -153,8 +153,8 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
                     {assessment.risk_matrix && (
                       <Badge
                         style={{
-                          backgroundColor: assessment.risk_matrix.risk_color,
-                          color: '#FFF'
+                          backgroundColor: assessment.risk_matrix.risk_color || '#gray-400',
+                          color: '#FFFFFF'
                         }}
                       >
                         {assessment.risk_matrix.risk_label}

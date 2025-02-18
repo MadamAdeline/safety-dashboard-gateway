@@ -380,8 +380,8 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
                 <div className="h-10 flex items-center">
                   <Badge
                     style={{
-                      backgroundColor: riskScore.risk_color,
-                      color: '#FFF'
+                      backgroundColor: riskScore.risk_color || '#gray-400',
+                      color: '#FFFFFF'
                     }}
                   >
                     {riskScore.risk_label}
