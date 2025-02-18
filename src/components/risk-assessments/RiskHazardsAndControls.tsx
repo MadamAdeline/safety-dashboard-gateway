@@ -1,4 +1,3 @@
-
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -502,7 +501,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                   <div className="space-y-2">
                     <Label>Hazard</Label>
                     {readOnly ? (
-                      <div className="p-2 bg-gray-50 rounded border">
+                      <div className="p-2 bg-gray-50 rounded border min-h-[80px] overflow-y-auto">
                         {hazard.hazard}
                       </div>
                     ) : (
@@ -510,7 +509,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                         value={hazard.hazard}
                         onChange={(e) => handleUpdate(hazard.id, 'hazard', e.target.value)}
                         placeholder="Enter hazard description"
-                        className="h-[38px] min-h-[38px] resize-none"
+                        className="min-h-[80px] resize-none"
                       />
                     )}
                   </div>
@@ -518,7 +517,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                   <div className="space-y-2">
                     <Label>Control</Label>
                     {readOnly ? (
-                      <div className="p-2 bg-gray-50 rounded border">
+                      <div className="p-2 bg-gray-50 rounded border min-h-[80px] overflow-y-auto">
                         {hazard.control}
                       </div>
                     ) : (
@@ -526,7 +525,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                         value={hazard.control}
                         onChange={(e) => handleUpdate(hazard.id, 'control', e.target.value)}
                         placeholder="Enter control measures"
-                        className="h-[38px] min-h-[38px] resize-none"
+                        className="min-h-[80px] resize-none"
                       />
                     )}
                   </div>
@@ -552,8 +551,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                   </div>
                 </div>
 
-                {/* Second Row: Likelihood, Consequence, Risk Level */}
-                <div className="grid grid-cols-3 gap-4">
+                {/* Second Row: Likelihood, Consequence, Risk Level, Empty column for alignment */}
+                <div className="grid grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label>Likelihood</Label>
                     {readOnly ? (
@@ -618,6 +617,10 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                         </Badge>
                       )}
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {/* Empty column for alignment */}
                   </div>
                 </div>
               </div>
