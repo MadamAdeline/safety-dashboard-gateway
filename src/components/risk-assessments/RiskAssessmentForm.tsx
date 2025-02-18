@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,6 +82,7 @@ export function RiskAssessmentForm({
     overall_risk_score_id: initialData?.overall_risk_score_id || null
   });
 
+  // Updated to use 'value' instead of 'code'
   const { data: evaluationStatus } = useQuery({
     queryKey: ['evaluationStatus'],
     queryFn: async () => {
@@ -88,7 +90,7 @@ export function RiskAssessmentForm({
         .from('master_data')
         .select('id')
         .eq('category', 'RISK_OVERALL_STATUS')
-        .eq('code', 'IN_PROGRESS')
+        .eq('value', 'IN_PROGRESS')
         .single();
       
       if (error) throw error;
@@ -96,6 +98,7 @@ export function RiskAssessmentForm({
     }
   });
 
+  // Updated to use 'value' instead of 'code'
   const { data: approvalStatus } = useQuery({
     queryKey: ['approvalStatus'],
     queryFn: async () => {
@@ -103,7 +106,7 @@ export function RiskAssessmentForm({
         .from('master_data')
         .select('id')
         .eq('category', 'RISK_APPROVAL_STATUS')
-        .eq('code', 'UNDER_REVIEW')
+        .eq('value', 'UNDER_REVIEW')
         .single();
       
       if (error) throw error;
