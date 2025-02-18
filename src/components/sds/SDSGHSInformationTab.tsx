@@ -49,7 +49,7 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
           sds_ghs_id,
           sds_id,
           hazard_classification_id,
-          hazard_classification:ghs_hazard_classifications (
+          hazard_classification:ghs_hazard_classifications!hazard_classification_id (
             hazard_classification_id,
             hazard_class,
             hazard_category,
@@ -58,11 +58,11 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
             hazard_statement_id,
             updated_at,
             updated_by,
-            ghs_code:ghs_codes (
+            ghs_code:ghs_codes!ghs_code_id (
               ghs_code,
               pictogram_url
             ),
-            hazard_statement:hazard_statements (
+            hazard_statement:hazard_statements!hazard_statement_id (
               hazard_statement_code,
               hazard_statement_text
             )
@@ -92,11 +92,11 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
           hazard_statement_id,
           updated_at,
           updated_by,
-          ghs_code:ghs_codes!ghs_code_id(
+          ghs_code:ghs_codes!ghs_code_id (
             ghs_code,
             pictogram_url
           ),
-          hazard_statement:hazard_statements!hazard_statement_id(
+          hazard_statement:hazard_statements!hazard_statement_id (
             hazard_statement_code,
             hazard_statement_text
           )
