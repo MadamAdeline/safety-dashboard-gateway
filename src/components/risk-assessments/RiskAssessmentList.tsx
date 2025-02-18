@@ -45,7 +45,7 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
             first_name,
             last_name
           ),
-          risk_matrix:risk_matrix!risk_assessments_overall_risk_score_id_fkey (
+          risk_matrix!risk_assessments_overall_risk_score_id_fkey (
             id,
             risk_label,
             risk_color
