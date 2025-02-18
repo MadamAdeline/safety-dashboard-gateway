@@ -30,5 +30,6 @@ export const HAZARD_CATEGORIES = [
 
 export const SIGNAL_WORDS = [
   'Danger',
-  'Warning'
+  'Warning',
+  'No Signal Word'
 ] as const;

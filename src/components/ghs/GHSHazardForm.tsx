@@ -20,7 +20,7 @@ import {
   getHazardStatements
 } from "@/services/ghs";
 import type { GHSHazardClassification } from "@/types/ghs";
-import { HAZARD_CATEGORIES, SIGNAL_WORDS } from "@/types/ghs";
+import { SIGNAL_WORDS } from "@/types/ghs";
 
 interface GHSHazardFormProps {
   onClose: () => void;
@@ -161,21 +161,11 @@ export function GHSHazardForm({ onClose, initialData }: GHSHazardFormProps) {
           <Label htmlFor="hazard_category" className="after:content-['*'] after:ml-0.5 after:text-red-500">
             Hazard Category
           </Label>
-          <Select
+          <Input
+            id="hazard_category"
             value={formData.hazard_category}
-            onValueChange={(value) => setFormData({ ...formData, hazard_category: value })}
-          >
-            <SelectTrigger id="hazard_category">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              {HAZARD_CATEGORIES.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            onChange={(e) => setFormData({ ...formData, hazard_category: e.target.value })}
+          />
         </div>
 
         <div className="space-y-2">
