@@ -82,19 +82,30 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
       if (!searchTerm) return [];
       
       // First, get matching GHS codes
-      const { data: matchingGHSCodes } = await supabase
+      const { data: matchingGHSCodes, error: ghsError } = await supabase
         .from('ghs_codes')
         .select('ghs_code_id')
         .ilike('ghs_code', `%${searchTerm}%`);
+
+      if (ghsError) {
+        console.error('GHS Codes search error:', ghsError);
+      } else {
+        console.log('Matching GHS Codes:', matchingGHSCodes);
+      }
       
       // Then, get matching hazard statements
-      const { data: matchingStatements } = await supabase
+      const { data: matchingStatements, error: stmtError } = await supabase
         .from('hazard_statements')
         .select('hazard_statement_id')
         .ilike('hazard_statement_code', `%${searchTerm}%`);
-      
-      // Finally, get hazard classifications matching any criteria
-      const { data, error } = await supabase
+
+      if (stmtError) {
+        console.error('Hazard Statements search error:', stmtError);
+      } else {
+        console.log('Matching Statements:', matchingStatements);
+      }
+
+      let query = supabase
         .from('ghs_hazard_classifications')
         .select(`
           hazard_classification_id,
@@ -113,30 +124,40 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
             hazard_statement_code,
             hazard_statement_text
           )
-        `)
-        .or(
-          `hazard_class.ilike.%${searchTerm}%,` +
-          `hazard_category.ilike.%${searchTerm}%,` +
-          `signal_word.ilike.%${searchTerm}%`
-        )
-        .or(
-          matchingGHSCodes?.length > 0 
-            ? `ghs_code_id.in.(${matchingGHSCodes.map(code => code.ghs_code_id).join(',')})`
-            : 'ghs_code_id.is.null'
-        )
-        .or(
-          matchingStatements?.length > 0
-            ? `hazard_statement_id.in.(${matchingStatements.map(stmt => stmt.hazard_statement_id).join(',')})`
-            : 'hazard_statement_id.is.null'
-        )
-        .order('hazard_class');
+        `);
+
+      // Build filter conditions
+      const conditions = [];
+
+      // Text search conditions
+      conditions.push(`hazard_class.ilike.%${searchTerm}%`);
+      conditions.push(`hazard_category.ilike.%${searchTerm}%`);
+      conditions.push(`signal_word.ilike.%${searchTerm}%`);
+
+      // GHS codes condition
+      if (matchingGHSCodes?.length > 0) {
+        conditions.push(`ghs_code_id.in.(${matchingGHSCodes.map(code => code.ghs_code_id).join(',')})`);
+      }
+
+      // Hazard statements condition
+      if (matchingStatements?.length > 0) {
+        conditions.push(`hazard_statement_id.in.(${matchingStatements.map(stmt => stmt.hazard_statement_id).join(',')})`);
+      }
+
+      // Apply all conditions with OR
+      query = query.or(conditions.join(','));
+      
+      // Add ordering
+      query = query.order('hazard_class');
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Search error:', error);
         throw error;
       }
 
-      console.log('Search results:', data);
+      console.log('Final search results:', data);
       
       return data as GHSHazardClassification[];
     },
