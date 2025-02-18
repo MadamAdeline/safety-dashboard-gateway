@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,14 +81,13 @@ export function RiskAssessmentForm({
     overall_risk_score_id: initialData?.overall_risk_score_id || null
   });
 
-  // Updated to use 'label' instead of 'value'
   const { data: evaluationStatus } = useQuery({
     queryKey: ['evaluationStatus'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('master_data')
         .select('id')
-        .eq('category', 'RISK_OVERALL_STATUS')
+        .eq('category', '\tRISK_OVERALL_STATUS')
         .eq('label', 'Risk Assessment In Progress')
         .single();
       
@@ -98,7 +96,6 @@ export function RiskAssessmentForm({
     }
   });
 
-  // Updated to use 'label' instead of 'value'
   const { data: approvalStatus } = useQuery({
     queryKey: ['approvalStatus'],
     queryFn: async () => {
