@@ -276,22 +276,26 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
             <div className="bg-gray-50 p-4 rounded-lg space-y-2">
               <p><strong>Location:</strong> {siteRegister?.location?.full_path}</p>
               <p><strong>Product:</strong> {siteRegister?.product?.product_name}</p>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => {
-                  setSelectedSiteRegister(null);
-                  setFormData(prev => ({ ...prev, site_register_record_id: "" }));
-                }}
-              >
-                Change Site Register
-              </Button>
+              {!initialData && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    setSelectedSiteRegister(null);
+                    setFormData(prev => ({ ...prev, site_register_record_id: "" }));
+                  }}
+                >
+                  Change the Site Register's Product
+                </Button>
+              )}
             </div>
           ) : (
-            <SiteRegisterSearch 
-              onSelect={handleSiteRegisterSelect}
-              className="w-full"
-            />
+            !initialData && (
+              <SiteRegisterSearch 
+                onSelect={handleSiteRegisterSelect}
+                className="w-full"
+              />
+            )
           )}
         </div>
 
@@ -391,8 +395,12 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
             )}
           </div>
 
-          <div className="bg-gray-100 p-4 rounded-lg mt-4">
-            <p className="text-gray-500 text-sm">Risk Matrix will be displayed here</p>
+          <div className="bg-white border rounded-lg p-4 mt-4">
+            <img 
+              src="/lovable-uploads/2cadd5b5-9f69-4e43-83af-bfc20517cde2.png" 
+              alt="Risk Assessment Matrix" 
+              className="w-full max-w-3xl mx-auto"
+            />
           </div>
         </div>
 
