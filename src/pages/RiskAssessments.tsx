@@ -24,25 +24,21 @@ export default function RiskAssessments() {
     setSelectedRiskAssessment(null);
   };
 
-  if (isFormOpen) {
-    return (
-      <DashboardLayout>
+  return (
+    <DashboardLayout>
+      {isFormOpen ? (
         <RiskAssessmentForm
           onClose={handleClose}
           initialData={selectedRiskAssessment}
         />
-      </DashboardLayout>
-    );
-  }
-
-  return (
-    <DashboardLayout>
-      <RiskAssessmentList
-        onEdit={handleEdit}
-        onNew={handleNew}
-        searchTerm={searchTerm}
-        onSearch={setSearchTerm}
-      />
+      ) : (
+        <RiskAssessmentList
+          onEdit={handleEdit}
+          onNew={handleNew}
+          searchTerm={searchTerm}
+          onSearch={setSearchTerm}
+        />
+      )}
     </DashboardLayout>
   );
 }
