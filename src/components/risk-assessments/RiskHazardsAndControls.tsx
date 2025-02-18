@@ -453,7 +453,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                 </TableCell>
                 <TableCell className="w-[125px] sm:w-[175px]">
                   <div 
-                    className="truncate w-full" 
+                    className="truncate max-w-[125px] sm:max-w-[175px]" 
                     title={hazard.hazard}
                   >
                     {hazard.hazard || '-'}
@@ -461,7 +461,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                 </TableCell>
                 <TableCell className="w-[125px] sm:w-[175px]">
                   <div 
-                    className="truncate w-full" 
+                    className="truncate max-w-[125px] sm:max-w-[175px]" 
                     title={hazard.control}
                   >
                     {hazard.control || '-'}
