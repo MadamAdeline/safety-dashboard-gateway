@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -368,15 +369,21 @@ export function RiskAssessmentForm({
           hazard_type_id: ph.hazard_type,
           hazard: ph.hazard,
           control: ph.control,
-          source: ph.source,
-          control_in_place: false
+          source: ph.source || "MANUAL", // Provide a default value if source is null
+          control_in_place: false,
+          likelihood_id: null,
+          consequence_id: null,
+          risk_score_id: null
         }));
 
         const { error: insertError } = await supabase
           .from('risk_hazards_and_controls')
           .insert(hazardsToInsert);
 
-        if (insertError) throw insertError;
+        if (insertError) {
+          console.error('Insert error:', insertError);
+          throw insertError;
+        }
 
         return hazardsToInsert;
       }
