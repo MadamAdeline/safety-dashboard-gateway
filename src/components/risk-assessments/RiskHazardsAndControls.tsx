@@ -410,15 +410,15 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         <TableHeader>
           <TableRow className="border-b">
             <TableHead className="w-[50px]"></TableHead>
-            <TableHead className="w-[150px] sm:w-[200px] text-left font-semibold">Type</TableHead>
+            <TableHead className="w-[100px] sm:w-[150px] text-left font-semibold">Type</TableHead>
             <TableHead 
-              className="w-[100px] sm:w-[150px] text-left font-semibold truncate"
+              className="w-[125px] sm:w-[175px] text-left font-semibold truncate"
               title="Hazard Description"
             >
               Hazard Desc.
             </TableHead>
             <TableHead 
-              className="w-[100px] sm:w-[150px] text-left font-semibold truncate"
+              className="w-[125px] sm:w-[175px] text-left font-semibold truncate"
               title="Control Description"
             >
               Control Desc.
@@ -446,22 +446,22 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                     <ChevronRight className="h-4 w-4" />
                   )}
                 </TableCell>
-                <TableCell className="w-[150px] sm:w-[200px]">
+                <TableCell className="w-[100px] sm:w-[150px]">
                   <div className="truncate" title={hazard.hazard_type?.label}>
                     {hazard.hazard_type?.label || '-'}
                   </div>
                 </TableCell>
-                <TableCell className="w-[100px] sm:w-[150px]">
+                <TableCell className="w-[125px] sm:w-[175px]">
                   <div 
-                    className="truncate max-w-[100px] sm:max-w-[150px]" 
+                    className="truncate max-w-[125px] sm:max-w-[175px]" 
                     title={hazard.hazard}
                   >
                     {hazard.hazard || '-'}
                   </div>
                 </TableCell>
-                <TableCell className="w-[100px] sm:w-[150px]">
+                <TableCell className="w-[125px] sm:w-[175px]">
                   <div 
-                    className="truncate max-w-[100px] sm:max-w-[150px]" 
+                    className="truncate max-w-[125px] sm:max-w-[175px]" 
                     title={hazard.control}
                   >
                     {hazard.control || '-'}
