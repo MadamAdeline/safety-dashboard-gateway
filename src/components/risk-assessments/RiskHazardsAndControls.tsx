@@ -156,7 +156,6 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     mutationFn: async () => {
       if (!riskAssessmentId || !siteRegister?.product?.id) return;
 
-      // Get existing hazards for this risk assessment
       const { data: existingHazards } = await supabase
         .from('risk_hazards_and_controls')
         .select('hazard_control_id')
@@ -164,7 +163,6 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
 
       const existingHazardIds = existingHazards?.map(h => h.hazard_control_id) || [];
 
-      // Get all product hazards
       const { data: productHazards, error: hazardsError } = await supabase
         .from('hazards_and_controls')
         .select(`
@@ -178,7 +176,6 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
 
       if (hazardsError) throw hazardsError;
 
-      // Filter out already existing hazards
       const newHazards = productHazards?.filter(
         ph => !existingHazardIds.includes(ph.hazard_control_id)
       );
@@ -626,15 +623,6 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
           </div>
         )}
       </div>
-
-      {!readOnly && (
-        <Button
-          onClick={handleAdd}
-          className="w-full bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-        >
-          <Plus className="h-4 w-4 mr-2" /> Add Hazard & Control
-        </Button>
-      )}
     </div>
   );
 });
