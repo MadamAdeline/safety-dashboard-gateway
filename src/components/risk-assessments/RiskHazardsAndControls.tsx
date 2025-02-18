@@ -329,50 +329,20 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       }
 
       try {
-        const existingHazardIds = new Set(
-          hazards.map(h => h.hazard_control_id).filter(Boolean)
-        );
+        const { error } = await supabase
+          .from('risk_assessments')
+          .update({ auto_generate_hazards: true })
+          .eq('id', riskAssessmentId);
 
-        const { data: productHazards, error: fetchError } = await supabase
-          .from('hazards_and_controls')
-          .select('*')
-          .eq('product_id', siteRegister.product.id);
+        if (error) throw error;
 
-        if (fetchError) throw fetchError;
-
-        const newHazards = (productHazards || []).filter(
-          ph => ph.hazard_control_id && !existingHazardIds.has(ph.hazard_control_id)
-        );
-
-        if (newHazards.length === 0) {
-          toast({
-            title: "Information",
-            description: "No new hazards to add",
-          });
-          return;
-        }
-
-        const hazardsToInsert = newHazards.map(ph => ({
-          risk_assessment_id: riskAssessmentId,
-          hazard_type_id: ph.hazard_type,
-          hazard: ph.hazard,
-          control: ph.control,
-          hazard_control_id: ph.hazard_control_id,
-          source: "Product",
-          control_in_place: false
-        }));
-
-        const { error: insertError } = await supabase
-          .from('risk_hazards_and_controls')
-          .insert(hazardsToInsert);
-
-        if (insertError) throw insertError;
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         await refetchHazards();
         
         toast({
           title: "Success",
-          description: `Added ${hazardsToInsert.length} new hazards`,
+          description: "Hazards auto-generated successfully",
         });
 
       } catch (error) {

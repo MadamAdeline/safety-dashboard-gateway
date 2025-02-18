@@ -573,6 +573,7 @@ export type Database = {
         Row: {
           approval_status_id: string | null
           approver: string | null
+          auto_generate_hazards: boolean | null
           conducted_by: string | null
           created_at: string | null
           date_of_next_review: string | null
@@ -595,6 +596,7 @@ export type Database = {
         Insert: {
           approval_status_id?: string | null
           approver?: string | null
+          auto_generate_hazards?: boolean | null
           conducted_by?: string | null
           created_at?: string | null
           date_of_next_review?: string | null
@@ -617,6 +619,7 @@ export type Database = {
         Update: {
           approval_status_id?: string | null
           approver?: string | null
+          auto_generate_hazards?: boolean | null
           conducted_by?: string | null
           created_at?: string | null
           date_of_next_review?: string | null
