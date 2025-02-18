@@ -14,11 +14,11 @@ export async function getGHSHazardClassifications() {
       hazard_statement_id,
       updated_at,
       updated_by,
-      ghs_codes (
+      ghs_codes!ghs_code_id (
         ghs_code,
         pictogram_url
       ),
-      hazard_statements (
+      hazard_statements!hazard_statement_id (
         hazard_statement_code,
         hazard_statement_text
       )
@@ -38,9 +38,12 @@ export async function getGHSHazardClassifications() {
 }
 
 export async function createGHSHazardClassification(data: Omit<GHSHazardClassification, 'hazard_classification_id' | 'updated_at'>) {
+  // Remove the nested objects before insert
+  const { ghs_code, hazard_statement, ...insertData } = data;
+  
   const { data: created, error } = await supabase
     .from('ghs_hazard_classifications')
-    .insert([data])
+    .insert([insertData])
     .select(`
       hazard_classification_id,
       hazard_class,
@@ -50,11 +53,11 @@ export async function createGHSHazardClassification(data: Omit<GHSHazardClassifi
       hazard_statement_id,
       updated_at,
       updated_by,
-      ghs_codes (
+      ghs_codes!ghs_code_id (
         ghs_code,
         pictogram_url
       ),
-      hazard_statements (
+      hazard_statements!hazard_statement_id (
         hazard_statement_code,
         hazard_statement_text
       )
@@ -77,11 +80,14 @@ export async function updateGHSHazardClassification(
   id: string,
   data: Partial<Omit<GHSHazardClassification, 'hazard_classification_id' | 'updated_at'>>
 ) {
-  console.log('Updating GHS classification:', id, data);
+  // Remove the nested objects before update
+  const { ghs_code, hazard_statement, ...updateData } = data;
+  
+  console.log('Updating GHS classification with data:', updateData);
   
   const { data: updated, error } = await supabase
     .from('ghs_hazard_classifications')
-    .update(data)
+    .update(updateData)
     .eq('hazard_classification_id', id)
     .select(`
       hazard_classification_id,
@@ -92,11 +98,11 @@ export async function updateGHSHazardClassification(
       hazard_statement_id,
       updated_at,
       updated_by,
-      ghs_codes (
+      ghs_codes!ghs_code_id (
         ghs_code,
         pictogram_url
       ),
-      hazard_statements (
+      hazard_statements!hazard_statement_id (
         hazard_statement_code,
         hazard_statement_text
       )
@@ -107,8 +113,6 @@ export async function updateGHSHazardClassification(
     console.error('Error updating GHS classification:', error);
     throw error;
   }
-  
-  console.log('Updated GHS classification:', updated);
   
   // Transform the response to match our type
   const transformedData = {
