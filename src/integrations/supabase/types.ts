@@ -41,6 +41,125 @@ export type Database = {
           },
         ]
       }
+      ghs_codes: {
+        Row: {
+          ghs_code: string
+          ghs_code_id: string
+          pictogram_image_url: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          ghs_code: string
+          ghs_code_id?: string
+          pictogram_image_url?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          ghs_code?: string
+          ghs_code_id?: string
+          pictogram_image_url?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ghs_codes_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ghs_hazard_classifications: {
+        Row: {
+          ghs_code_id: string | null
+          hazard_category: string
+          hazard_class: string
+          hazard_classification_id: string
+          hazard_statement_id: string | null
+          signal_word: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          ghs_code_id?: string | null
+          hazard_category: string
+          hazard_class: string
+          hazard_classification_id?: string
+          hazard_statement_id?: string | null
+          signal_word?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          ghs_code_id?: string | null
+          hazard_category?: string
+          hazard_class?: string
+          hazard_classification_id?: string
+          hazard_statement_id?: string | null
+          signal_word?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ghs_hazard_classifications_ghs_code_id_fkey"
+            columns: ["ghs_code_id"]
+            isOneToOne: false
+            referencedRelation: "ghs_codes"
+            referencedColumns: ["ghs_code_id"]
+          },
+          {
+            foreignKeyName: "ghs_hazard_classifications_hazard_statement_id_fkey"
+            columns: ["hazard_statement_id"]
+            isOneToOne: false
+            referencedRelation: "hazard_statements"
+            referencedColumns: ["hazard_statement_id"]
+          },
+          {
+            foreignKeyName: "ghs_hazard_classifications_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hazard_statements: {
+        Row: {
+          hazard_statement_code: string
+          hazard_statement_id: string
+          hazard_statement_text: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          hazard_statement_code: string
+          hazard_statement_id?: string
+          hazard_statement_text: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          hazard_statement_code?: string
+          hazard_statement_id?: string
+          hazard_statement_text?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hazard_statements_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       locations: {
         Row: {
           coordinates: Json | null
@@ -469,6 +588,55 @@ export type Database = {
           },
           {
             foreignKeyName: "sds_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sds_ghs_classifications: {
+        Row: {
+          created_at: string | null
+          hazard_classification_id: string
+          sds_ghs_id: string
+          sds_id: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          hazard_classification_id: string
+          sds_ghs_id?: string
+          sds_id: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          hazard_classification_id?: string
+          sds_ghs_id?: string
+          sds_id?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sds_ghs_classifications_hazard_classification_id_fkey"
+            columns: ["hazard_classification_id"]
+            isOneToOne: false
+            referencedRelation: "ghs_hazard_classifications"
+            referencedColumns: ["hazard_classification_id"]
+          },
+          {
+            foreignKeyName: "sds_ghs_classifications_sds_id_fkey"
+            columns: ["sds_id"]
+            isOneToOne: false
+            referencedRelation: "sds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sds_ghs_classifications_updated_by_fkey"
             columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "users"

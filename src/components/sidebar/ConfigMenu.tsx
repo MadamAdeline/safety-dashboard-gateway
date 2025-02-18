@@ -5,6 +5,7 @@ import {
   Database,
   Cog,
   MapPin,
+  AlertTriangle
 } from "lucide-react"
 import {
   SidebarMenuItem,
@@ -29,6 +30,12 @@ const configItems = [
     label: "Master Data",
     path: "/master-data",
     icon: Database,
+    allowedRoles: ['administrator'],
+  },
+  {
+    label: "GHS Hazards",
+    path: "/ghs-hazards",
+    icon: AlertTriangle,
     allowedRoles: ['administrator'],
   },
   {
