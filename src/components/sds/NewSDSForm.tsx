@@ -13,6 +13,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { format, addYears } from "date-fns";
 import { useUserRole } from "@/hooks/use-user-role";
 import { SDSRelatedProductsTab } from "./SDSRelatedProductsTab";
+import { SDSGHSInformationTab } from "./SDSGHSInformationTab";
 
 interface NewSDSFormProps {
   onClose: () => void;
@@ -240,10 +241,11 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
       <div className="grid grid-cols-2 gap-6">
         <div className="space-y-6">
           <Tabs defaultValue="product-details" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="product-details">SDS Details</TabsTrigger>
               <TabsTrigger value="version">Version History</TabsTrigger>
               <TabsTrigger value="related-products">Related Products</TabsTrigger>
+              <TabsTrigger value="ghs-information">GHS Information</TabsTrigger>
             </TabsList>
 
             <TabsContent value="product-details">
@@ -278,6 +280,15 @@ export function NewSDSForm({ onClose, initialData }: NewSDSFormProps) {
               {!initialData && (
                 <div className="text-center p-4 text-gray-500">
                   Related products will be available after saving the SDS.
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="ghs-information">
+              {initialData && <SDSGHSInformationTab sds={initialData} readOnly={isManager} />}
+              {!initialData && (
+                <div className="text-center p-4 text-gray-500">
+                  GHS Information will be available after saving the SDS.
                 </div>
               )}
             </TabsContent>
