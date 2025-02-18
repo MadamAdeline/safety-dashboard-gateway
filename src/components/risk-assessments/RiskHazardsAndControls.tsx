@@ -203,6 +203,7 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
           throw insertError;
         }
 
+        queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
         return hazardsToInsert;
       }
 
@@ -623,6 +624,15 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
           </div>
         )}
       </div>
+
+      {!readOnly && (
+        <Button
+          onClick={handleAdd}
+          className="w-full bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+        >
+          <Plus className="h-4 w-4 mr-2" /> Add Hazard & Control
+        </Button>
+      )}
     </div>
   );
 });
