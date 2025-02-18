@@ -18,6 +18,7 @@ export function GHSCodeForm({ onClose }: GHSCodeFormProps) {
     pictogram_image: null as File | null,
     pictogram_url: "",
   });
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   
   const { toast } = useToast();
@@ -76,10 +77,18 @@ export function GHSCodeForm({ onClose }: GHSCodeFormProps) {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
       setFormData(prev => ({
         ...prev,
-        pictogram_image: e.target.files![0]
+        pictogram_image: file
       }));
+      
+      // Create preview URL
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+      
+      // Clean up preview URL when component unmounts
+      return () => URL.revokeObjectURL(objectUrl);
     }
   };
 
@@ -144,6 +153,15 @@ export function GHSCodeForm({ onClose }: GHSCodeFormProps) {
             accept="image/*"
             onChange={handleFileChange}
           />
+          {previewUrl && (
+            <div className="mt-4">
+              <img 
+                src={previewUrl} 
+                alt="Pictogram preview" 
+                className="max-w-[200px] h-auto border rounded-md"
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

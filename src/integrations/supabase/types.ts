@@ -45,21 +45,21 @@ export type Database = {
         Row: {
           ghs_code: string
           ghs_code_id: string
-          pictogram_image_url: string | null
+          pictogram_url: string | null
           updated_at: string | null
           updated_by: string | null
         }
         Insert: {
           ghs_code: string
           ghs_code_id?: string
-          pictogram_image_url?: string | null
+          pictogram_url?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Update: {
           ghs_code?: string
           ghs_code_id?: string
-          pictogram_image_url?: string | null
+          pictogram_url?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }

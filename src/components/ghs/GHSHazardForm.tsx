@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -122,6 +121,8 @@ export function GHSHazardForm({ onClose, initialData }: GHSHazardFormProps) {
     }
   };
 
+  const selectedGHSCode = ghsCodes.find(code => code.ghs_code_id === formData.ghs_code_id);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -187,6 +188,15 @@ export function GHSHazardForm({ onClose, initialData }: GHSHazardFormProps) {
               ))}
             </SelectContent>
           </Select>
+          {selectedGHSCode?.pictogram_url && (
+            <div className="mt-2">
+              <img 
+                src={selectedGHSCode.pictogram_url} 
+                alt={`GHS Code ${selectedGHSCode.ghs_code} pictogram`}
+                className="max-w-[200px] h-auto border rounded-md"
+              />
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
