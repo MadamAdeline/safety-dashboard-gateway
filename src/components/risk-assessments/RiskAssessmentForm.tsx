@@ -290,7 +290,21 @@ export function RiskAssessmentForm({
       let riskAssessmentId: string;
 
       if (initialData?.id) {
-        await updateMutation.mutateAsync(formData);
+        const { data, error } = await supabase
+          .from('risk_assessments')
+          .update({
+            ...formData,
+            site_register_record_id: formData.site_register_record_id || null,
+            conducted_by: formData.conducted_by || null,
+            approver: formData.approver || null,
+            overall_evaluation_status_id: formData.overall_evaluation_status_id || null,
+            approval_status_id: formData.approval_status_id || null
+          })
+          .eq('id', initialData.id)
+          .select()
+          .single();
+
+        if (error) throw error;
         riskAssessmentId = initialData.id;
       } else {
         // Create the risk assessment first
@@ -578,6 +592,7 @@ export function RiskAssessmentForm({
       </Tabs>
     </div>;
 }
+
 const createMutation = useMutation({
     mutationFn: async (data: any) => {
       const cleanedData = {
