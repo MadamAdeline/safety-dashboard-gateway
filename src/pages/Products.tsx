@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProductForm } from "@/components/products/ProductForm";
@@ -120,12 +119,10 @@ export default function Products() {
     setShowWizard(false);
     setSelectedProduct(null);
     window.history.replaceState({}, document.title);
-    refetch();
   };
 
   const handleFormSave = () => {
     refetch();
-    handleFormClose();
     toast({
       title: "Success",
       description: "Product saved successfully"
