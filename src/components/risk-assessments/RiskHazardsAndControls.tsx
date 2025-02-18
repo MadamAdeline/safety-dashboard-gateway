@@ -392,9 +392,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
   const toggleItem = (id: string) => {
     setOpenItems(prev => 
-      prev.includes(id) 
-        ? prev.filter(item => item !== id)
-        : [...prev, id]
+      prev.includes(id) ? [] : [id]
     );
   };
 
