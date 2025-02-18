@@ -413,7 +413,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
               className="flex items-start justify-between p-4 cursor-pointer hover:bg-gray-50"
               onClick={() => toggleItem(hazard.id)}
             >
-              <div className="flex-1 grid grid-cols-[auto,1fr,1fr,1fr] gap-4 items-start">
+              <div className="flex-1 grid grid-cols-[auto,1fr,1fr,1fr,auto] gap-4 items-start">
                 <CollapsibleTrigger className="flex items-center pt-1">
                   {openItems.includes(hazard.id) ? (
                     <ChevronDown className="h-4 w-4" />
@@ -424,21 +424,19 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                 
                 <div>
                   <div className="font-medium text-sm text-gray-500">Type</div>
-                  <div className="font-medium truncate">{hazard.hazard_type?.label}</div>
+                  <div className="font-medium">{hazard.hazard_type?.label}</div>
                 </div>
 
-                <div>
+                <div className="truncate">
                   <div className="font-medium text-sm text-gray-500">Hazard</div>
                   <div className="font-medium truncate">{hazard.hazard || '-'}</div>
                 </div>
 
-                <div>
+                <div className="truncate">
                   <div className="font-medium text-sm text-gray-500">Control</div>
                   <div className="font-medium truncate">{hazard.control || '-'}</div>
                 </div>
-              </div>
 
-              <div className="flex items-start gap-4">
                 {hazard.risk_score && (
                   <div>
                     <div className="font-medium text-sm text-gray-500">Risk Level</div>
@@ -452,27 +450,27 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                     </Badge>
                   </div>
                 )}
-
-                {!readOnly && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(hazard.id);
-                    }}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
               </div>
+
+              {!readOnly && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(hazard.id);
+                  }}
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
             </div>
 
             <CollapsibleContent className="p-4 pt-0 border-t">
               <div className="space-y-4">
                 {/* First Row: Hazard Type, Hazard, Control, Control in Place */}
-                <div className="grid grid-cols-[1fr,1fr,1fr,auto] gap-4">
+                <div className="grid grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label>Hazard Type</Label>
                     {readOnly ? (
@@ -551,8 +549,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                   </div>
                 </div>
 
-                {/* Second Row: Likelihood, Consequence, Risk Level */}
-                <div className="grid grid-cols-[1fr,1fr,1fr,auto] gap-4">
+                {/* Second Row: Likelihood, Consequence, Risk Level, Empty column for alignment */}
+                <div className="grid grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label>Likelihood</Label>
                     {readOnly ? (
