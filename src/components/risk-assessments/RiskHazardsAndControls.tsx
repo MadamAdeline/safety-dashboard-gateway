@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -176,38 +177,74 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     mutationFn: async (hazardsData: any[]) => {
       if (!riskAssessmentId) return;
 
-      if (hazardsData.length > 0) {
-        const dataToSave = hazardsData.map(h => {
-          console.log('Saving hazard data:', h);
-          return {
-            id: h.id,
-            risk_assessment_id: riskAssessmentId,
-            hazard_type_id: h.hazard_type_id,
-            hazard: h.hazard,
-            control: h.control,
-            control_in_place: h.control_in_place,
-            likelihood_id: h.likelihood_id,
-            consequence_id: h.consequence_id,
-            risk_score_id: h.risk_score?.id,
-            risk_score_int: h.risk_score?.risk_score,
-            risk_level_text: h.risk_score?.risk_label,
-            likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
-            consequence_text: h.consequence_text,
-            hazard_control_id: h.hazard_control_id
-          };
-        });
+      // Split hazards into copied (with hazard_control_id) and manual hazards
+      const copiedHazards = hazardsData.filter(h => h.hazard_control_id);
+      const manualHazards = hazardsData.filter(h => !h.hazard_control_id);
 
-        console.log('Data being saved to database:', dataToSave);
-        const { error } = await supabase
+      console.log('Saving copied hazards:', copiedHazards.length);
+      console.log('Saving manual hazards:', manualHazards.length);
+
+      // Handle copied hazards - use composite key
+      if (copiedHazards.length > 0) {
+        const copiedHazardsToSave = copiedHazards.map(h => ({
+          risk_assessment_id: riskAssessmentId,
+          hazard_control_id: h.hazard_control_id,
+          hazard_type_id: h.hazard_type_id,
+          hazard: h.hazard,
+          control: h.control,
+          control_in_place: h.control_in_place,
+          likelihood_id: h.likelihood_id,
+          consequence_id: h.consequence_id,
+          risk_score_id: h.risk_score?.id,
+          risk_score_int: h.risk_score?.risk_score,
+          risk_level_text: h.risk_score?.risk_label,
+          likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
+          consequence_text: h.consequence_text,
+          source: 'Product'
+        }));
+
+        const { error: copiedError } = await supabase
           .from('risk_hazards_and_controls')
-          .upsert(dataToSave, { 
-            onConflict: 'id',
-            ignoreDuplicates: false 
+          .upsert(copiedHazardsToSave, {
+            onConflict: 'risk_assessment_id,hazard_control_id',
+            ignoreDuplicates: false
           });
-        
-        if (error) {
-          console.error('Error saving hazards:', error);
-          throw error;
+
+        if (copiedError) {
+          console.error('Error saving copied hazards:', copiedError);
+          throw copiedError;
+        }
+      }
+
+      // Handle manual hazards - use primary key
+      if (manualHazards.length > 0) {
+        const manualHazardsToSave = manualHazards.map(h => ({
+          id: h.id, // Use the existing ID for manual hazards
+          risk_assessment_id: riskAssessmentId,
+          hazard_type_id: h.hazard_type_id,
+          hazard: h.hazard,
+          control: h.control,
+          control_in_place: h.control_in_place,
+          likelihood_id: h.likelihood_id,
+          consequence_id: h.consequence_id,
+          risk_score_id: h.risk_score?.id,
+          risk_score_int: h.risk_score?.risk_score,
+          risk_level_text: h.risk_score?.risk_label,
+          likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
+          consequence_text: h.consequence_text,
+          source: 'Manual'
+        }));
+
+        const { error: manualError } = await supabase
+          .from('risk_hazards_and_controls')
+          .upsert(manualHazardsToSave, {
+            onConflict: 'id',
+            ignoreDuplicates: false
+          });
+
+        if (manualError) {
+          console.error('Error saving manual hazards:', manualError);
+          throw manualError;
         }
       }
     }
@@ -224,14 +261,17 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         return;
       }
 
+      // Get existing hazard_control_ids for this risk assessment
       const { data: existingHazards } = await supabase
         .from('risk_hazards_and_controls')
         .select('hazard_control_id')
-        .eq('risk_assessment_id', riskAssessmentId);
+        .eq('risk_assessment_id', riskAssessmentId)
+        .not('hazard_control_id', 'is', null);
 
       const existingHazardIds = existingHazards?.map(h => h.hazard_control_id) || [];
-      console.log('Existing hazard IDs:', existingHazardIds);
+      console.log('Existing hazard control IDs:', existingHazardIds);
 
+      // Get all product hazards
       const { data: productHazards, error: hazardsError } = await supabase
         .from('hazards_and_controls')
         .select(`
@@ -253,6 +293,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         throw hazardsError;
       }
 
+      // Filter to only get hazards that don't already exist
       const newHazards = productHazards?.filter(
         ph => !existingHazardIds.includes(ph.hazard_control_id)
       );
@@ -275,7 +316,10 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
         const { error: insertError } = await supabase
           .from('risk_hazards_and_controls')
-          .insert(hazardsToInsert);
+          .upsert(hazardsToInsert, {
+            onConflict: 'risk_assessment_id,hazard_control_id',
+            ignoreDuplicates: true
+          });
 
         if (insertError) {
           console.error('Error inserting new hazards:', insertError);
