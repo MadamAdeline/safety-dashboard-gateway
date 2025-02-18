@@ -140,7 +140,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     enabled: !!riskAssessmentId
   });
 
-  const { data: hazardsData } = useQuery({
+  const { data: hazardsData, refetch: refetchHazards } = useQuery({
     queryKey: ['risk-hazards', riskAssessmentId],
     queryFn: async () => {
       if (!riskAssessmentId) return [];
@@ -186,7 +186,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
   useEffect(() => {
     if (hazardsData) {
-      console.log('Updating hazards state with:', hazardsData.length, 'records');
+      console.log('Setting hazards state:', hazardsData.length, 'records');
       setHazards(hazardsData);
     }
   }, [hazardsData]);
@@ -322,32 +322,29 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       if (!riskAssessmentId || !siteRegister?.product?.id) {
         toast({
           title: "Error",
-          description: "Missing required information for auto-generation",
+          description: "Missing required information",
           variant: "destructive",
         });
         return;
       }
 
       try {
-        const { data: existingHazards } = await supabase
-          .from('risk_hazards_and_controls')
-          .select('hazard_control_id')
-          .eq('risk_assessment_id', riskAssessmentId);
-
-        const existingIds = new Set(
-          existingHazards?.map(h => h.hazard_control_id) || []
+        const existingHazardIds = new Set(
+          hazards.map(h => h.hazard_control_id).filter(Boolean)
         );
 
-        const { data: productHazards } = await supabase
+        const { data: productHazards, error: fetchError } = await supabase
           .from('hazards_and_controls')
           .select('*')
           .eq('product_id', siteRegister.product.id);
 
+        if (fetchError) throw fetchError;
+
         const newHazards = (productHazards || []).filter(
-          ph => ph.hazard_control_id && !existingIds.has(ph.hazard_control_id)
+          ph => ph.hazard_control_id && !existingHazardIds.has(ph.hazard_control_id)
         );
 
-        if (!newHazards.length) {
+        if (newHazards.length === 0) {
           toast({
             title: "Information",
             description: "No new hazards to add",
@@ -355,27 +352,27 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           return;
         }
 
+        const hazardsToInsert = newHazards.map(ph => ({
+          risk_assessment_id: riskAssessmentId,
+          hazard_type_id: ph.hazard_type,
+          hazard: ph.hazard,
+          control: ph.control,
+          hazard_control_id: ph.hazard_control_id,
+          source: "Product",
+          control_in_place: false
+        }));
+
         const { error: insertError } = await supabase
           .from('risk_hazards_and_controls')
-          .insert(newHazards.map(ph => ({
-            risk_assessment_id: riskAssessmentId,
-            hazard_type_id: ph.hazard_type,
-            hazard: ph.hazard,
-            control: ph.control,
-            hazard_control_id: ph.hazard_control_id,
-            source: "Product",
-            control_in_place: false
-          })));
+          .insert(hazardsToInsert);
 
         if (insertError) throw insertError;
 
-        await queryClient.invalidateQueries({
-          queryKey: ['risk-hazards', riskAssessmentId]
-        });
+        await refetchHazards();
         
         toast({
           title: "Success",
-          description: `Added ${newHazards.length} new hazards`,
+          description: `Added ${hazardsToInsert.length} new hazards`,
         });
 
       } catch (error) {
@@ -403,32 +400,29 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
   const deleteMutation = useMutation({
     mutationFn: async (hazardId: string) => {
-      if (!riskAssessmentId) return;
-
       const { error } = await supabase
         .from('risk_hazards_and_controls')
         .delete()
         .eq('id', hazardId);
 
-      if (error) {
-        console.error('Error deleting hazard:', error);
-        throw error;
-      }
+      if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
+    onSuccess: async (_, hazardId) => {
+      setHazards(current => current.filter(h => h.id !== hazardId));
+      await refetchHazards();
+      
       toast({
         title: "Success",
-        description: "Hazard and control deleted successfully",
+        description: "Hazard deleted successfully",
       });
       setDeleteDialogOpen(false);
       setHazardToDelete(null);
     },
     onError: (error) => {
-      console.error('Delete mutation error:', error);
+      console.error('Delete error:', error);
       toast({
         title: "Error",
-        description: "Failed to delete hazard and control",
+        description: "Failed to delete hazard",
         variant: "destructive",
       });
       setDeleteDialogOpen(false);
@@ -525,9 +519,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
   const handleConfirmDelete = async () => {
     if (hazardToDelete) {
-      await deleteMutation.mutate(hazardToDelete);
-      setHazards(hazards.filter(h => h.id !== hazardToDelete));
-      setOpenItems(openItems.filter(item => item !== hazardToDelete));
+      await deleteMutation.mutateAsync(hazardToDelete);
     }
   };
 
