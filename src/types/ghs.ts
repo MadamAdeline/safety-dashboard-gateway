@@ -6,10 +6,13 @@ export interface GHSHazardClassification {
   ghs_code_id: string | null;
   hazard_statement_id: string | null;
   signal_word: string;
+  notes: string | null;
+  source: string | null;
   updated_at: string;
   updated_by: string | null;
   ghs_code?: {
     ghs_code: string;
+    pictogram_url?: string;
   };
   hazard_statement?: {
     hazard_statement_code: string;
