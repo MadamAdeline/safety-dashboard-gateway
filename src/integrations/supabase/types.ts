@@ -273,6 +273,41 @@ export type Database = {
         }
         Relationships: []
       }
+      precautionary_statements: {
+        Row: {
+          code: string
+          created_at: string | null
+          precautionary_statement_id: string
+          statement: string
+          type: string
+          updated_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          precautionary_statement_id?: string
+          statement: string
+          type: string
+          updated_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          precautionary_statement_id?: string
+          statement?: string
+          type?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "precautionary_statements_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_approvals: {
         Row: {
           approved_at: string | null
@@ -646,6 +681,52 @@ export type Database = {
           },
           {
             foreignKeyName: "sds_ghs_classifications_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sds_precautionary_statements: {
+        Row: {
+          created_at: string | null
+          precautionary_statement_id: string
+          sds_id: string
+          sds_precautionary_statement_id: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          precautionary_statement_id: string
+          sds_id: string
+          sds_precautionary_statement_id?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          precautionary_statement_id?: string
+          sds_id?: string
+          sds_precautionary_statement_id?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sds_precautionary_statements_precautionary_statement_id_fkey"
+            columns: ["precautionary_statement_id"]
+            isOneToOne: false
+            referencedRelation: "precautionary_statements"
+            referencedColumns: ["precautionary_statement_id"]
+          },
+          {
+            foreignKeyName: "sds_precautionary_statements_sds_id_fkey"
+            columns: ["sds_id"]
+            isOneToOne: false
+            referencedRelation: "sds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sds_precautionary_statements_updated_by_fkey"
             columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "users"
