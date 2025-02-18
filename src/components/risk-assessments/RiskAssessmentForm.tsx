@@ -341,7 +341,7 @@ export function RiskAssessmentForm({
 
             <div className="space-y-4">
               <div className="border-t pt-4">
-                <div className="bg-gray-50 py-2 px-4 rounded-md">
+                <div className="bg-gray-50 py-2 rounded-md">
                   <h2 className="text-lg font-semibold">Assessment Details</h2>
                 </div>
               </div>
