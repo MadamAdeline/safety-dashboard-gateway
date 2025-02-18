@@ -387,7 +387,7 @@ export function RiskAssessmentForm({
           <div className="space-y-6">
             <div className="space-y-4">
               <div className="border-t pt-4">
-                <div className="bg-gray-50 py-2 px-4 rounded-md">
+                <div className="bg-gray-50 py-2 rounded-md">
                   <h2 className="text-lg font-semibold">Hazards and Controls</h2>
                 </div>
               </div>
@@ -396,7 +396,7 @@ export function RiskAssessmentForm({
 
             <div className="space-y-4">
               <div className="border-t pt-4">
-                <div className="bg-gray-50 py-2 px-4 rounded-md">
+                <div className="bg-gray-50 py-2 rounded-md">
                   <h2 className="text-lg font-semibold">Risk Assessment</h2>
                 </div>
               </div>
@@ -457,11 +457,6 @@ export function RiskAssessmentForm({
 
         <TabsContent value="approval" className="space-y-6">
           <div className="space-y-4">
-            <div className="border-t pt-4">
-              <div className="bg-gray-50 py-2 px-4 rounded-md">
-                <h2 className="text-lg font-semibold">Evaluation and Approval</h2>
-              </div>
-            </div>
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2 col-span-2">
                 <Label>Overall Evaluation</Label>
