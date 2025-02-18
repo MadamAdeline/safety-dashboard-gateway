@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,12 +88,7 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
             hazard_statement_text
           )
         `)
-        .or([
-          `hazard_class.ilike.%${searchTerm}%`,
-          `hazard_category.ilike.%${searchTerm}%`,
-          `signal_word.ilike.%${searchTerm}%`,
-          `hazard_statement.hazard_statement_code.ilike.%${searchTerm}%`
-        ])
+        .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%,hazard_statement.hazard_statement_code.ilike.%${searchTerm}%`)
         .order('hazard_class');
 
       if (error) throw error;
