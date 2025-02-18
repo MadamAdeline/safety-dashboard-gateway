@@ -335,6 +335,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         return;
       }
 
+      // First, get all existing hazards for this risk assessment
       const { data: existingHazards } = await supabase
         .from('risk_hazards_and_controls')
         .select('hazard_control_id')
@@ -344,6 +345,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       const existingHazardIds = existingHazards?.map(h => h.hazard_control_id) || [];
       console.log('Existing hazard control IDs:', existingHazardIds);
 
+      // Fetch all product hazards
       const { data: productHazards, error: hazardsError } = await supabase
         .from('hazards_and_controls')
         .select(`
@@ -365,6 +367,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         throw hazardsError;
       }
 
+      // Filter out hazards that already exist
       const newHazards = productHazards?.filter(
         ph => !existingHazardIds.includes(ph.hazard_control_id)
       );
@@ -387,10 +390,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
         const { error: insertError } = await supabase
           .from('risk_hazards_and_controls')
-          .upsert(hazardsToInsert, {
-            onConflict: 'risk_assessment_id,hazard_control_id',
-            ignoreDuplicates: true
-          });
+          .insert(hazardsToInsert);
 
         if (insertError) {
           console.error('Error inserting new hazards:', insertError);
