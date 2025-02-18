@@ -43,7 +43,7 @@ export function RiskAssessmentForm({
   const [selectedSiteRegister, setSelectedSiteRegister] = useState<any>(null);
   const [riskScore, setRiskScore] = useState<any>(null);
   const hazardsControlsRef = useRef<{
-    saveHazards: () => Promise<void>;
+    saveHazards: (newRiskAssessmentId: string) => Promise<void>;
     populateHazards: (hazards: any[]) => void;
   }>(null);
   const [formData, setFormData] = useState<FormData>({
@@ -285,106 +285,46 @@ export function RiskAssessmentForm({
     }
   }, [productHazards, initialData]);
 
-  const createMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const cleanedData = {
-        ...data,
-        site_register_record_id: data.site_register_record_id || null,
-        conducted_by: data.conducted_by || null,
-        approver: data.approver || null,
-        overall_evaluation_status_id: data.overall_evaluation_status_id || null,
-        approval_status_id: data.approval_status_id || null
-      };
-
-      const { error } = await supabase
-        .from('risk_assessments')
-        .insert([cleanedData]);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['risk-assessments']
-      });
-      toast({
-        title: "Success",
-        description: "Risk assessment has been created"
-      });
-      onClose();
-    },
-    onError: error => {
-      console.error('Error creating risk assessment:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create risk assessment",
-        variant: "destructive"
-      });
-    }
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const cleanedData = {
-        ...data,
-        site_register_record_id: data.site_register_record_id || null,
-        conducted_by: data.conducted_by || null,
-        approver: data.approver || null,
-        overall_evaluation_status_id: data.overall_evaluation_status_id || null,
-        approval_status_id: data.approval_status_id || null
-      };
-
-      const { error } = await supabase
-        .from('risk_assessments')
-        .update(cleanedData)
-        .eq('id', initialData.id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['risk-assessments']
-      });
-      toast({
-        title: "Success",
-        description: "Risk assessment has been updated"
-      });
-      onClose();
-    },
-    onError: error => {
-      console.error('Error updating risk assessment:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update risk assessment",
-        variant: "destructive"
-      });
-    }
-  });
-
   const handleSave = async () => {
     try {
-      let riskAssessmentId = initialData?.id;
+      let riskAssessmentId: string;
+
       if (initialData?.id) {
         await updateMutation.mutateAsync(formData);
+        riskAssessmentId = initialData.id;
       } else {
-        const {
-          data,
-          error
-        } = await supabase.from('risk_assessments').insert([formData]).select().single();
+        // Create the risk assessment first
+        const { data, error } = await supabase
+          .from('risk_assessments')
+          .insert([{
+            ...formData,
+            site_register_record_id: formData.site_register_record_id || null,
+            conducted_by: formData.conducted_by || null,
+            approver: formData.approver || null,
+            overall_evaluation_status_id: formData.overall_evaluation_status_id || null,
+            approval_status_id: formData.approval_status_id || null
+          }])
+          .select()
+          .single();
+
         if (error) throw error;
         riskAssessmentId = data.id;
       }
 
-      // Save hazards and controls
+      // Now that we have the risk assessment ID, save the hazards and controls
       if (hazardsControlsRef.current) {
-        await hazardsControlsRef.current.saveHazards();
+        await hazardsControlsRef.current.saveHazards(riskAssessmentId);
       }
+
       queryClient.invalidateQueries({
         queryKey: ['risk-assessments']
       });
+
       toast({
         title: "Success",
         description: initialData ? "Risk assessment updated" : "Risk assessment created"
       });
+      
       onClose();
     } catch (error) {
       console.error('Error saving risk assessment:', error);
@@ -638,3 +578,77 @@ export function RiskAssessmentForm({
       </Tabs>
     </div>;
 }
+const createMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const cleanedData = {
+        ...data,
+        site_register_record_id: data.site_register_record_id || null,
+        conducted_by: data.conducted_by || null,
+        approver: data.approver || null,
+        overall_evaluation_status_id: data.overall_evaluation_status_id || null,
+        approval_status_id: data.approval_status_id || null
+      };
+
+      const { error } = await supabase
+        .from('risk_assessments')
+        .insert([cleanedData]);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['risk-assessments']
+      });
+      toast({
+        title: "Success",
+        description: "Risk assessment has been created"
+      });
+      onClose();
+    },
+    onError: error => {
+      console.error('Error creating risk assessment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create risk assessment",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const cleanedData = {
+        ...data,
+        site_register_record_id: data.site_register_record_id || null,
+        conducted_by: data.conducted_by || null,
+        approver: data.approver || null,
+        overall_evaluation_status_id: data.overall_evaluation_status_id || null,
+        approval_status_id: data.approval_status_id || null
+      };
+
+      const { error } = await supabase
+        .from('risk_assessments')
+        .update(cleanedData)
+        .eq('id', initialData.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['risk-assessments']
+      });
+      toast({
+        title: "Success",
+        description: "Risk assessment has been updated"
+      });
+      onClose();
+    },
+    onError: error => {
+      console.error('Error updating risk assessment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update risk assessment",
+        variant: "destructive"
+      });
+    }
+  });

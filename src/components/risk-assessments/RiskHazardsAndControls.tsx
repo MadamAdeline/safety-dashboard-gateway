@@ -155,9 +155,31 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
   });
 
   useImperativeHandle(ref, () => ({
-    saveHazards: async () => {
+    saveHazards: async (newRiskAssessmentId: string) => {
       if (hazards.length > 0) {
-        await saveMutation.mutateAsync(hazards);
+        const hazardsToSave = hazards.map(h => ({
+          risk_assessment_id: newRiskAssessmentId,
+          hazard_type_id: h.hazard_type_id,
+          hazard: h.hazard,
+          control: h.control,
+          control_in_place: h.control_in_place,
+          likelihood_id: h.likelihood_id,
+          consequence_id: h.consequence_id,
+          risk_score_id: h.risk_score?.id,
+          risk_score_int: h.risk_score?.risk_score,
+          risk_level_text: h.risk_score?.risk_label,
+          likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
+          consequence_text: h.consequence_text
+        }));
+
+        const { error } = await supabase
+          .from('risk_hazards_and_controls')
+          .insert(hazardsToSave);
+        
+        if (error) {
+          console.error('Error saving hazards:', error);
+          throw error;
+        }
       }
     }
   }));
