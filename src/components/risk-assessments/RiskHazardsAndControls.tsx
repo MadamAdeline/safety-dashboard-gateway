@@ -137,7 +137,7 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
             risk_score_int: h.risk_score?.risk_score,
             risk_level_text: h.risk_score?.risk_label,
             likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
-            consequence_text: consequenceOptions?.find(c => c.id === h.consequence_id)?.name
+            consequence_text: h.consequence_text
           };
         });
 
@@ -186,7 +186,13 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     
     const updatedHazards = hazards.map(h => {
       if (h.id === id) {
-        const updatedHazard = { ...h, [field]: value };
+        const updatedHazard = { 
+          ...h, 
+          [field]: value,
+          ...(field === 'consequence_id' ? {
+            consequence_text: consequenceOptions?.find(c => c.id === value)?.name
+          } : {})
+        };
         
         if (field === 'likelihood_id' || field === 'consequence_id') {
           console.log('Triggering risk score update for:', updatedHazard);
@@ -221,8 +227,11 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
           if (h.id === hazard.id) {
             return {
               ...h,
+              consequence_id: hazard.consequence_id,
+              consequence_text: consequenceOptions?.find(c => c.id === hazard.consequence_id)?.name,
               risk_score: data,
               risk_score_id: data.id,
+              risk_score_int: data.risk_score,
               risk_level_text: data.risk_label
             };
           }
