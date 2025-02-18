@@ -29,6 +29,7 @@ interface SDSGHSClassification {
   hazard_classification_id: string;
   hazard_classification: GHSHazardClassification & {
     ghs_code: { ghs_code: string; pictogram_url: string | null } | null;
+    hazard_statement: { hazard_statement_code: string; hazard_statement_text: string } | null;
   };
 }
 
@@ -53,13 +54,13 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
             hazard_class,
             hazard_category,
             signal_word,
-            ghs_code_id,
-            hazard_statement_id,
-            updated_at,
-            updated_by,
             ghs_code:ghs_codes (
               ghs_code,
               pictogram_url
+            ),
+            hazard_statement:hazard_statements (
+              hazard_statement_code,
+              hazard_statement_text
             )
           )
         `)
@@ -89,8 +90,7 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
             hazard_statement_text
           )
         `)
-        .filter('hazard_class', 'ilike', `%${searchTerm}%`)
-        .or('hazard_category.ilike.%' + searchTerm + '%,signal_word.ilike.%' + searchTerm + '%')
+        .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,ghs_code.ghs_code.ilike.%${searchTerm}%,hazard_statement.hazard_statement_code.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%`)
         .order('hazard_class');
 
       if (error) throw error;
@@ -236,6 +236,7 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
               <TableHead>Hazard Class</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>GHS Code</TableHead>
+              <TableHead>Hazard Statement</TableHead>
               <TableHead>Signal Word</TableHead>
               <TableHead>Pictogram</TableHead>
               {!readOnly && <TableHead className="w-[100px]">Actions</TableHead>}
@@ -247,6 +248,7 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
                 <TableCell>{item.hazard_classification.hazard_class}</TableCell>
                 <TableCell>{item.hazard_classification.hazard_category}</TableCell>
                 <TableCell>{item.hazard_classification.ghs_code?.ghs_code}</TableCell>
+                <TableCell>{item.hazard_classification.hazard_statement?.hazard_statement_code}</TableCell>
                 <TableCell>
                   <Badge variant={item.hazard_classification.signal_word === 'Danger' ? 'destructive' : 'default'}>
                     {item.hazard_classification.signal_word}
@@ -277,7 +279,7 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
             ))}
             {sdsGHSClassifications.length === 0 && (
               <TableRow>
-                <TableCell colSpan={!readOnly ? 6 : 5} className="text-center py-4">
+                <TableCell colSpan={!readOnly ? 7 : 6} className="text-center py-4">
                   No GHS Classifications added
                 </TableCell>
               </TableRow>
