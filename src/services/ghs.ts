@@ -14,11 +14,11 @@ export async function getGHSHazardClassifications() {
       hazard_statement_id,
       updated_at,
       updated_by,
-      ghs_codes!inner (
+      ghs_codes (
         ghs_code,
         pictogram_url
       ),
-      hazard_statements!inner (
+      hazard_statements (
         hazard_statement_code,
         hazard_statement_text
       )
@@ -50,11 +50,11 @@ export async function createGHSHazardClassification(data: Omit<GHSHazardClassifi
       hazard_statement_id,
       updated_at,
       updated_by,
-      ghs_codes!inner (
+      ghs_codes (
         ghs_code,
         pictogram_url
       ),
-      hazard_statements!inner (
+      hazard_statements (
         hazard_statement_code,
         hazard_statement_text
       )
@@ -90,11 +90,11 @@ export async function updateGHSHazardClassification(
       hazard_statement_id,
       updated_at,
       updated_by,
-      ghs_codes!inner (
+      ghs_codes (
         ghs_code,
         pictogram_url
       ),
-      hazard_statements!inner (
+      hazard_statements (
         hazard_statement_code,
         hazard_statement_text
       )
