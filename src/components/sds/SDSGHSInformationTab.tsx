@@ -81,6 +81,19 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
     queryFn: async () => {
       if (!searchTerm) return [];
       
+      // First, get matching GHS codes
+      const { data: matchingGHSCodes } = await supabase
+        .from('ghs_codes')
+        .select('ghs_code_id')
+        .ilike('ghs_code', `%${searchTerm}%`);
+      
+      // Then, get matching hazard statements
+      const { data: matchingStatements } = await supabase
+        .from('hazard_statements')
+        .select('hazard_statement_id')
+        .ilike('hazard_statement_code', `%${searchTerm}%`);
+      
+      // Finally, get hazard classifications matching any criteria
       const { data, error } = await supabase
         .from('ghs_hazard_classifications')
         .select(`
@@ -101,9 +114,21 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
             hazard_statement_text
           )
         `)
-        .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%`)
-        .or(`ghs_code_id.in.(select ghs_code_id::uuid from ghs_codes where ghs_code ilike '%${searchTerm}%')`)
-        .or(`hazard_statement_id.in.(select hazard_statement_id::uuid from hazard_statements where hazard_statement_code ilike '%${searchTerm}%')`)
+        .or(
+          `hazard_class.ilike.%${searchTerm}%,` +
+          `hazard_category.ilike.%${searchTerm}%,` +
+          `signal_word.ilike.%${searchTerm}%`
+        )
+        .or(
+          matchingGHSCodes?.length > 0 
+            ? `ghs_code_id.in.(${matchingGHSCodes.map(code => code.ghs_code_id).join(',')})`
+            : 'ghs_code_id.is.null'
+        )
+        .or(
+          matchingStatements?.length > 0
+            ? `hazard_statement_id.in.(${matchingStatements.map(stmt => stmt.hazard_statement_id).join(',')})`
+            : 'hazard_statement_id.is.null'
+        )
         .order('hazard_class');
 
       if (error) {
