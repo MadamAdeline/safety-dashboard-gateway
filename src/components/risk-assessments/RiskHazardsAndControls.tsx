@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/collapsible";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { forwardRef, useImperativeHandle } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface RiskHazardsAndControlsProps {
@@ -27,7 +26,13 @@ interface RiskHazardsAndControlsProps {
   readOnly?: boolean;
 }
 
-export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }: RiskHazardsAndControlsProps, ref) => {
+export interface RiskHazardsAndControlsRef {
+  handleAdd: () => void;
+  saveHazards: (riskAssessmentId: string) => Promise<void>;
+  populateHazards: (hazards: any[]) => void;
+}
+
+export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, RiskHazardsAndControlsProps>(({ riskAssessmentId, readOnly }, ref) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [hazards, setHazards] = useState<any[]>([]);
@@ -254,33 +259,13 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
   });
 
   useImperativeHandle(ref, () => ({
-    saveHazards: async (newRiskAssessmentId: string) => {
-      if (hazards.length > 0) {
-        const hazardsToSave = hazards.map(h => ({
-          risk_assessment_id: newRiskAssessmentId,
-          hazard_type_id: h.hazard_type_id,
-          hazard: h.hazard,
-          control: h.control,
-          control_in_place: h.control_in_place,
-          likelihood_id: h.likelihood_id,
-          consequence_id: h.consequence_id,
-          risk_score_id: h.risk_score?.id,
-          risk_score_int: h.risk_score?.risk_score,
-          risk_level_text: h.risk_score?.risk_label,
-          likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
-          consequence_text: h.consequence_text,
-          hazard_control_id: h.hazard_control_id
-        }));
-
-        const { error } = await supabase
-          .from('risk_hazards_and_controls')
-          .insert(hazardsToSave);
-        
-        if (error) {
-          console.error('Error saving hazards:', error);
-          throw error;
-        }
-      }
+    handleAdd,
+    saveHazards: async (riskAssessmentId: string) => {
+      await saveMutation.mutateAsync(hazards);
+    },
+    populateHazards: (newHazards: any[]) => {
+      setHazards(newHazards);
+      setOpenItems(newHazards.map(h => h.id));
     }
   }));
 
@@ -315,7 +300,7 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     }
   });
 
-  const handleAdd = async () => {
+  const handleAdd = () => {
     if (!hazardTypes?.length) return;
 
     const newHazard = {
@@ -332,7 +317,7 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     };
 
     setHazards([...hazards, newHazard]);
-    setOpenItems([newHazard.id]);
+    setOpenItems([...openItems, newHazard.id]);
   };
 
   const handleUpdate = async (id: string, field: string, value: any) => {
@@ -624,15 +609,6 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
           </div>
         )}
       </div>
-
-      {!readOnly && (
-        <Button
-          onClick={handleAdd}
-          className="w-full bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-        >
-          <Plus className="h-4 w-4 mr-2" /> Add Hazard & Control
-        </Button>
-      )}
     </div>
   );
 });

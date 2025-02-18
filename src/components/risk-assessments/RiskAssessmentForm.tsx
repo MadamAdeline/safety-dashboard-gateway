@@ -14,6 +14,12 @@ import { Badge } from "@/components/ui/badge";
 import { SiteRegisterSearch } from "./SiteRegisterSearch";
 import { RiskHazardsAndControls } from "./RiskHazardsAndControls";
 
+interface RiskHazardsAndControlsRef {
+  handleAdd: () => void;
+  saveHazards: (riskAssessmentId: string) => Promise<void>;
+  populateHazards: (hazards: any[]) => void;
+}
+
 interface RiskAssessmentFormProps {
   onClose: () => void;
   initialData?: any | null;
@@ -42,7 +48,7 @@ export function RiskAssessmentForm({
   const queryClient = useQueryClient();
   const [selectedSiteRegister, setSelectedSiteRegister] = useState<any>(null);
   const [riskScore, setRiskScore] = useState<any>(null);
-  const hazardsControlsRef = useRef<any>(null);
+  const hazardsControlsRef = useRef<RiskHazardsAndControlsRef>(null);
 
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
