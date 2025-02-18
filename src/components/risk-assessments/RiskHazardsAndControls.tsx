@@ -174,7 +174,14 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
   const autoGenerateMutation = useMutation({
     mutationFn: async () => {
-      if (!riskAssessmentId || !siteRegister?.product?.id) return;
+      if (!riskAssessmentId || !siteRegister?.product?.id) {
+        toast({
+          title: "Error",
+          description: "Missing required information for auto-generation",
+          variant: "destructive",
+        });
+        return;
+      }
 
       const { data: existingHazards } = await supabase
         .from('risk_hazards_and_controls')
@@ -182,6 +189,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         .eq('risk_assessment_id', riskAssessmentId);
 
       const existingHazardIds = existingHazards?.map(h => h.hazard_control_id) || [];
+      console.log('Existing hazard IDs:', existingHazardIds);
 
       const { data: productHazards, error: hazardsError } = await supabase
         .from('hazards_and_controls')
@@ -194,11 +202,21 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         `)
         .eq('product_id', siteRegister.product.id);
 
-      if (hazardsError) throw hazardsError;
+      if (hazardsError) {
+        console.error('Error fetching product hazards:', hazardsError);
+        toast({
+          title: "Error",
+          description: "Failed to fetch product hazards",
+          variant: "destructive",
+        });
+        throw hazardsError;
+      }
 
       const newHazards = productHazards?.filter(
         ph => !existingHazardIds.includes(ph.hazard_control_id)
       );
+
+      console.log('New hazards to be added:', newHazards?.length);
 
       if (newHazards && newHazards.length > 0) {
         const hazardsToInsert = newHazards.map(ph => ({
@@ -219,15 +237,29 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           .insert(hazardsToInsert);
 
         if (insertError) {
-          console.error('Insert error:', insertError);
+          console.error('Error inserting new hazards:', insertError);
+          toast({
+            title: "Error",
+            description: "Failed to add new hazards",
+            variant: "destructive",
+          });
           throw insertError;
         }
 
+        toast({
+          title: "Success",
+          description: `Added ${hazardsToInsert.length} new hazards and controls`,
+        });
+
         queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
         return hazardsToInsert;
+      } else {
+        toast({
+          title: "Information",
+          description: "No new hazards to add",
+        });
+        return [];
       }
-
-      return [];
     }
   });
 
