@@ -427,6 +427,14 @@ export function RiskAssessmentForm({
     }
   };
 
+  const handleSiteRegisterSelect = (register: any) => {
+    setSelectedSiteRegister(register);
+    setFormData(prev => ({
+      ...prev,
+      site_register_record_id: register.id
+    }));
+  };
+
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   return <div className="space-y-8">
