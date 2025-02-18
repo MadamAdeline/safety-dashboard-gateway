@@ -183,66 +183,74 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       console.log('Saving copied hazards:', copiedHazards.length);
       console.log('Saving manual hazards:', manualHazards.length);
 
-      // Handle copied hazards - use composite key
+      // Handle copied hazards
       if (copiedHazards.length > 0) {
-        const copiedHazardsToSave = copiedHazards.map(h => ({
-          id: h.id, // Keep the existing ID if it exists
-          risk_assessment_id: riskAssessmentId,
-          hazard_control_id: h.hazard_control_id,
-          hazard_type_id: h.hazard_type_id,
-          hazard: h.hazard,
-          control: h.control,
-          control_in_place: h.control_in_place,
-          likelihood_id: h.likelihood_id,
-          consequence_id: h.consequence_id,
-          risk_score_id: h.risk_score?.id,
-          risk_score_int: h.risk_score?.risk_score,
-          risk_level_text: h.risk_score?.risk_label,
-          likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
-          consequence_text: h.consequence_text,
-          source: 'Product'
-        }));
-
         // Get existing hazard records to preserve IDs
-        const { data: existingHazards, error: fetchError } = await supabase
+        const { data: existingHazards } = await supabase
           .from('risk_hazards_and_controls')
           .select('id, hazard_control_id')
           .eq('risk_assessment_id', riskAssessmentId)
           .not('hazard_control_id', 'is', null);
 
-        if (fetchError) {
-          console.error('Error fetching existing hazards:', fetchError);
-          throw fetchError;
-        }
-
-        // Create a map of hazard_control_id to record id
         const existingHazardMap = new Map(
           existingHazards?.map(h => [h.hazard_control_id, h.id]) || []
         );
 
-        // Update records with existing IDs where available
-        const finalCopiedHazards = copiedHazardsToSave.map(h => ({
-          ...h,
-          id: existingHazardMap.get(h.hazard_control_id) || h.id
-        }));
+        // Split into updates and inserts
+        const updates = [];
+        const inserts = [];
 
-        const { error: copiedError } = await supabase
-          .from('risk_hazards_and_controls')
-          .upsert(finalCopiedHazards, {
-            onConflict: 'risk_assessment_id,hazard_control_id',
-            ignoreDuplicates: false
-          });
+        for (const hazard of copiedHazards) {
+          const existingId = existingHazardMap.get(hazard.hazard_control_id);
+          const hazardData = {
+            risk_assessment_id: riskAssessmentId,
+            hazard_control_id: hazard.hazard_control_id,
+            hazard_type_id: hazard.hazard_type_id,
+            hazard: hazard.hazard,
+            control: hazard.control,
+            control_in_place: hazard.control_in_place,
+            likelihood_id: hazard.likelihood_id,
+            consequence_id: hazard.consequence_id,
+            risk_score_id: hazard.risk_score?.id,
+            risk_score_int: hazard.risk_score?.risk_score,
+            risk_level_text: hazard.risk_score?.risk_label,
+            likelihood_text: likelihoodOptions?.find(l => l.id === hazard.likelihood_id)?.name,
+            consequence_text: hazard.consequence_text,
+            source: 'Product'
+          };
 
-        if (copiedError) {
-          console.error('Error saving copied hazards:', copiedError);
-          throw copiedError;
+          if (existingId) {
+            updates.push({ ...hazardData, id: existingId });
+          } else {
+            inserts.push(hazardData);
+          }
+        }
+
+        // Handle updates first
+        if (updates.length > 0) {
+          const { error: updateError } = await supabase
+            .from('risk_hazards_and_controls')
+            .upsert(updates, {
+              onConflict: 'id'
+            });
+
+          if (updateError) throw updateError;
+        }
+
+        // Handle inserts
+        if (inserts.length > 0) {
+          const { error: insertError } = await supabase
+            .from('risk_hazards_and_controls')
+            .insert(inserts);
+
+          if (insertError) throw insertError;
         }
       }
 
-      // Handle manual hazards - use primary key
+      // Handle manual hazards - only update existing ones
       if (manualHazards.length > 0) {
-        const manualHazardsToSave = manualHazards.map(h => ({
-          id: h.id, // Keep the existing ID
+        const updates = manualHazards.filter(h => h.id).map(h => ({
+          id: h.id,
           risk_assessment_id: riskAssessmentId,
           hazard_type_id: h.hazard_type_id,
           hazard: h.hazard,
@@ -258,20 +266,45 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           source: 'Manual'
         }));
 
-        const { error: manualError } = await supabase
-          .from('risk_hazards_and_controls')
-          .upsert(manualHazardsToSave, {
-            onConflict: 'id',
-            ignoreDuplicates: false
-          });
+        // Only insert new manual hazards (ones without IDs)
+        const inserts = manualHazards.filter(h => !h.id).map(h => ({
+          risk_assessment_id: riskAssessmentId,
+          hazard_type_id: h.hazard_type_id,
+          hazard: h.hazard,
+          control: h.control,
+          control_in_place: h.control_in_place,
+          likelihood_id: h.likelihood_id,
+          consequence_id: h.consequence_id,
+          risk_score_id: h.risk_score?.id,
+          risk_score_int: h.risk_score?.risk_score,
+          risk_level_text: h.risk_score?.risk_label,
+          likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
+          consequence_text: h.consequence_text,
+          source: 'Manual'
+        }));
 
-        if (manualError) {
-          console.error('Error saving manual hazards:', manualError);
-          throw manualError;
+        // Handle updates
+        if (updates.length > 0) {
+          const { error: updateError } = await supabase
+            .from('risk_hazards_and_controls')
+            .upsert(updates, {
+              onConflict: 'id'
+            });
+
+          if (updateError) throw updateError;
+        }
+
+        // Handle inserts
+        if (inserts.length > 0) {
+          const { error: insertError } = await supabase
+            .from('risk_hazards_and_controls')
+            .insert(inserts);
+
+          if (insertError) throw insertError;
         }
       }
 
-      await queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
+      queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
     }
   });
 
