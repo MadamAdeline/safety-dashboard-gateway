@@ -80,12 +80,21 @@ export function ProductHazardsTab({ productId, readOnly }: ProductHazardsTabProp
   }, [productId, toast]);
 
   const handleAdd = async () => {
+    if (!hazardTypes.length) {
+      toast({
+        title: "Error",
+        description: "No hazard types available. Please add hazard types first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      const newHazard: Partial<HazardAndControl> = {
+      const newHazard = {
         product_id: productId,
-        hazard_type: hazardTypes[0]?.id,
-        hazard: "",
-        control: "",
+        hazard_type: hazardTypes[0].id,
+        hazard: "New Hazard",
+        control: "New Control",
         source: ""
       };
 
