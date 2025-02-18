@@ -414,17 +414,17 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[30px]"></TableHead>
+            <TableHead className="w-[40px]"></TableHead>
             <TableHead className="w-[200px]">Type</TableHead>
-            <TableHead className="w-[300px]">Hazard</TableHead>
-            <TableHead className="w-[300px]">Control</TableHead>
-            <TableHead className="w-[120px]">Risk Level</TableHead>
+            <TableHead className="w-[350px]">Hazard</TableHead>
+            <TableHead className="w-[350px]">Control</TableHead>
+            <TableHead className="w-[120px] text-right pr-8">Risk Level</TableHead>
             {!readOnly && <TableHead className="w-[50px]"></TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
           {hazards.map((hazard) => (
-            <Collapsible key={hazard.id}>
+            <Collapsible key={hazard.id} open={openItems.includes(hazard.id)}>
               <TableRow 
                 className="cursor-pointer hover:bg-gray-50"
                 onClick={() => toggleItem(hazard.id)}
@@ -439,9 +439,13 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                   </CollapsibleTrigger>
                 </TableCell>
                 <TableCell className="font-medium">{hazard.hazard_type?.label || '-'}</TableCell>
-                <TableCell className="truncate max-w-[300px]">{hazard.hazard || '-'}</TableCell>
-                <TableCell className="truncate max-w-[300px]">{hazard.control || '-'}</TableCell>
                 <TableCell>
+                  <div className="truncate max-w-[350px]">{hazard.hazard || '-'}</div>
+                </TableCell>
+                <TableCell>
+                  <div className="truncate max-w-[350px]">{hazard.control || '-'}</div>
+                </TableCell>
+                <TableCell className="text-right pr-8">
                   {hazard.risk_score && (
                     <Badge
                       style={{
@@ -469,11 +473,11 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                   </TableCell>
                 )}
               </TableRow>
-              <CollapsibleContent>
+              {openItems.includes(hazard.id) && (
                 <TableRow>
-                  <TableCell colSpan={6} className="p-4 border-t">
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-4 gap-4">
+                  <TableCell colSpan={6} className="p-6 border-t">
+                    <CollapsibleContent>
+                      <div className="grid grid-cols-4 gap-6">
                         <div className="space-y-2">
                           <Label>Hazard Type</Label>
                           {readOnly ? (
@@ -550,9 +554,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                             </label>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="grid grid-cols-4 gap-4">
                         <div className="space-y-2">
                           <Label>Likelihood</Label>
                           {readOnly ? (
@@ -619,10 +621,10 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </CollapsibleContent>
                   </TableCell>
                 </TableRow>
-              </CollapsibleContent>
+              )}
             </Collapsible>
           ))}
         </TableBody>
