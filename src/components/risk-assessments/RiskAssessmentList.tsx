@@ -45,7 +45,8 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
             first_name,
             last_name
           ),
-          risk_matrix (
+          risk_matrix:risk_matrix!risk_assessments_risk_matrix_id_fkey (
+            id,
             risk_label,
             risk_color
           ),
@@ -140,14 +141,16 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
                   {`${assessment.assessor?.first_name} ${assessment.assessor?.last_name}`}
                 </TableCell>
                 <TableCell>
-                  <Badge
-                    style={{
-                      backgroundColor: assessment.risk_matrix?.risk_color,
-                      color: '#FFF'
-                    }}
-                  >
-                    {assessment.risk_matrix?.risk_label}
-                  </Badge>
+                  {assessment.risk_matrix && (
+                    <Badge
+                      style={{
+                        backgroundColor: assessment.risk_matrix.risk_color,
+                        color: '#FFF'
+                      }}
+                    >
+                      {assessment.risk_matrix.risk_label}
+                    </Badge>
+                  )}
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline">
