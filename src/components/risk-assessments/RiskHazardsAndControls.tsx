@@ -1,3 +1,4 @@
+
 import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -33,7 +34,31 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import type { HazardData } from "@/types/site-register";
+
+interface Hazard {
+  id: string;
+  risk_assessment_id: string;
+  hazard_type_id: string;
+  hazard: string;
+  control: string;
+  control_in_place: boolean;
+  source: string;
+  likelihood_id?: string;
+  consequence_id?: string;
+  hazard_control_id?: string;
+  created_at?: string;
+  hazard_type?: {
+    id: string;
+    label: string;
+  };
+  product_hazard?: {
+    hazard_control_id: string;
+    hazard: string;
+    control: string;
+    hazard_type: string;
+  };
+  risk_score?: any;
+}
 
 interface RiskHazardsAndControlsProps {
   riskAssessmentId: string | null;
@@ -43,7 +68,7 @@ interface RiskHazardsAndControlsProps {
 export interface RiskHazardsAndControlsRef {
   handleAdd: () => void;
   saveHazards: (riskAssessmentId: string) => Promise<void>;
-  populateHazards: (hazards: any[]) => void;
+  populateHazards: (hazards: Hazard[]) => void;
 }
 
 export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, RiskHazardsAndControlsProps>(({ riskAssessmentId, readOnly }, ref) => {
