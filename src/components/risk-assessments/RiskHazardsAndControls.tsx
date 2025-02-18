@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -32,7 +31,6 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
   const [hazards, setHazards] = useState<any[]>([]);
   const [openItems, setOpenItems] = useState<string[]>([]);
 
-  // Fetch hazard types
   const { data: hazardTypes } = useQuery({
     queryKey: ['hazardTypes'],
     queryFn: async () => {
@@ -47,7 +45,6 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     }
   });
 
-  // Fetch likelihood options
   const { data: likelihoodOptions } = useQuery({
     queryKey: ['likelihood-options'],
     queryFn: async () => {
@@ -60,7 +57,6 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     }
   });
 
-  // Fetch consequence options
   const { data: consequenceOptions } = useQuery({
     queryKey: ['consequence-options'],
     queryFn: async () => {
@@ -73,12 +69,12 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     }
   });
 
-  // Fetch existing hazards if we have a risk assessment ID
   useQuery({
     queryKey: ['risk-hazards', riskAssessmentId],
     queryFn: async () => {
       if (!riskAssessmentId) return [];
-      const { data, error } = await supabase
+      
+      const { data: hazardsData, error } = await supabase
         .from('risk_hazards_and_controls')
         .select(`
           *,
@@ -88,9 +84,30 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
           )
         `)
         .eq('risk_assessment_id', riskAssessmentId);
+      
       if (error) throw error;
-      setHazards(data);
-      return data;
+
+      const hazardsWithRiskScores = await Promise.all(
+        hazardsData.map(async (hazard) => {
+          if (hazard.likelihood_id && hazard.consequence_id) {
+            const { data: riskScore } = await supabase
+              .from('risk_matrix')
+              .select('*')
+              .eq('likelihood_id', hazard.likelihood_id)
+              .eq('consequence_id', hazard.consequence_id)
+              .single();
+
+            return {
+              ...hazard,
+              risk_score: riskScore
+            };
+          }
+          return hazard;
+        })
+      );
+
+      setHazards(hazardsWithRiskScores);
+      return hazardsWithRiskScores;
     },
     enabled: !!riskAssessmentId
   });
@@ -99,13 +116,11 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     mutationFn: async (hazardsData: any[]) => {
       if (!riskAssessmentId) return;
 
-      // First delete existing records
       await supabase
         .from('risk_hazards_and_controls')
         .delete()
         .eq('risk_assessment_id', riskAssessmentId);
 
-      // Then insert new records
       if (hazardsData.length > 0) {
         const { error } = await supabase
           .from('risk_hazards_and_controls')
@@ -118,15 +133,18 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
               control_in_place: h.control_in_place,
               likelihood_id: h.likelihood_id,
               consequence_id: h.consequence_id,
-              risk_score_id: h.risk_score?.id, // Fix: Use the risk_score.id
-              risk_score_int: h.risk_score?.risk_score, // Add risk score value
-              risk_level_text: h.risk_score?.risk_label, // Add risk level text
+              risk_score_id: h.risk_score?.id,
+              risk_score_int: h.risk_score?.risk_score,
+              risk_level_text: h.risk_score?.risk_label,
               likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
               consequence_text: consequenceOptions?.find(c => c.id === h.consequence_id)?.name
             }))
           );
         
-        if (error) throw error;
+        if (error) {
+          console.error('Error saving hazards:', error);
+          throw error;
+        }
       }
     }
   });
@@ -159,11 +177,12 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
   };
 
   const handleUpdate = async (id: string, field: string, value: any) => {
+    console.log('Updating field:', field, 'with value:', value);
+    
     const updatedHazards = hazards.map(h => {
       if (h.id === id) {
         const updatedHazard = { ...h, [field]: value };
         
-        // Update risk score if likelihood or consequence changes
         if (field === 'likelihood_id' || field === 'consequence_id') {
           updateRiskScore(updatedHazard);
         }
@@ -176,6 +195,8 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
   };
 
   const updateRiskScore = async (hazard: any) => {
+    console.log('Updating risk score for hazard:', hazard);
+    
     if (hazard.likelihood_id && hazard.consequence_id) {
       const { data, error } = await supabase
         .from('risk_matrix')
@@ -185,8 +206,19 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
         .single();
       
       if (!error && data) {
-        handleUpdate(hazard.id, 'risk_score_id', data.id);
-        handleUpdate(hazard.id, 'risk_score', data);
+        console.log('Retrieved risk score:', data);
+        
+        const updatedHazards = hazards.map(h => {
+          if (h.id === hazard.id) {
+            return {
+              ...h,
+              risk_score: data
+            };
+          }
+          return h;
+        });
+        
+        setHazards(updatedHazards);
       }
     }
   };
