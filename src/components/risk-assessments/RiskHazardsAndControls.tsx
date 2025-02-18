@@ -284,19 +284,6 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Hazards and Controls</h2>
-        {!readOnly && (
-          <Button
-            onClick={handleAdd}
-            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Hazard & Control
-          </Button>
-        )}
-      </div>
-
       <div className="space-y-2">
         {hazards.map((hazard) => (
           <Collapsible

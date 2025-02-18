@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -369,7 +368,7 @@ export function RiskAssessmentForm({
           hazard_type_id: ph.hazard_type,
           hazard: ph.hazard,
           control: ph.control,
-          source: ph.source || "MANUAL", // Reverted back to use source from product or default to MANUAL
+          source: ph.source || "MANUAL",
           control_in_place: false,
           likelihood_id: null,
           consequence_id: null,
@@ -592,7 +591,11 @@ export function RiskAssessmentForm({
               </div>
             </div>
 
-            <RiskHazardsAndControls riskAssessmentId={initialData?.id || null} readOnly={false} ref={hazardsControlsRef} />
+            <RiskHazardsAndControls 
+              riskAssessmentId={initialData?.id || null} 
+              readOnly={false} 
+              ref={hazardsControlsRef} 
+            />
 
             <div className="space-y-4">
               <div className="border-t pt-4">
