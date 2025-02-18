@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,7 +88,7 @@ export function RiskAssessmentForm({
       const { data, error } = await supabase
         .from('master_data')
         .select('id')
-        .eq('category', '\tRISK_OVERALL_STATUS')
+        .eq('category', 'RISK_OVERALL_STATUS')
         .eq('label', 'Risk Assessment In Progress')
         .single();
       
