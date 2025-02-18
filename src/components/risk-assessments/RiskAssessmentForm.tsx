@@ -78,36 +78,74 @@ export function RiskAssessmentForm({
   });
 
   const {
-    data: siteRegister
+    data: siteRegister,
+    error: siteRegisterError
   } = useQuery({
     queryKey: ['site-register', formData.site_register_record_id],
     queryFn: async () => {
       if (!formData.site_register_record_id) return null;
-      const {
-        data,
-        error
-      } = await supabase.from('site_registers').select(`
-          *,
-          location:locations (name, full_path),
-          product:products (
+      
+      try {
+        const { data, error } = await supabase
+          .from('site_registers')
+          .select(`
             id,
-            product_name,
-            product_code,
-            brand_name,
-            unit,
-            unit_size,
-            uom_id,
-            description,
-            uses,
-            other_names,
-            product_status_id
-          )
-        `).eq('id', formData.site_register_record_id).single();
-      if (error) throw error;
-      return data;
+            location_id,
+            product_id,
+            current_stock_level,
+            max_stock_level,
+            total_qty,
+            exact_location,
+            override_product_name,
+            storage_conditions,
+            placarding_required,
+            manifest_required,
+            fire_protection_required,
+            location:locations (
+              id,
+              name,
+              full_path
+            ),
+            product:products (
+              id,
+              product_name,
+              product_code,
+              brand_name,
+              unit,
+              unit_size,
+              uom_id,
+              description,
+              uses,
+              other_names,
+              product_status_id
+            )
+          `)
+          .eq('id', formData.site_register_record_id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching site register:', error);
+          throw error;
+        }
+
+        return data;
+      } catch (error) {
+        console.error('Error in site register query:', error);
+        throw error;
+      }
     },
     enabled: !!formData.site_register_record_id
   });
+
+  useEffect(() => {
+    if (siteRegisterError) {
+      toast({
+        title: "Error",
+        description: "Failed to load site register details",
+        variant: "destructive"
+      });
+    }
+  }, [siteRegisterError, toast]);
 
   const {
     data: likelihoodOptions
