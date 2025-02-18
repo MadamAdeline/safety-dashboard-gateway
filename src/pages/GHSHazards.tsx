@@ -6,16 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Plus, Download, RefreshCw, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getGHSHazardClassifications } from "@/services/ghs";
-import type { GHSHazardClassification, GHSHazardFilters } from "@/types/ghs";
+import type { GHSHazardClassification } from "@/types/ghs";
 import { GHSHazardList } from "@/components/ghs/GHSHazardList";
 import { GHSHazardForm } from "@/components/ghs/GHSHazardForm";
+import { GHSCodeForm } from "@/components/ghs/GHSCodeForm";
 import { useToast } from "@/hooks/use-toast";
 import * as XLSX from 'xlsx';
 
 export default function GHSHazards() {
   const [search, setSearch] = useState("");
   const [selectedHazard, setSelectedHazard] = useState<GHSHazardClassification | null>(null);
-  const [showForm, setShowForm] = useState(false);
+  const [showHazardForm, setShowHazardForm] = useState(false);
+  const [showCodeForm, setShowCodeForm] = useState(false);
   const { toast } = useToast();
 
   const { data = [], isLoading, refetch } = useQuery({
@@ -46,15 +48,16 @@ export default function GHSHazards() {
 
   const handleEdit = (hazard: GHSHazardClassification) => {
     setSelectedHazard(hazard);
-    setShowForm(true);
+    setShowHazardForm(true);
   };
 
   const handleCloseForm = () => {
     setSelectedHazard(null);
-    setShowForm(false);
+    setShowHazardForm(false);
+    setShowCodeForm(false);
   };
 
-  if (showForm) {
+  if (showHazardForm) {
     return (
       <DashboardLayout>
         <GHSHazardForm
@@ -65,11 +68,31 @@ export default function GHSHazards() {
     );
   }
 
+  if (showCodeForm) {
+    return (
+      <DashboardLayout>
+        <GHSCodeForm onClose={handleCloseForm} />
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">GHS Hazard Classifications</h1>
+        </div>
+
+        <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
+          <div className="relative w-1/2">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search GHS Hazard Classifications..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -88,24 +111,19 @@ export default function GHSHazards() {
               Refresh
             </Button>
             <Button
-              onClick={() => setShowForm(true)}
+              onClick={() => setShowCodeForm(true)}
               className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
             >
               <Plus className="h-4 w-4" />
-              Add New
+              Add GHS Codes
             </Button>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search GHS Hazard Classifications..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
-            />
+            <Button
+              onClick={() => setShowHazardForm(true)}
+              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add GHS Classification
+            </Button>
           </div>
         </div>
 
