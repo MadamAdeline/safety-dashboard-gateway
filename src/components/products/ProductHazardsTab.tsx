@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -12,6 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import type { HazardAndControl } from "@/types/product";
 import { useToast } from "@/components/ui/use-toast";
@@ -24,6 +28,7 @@ interface ProductHazardsTabProps {
 export function ProductHazardsTab({ productId, readOnly }: ProductHazardsTabProps) {
   const [hazardTypes, setHazardTypes] = useState<{ id: string; label: string; }[]>([]);
   const [hazards, setHazards] = useState<HazardAndControl[]>([]);
+  const [openItems, setOpenItems] = useState<string[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -113,6 +118,7 @@ export function ProductHazardsTab({ productId, readOnly }: ProductHazardsTabProp
       if (error) throw error;
 
       setHazards([...hazards, data]);
+      setOpenItems(prev => [...prev, data.hazard_control_id]);
     } catch (error) {
       console.error('Error adding hazard:', error);
       toast({
@@ -169,6 +175,14 @@ export function ProductHazardsTab({ productId, readOnly }: ProductHazardsTabProp
     }
   };
 
+  const toggleItem = (id: string) => {
+    setOpenItems(prev => 
+      prev.includes(id) 
+        ? prev.filter(item => item !== id)
+        : [...prev, id]
+    );
+  };
+
   return (
     <div className="space-y-6">
       {!readOnly && (
@@ -181,95 +195,114 @@ export function ProductHazardsTab({ productId, readOnly }: ProductHazardsTabProp
         </Button>
       )}
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         {hazards.map((hazard) => (
-          <div
+          <Collapsible
             key={hazard.hazard_control_id}
-            className="grid gap-4 p-4 border rounded-lg"
+            open={openItems.includes(hazard.hazard_control_id)}
+            className="border rounded-lg"
           >
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Hazard Type</Label>
-                {readOnly ? (
-                  <div className="p-2 bg-gray-50 rounded border">
-                    {hazard.hazardType?.label || '-'}
-                  </div>
-                ) : (
-                  <Select
-                    value={hazard.hazard_type}
-                    onValueChange={(value) => handleUpdate(hazard.hazard_control_id, 'hazard_type', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select hazard type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {hazardTypes.map((type) => (
-                        <SelectItem key={type.id} value={type.id}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
+            <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50" 
+                 onClick={() => toggleItem(hazard.hazard_control_id)}>
+              <div className="flex items-center space-x-2">
+                <CollapsibleTrigger className="flex items-center">
+                  {openItems.includes(hazard.hazard_control_id) ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </CollapsibleTrigger>
+                <span className="font-medium">{hazard.hazardType?.label || 'Unknown Type'}</span>
               </div>
-              <div className="space-y-2">
-                <Label>Source</Label>
-                {readOnly ? (
-                  <div className="p-2 bg-gray-50 rounded border">
-                    {hazard.source || '-'}
-                  </div>
-                ) : (
-                  <Input
-                    value={hazard.source || ''}
-                    onChange={(e) => handleUpdate(hazard.hazard_control_id, 'source', e.target.value)}
-                    placeholder="Enter source"
-                  />
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Hazard</Label>
-              {readOnly ? (
-                <div className="p-2 bg-gray-50 rounded border">
-                  {hazard.hazard}
-                </div>
-              ) : (
-                <Textarea
-                  value={hazard.hazard}
-                  onChange={(e) => handleUpdate(hazard.hazard_control_id, 'hazard', e.target.value)}
-                  placeholder="Enter hazard description"
-                />
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Control</Label>
-              {readOnly ? (
-                <div className="p-2 bg-gray-50 rounded border">
-                  {hazard.control}
-                </div>
-              ) : (
-                <Textarea
-                  value={hazard.control}
-                  onChange={(e) => handleUpdate(hazard.hazard_control_id, 'control', e.target.value)}
-                  placeholder="Enter control measures"
-                />
-              )}
-            </div>
-
-            {!readOnly && (
-              <div className="flex justify-end">
+              {!readOnly && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => handleDelete(hazard.hazard_control_id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(hazard.hazard_control_id);
+                  }}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
+              )}
+            </div>
+
+            <CollapsibleContent className="p-4 pt-0">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Hazard Type</Label>
+                    {readOnly ? (
+                      <div className="p-2 bg-gray-50 rounded border">
+                        {hazard.hazardType?.label || '-'}
+                      </div>
+                    ) : (
+                      <Select
+                        value={hazard.hazard_type}
+                        onValueChange={(value) => handleUpdate(hazard.hazard_control_id, 'hazard_type', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select hazard type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {hazardTypes.map((type) => (
+                            <SelectItem key={type.id} value={type.id}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Source</Label>
+                    {readOnly ? (
+                      <div className="p-2 bg-gray-50 rounded border">
+                        {hazard.source || '-'}
+                      </div>
+                    ) : (
+                      <Input
+                        value={hazard.source || ''}
+                        onChange={(e) => handleUpdate(hazard.hazard_control_id, 'source', e.target.value)}
+                        placeholder="Enter source"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Hazard</Label>
+                  {readOnly ? (
+                    <div className="p-2 bg-gray-50 rounded border">
+                      {hazard.hazard}
+                    </div>
+                  ) : (
+                    <Textarea
+                      value={hazard.hazard}
+                      onChange={(e) => handleUpdate(hazard.hazard_control_id, 'hazard', e.target.value)}
+                      placeholder="Enter hazard description"
+                    />
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Control</Label>
+                  {readOnly ? (
+                    <div className="p-2 bg-gray-50 rounded border">
+                      {hazard.control}
+                    </div>
+                  ) : (
+                    <Textarea
+                      value={hazard.control}
+                      onChange={(e) => handleUpdate(hazard.hazard_control_id, 'control', e.target.value)}
+                      placeholder="Enter control measures"
+                    />
+                  )}
+                </div>
               </div>
-            )}
-          </div>
+            </CollapsibleContent>
+          </Collapsible>
         ))}
 
         {hazards.length === 0 && (
