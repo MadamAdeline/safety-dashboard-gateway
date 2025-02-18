@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit2, Plus, Search } from "lucide-react";
+import { Edit2, Plus, Search, Download, RotateCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,7 +24,7 @@ interface RiskAssessmentListProps {
 }
 
 export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: RiskAssessmentListProps) {
-  const { data: riskAssessments, isLoading } = useQuery({
+  const { data: riskAssessments, isLoading, refetch } = useQuery({
     queryKey: ['risk-assessments'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -48,6 +48,12 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
           risk_matrix (
             risk_label,
             risk_color
+          ),
+          evaluation_status:master_data!risk_assessments_overall_evaluation_status_id_fkey (
+            label
+          ),
+          approval_status:master_data!risk_assessments_approval_status_id_fkey (
+            label
           )
         `)
         .order('risk_assessment_date', { ascending: false });
@@ -56,6 +62,11 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
       return data;
     }
   });
+
+  const handleExport = () => {
+    // TODO: Implement export functionality
+    console.log('Export functionality to be implemented');
+  };
 
   return (
     <div className="space-y-4">
@@ -66,18 +77,38 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
           className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
         >
           <Plus className="h-4 w-4" />
-          Risk Assessment
+          New Risk Assessment
         </Button>
       </div>
 
-      <div className="relative w-1/2">
-        <Input
-          placeholder="Search Risk Assessments..."
-          value={searchTerm}
-          onChange={(e) => onSearch(e.target.value)}
-          className="pl-10"
-        />
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+      <div className="flex justify-between items-center gap-4">
+        <div className="relative flex-1">
+          <Input
+            placeholder="Search Risk Assessments..."
+            value={searchTerm}
+            onChange={(e) => onSearch(e.target.value)}
+            className="pl-10"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleExport}
+            className="hover:bg-dgxprt-hover text-dgxprt-navy"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => refetch()}
+            className="hover:bg-dgxprt-hover text-dgxprt-navy"
+          >
+            <RotateCw className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow">
@@ -120,12 +151,12 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline">
-                    {assessment.overall_evaluation_status_id}
+                    {assessment.evaluation_status?.label}
                   </Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline">
-                    {assessment.approval_status_id}
+                    {assessment.approval_status?.label}
                   </Badge>
                 </TableCell>
                 <TableCell>
