@@ -261,15 +261,27 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         });
 
         for (const hazard of copiedHazardsToSave) {
-          const { error } = await supabase
-            .from('risk_hazards_and_controls')
-            .upsert(hazard, {
-              onConflict: 'risk_assessment_id,hazard_control_id'
-            });
+          if (copiedHazardMap.has(hazard.hazard_control_id)) {
+            // Update existing hazard
+            const { error } = await supabase
+              .from('risk_hazards_and_controls')
+              .update(hazard)
+              .eq('id', hazard.id);
 
-          if (error) {
-            console.error('Error saving copied hazard:', error);
-            throw error;
+            if (error) {
+              console.error('Error updating copied hazard:', error);
+              throw error;
+            }
+          } else {
+            // Insert new hazard
+            const { error } = await supabase
+              .from('risk_hazards_and_controls')
+              .insert(hazard);
+
+            if (error) {
+              console.error('Error inserting copied hazard:', error);
+              throw error;
+            }
           }
         }
       }
@@ -301,15 +313,27 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         });
 
         for (const hazard of manualHazardsToSave) {
-          const { error } = await supabase
-            .from('risk_hazards_and_controls')
-            .upsert(hazard, {
-              onConflict: 'id'
-            });
+          if (manualHazardMap.has(hazard.id)) {
+            // Update existing hazard
+            const { error } = await supabase
+              .from('risk_hazards_and_controls')
+              .update(hazard)
+              .eq('id', hazard.id);
 
-          if (error) {
-            console.error('Error saving manual hazard:', error);
-            throw error;
+            if (error) {
+              console.error('Error updating manual hazard:', error);
+              throw error;
+            }
+          } else {
+            // Insert new hazard
+            const { error } = await supabase
+              .from('risk_hazards_and_controls')
+              .insert(hazard);
+
+            if (error) {
+              console.error('Error inserting manual hazard:', error);
+              throw error;
+            }
           }
         }
       }
