@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -102,20 +101,8 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
           )
         `)
         .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%`)
-        .or(`ghs_code_id.in.(${
-          supabase
-            .from('ghs_codes')
-            .select('ghs_code_id')
-            .ilike('ghs_code', `%${searchTerm}%`)
-            .query()
-        })`)
-        .or(`hazard_statement_id.in.(${
-          supabase
-            .from('hazard_statements')
-            .select('hazard_statement_id')
-            .ilike('hazard_statement_code', `%${searchTerm}%`)
-            .query()
-        })`)
+        .or(`ghs_code_id.in.(select ghs_code_id from ghs_codes where ghs_code ilike '%${searchTerm}%')`)
+        .or(`hazard_statement_id.in.(select hazard_statement_id from hazard_statements where hazard_statement_code ilike '%${searchTerm}%')`)
         .order('hazard_class');
 
       if (error) {
