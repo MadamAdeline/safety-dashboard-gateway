@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,10 +42,7 @@ export function RiskAssessmentForm({
   const queryClient = useQueryClient();
   const [selectedSiteRegister, setSelectedSiteRegister] = useState<any>(null);
   const [riskScore, setRiskScore] = useState<any>(null);
-  const hazardsControlsRef = useRef<{
-    saveHazards: (newRiskAssessmentId: string) => Promise<void>;
-    populateHazards: (hazards: any[]) => void;
-  }>(null);
+  const hazardsControlsRef = useRef<any>(null);
 
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
@@ -641,7 +637,7 @@ export function RiskAssessmentForm({
                   Auto Generate Hazards and Controls
                 </Button>
                 <Button
-                  onClick={() => hazardsControlsRef.current?.saveHazards(initialData?.id)}
+                  onClick={() => hazardsControlsRef.current?.handleAdd()}
                   className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
                 >
                   <Plus className="h-4 w-4 mr-2" />
