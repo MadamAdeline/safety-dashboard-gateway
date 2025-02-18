@@ -12,6 +12,8 @@ export async function getGHSHazardClassifications() {
       signal_word,
       ghs_code_id,
       hazard_statement_id,
+      notes,
+      source,
       updated_at,
       updated_by,
       ghs_code:ghs_codes(
@@ -44,6 +46,8 @@ export async function createGHSHazardClassification(data: Omit<GHSHazardClassifi
       signal_word,
       ghs_code_id,
       hazard_statement_id,
+      notes,
+      source,
       updated_at,
       updated_by,
       ghs_code:ghs_codes(
@@ -82,6 +86,8 @@ export async function updateGHSHazardClassification(
       signal_word,
       ghs_code_id,
       hazard_statement_id,
+      notes,
+      source,
       updated_at,
       updated_by,
       ghs_code:ghs_codes(
