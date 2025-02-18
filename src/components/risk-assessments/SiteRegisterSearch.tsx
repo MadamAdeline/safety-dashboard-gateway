@@ -7,15 +7,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface SiteRegisterSearchProps {
   onSelect: (siteRegister: any) => void;
-  selectedSiteRegisterId?: string | null;
   className?: string;
 }
 
-export function SiteRegisterSearch({ 
-  onSelect, 
-  selectedSiteRegisterId,
-  className 
-}: SiteRegisterSearchProps) {
+export function SiteRegisterSearch({ onSelect, className }: SiteRegisterSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -82,9 +77,7 @@ export function SiteRegisterSearch({
               filteredSiteRegisters.map(record => (
                 <div
                   key={record.id}
-                  className={`p-2 hover:bg-gray-100 cursor-pointer ${
-                    selectedSiteRegisterId === record.id ? 'bg-gray-50' : ''
-                  }`}
+                  className="p-2 hover:bg-gray-100 cursor-pointer"
                   onClick={() => {
                     onSelect(record);
                     setIsDropdownOpen(false);
