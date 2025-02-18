@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -415,3 +416,5 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     </div>
   );
 });
+
+RiskHazardsAndControls.displayName = "RiskHazardsAndControls";
