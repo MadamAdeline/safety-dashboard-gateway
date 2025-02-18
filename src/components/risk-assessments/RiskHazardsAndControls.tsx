@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -141,7 +140,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     enabled: !!riskAssessmentId
   });
 
-  useQuery({
+  const { data: hazardsData, refetch: refetchHazards } = useQuery({
     queryKey: ['risk-hazards', riskAssessmentId],
     queryFn: async () => {
       if (!riskAssessmentId) return [];
@@ -184,7 +183,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         })
       );
 
-      console.log('Loaded hazards with risk scores:', hazardsWithRiskScores);
       setHazards(hazardsWithRiskScores);
       return hazardsWithRiskScores;
     },
@@ -337,34 +335,20 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
       console.log('Starting auto-generate for risk assessment:', riskAssessmentId);
 
-      // First, get ALL existing hazards for this risk assessment
-      const { data: existingHazards, error: fetchError } = await supabase
-        .from('risk_hazards_and_controls')
-        .select('*')
-        .eq('risk_assessment_id', riskAssessmentId);
-
-      if (fetchError) {
-        console.error('Error fetching existing hazards:', fetchError);
-        throw fetchError;
-      }
-
-      // Create a map of existing hazard control IDs
-      const existingHazardMap = new Map(
-        existingHazards?.filter(h => h.hazard_control_id).map(h => [h.hazard_control_id, h]) || []
+      // Get current hazards from state to ensure we have the latest data
+      const currentHazards = hazards || [];
+      const existingHazardIds = new Set(
+        currentHazards
+          .filter(h => h.hazard_control_id)
+          .map(h => h.hazard_control_id)
       );
 
-      console.log('Existing hazards map size:', existingHazardMap.size);
+      console.log('Existing hazard control IDs:', Array.from(existingHazardIds));
 
       // Fetch all product hazards
       const { data: productHazards, error: hazardsError } = await supabase
         .from('hazards_and_controls')
-        .select(`
-          hazard_control_id,
-          hazard_type,
-          hazard,
-          control,
-          source
-        `)
+        .select('*')
         .eq('product_id', siteRegister.product.id);
 
       if (hazardsError) {
@@ -379,7 +363,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
       // Filter to only get hazards that don't exist yet
       const newHazards = productHazards?.filter(
-        ph => ph.hazard_control_id && !existingHazardMap.has(ph.hazard_control_id)
+        ph => ph.hazard_control_id && !existingHazardIds.has(ph.hazard_control_id)
       );
 
       console.log('New hazards to be added:', newHazards?.length);
@@ -402,7 +386,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           consequence_text: null
         }));
 
-        // Insert only new records
         const { error: insertError } = await supabase
           .from('risk_hazards_and_controls')
           .insert(hazardsToInsert);
@@ -422,8 +405,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           description: `Added ${hazardsToInsert.length} new hazards and controls`,
         });
 
-        // Refresh the data
-        await queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
+        // Manually refetch to ensure we get fresh data
+        await refetchHazards();
         return hazardsToInsert;
       } else {
         toast({
