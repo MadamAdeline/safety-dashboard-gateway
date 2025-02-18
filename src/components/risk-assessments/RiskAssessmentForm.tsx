@@ -369,7 +369,7 @@ export function RiskAssessmentForm({
           hazard_type_id: ph.hazard_type,
           hazard: ph.hazard,
           control: ph.control,
-          source: "Product", // Changed to match the constraint
+          source: ph.source || "MANUAL", // Reverted back to use source from product or default to MANUAL
           control_in_place: false,
           likelihood_id: null,
           consequence_id: null,
