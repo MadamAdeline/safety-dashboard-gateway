@@ -10,7 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useUserRole } from "@/hooks/use-user-role";
 import { SupplierForm } from "@/components/suppliers/SupplierForm";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export function SDSSupplierSelect() {
   const { supplier, setSupplier, initialData, status, readOnly } = useSDSForm();
@@ -76,6 +75,10 @@ export function SDSSupplierSelect() {
     refetchSuppliers();
   };
 
+  if (showSupplierForm) {
+    return <SupplierForm onClose={handleSupplierFormClose} />;
+  }
+
   return (
     <div className="space-y-2">
       <Label htmlFor="supplier" className="after:content-['*'] after:ml-0.5 after:text-red-500">
@@ -114,12 +117,6 @@ export function SDSSupplierSelect() {
           </Button>
         )}
       </div>
-
-      <Dialog open={showSupplierForm} onOpenChange={setShowSupplierForm}>
-        <DialogContent className="max-w-4xl">
-          <SupplierForm onClose={handleSupplierFormClose} />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
