@@ -14,11 +14,11 @@ export async function getGHSHazardClassifications() {
       hazard_statement_id,
       updated_at,
       updated_by,
-      ghs_codes!ghs_code_id (
+      ghs_code:ghs_codes(
         ghs_code,
         pictogram_url
       ),
-      hazard_statements!hazard_statement_id (
+      hazard_statement:hazard_statements(
         hazard_statement_code,
         hazard_statement_text
       )
@@ -27,14 +27,7 @@ export async function getGHSHazardClassifications() {
 
   if (error) throw error;
   
-  // Transform the response to match our type
-  const transformedData = data.map(item => ({
-    ...item,
-    ghs_code: item.ghs_codes,
-    hazard_statement: item.hazard_statements
-  }));
-  
-  return transformedData as GHSHazardClassification[];
+  return data as GHSHazardClassification[];
 }
 
 export async function createGHSHazardClassification(data: Omit<GHSHazardClassification, 'hazard_classification_id' | 'updated_at'>) {
@@ -53,11 +46,11 @@ export async function createGHSHazardClassification(data: Omit<GHSHazardClassifi
       hazard_statement_id,
       updated_at,
       updated_by,
-      ghs_codes!ghs_code_id (
+      ghs_code:ghs_codes(
         ghs_code,
         pictogram_url
       ),
-      hazard_statements!hazard_statement_id (
+      hazard_statement:hazard_statements(
         hazard_statement_code,
         hazard_statement_text
       )
@@ -66,14 +59,7 @@ export async function createGHSHazardClassification(data: Omit<GHSHazardClassifi
 
   if (error) throw error;
   
-  // Transform the response to match our type
-  const transformedData = {
-    ...created,
-    ghs_code: created.ghs_codes,
-    hazard_statement: created.hazard_statements
-  };
-  
-  return transformedData as GHSHazardClassification;
+  return created as GHSHazardClassification;
 }
 
 export async function updateGHSHazardClassification(
@@ -98,11 +84,11 @@ export async function updateGHSHazardClassification(
       hazard_statement_id,
       updated_at,
       updated_by,
-      ghs_codes!ghs_code_id (
+      ghs_code:ghs_codes(
         ghs_code,
         pictogram_url
       ),
-      hazard_statements!hazard_statement_id (
+      hazard_statement:hazard_statements(
         hazard_statement_code,
         hazard_statement_text
       )
@@ -114,14 +100,7 @@ export async function updateGHSHazardClassification(
     throw error;
   }
   
-  // Transform the response to match our type
-  const transformedData = {
-    ...updated,
-    ghs_code: updated.ghs_codes,
-    hazard_statement: updated.hazard_statements
-  };
-  
-  return transformedData as GHSHazardClassification;
+  return updated as GHSHazardClassification;
 }
 
 export async function deleteGHSHazardClassification(id: string) {
