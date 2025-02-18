@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { X } from "lucide-react";
+import { X, Plus, Brain } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -229,11 +228,7 @@ export function RiskAssessmentForm({
           hazard_type,
           hazard,
           control,
-          source,
-          hazardType:master_data!hazards_and_controls_hazard_type_fkey (
-            id,
-            label
-          )
+          source
         `)
         .eq('product_id', siteRegister.product.id);
 
@@ -335,6 +330,96 @@ export function RiskAssessmentForm({
     }
   });
 
+  const autoGenerateMutation = useMutation({
+    mutationFn: async () => {
+      let riskAssessmentId: string;
+      
+      if (initialData?.id) {
+        await updateMutation.mutateAsync(formData);
+        riskAssessmentId = initialData.id;
+      } else {
+        const createdData = await createMutation.mutateAsync(formData);
+        riskAssessmentId = createdData.id;
+      }
+
+      const { data: productHazards, error: hazardsError } = await supabase
+        .from('hazards_and_controls')
+        .select(`
+          hazard_control_id,
+          hazard_type,
+          hazard,
+          control,
+          source
+        `)
+        .eq('product_id', siteRegister?.product?.id);
+
+      if (hazardsError) throw hazardsError;
+
+      const { error: deleteError } = await supabase
+        .from('risk_hazards_and_controls')
+        .delete()
+        .eq('risk_assessment_id', riskAssessmentId);
+
+      if (deleteError) throw deleteError;
+
+      if (productHazards && productHazards.length > 0) {
+        const hazardsToInsert = productHazards.map(ph => ({
+          risk_assessment_id: riskAssessmentId,
+          hazard_type_id: ph.hazard_type,
+          hazard: ph.hazard,
+          control: ph.control,
+          source: ph.source,
+          control_in_place: false
+        }));
+
+        const { error: insertError } = await supabase
+          .from('risk_hazards_and_controls')
+          .insert(hazardsToInsert);
+
+        if (insertError) throw insertError;
+
+        return hazardsToInsert;
+      }
+
+      return [];
+    }
+  });
+
+  const handleAutoGenerate = async () => {
+    if (!siteRegister?.product?.id) {
+      toast({
+        title: "Error",
+        description: "Please select a product from the site register first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const hazards = await autoGenerateMutation.mutateAsync();
+      
+      if (hazardsControlsRef.current) {
+        hazardsControlsRef.current.populateHazards(hazards);
+      }
+
+      toast({
+        title: "Success",
+        description: `Generated ${hazards.length} hazards and controls from the product`
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['risk-hazards']
+      });
+    } catch (error) {
+      console.error('Error auto-generating hazards:', error);
+      toast({
+        title: "Error",
+        description: "Failed to auto-generate hazards and controls",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleSave = async () => {
     try {
       let riskAssessmentId: string;
@@ -347,7 +432,6 @@ export function RiskAssessmentForm({
         riskAssessmentId = createdData.id;
       }
 
-      // Now that we have the risk assessment ID, save the hazards and controls
       if (hazardsControlsRef.current) {
         await hazardsControlsRef.current.saveHazards(riskAssessmentId);
       }
@@ -391,7 +475,11 @@ export function RiskAssessmentForm({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button className="bg-dgxprt-purple hover:bg-dgxprt-purple/90" onClick={handleSave} disabled={isPending}>
+          <Button 
+            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90" 
+            onClick={handleSave} 
+            disabled={isPending}
+          >
             {isPending ? "Saving..." : initialData ? "Update" : "Save"}
           </Button>
           <Button variant="ghost" size="icon" onClick={onClose}>
@@ -476,6 +564,27 @@ export function RiskAssessmentForm({
 
         <TabsContent value="assessment" className="space-y-6">
           <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Hazards and Controls</h2>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleAutoGenerate}
+                  className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+                  disabled={autoGenerateMutation.isPending}
+                >
+                  <Brain className="h-4 w-4 mr-2" />
+                  Auto Generate Hazards and Controls
+                </Button>
+                <Button
+                  onClick={() => hazardsControlsRef.current?.saveHazards(initialData?.id)}
+                  className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Hazard & Control
+                </Button>
+              </div>
+            </div>
+
             <RiskHazardsAndControls riskAssessmentId={initialData?.id || null} readOnly={false} ref={hazardsControlsRef} />
 
             <div className="space-y-4">
