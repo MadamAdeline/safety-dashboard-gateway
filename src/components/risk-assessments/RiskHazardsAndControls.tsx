@@ -335,40 +335,52 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
       console.log('Starting auto-generate for risk assessment:', riskAssessmentId);
 
-      // Get current hazards from state to ensure we have the latest data
-      const currentHazards = hazards || [];
-      const existingHazardIds = new Set(
-        currentHazards
-          .filter(h => h.hazard_control_id)
-          .map(h => h.hazard_control_id)
-      );
+      try {
+        // Step 1: Get existing hazards directly from the database
+        const { data: existingHazards, error: existingError } = await supabase
+          .from('risk_hazards_and_controls')
+          .select('hazard_control_id')
+          .eq('risk_assessment_id', riskAssessmentId)
+          .not('hazard_control_id', 'is', null);
 
-      console.log('Existing hazard control IDs:', Array.from(existingHazardIds));
+        if (existingError) {
+          console.error('Error fetching existing hazards:', existingError);
+          throw existingError;
+        }
 
-      // Fetch all product hazards
-      const { data: productHazards, error: hazardsError } = await supabase
-        .from('hazards_and_controls')
-        .select('*')
-        .eq('product_id', siteRegister.product.id);
+        const existingHazardIds = new Set(
+          existingHazards.map(h => h.hazard_control_id)
+        );
 
-      if (hazardsError) {
-        console.error('Error fetching product hazards:', hazardsError);
-        toast({
-          title: "Error",
-          description: "Failed to fetch product hazards",
-          variant: "destructive",
-        });
-        throw hazardsError;
-      }
+        console.log('Existing hazard control IDs:', Array.from(existingHazardIds));
 
-      // Filter to only get hazards that don't exist yet
-      const newHazards = productHazards?.filter(
-        ph => ph.hazard_control_id && !existingHazardIds.has(ph.hazard_control_id)
-      );
+        // Step 2: Get all product hazards
+        const { data: productHazards, error: productError } = await supabase
+          .from('hazards_and_controls')
+          .select('*')
+          .eq('product_id', siteRegister.product.id);
 
-      console.log('New hazards to be added:', newHazards?.length);
+        if (productError) {
+          console.error('Error fetching product hazards:', productError);
+          throw productError;
+        }
 
-      if (newHazards && newHazards.length > 0) {
+        // Step 3: Filter out existing hazards
+        const newHazards = productHazards.filter(
+          ph => ph.hazard_control_id && !existingHazardIds.has(ph.hazard_control_id)
+        );
+
+        console.log('New hazards to be added:', newHazards.length);
+
+        if (newHazards.length === 0) {
+          toast({
+            title: "Information",
+            description: "No new hazards to add",
+          });
+          return [];
+        }
+
+        // Step 4: Prepare hazards for insertion
         const hazardsToInsert = newHazards.map(ph => ({
           risk_assessment_id: riskAssessmentId,
           hazard_type_id: ph.hazard_type,
@@ -386,34 +398,54 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           consequence_text: null
         }));
 
+        // Step 5: Insert new hazards
         const { error: insertError } = await supabase
           .from('risk_hazards_and_controls')
           .insert(hazardsToInsert);
 
         if (insertError) {
           console.error('Error inserting new hazards:', insertError);
-          toast({
-            title: "Error",
-            description: "Failed to add new hazards",
-            variant: "destructive",
-          });
           throw insertError;
         }
 
-        toast({
-          title: "Success",
-          description: `Added ${hazardsToInsert.length} new hazards and controls`,
-        });
+        // Step 6: Verify the insertion by counting new records
+        const { count, error: countError } = await supabase
+          .from('risk_hazards_and_controls')
+          .select('*', { count: 'exact', head: true })
+          .eq('risk_assessment_id', riskAssessmentId);
 
-        // Manually refetch to ensure we get fresh data
-        await refetchHazards();
+        if (countError) {
+          console.error('Error verifying insertion:', countError);
+          throw countError;
+        }
+
+        console.log('Verification count after insertion:', count);
+
+        // Step 7: Refetch data and update UI
+        try {
+          await refetchHazards();
+          toast({
+            title: "Success",
+            description: `Added ${hazardsToInsert.length} new hazards and controls`,
+          });
+        } catch (refetchError) {
+          console.error('Error refetching hazards:', refetchError);
+          toast({
+            title: "Warning",
+            description: "Hazards were added but the display may need to be refreshed",
+            variant: "destructive",
+          });
+        }
+
         return hazardsToInsert;
-      } else {
+      } catch (error) {
+        console.error('Auto-generate operation failed:', error);
         toast({
-          title: "Information",
-          description: "No new hazards to add",
+          title: "Error",
+          description: "Failed to auto-generate hazards. Please try again.",
+          variant: "destructive",
         });
-        return [];
+        throw error;
       }
     }
   });
