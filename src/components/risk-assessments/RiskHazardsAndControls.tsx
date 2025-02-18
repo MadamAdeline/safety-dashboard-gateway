@@ -34,6 +34,24 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+interface HazardData {
+  id: string;
+  risk_assessment_id: string;
+  hazard_control_id?: string;
+  hazard_type_id: string;
+  hazard: string;
+  control: string;
+  control_in_place: boolean;
+  likelihood_id: number | null;
+  consequence_id: number | null;
+  risk_score_id: number | null;
+  risk_score_int: number | null;
+  risk_level_text: string | null;
+  likelihood_text: string | null;
+  consequence_text: string | null;
+  source: 'Manual' | 'Product';
+}
+
 interface RiskHazardsAndControlsProps {
   riskAssessmentId: string | null;
   readOnly?: boolean;
@@ -176,7 +194,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     mutationFn: async (hazardsData: any[]) => {
       if (!riskAssessmentId) return;
 
-      // Split hazards into copied (with hazard_control_id) and manual hazards
       const copiedHazards = hazardsData.filter(h => h.hazard_control_id);
       const manualHazards = hazardsData.filter(h => !h.hazard_control_id);
 
@@ -209,7 +226,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
       // Step 2: Handle Copied Hazards
       if (copiedHazards.length > 0) {
-        const copiedHazardsToSave = copiedHazards.map(h => ({
+        const copiedHazardsToSave: HazardData[] = copiedHazards.map(h => ({
           id: copiedHazardMap.get(h.hazard_control_id) || h.id,
           risk_assessment_id: riskAssessmentId,
           hazard_control_id: h.hazard_control_id,
@@ -219,10 +236,10 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           control_in_place: h.control_in_place,
           likelihood_id: h.likelihood_id,
           consequence_id: h.consequence_id,
-          risk_score_id: h.risk_score?.id,
-          risk_score_int: h.risk_score?.risk_score,
-          risk_level_text: h.risk_score?.risk_label,
-          likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
+          risk_score_id: h.risk_score?.id || null,
+          risk_score_int: h.risk_score?.risk_score || null,
+          risk_level_text: h.risk_score?.risk_label || null,
+          likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name || null,
           consequence_text: h.consequence_text,
           source: 'Product'
         }));
@@ -230,7 +247,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         const { error: copiedError } = await supabase
           .from('risk_hazards_and_controls')
           .upsert(copiedHazardsToSave, {
-            onConflict: ['risk_assessment_id', 'hazard_control_id']
+            onConflict: 'risk_assessment_id,hazard_control_id'
           });
 
         if (copiedError) {
@@ -243,7 +260,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
       // Step 3: Handle Manual Hazards
       if (manualHazards.length > 0) {
-        const manualHazardsToSave = manualHazards.map(h => ({
+        const manualHazardsToSave: HazardData[] = manualHazards.map(h => ({
           id: manualHazardMap.get(h.id) || h.id,
           risk_assessment_id: riskAssessmentId,
           hazard_type_id: h.hazard_type_id,
@@ -252,10 +269,10 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           control_in_place: h.control_in_place,
           likelihood_id: h.likelihood_id,
           consequence_id: h.consequence_id,
-          risk_score_id: h.risk_score?.id,
-          risk_score_int: h.risk_score?.risk_score,
-          risk_level_text: h.risk_score?.risk_label,
-          likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
+          risk_score_id: h.risk_score?.id || null,
+          risk_score_int: h.risk_score?.risk_score || null,
+          risk_level_text: h.risk_score?.risk_label || null,
+          likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name || null,
           consequence_text: h.consequence_text,
           source: 'Manual'
         }));
@@ -263,7 +280,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         const { error: manualError } = await supabase
           .from('risk_hazards_and_controls')
           .upsert(manualHazardsToSave, {
-            onConflict: ['id']
+            onConflict: 'id'
           });
 
         if (manualError) {
@@ -289,7 +306,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         return;
       }
 
-      // Get existing hazard_control_ids for this risk assessment
       const { data: existingHazards } = await supabase
         .from('risk_hazards_and_controls')
         .select('hazard_control_id')
@@ -299,7 +315,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       const existingHazardIds = existingHazards?.map(h => h.hazard_control_id) || [];
       console.log('Existing hazard control IDs:', existingHazardIds);
 
-      // Get all product hazards
       const { data: productHazards, error: hazardsError } = await supabase
         .from('hazards_and_controls')
         .select(`
@@ -321,7 +336,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         throw hazardsError;
       }
 
-      // Filter to only get hazards that don't already exist
       const newHazards = productHazards?.filter(
         ph => !existingHazardIds.includes(ph.hazard_control_id)
       );
