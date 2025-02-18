@@ -82,7 +82,7 @@ export function RiskAssessmentForm({
     overall_risk_score_id: initialData?.overall_risk_score_id || null
   });
 
-  // Updated to use 'value' instead of 'code'
+  // Updated to use 'label' instead of 'value'
   const { data: evaluationStatus } = useQuery({
     queryKey: ['evaluationStatus'],
     queryFn: async () => {
@@ -90,7 +90,7 @@ export function RiskAssessmentForm({
         .from('master_data')
         .select('id')
         .eq('category', 'RISK_OVERALL_STATUS')
-        .eq('value', 'IN_PROGRESS')
+        .eq('label', 'Risk Assessment In Progress')
         .single();
       
       if (error) throw error;
@@ -98,7 +98,7 @@ export function RiskAssessmentForm({
     }
   });
 
-  // Updated to use 'value' instead of 'code'
+  // Updated to use 'label' instead of 'value'
   const { data: approvalStatus } = useQuery({
     queryKey: ['approvalStatus'],
     queryFn: async () => {
@@ -106,7 +106,7 @@ export function RiskAssessmentForm({
         .from('master_data')
         .select('id')
         .eq('category', 'RISK_APPROVAL_STATUS')
-        .eq('value', 'UNDER_REVIEW')
+        .eq('label', 'Under Review')
         .single();
       
       if (error) throw error;
