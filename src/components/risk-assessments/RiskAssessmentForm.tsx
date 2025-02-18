@@ -16,6 +16,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { SiteRegisterSearch } from "./SiteRegisterSearch";
 
 interface RiskAssessmentFormProps {
   onClose: () => void;
@@ -226,17 +227,25 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Site Register Information</h2>
           {selectedSiteRegister ? (
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
               <p><strong>Location:</strong> {siteRegister?.location?.full_path}</p>
               <p><strong>Product:</strong> {siteRegister?.product?.product_name}</p>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  setSelectedSiteRegister(null);
+                  setFormData(prev => ({ ...prev, site_register_record_id: "" }));
+                }}
+              >
+                Change Site Register
+              </Button>
             </div>
           ) : (
-            <div>
-              <Input 
-                placeholder="Search for a site register record..."
-                onChange={(e) => console.log(e.target.value)}
-              />
-            </div>
+            <SiteRegisterSearch 
+              onSelect={handleSiteRegisterSelect}
+              className="w-full"
+            />
           )}
         </div>
 
