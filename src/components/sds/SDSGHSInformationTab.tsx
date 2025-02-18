@@ -83,9 +83,13 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
           ghs_code:ghs_codes (
             ghs_code,
             pictogram_url
+          ),
+          hazard_statement:hazard_statements (
+            hazard_statement_code,
+            hazard_statement_text
           )
         `)
-        .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%`)
+        .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%,hazard_statements.hazard_statement_code.ilike.%${searchTerm}%`)
         .order('hazard_class');
 
       if (error) throw error;
@@ -181,6 +185,7 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
                     <TableHead>Hazard Class</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>GHS Code</TableHead>
+                    <TableHead>Hazard Statement</TableHead>
                     <TableHead>Signal Word</TableHead>
                     <TableHead className="w-[100px]">Actions</TableHead>
                   </TableRow>
@@ -191,6 +196,7 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
                       <TableCell>{result.hazard_class}</TableCell>
                       <TableCell>{result.hazard_category}</TableCell>
                       <TableCell>{result.ghs_code?.ghs_code}</TableCell>
+                      <TableCell>{result.hazard_statement?.hazard_statement_code}</TableCell>
                       <TableCell>
                         <Badge variant={result.signal_word === 'Danger' ? 'destructive' : 'default'}>
                           {result.signal_word}
@@ -210,7 +216,7 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
                   ))}
                   {filteredSearchResults.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-4">
+                      <TableCell colSpan={6} className="text-center py-4">
                         No matching GHS Classifications found
                       </TableCell>
                     </TableRow>
