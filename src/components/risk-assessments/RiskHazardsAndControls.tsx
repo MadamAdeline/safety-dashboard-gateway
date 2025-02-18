@@ -410,11 +410,25 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         <TableHeader>
           <TableRow className="border-b">
             <TableHead className="w-[50px]"></TableHead>
-            <TableHead className="w-[200px] text-left font-semibold">Type</TableHead>
-            <TableHead className="w-[75px] text-left font-semibold">Hazard</TableHead>
-            <TableHead className="w-[75px] text-left font-semibold">Control</TableHead>
-            <TableHead className="w-[150px] text-center font-semibold">Risk Level</TableHead>
-            {!readOnly && <TableHead className="w-[80px] text-center font-semibold">Actions</TableHead>}
+            <TableHead className="w-[150px] sm:w-[200px] text-left font-semibold">Type</TableHead>
+            <TableHead 
+              className="w-[100px] sm:w-[150px] text-left font-semibold truncate"
+              title="Hazard Description"
+            >
+              Hazard Desc.
+            </TableHead>
+            <TableHead 
+              className="w-[100px] sm:w-[150px] text-left font-semibold truncate"
+              title="Control Description"
+            >
+              Control Desc.
+            </TableHead>
+            <TableHead className="w-[120px] sm:w-[150px] text-center font-semibold">Risk Level</TableHead>
+            {!readOnly && (
+              <TableHead className="w-[60px] sm:w-[80px] text-center font-semibold">
+                Actions
+              </TableHead>
+            )}
           </TableRow>
         </TableHeader>
 
@@ -432,14 +446,28 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                     <ChevronRight className="h-4 w-4" />
                   )}
                 </TableCell>
-                <TableCell className="w-[200px]">{hazard.hazard_type?.label || '-'}</TableCell>
-                <TableCell className="w-[75px]">
-                  <div className="truncate">{hazard.hazard || '-'}</div>
+                <TableCell className="w-[150px] sm:w-[200px]">
+                  <div className="truncate" title={hazard.hazard_type?.label}>
+                    {hazard.hazard_type?.label || '-'}
+                  </div>
                 </TableCell>
-                <TableCell className="w-[75px]">
-                  <div className="truncate">{hazard.control || '-'}</div>
+                <TableCell className="w-[100px] sm:w-[150px]">
+                  <div 
+                    className="truncate max-w-[100px] sm:max-w-[150px]" 
+                    title={hazard.hazard}
+                  >
+                    {hazard.hazard || '-'}
+                  </div>
                 </TableCell>
-                <TableCell className="w-[150px] text-center">
+                <TableCell className="w-[100px] sm:w-[150px]">
+                  <div 
+                    className="truncate max-w-[100px] sm:max-w-[150px]" 
+                    title={hazard.control}
+                  >
+                    {hazard.control || '-'}
+                  </div>
+                </TableCell>
+                <TableCell className="w-[120px] sm:w-[150px] text-center">
                   {hazard.risk_score && (
                     <Badge
                       style={{
@@ -453,7 +481,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                   )}
                 </TableCell>
                 {!readOnly && (
-                  <TableCell className="w-[80px] text-center">
+                  <TableCell className="w-[60px] sm:w-[80px] text-center">
                     <Button
                       variant="ghost"
                       size="icon"
