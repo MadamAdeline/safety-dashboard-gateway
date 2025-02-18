@@ -41,6 +41,24 @@ export type Database = {
           },
         ]
       }
+      consequence: {
+        Row: {
+          id: number
+          name: string
+          score: number
+        }
+        Insert: {
+          id?: number
+          name: string
+          score: number
+        }
+        Update: {
+          id?: number
+          name?: string
+          score?: number
+        }
+        Relationships: []
+      }
       ghs_codes: {
         Row: {
           ghs_code: string
@@ -223,6 +241,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      likelihood: {
+        Row: {
+          id: number
+          name: string
+          score: number
+        }
+        Insert: {
+          id?: number
+          name: string
+          score: number
+        }
+        Update: {
+          id?: number
+          name?: string
+          score?: number
+        }
+        Relationships: []
       }
       locations: {
         Row: {
@@ -529,6 +565,287 @@ export type Database = {
             columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_assessments: {
+        Row: {
+          approval_status_id: string | null
+          approver: string | null
+          conducted_by: string | null
+          created_at: string | null
+          date_of_next_review: string | null
+          id: string
+          overall_consequence_id: number | null
+          overall_consequence_text: string | null
+          overall_evaluation: string | null
+          overall_evaluation_status_id: string | null
+          overall_likelihood_id: number | null
+          overall_likelihood_text: string | null
+          overall_risk_level_text: string | null
+          overall_risk_score_id: number | null
+          overall_risk_score_int: number | null
+          product_usage: string | null
+          risk_assessment_date: string | null
+          site_register_record_id: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          approval_status_id?: string | null
+          approver?: string | null
+          conducted_by?: string | null
+          created_at?: string | null
+          date_of_next_review?: string | null
+          id?: string
+          overall_consequence_id?: number | null
+          overall_consequence_text?: string | null
+          overall_evaluation?: string | null
+          overall_evaluation_status_id?: string | null
+          overall_likelihood_id?: number | null
+          overall_likelihood_text?: string | null
+          overall_risk_level_text?: string | null
+          overall_risk_score_id?: number | null
+          overall_risk_score_int?: number | null
+          product_usage?: string | null
+          risk_assessment_date?: string | null
+          site_register_record_id?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          approval_status_id?: string | null
+          approver?: string | null
+          conducted_by?: string | null
+          created_at?: string | null
+          date_of_next_review?: string | null
+          id?: string
+          overall_consequence_id?: number | null
+          overall_consequence_text?: string | null
+          overall_evaluation?: string | null
+          overall_evaluation_status_id?: string | null
+          overall_likelihood_id?: number | null
+          overall_likelihood_text?: string | null
+          overall_risk_level_text?: string | null
+          overall_risk_score_id?: number | null
+          overall_risk_score_int?: number | null
+          product_usage?: string | null
+          risk_assessment_date?: string | null
+          site_register_record_id?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_assessments_approval_status_id_fkey"
+            columns: ["approval_status_id"]
+            isOneToOne: false
+            referencedRelation: "master_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_approver_fkey"
+            columns: ["approver"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_conducted_by_fkey"
+            columns: ["conducted_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_overall_consequence_id_fkey"
+            columns: ["overall_consequence_id"]
+            isOneToOne: false
+            referencedRelation: "consequence"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_overall_evaluation_status_id_fkey"
+            columns: ["overall_evaluation_status_id"]
+            isOneToOne: false
+            referencedRelation: "master_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_overall_likelihood_id_fkey"
+            columns: ["overall_likelihood_id"]
+            isOneToOne: false
+            referencedRelation: "likelihood"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_overall_risk_score_id_fkey"
+            columns: ["overall_risk_score_id"]
+            isOneToOne: false
+            referencedRelation: "risk_matrix"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_site_register_record_id_fkey"
+            columns: ["site_register_record_id"]
+            isOneToOne: false
+            referencedRelation: "site_registers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_hazards_and_controls: {
+        Row: {
+          consequence_id: number | null
+          consequence_text: string | null
+          control: string | null
+          control_in_place: boolean | null
+          created_at: string | null
+          hazard: string | null
+          hazard_type_id: string | null
+          id: string
+          likelihood_id: number | null
+          likelihood_text: string | null
+          risk_assessment_id: string | null
+          risk_level_text: string | null
+          risk_score_id: number | null
+          risk_score_int: number | null
+          source: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          consequence_id?: number | null
+          consequence_text?: string | null
+          control?: string | null
+          control_in_place?: boolean | null
+          created_at?: string | null
+          hazard?: string | null
+          hazard_type_id?: string | null
+          id?: string
+          likelihood_id?: number | null
+          likelihood_text?: string | null
+          risk_assessment_id?: string | null
+          risk_level_text?: string | null
+          risk_score_id?: number | null
+          risk_score_int?: number | null
+          source?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          consequence_id?: number | null
+          consequence_text?: string | null
+          control?: string | null
+          control_in_place?: boolean | null
+          created_at?: string | null
+          hazard?: string | null
+          hazard_type_id?: string | null
+          id?: string
+          likelihood_id?: number | null
+          likelihood_text?: string | null
+          risk_assessment_id?: string | null
+          risk_level_text?: string | null
+          risk_score_id?: number | null
+          risk_score_int?: number | null
+          source?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_hazards_and_controls_consequence_id_fkey"
+            columns: ["consequence_id"]
+            isOneToOne: false
+            referencedRelation: "consequence"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_hazards_and_controls_hazard_type_id_fkey"
+            columns: ["hazard_type_id"]
+            isOneToOne: false
+            referencedRelation: "master_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_hazards_and_controls_likelihood_id_fkey"
+            columns: ["likelihood_id"]
+            isOneToOne: false
+            referencedRelation: "likelihood"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_hazards_and_controls_risk_assessment_id_fkey"
+            columns: ["risk_assessment_id"]
+            isOneToOne: false
+            referencedRelation: "risk_assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_hazards_and_controls_risk_score_id_fkey"
+            columns: ["risk_score_id"]
+            isOneToOne: false
+            referencedRelation: "risk_matrix"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_hazards_and_controls_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_matrix: {
+        Row: {
+          consequence_id: number | null
+          id: number
+          likelihood_id: number | null
+          risk_color: string
+          risk_label: string | null
+          risk_level: string
+          risk_score: number
+        }
+        Insert: {
+          consequence_id?: number | null
+          id?: number
+          likelihood_id?: number | null
+          risk_color: string
+          risk_label?: string | null
+          risk_level: string
+          risk_score: number
+        }
+        Update: {
+          consequence_id?: number | null
+          id?: number
+          likelihood_id?: number | null
+          risk_color?: string
+          risk_label?: string | null
+          risk_level?: string
+          risk_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_matrix_consequence_id_fkey"
+            columns: ["consequence_id"]
+            isOneToOne: false
+            referencedRelation: "consequence"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_matrix_likelihood_id_fkey"
+            columns: ["likelihood_id"]
+            isOneToOne: false
+            referencedRelation: "likelihood"
             referencedColumns: ["id"]
           },
         ]
