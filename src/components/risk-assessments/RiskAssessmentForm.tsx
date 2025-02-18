@@ -11,6 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -302,252 +308,271 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
         </div>
       </div>
 
-      <div className="space-y-8">
-        <div className="space-y-4">
-          <div className="border-t pt-4">
-            <div className="bg-gray-50 py-2 px-4 rounded-md">
-              <h2 className="text-lg font-semibold">Site Register Information</h2>
-            </div>
-          </div>
-          {selectedSiteRegister ? (
-            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-              <p><strong>Location:</strong> {siteRegister?.location?.full_path}</p>
-              <p><strong>Product:</strong> {siteRegister?.product?.product_name}</p>
-              {!initialData && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => {
-                    setSelectedSiteRegister(null);
-                    setFormData(prev => ({ ...prev, site_register_record_id: "" }));
-                  }}
-                >
-                  Change the Site Register's Product
-                </Button>
-              )}
-            </div>
-          ) : (
-            !initialData && (
-              <SiteRegisterSearch 
-                onSelect={handleSiteRegisterSelect}
-                className="w-full"
-              />
-            )
-          )}
-        </div>
+      <Tabs defaultValue="details" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="details">Risk Assessment Details</TabsTrigger>
+          <TabsTrigger value="assessment">Risk Assessment</TabsTrigger>
+          <TabsTrigger value="approval">Evaluation & Approval</TabsTrigger>
+        </TabsList>
 
-        <div className="space-y-4">
-          <div className="border-t pt-4">
-            <div className="bg-gray-50 py-2 px-4 rounded-md">
-              <h2 className="text-lg font-semibold">Assessment Details</h2>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label>Risk Assessment Date</Label>
-              <Input
-                type="date"
-                value={formData.risk_assessment_date}
-                onChange={(e) => setFormData({ ...formData, risk_assessment_date: e.target.value })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Assessed By</Label>
-              <Select 
-                value={formData.conducted_by}
-                onValueChange={(value) => setFormData({ ...formData, conducted_by: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select assessor" />
-                </SelectTrigger>
-                <SelectContent>
-                  {users?.map((user) => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {`${user.first_name} ${user.last_name}`}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2 col-span-2">
-              <Label>Product Usage</Label>
-              <Textarea
-                value={formData.product_usage}
-                onChange={(e) => setFormData({ ...formData, product_usage: e.target.value })}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="border-t pt-4">
-            <div className="bg-gray-50 py-2 px-4 rounded-md">
-              <h2 className="text-lg font-semibold">Hazards and Controls</h2>
-            </div>
-          </div>
-          <RiskHazardsAndControls 
-            riskAssessmentId={initialData?.id || null}
-            readOnly={false}
-            ref={hazardsControlsRef}
-          />
-        </div>
-
-        <div className="space-y-4">
-          <div className="border-t pt-4">
-            <div className="bg-gray-50 py-2 px-4 rounded-md">
-              <h2 className="text-lg font-semibold">Risk Assessment</h2>
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <Label>Overall Likelihood</Label>
-              <Select
-                value={formData.overall_likelihood_id?.toString() || ""}
-                onValueChange={(value) => setFormData({ ...formData, overall_likelihood_id: parseInt(value) })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select likelihood" />
-                </SelectTrigger>
-                <SelectContent>
-                  {likelihoodOptions?.map((option) => (
-                    <SelectItem key={option.id} value={option.id.toString()}>
-                      {option.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Overall Consequence</Label>
-              <Select
-                value={formData.overall_consequence_id?.toString() || ""}
-                onValueChange={(value) => setFormData({ ...formData, overall_consequence_id: parseInt(value) })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select consequence" />
-                </SelectTrigger>
-                <SelectContent>
-                  {consequenceOptions?.map((option) => (
-                    <SelectItem key={option.id} value={option.id.toString()}>
-                      {option.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {riskScore && (
-              <div className="space-y-2">
-                <Label>Overall Risk Level</Label>
-                <div className="h-10 flex items-center">
-                  <Badge
-                    style={{
-                      backgroundColor: riskScore.risk_color || '#gray-400',
-                      color: '#FFFFFF'
-                    }}
-                  >
-                    {riskScore.risk_label}
-                  </Badge>
+        {/* Tab 1: Risk Assessment Details */}
+        <TabsContent value="details" className="space-y-6">
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="border-t pt-4">
+                <div className="bg-gray-50 py-2 px-4 rounded-md">
+                  <h2 className="text-lg font-semibold">Site Register Information</h2>
                 </div>
               </div>
-            )}
-          </div>
+              {selectedSiteRegister ? (
+                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                  <p><strong>Location:</strong> {siteRegister?.location?.full_path}</p>
+                  <p><strong>Product:</strong> {siteRegister?.product?.product_name}</p>
+                  {!initialData && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setSelectedSiteRegister(null);
+                        setFormData(prev => ({ ...prev, site_register_record_id: "" }));
+                      }}
+                    >
+                      Change the Site Register's Product
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                !initialData && (
+                  <SiteRegisterSearch 
+                    onSelect={handleSiteRegisterSelect}
+                    className="w-full"
+                  />
+                )
+              )}
+            </div>
 
-          <div className="bg-white border rounded-lg p-4 mt-4">
-            <img 
-              src="/lovable-uploads/2cadd5b5-9f69-4e43-83af-bfc20517cde2.png" 
-              alt="Risk Assessment Matrix" 
-              className="w-full max-w-3xl mx-auto"
-            />
-          </div>
-        </div>
+            <div className="space-y-4">
+              <div className="border-t pt-4">
+                <div className="bg-gray-50 py-2 px-4 rounded-md">
+                  <h2 className="text-lg font-semibold">Assessment Details</h2>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>Risk Assessment Date</Label>
+                  <Input
+                    type="date"
+                    value={formData.risk_assessment_date}
+                    onChange={(e) => setFormData({ ...formData, risk_assessment_date: e.target.value })}
+                  />
+                </div>
 
-        <div className="space-y-4">
-          <div className="border-t pt-4">
-            <div className="bg-gray-50 py-2 px-4 rounded-md">
-              <h2 className="text-lg font-semibold">Approval</h2>
+                <div className="space-y-2">
+                  <Label>Assessed By</Label>
+                  <Select 
+                    value={formData.conducted_by}
+                    onValueChange={(value) => setFormData({ ...formData, conducted_by: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select assessor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {users?.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {`${user.first_name} ${user.last_name}`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2 col-span-2">
+                  <Label>Product Usage</Label>
+                  <Textarea
+                    value={formData.product_usage}
+                    onChange={(e) => setFormData({ ...formData, product_usage: e.target.value })}
+                  />
+                </div>
+              </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-2 col-span-2">
-              <Label>Overall Evaluation</Label>
-              <Textarea
-                value={formData.overall_evaluation}
-                onChange={(e) => setFormData({ ...formData, overall_evaluation: e.target.value })}
+        </TabsContent>
+
+        {/* Tab 2: Risk Assessment */}
+        <TabsContent value="assessment" className="space-y-6">
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="border-t pt-4">
+                <div className="bg-gray-50 py-2 px-4 rounded-md">
+                  <h2 className="text-lg font-semibold">Hazards and Controls</h2>
+                </div>
+              </div>
+              <RiskHazardsAndControls 
+                riskAssessmentId={initialData?.id || null}
+                readOnly={false}
+                ref={hazardsControlsRef}
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>Overall Evaluation Status</Label>
-              <Select
-                value={formData.overall_evaluation_status_id}
-                onValueChange={(value) => setFormData({ ...formData, overall_evaluation_status_id: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {evaluationStatuses?.map((status) => (
-                    <SelectItem key={status.id} value={status.id}>
-                      {status.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <div className="space-y-4">
+              <div className="border-t pt-4">
+                <div className="bg-gray-50 py-2 px-4 rounded-md">
+                  <h2 className="text-lg font-semibold">Risk Assessment</h2>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <Label>Overall Likelihood</Label>
+                  <Select
+                    value={formData.overall_likelihood_id?.toString() || ""}
+                    onValueChange={(value) => setFormData({ ...formData, overall_likelihood_id: parseInt(value) })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select likelihood" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {likelihoodOptions?.map((option) => (
+                        <SelectItem key={option.id} value={option.id.toString()}>
+                          {option.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div className="space-y-2">
-              <Label>Approval Status</Label>
-              <Select
-                value={formData.approval_status_id}
-                onValueChange={(value) => setFormData({ ...formData, approval_status_id: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {approvalStatuses?.map((status) => (
-                    <SelectItem key={status.id} value={status.id}>
-                      {status.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <div className="space-y-2">
+                  <Label>Overall Consequence</Label>
+                  <Select
+                    value={formData.overall_consequence_id?.toString() || ""}
+                    onValueChange={(value) => setFormData({ ...formData, overall_consequence_id: parseInt(value) })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select consequence" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {consequenceOptions?.map((option) => (
+                        <SelectItem key={option.id} value={option.id.toString()}>
+                          {option.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div className="space-y-2">
-              <Label>Approver</Label>
-              <Select
-                value={formData.approver}
-                onValueChange={(value) => setFormData({ ...formData, approver: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select approver" />
-                </SelectTrigger>
-                <SelectContent>
-                  {users?.map((user) => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {`${user.first_name} ${user.last_name}`}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                {riskScore && (
+                  <div className="space-y-2">
+                    <Label>Overall Risk Level</Label>
+                    <div className="h-10 flex items-center">
+                      <Badge
+                        style={{
+                          backgroundColor: riskScore.risk_color || '#gray-400',
+                          color: '#FFFFFF'
+                        }}
+                      >
+                        {riskScore.risk_label}
+                      </Badge>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label>Date of Next Review</Label>
-              <Input
-                type="date"
-                value={formData.date_of_next_review}
-                onChange={(e) => setFormData({ ...formData, date_of_next_review: e.target.value })}
-              />
+              <div className="bg-white border rounded-lg p-4 mt-4">
+                <img 
+                  src="/lovable-uploads/2cadd5b5-9f69-4e43-83af-bfc20517cde2.png" 
+                  alt="Risk Assessment Matrix" 
+                  className="w-full max-w-3xl mx-auto"
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </TabsContent>
+
+        {/* Tab 3: Evaluation & Approval */}
+        <TabsContent value="approval" className="space-y-6">
+          <div className="space-y-4">
+            <div className="border-t pt-4">
+              <div className="bg-gray-50 py-2 px-4 rounded-md">
+                <h2 className="text-lg font-semibold">Evaluation and Approval</h2>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2 col-span-2">
+                <Label>Overall Evaluation</Label>
+                <Textarea
+                  value={formData.overall_evaluation}
+                  onChange={(e) => setFormData({ ...formData, overall_evaluation: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Overall Evaluation Status</Label>
+                <Select
+                  value={formData.overall_evaluation_status_id}
+                  onValueChange={(value) => setFormData({ ...formData, overall_evaluation_status_id: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {evaluationStatuses?.map((status) => (
+                      <SelectItem key={status.id} value={status.id}>
+                        {status.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Approval Status</Label>
+                <Select
+                  value={formData.approval_status_id}
+                  onValueChange={(value) => setFormData({ ...formData, approval_status_id: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {approvalStatuses?.map((status) => (
+                      <SelectItem key={status.id} value={status.id}>
+                        {status.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Approver</Label>
+                <Select
+                  value={formData.approver}
+                  onValueChange={(value) => setFormData({ ...formData, approver: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select approver" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {users?.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {`${user.first_name} ${user.last_name}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Date of Next Review</Label>
+                <Input
+                  type="date"
+                  value={formData.date_of_next_review}
+                  onChange={(e) => setFormData({ ...formData, date_of_next_review: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
