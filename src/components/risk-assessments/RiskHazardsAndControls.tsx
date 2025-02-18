@@ -145,6 +145,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     queryFn: async () => {
       if (!riskAssessmentId) return [];
       
+      console.log('Fetching ALL hazards for risk assessment:', riskAssessmentId);
+      
       const { data: hazardsData, error } = await supabase
         .from('risk_hazards_and_controls')
         .select(`
@@ -160,9 +162,15 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
             hazard_type
           )
         `)
-        .eq('risk_assessment_id', riskAssessmentId);
+        .eq('risk_assessment_id', riskAssessmentId)
+        .order('created_at', { ascending: true });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching hazards:', error);
+        throw error;
+      }
+
+      console.log('Found hazards:', hazardsData?.length);
 
       const hazardsWithRiskScores = await Promise.all(
         hazardsData.map(async (hazard) => {
@@ -183,7 +191,15 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         })
       );
 
-      setHazards(hazardsWithRiskScores);
+      // Merge with existing hazards to ensure we don't lose any data
+      setHazards(prevHazards => {
+        const hazardMap = new Map([
+          ...prevHazards.map(h => [h.id, h]),
+          ...hazardsWithRiskScores.map(h => [h.id, h])
+        ]);
+        return Array.from(hazardMap.values());
+      });
+
       return hazardsWithRiskScores;
     },
     enabled: !!riskAssessmentId
@@ -408,20 +424,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           throw insertError;
         }
 
-        // Step 6: Verify the insertion by counting new records
-        const { count, error: countError } = await supabase
-          .from('risk_hazards_and_controls')
-          .select('*', { count: 'exact', head: true })
-          .eq('risk_assessment_id', riskAssessmentId);
-
-        if (countError) {
-          console.error('Error verifying insertion:', countError);
-          throw countError;
-        }
-
-        console.log('Verification count after insertion:', count);
-
-        // Step 7: Refetch data and update UI
+        // Step 6: Refetch data and update UI
         try {
           await refetchHazards();
           toast({
