@@ -13,7 +13,7 @@ import { Edit2, Trash2, Plus, Check, X } from "lucide-react";
 import type { GHSHazardClassification, GHSHazardFilters } from "@/types/ghs";
 import { useUserRole } from "@/hooks/use-user-role";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, Dispatch, SetStateAction } from "react";
 import { deleteGHSHazardClassification, createGHSHazardClassification } from "@/services/ghs";
 import { Input } from "@/components/ui/input";
 import {
@@ -32,19 +32,22 @@ interface GHSHazardListProps {
   filters: GHSHazardFilters;
   onEdit: (hazard: GHSHazardClassification) => void;
   onRefresh: () => void;
+  currentPage: number;
+  onPageChange: Dispatch<SetStateAction<number>>;
 }
 
 export function GHSHazardList({
   data,
   filters,
   onEdit,
-  onRefresh
+  onRefresh,
+  currentPage,
+  onPageChange
 }: GHSHazardListProps) {
   const { data: userData } = useUserRole();
   const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
   const [newHazard, setNewHazard] = useState<Partial<GHSHazardClassification> | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const { data: ghsCodes = [] } = useQuery({
@@ -124,7 +127,7 @@ export function GHSHazardList({
     }
   };
 
-  // Pagination
+  // Pagination calculations
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, endIndex);
@@ -311,7 +314,7 @@ export function GHSHazardList({
               <li>
                 <Button
                   variant="outline"
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  onClick={() => onPageChange(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
                   className="gap-1"
                 >
@@ -322,7 +325,7 @@ export function GHSHazardList({
                 <li key={page}>
                   <Button
                     variant={currentPage === page ? "default" : "outline"}
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => onPageChange(page)}
                   >
                     {page}
                   </Button>
@@ -331,7 +334,7 @@ export function GHSHazardList({
               <li>
                 <Button
                   variant="outline"
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  onClick={() => onPageChange(prev => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
                   className="gap-1"
                 >
