@@ -103,9 +103,9 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
   };
 
   return (
-    <div className="w-full p-6">
-      <div className="max-w-4xl">
-        <div className="flex justify-between items-center mb-6">
+    <div className="absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-lg w-[900px] p-6">
+        <div className="flex justify-between items-center mb-6 border-b pb-4">
           <h1 className="text-2xl font-bold">
             {initialData ? "Edit Supplier" : "New Supplier"}
           </h1>
@@ -127,7 +127,7 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
         </div>
 
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="supplier_name" className="after:content-['*'] after:ml-0.5 after:text-red-500">
                 Supplier Name
