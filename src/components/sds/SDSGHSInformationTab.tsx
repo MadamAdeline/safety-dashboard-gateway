@@ -81,7 +81,7 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
     queryFn: async () => {
       if (!searchTerm) return [];
       
-      const query = supabase
+      const { data, error } = await supabase
         .from('ghs_hazard_classifications')
         .select(`
           *,
@@ -94,17 +94,17 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
             hazard_statement_text
           )
         `)
+        .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%`)
         .order('hazard_class');
 
-      // Add OR conditions one by one
-      query
-        .or(`hazard_class.ilike.%${searchTerm}%`)
-        .or(`hazard_category.ilike.%${searchTerm}%`)
-        .or(`signal_word.ilike.%${searchTerm}%`);
+      if (error) {
+        console.error('Search error:', error);
+        throw error;
+      }
 
-      const { data, error } = await query;
-
-      if (error) throw error;
+      // Log the results for debugging
+      console.log('Search results:', data);
+      
       return data as GHSHazardClassification[];
     },
     enabled: searchTerm.length > 0
