@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -279,7 +280,7 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">
           {initialData ? "Edit Risk Assessment" : "New Risk Assessment"}
@@ -301,9 +302,13 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Site Register Information</h2>
+          <div className="border-t pt-4">
+            <div className="bg-gray-50 py-2 px-4 rounded-md">
+              <h2 className="text-lg font-semibold">Site Register Information</h2>
+            </div>
+          </div>
           {selectedSiteRegister ? (
             <div className="bg-gray-50 p-4 rounded-lg space-y-2">
               <p><strong>Location:</strong> {siteRegister?.location?.full_path}</p>
@@ -331,51 +336,70 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label>Risk Assessment Date</Label>
-            <Input
-              type="date"
-              value={formData.risk_assessment_date}
-              onChange={(e) => setFormData({ ...formData, risk_assessment_date: e.target.value })}
-            />
+        <div className="space-y-4">
+          <div className="border-t pt-4">
+            <div className="bg-gray-50 py-2 px-4 rounded-md">
+              <h2 className="text-lg font-semibold">Assessment Details</h2>
+            </div>
           </div>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label>Risk Assessment Date</Label>
+              <Input
+                type="date"
+                value={formData.risk_assessment_date}
+                onChange={(e) => setFormData({ ...formData, risk_assessment_date: e.target.value })}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label>Assessed By</Label>
-            <Select 
-              value={formData.conducted_by}
-              onValueChange={(value) => setFormData({ ...formData, conducted_by: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select assessor" />
-              </SelectTrigger>
-              <SelectContent>
-                {users?.map((user) => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {`${user.first_name} ${user.last_name}`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <div className="space-y-2">
+              <Label>Assessed By</Label>
+              <Select 
+                value={formData.conducted_by}
+                onValueChange={(value) => setFormData({ ...formData, conducted_by: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select assessor" />
+                </SelectTrigger>
+                <SelectContent>
+                  {users?.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {`${user.first_name} ${user.last_name}`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="space-y-2 col-span-2">
-            <Label>Product Usage</Label>
-            <Textarea
-              value={formData.product_usage}
-              onChange={(e) => setFormData({ ...formData, product_usage: e.target.value })}
-            />
+            <div className="space-y-2 col-span-2">
+              <Label>Product Usage</Label>
+              <Textarea
+                value={formData.product_usage}
+                onChange={(e) => setFormData({ ...formData, product_usage: e.target.value })}
+              />
+            </div>
           </div>
         </div>
 
-        <RiskHazardsAndControls 
-          riskAssessmentId={initialData?.id || null}
-          readOnly={false}
-        />
+        <div className="space-y-4">
+          <div className="border-t pt-4">
+            <div className="bg-gray-50 py-2 px-4 rounded-md">
+              <h2 className="text-lg font-semibold">Hazards and Controls</h2>
+            </div>
+          </div>
+          <RiskHazardsAndControls 
+            riskAssessmentId={initialData?.id || null}
+            readOnly={false}
+            ref={hazardsControlsRef}
+          />
+        </div>
 
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Risk Assessment</h2>
+          <div className="border-t pt-4">
+            <div className="bg-gray-50 py-2 px-4 rounded-md">
+              <h2 className="text-lg font-semibold">Risk Assessment</h2>
+            </div>
+          </div>
           <div className="grid grid-cols-3 gap-6">
             <div className="space-y-2">
               <Label>Overall Likelihood</Label>
@@ -442,7 +466,11 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Approval</h2>
+          <div className="border-t pt-4">
+            <div className="bg-gray-50 py-2 px-4 rounded-md">
+              <h2 className="text-lg font-semibold">Approval</h2>
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2 col-span-2">
               <Label>Overall Evaluation</Label>
