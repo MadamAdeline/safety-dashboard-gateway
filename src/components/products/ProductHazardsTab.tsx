@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -202,22 +203,40 @@ export function ProductHazardsTab({ productId, readOnly }: ProductHazardsTabProp
             open={openItems.includes(hazard.hazard_control_id)}
             className="border rounded-lg"
           >
-            <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50" 
-                 onClick={() => toggleItem(hazard.hazard_control_id)}>
-              <div className="flex items-center space-x-2">
-                <CollapsibleTrigger className="flex items-center">
+            <div 
+              className="flex items-start justify-between p-4 cursor-pointer hover:bg-gray-50" 
+              onClick={() => toggleItem(hazard.hazard_control_id)}
+            >
+              <div className="flex-1 grid grid-cols-[auto,1fr,1fr,1fr] gap-4 items-start">
+                <CollapsibleTrigger className="flex items-center mt-1">
                   {openItems.includes(hazard.hazard_control_id) ? (
                     <ChevronDown className="h-4 w-4" />
                   ) : (
                     <ChevronRight className="h-4 w-4" />
                   )}
                 </CollapsibleTrigger>
-                <span className="font-medium">{hazard.hazardType?.label || 'Unknown Type'}</span>
+                
+                <div className="space-y-1">
+                  <div className="font-medium text-sm text-gray-500">Type</div>
+                  <div className="font-medium">{hazard.hazardType?.label || 'Unknown Type'}</div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="font-medium text-sm text-gray-500">Hazard</div>
+                  <div className="line-clamp-2">{hazard.hazard}</div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="font-medium text-sm text-gray-500">Control</div>
+                  <div className="line-clamp-2">{hazard.control}</div>
+                </div>
               </div>
+
               {!readOnly && (
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="ml-4 mt-1"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDelete(hazard.hazard_control_id);
@@ -228,7 +247,7 @@ export function ProductHazardsTab({ productId, readOnly }: ProductHazardsTabProp
               )}
             </div>
 
-            <CollapsibleContent className="p-4 pt-0">
+            <CollapsibleContent className="p-4 pt-0 border-t">
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
