@@ -14,6 +14,7 @@ const routePermissions: Record<string, string[]> = {
   "/users": ["administrator"],
   "/master-data": ["administrator"],
   "/system-config": ["administrator"],
+  "/ghs-hazards": ["administrator"],
 };
 
 export function useRoutePermission(path: string) {

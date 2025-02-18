@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +22,7 @@ import WasteTracking from "./pages/WasteTracking";
 import { AccessDeniedDialog } from "./components/auth/AccessDeniedDialog";
 import { useRoutePermission } from "./hooks/use-route-permission";
 import SystemConfig from "./pages/SystemConfig";
+import GHSHazards from "./pages/GHSHazards";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,9 +64,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <Routes>
-            {/* Landing page as the default route */}
             <Route path="/" element={<Landing />} />
-            {/* Protected dashboard route */}
             <Route path="/dashboard" element={<PrivateRoute><Index /></PrivateRoute>} />
             <Route path="/sds-library" element={<PrivateRoute><SDSLibrary /></PrivateRoute>} />
             <Route path="/sds-library/new" element={<PrivateRoute><NewSDSForm onClose={() => window.history.back()} /></PrivateRoute>} />
@@ -78,6 +78,7 @@ const App = () => (
             <Route path="/risk-assessments" element={<PrivateRoute><RiskAssessments /></PrivateRoute>} />
             <Route path="/waste-tracking" element={<PrivateRoute><WasteTracking /></PrivateRoute>} />
             <Route path="/system-config" element={<PrivateRoute><SystemConfig /></PrivateRoute>} />
+            <Route path="/ghs-hazards" element={<PrivateRoute><GHSHazards /></PrivateRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>

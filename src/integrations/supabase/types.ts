@@ -75,6 +75,7 @@ export type Database = {
       }
       ghs_hazard_classifications: {
         Row: {
+          created_at: string | null
           ghs_code_id: string | null
           hazard_category: string
           hazard_class: string
@@ -85,6 +86,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          created_at?: string | null
           ghs_code_id?: string | null
           hazard_category: string
           hazard_class: string
@@ -95,6 +97,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          created_at?: string | null
           ghs_code_id?: string | null
           hazard_category?: string
           hazard_class?: string
