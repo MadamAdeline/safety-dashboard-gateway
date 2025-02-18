@@ -335,15 +335,25 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         return;
       }
 
-      // First, get all existing hazards for this risk assessment
-      const { data: existingHazards } = await supabase
-        .from('risk_hazards_and_controls')
-        .select('hazard_control_id')
-        .eq('risk_assessment_id', riskAssessmentId)
-        .not('hazard_control_id', 'is', null);
+      console.log('Starting auto-generate for risk assessment:', riskAssessmentId);
 
-      const existingHazardIds = existingHazards?.map(h => h.hazard_control_id) || [];
-      console.log('Existing hazard control IDs:', existingHazardIds);
+      // First, get ALL existing hazards for this risk assessment
+      const { data: existingHazards, error: fetchError } = await supabase
+        .from('risk_hazards_and_controls')
+        .select('*')
+        .eq('risk_assessment_id', riskAssessmentId);
+
+      if (fetchError) {
+        console.error('Error fetching existing hazards:', fetchError);
+        throw fetchError;
+      }
+
+      // Create a map of existing hazard control IDs
+      const existingHazardMap = new Map(
+        existingHazards?.filter(h => h.hazard_control_id).map(h => [h.hazard_control_id, h]) || []
+      );
+
+      console.log('Existing hazards map size:', existingHazardMap.size);
 
       // Fetch all product hazards
       const { data: productHazards, error: hazardsError } = await supabase
@@ -367,9 +377,9 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         throw hazardsError;
       }
 
-      // Filter out hazards that already exist
+      // Filter to only get hazards that don't exist yet
       const newHazards = productHazards?.filter(
-        ph => !existingHazardIds.includes(ph.hazard_control_id)
+        ph => ph.hazard_control_id && !existingHazardMap.has(ph.hazard_control_id)
       );
 
       console.log('New hazards to be added:', newHazards?.length);
@@ -385,9 +395,14 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           control_in_place: false,
           likelihood_id: null,
           consequence_id: null,
-          risk_score_id: null
+          risk_score_id: null,
+          risk_score_int: null,
+          risk_level_text: null,
+          likelihood_text: null,
+          consequence_text: null
         }));
 
+        // Insert only new records
         const { error: insertError } = await supabase
           .from('risk_hazards_and_controls')
           .insert(hazardsToInsert);
@@ -407,7 +422,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           description: `Added ${hazardsToInsert.length} new hazards and controls`,
         });
 
-        queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
+        // Refresh the data
+        await queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
         return hazardsToInsert;
       } else {
         toast({
