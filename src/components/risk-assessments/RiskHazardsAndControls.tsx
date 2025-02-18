@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -466,18 +465,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        {!readOnly && (
-          <Button
-            onClick={handleAdd}
-            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Hazard & Control
-          </Button>
-        )}
-      </div>
-
       <Table>
         <TableHeader>
           <TableRow>
@@ -740,9 +727,20 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           No hazards and controls added yet.
         </div>
       )}
+
+      {!readOnly && (
+        <div className="flex items-center justify-end">
+          <Button
+            onClick={handleAdd}
+            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Hazard & Control
+          </Button>
+        </div>
+      )}
     </div>
   );
 });
 
 RiskHazardsAndControls.displayName = "RiskHazardsAndControls";
-
