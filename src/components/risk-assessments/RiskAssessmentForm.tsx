@@ -38,14 +38,13 @@ export function RiskAssessmentForm({
   onClose,
   initialData
 }: RiskAssessmentFormProps) {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedSiteRegister, setSelectedSiteRegister] = useState<any>(null);
   const [riskScore, setRiskScore] = useState<any>(null);
   const hazardsControlsRef = useRef<{
     saveHazards: () => Promise<void>;
+    populateHazards: (hazards: any[]) => void;
   }>(null);
   const [formData, setFormData] = useState<FormData>({
     site_register_record_id: initialData?.site_register_record_id || "",
@@ -162,6 +161,34 @@ export function RiskAssessmentForm({
     }
   });
 
+  const {
+    data: productHazards
+  } = useQuery({
+    queryKey: ['product-hazards', siteRegister?.product?.id],
+    queryFn: async () => {
+      if (!siteRegister?.product?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('hazards_and_controls')
+        .select(`
+          hazard_control_id,
+          hazard_type,
+          hazard,
+          control,
+          source,
+          hazardType:master_data!hazards_and_controls_hazard_type_fkey (
+            id,
+            label
+          )
+        `)
+        .eq('product_id', siteRegister.product.id);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!siteRegister?.product?.id
+  });
+
   useEffect(() => {
     if (initialData?.site_register_record_id) {
       setSelectedSiteRegister({
@@ -190,6 +217,23 @@ export function RiskAssessmentForm({
     };
     updateRiskScore();
   }, [formData.overall_likelihood_id, formData.overall_consequence_id]);
+
+  useEffect(() => {
+    if (productHazards && hazardsControlsRef.current && !initialData) {
+      const mappedHazards = productHazards.map(ph => ({
+        hazard_type_id: ph.hazard_type,
+        hazard: ph.hazard,
+        control: ph.control,
+        source: ph.source,
+        likelihood_id: null,
+        consequence_id: null,
+        risk_score_id: null,
+        control_in_place: false
+      }));
+      
+      hazardsControlsRef.current.populateHazards(mappedHazards);
+    }
+  }, [productHazards, initialData]);
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
