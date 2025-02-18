@@ -71,6 +71,37 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     }
   });
 
+  const { data: siteRegister } = useQuery({
+    queryKey: ['site-register', riskAssessmentId],
+    queryFn: async () => {
+      if (!riskAssessmentId) return null;
+      
+      const { data: riskAssessment } = await supabase
+        .from('risk_assessments')
+        .select('site_register_record_id')
+        .eq('id', riskAssessmentId)
+        .single();
+
+      if (!riskAssessment?.site_register_record_id) return null;
+
+      const { data, error } = await supabase
+        .from('site_registers')
+        .select(`
+          *,
+          product:products (
+            id,
+            product_name
+          )
+        `)
+        .eq('id', riskAssessment.site_register_record_id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!riskAssessmentId
+  });
+
   useQuery({
     queryKey: ['risk-hazards', riskAssessmentId],
     queryFn: async () => {
@@ -123,7 +154,7 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
 
   const autoGenerateMutation = useMutation({
     mutationFn: async () => {
-      if (!riskAssessmentId) return;
+      if (!riskAssessmentId || !siteRegister?.product?.id) return;
 
       // Get existing hazards for this risk assessment
       const { data: existingHazards } = await supabase
@@ -143,7 +174,7 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
           control,
           source
         `)
-        .eq('product_id', siteRegister?.product?.id);
+        .eq('product_id', siteRegister.product.id);
 
       if (hazardsError) throw hazardsError;
 

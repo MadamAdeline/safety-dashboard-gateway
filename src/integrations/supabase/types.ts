@@ -710,6 +710,7 @@ export type Database = {
           control_in_place: boolean | null
           created_at: string | null
           hazard: string | null
+          hazard_control_id: string | null
           hazard_type_id: string | null
           id: string
           likelihood_id: number | null
@@ -729,6 +730,7 @@ export type Database = {
           control_in_place?: boolean | null
           created_at?: string | null
           hazard?: string | null
+          hazard_control_id?: string | null
           hazard_type_id?: string | null
           id?: string
           likelihood_id?: number | null
@@ -748,6 +750,7 @@ export type Database = {
           control_in_place?: boolean | null
           created_at?: string | null
           hazard?: string | null
+          hazard_control_id?: string | null
           hazard_type_id?: string | null
           id?: string
           likelihood_id?: number | null
@@ -767,6 +770,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "consequence"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_hazards_and_controls_hazard_control_id_fkey"
+            columns: ["hazard_control_id"]
+            isOneToOne: false
+            referencedRelation: "hazards_and_controls"
+            referencedColumns: ["hazard_control_id"]
           },
           {
             foreignKeyName: "risk_hazards_and_controls_hazard_type_id_fkey"
