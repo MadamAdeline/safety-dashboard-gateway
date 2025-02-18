@@ -193,10 +193,11 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
       // Merge with existing hazards to ensure we don't lose any data
       setHazards(prevHazards => {
-        const hazardMap = new Map([
-          ...prevHazards.map(h => [h.id, h]),
-          ...hazardsWithRiskScores.map(h => [h.id, h])
-        ]);
+        const entries: [string, any][] = [
+          ...prevHazards.map(h => [h.id, h] as [string, any]),
+          ...hazardsWithRiskScores.map(h => [h.id, h] as [string, any])
+        ];
+        const hazardMap = new Map(entries);
         return Array.from(hazardMap.values());
       });
 
