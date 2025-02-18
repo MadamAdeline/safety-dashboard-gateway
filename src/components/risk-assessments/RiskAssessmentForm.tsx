@@ -89,7 +89,19 @@ export function RiskAssessmentForm({
       } = await supabase.from('site_registers').select(`
           *,
           location:locations (name, full_path),
-          product:products (product_name)
+          product:products (
+            id,
+            product_name,
+            product_code,
+            brand_name,
+            unit,
+            unit_size,
+            uom_id,
+            description,
+            uses,
+            other_names,
+            status
+          )
         `).eq('id', formData.site_register_record_id).single();
       if (error) throw error;
       return data;
