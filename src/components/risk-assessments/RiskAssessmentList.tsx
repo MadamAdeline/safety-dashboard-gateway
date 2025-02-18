@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -7,32 +8,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit2, Plus, Download, RefreshCw } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Edit2, Plus, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 
 interface RiskAssessmentListProps {
+  searchTerm: string;
   onEdit: (riskAssessment: any) => void;
   onNew: () => void;
-  searchTerm: string;
   onSearch: (value: string) => void;
 }
 
-export function RiskAssessmentList({ 
-  onEdit, 
-  onNew, 
-  searchTerm, 
-  onSearch 
-}: RiskAssessmentListProps) {
-  const { toast } = useToast();
-
-  const { data: riskAssessments, isLoading, refetch } = useQuery({
+export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: RiskAssessmentListProps) {
+  const { data: riskAssessments, isLoading } = useQuery({
     queryKey: ['risk-assessments'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -53,21 +45,9 @@ export function RiskAssessmentList({
             first_name,
             last_name
           ),
-          likelihood (
-            name
-          ),
-          consequence (
-            name
-          ),
           risk_matrix (
             risk_label,
             risk_color
-          ),
-          evaluation_status:master_data!risk_assessments_overall_evaluation_status_id_fkey (
-            label
-          ),
-          approval_status:master_data!risk_assessments_approval_status_id_fkey (
-            label
           )
         `)
         .order('risk_assessment_date', { ascending: false });
@@ -77,59 +57,30 @@ export function RiskAssessmentList({
     }
   });
 
-  const handleRefresh = () => {
-    refetch();
-  };
-
-  const handleExport = () => {
-    // TODO: Implement export functionality
-    toast({
-      title: "Coming Soon",
-      description: "Export functionality will be available soon",
-    });
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <div className="relative w-1/2">
-          <Input
-            placeholder="Search Risk Assessments..."
-            value={searchTerm}
-            onChange={(e) => onSearch(e.target.value)}
-            className="pl-10"
-          />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-        </div>
-        
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={handleExport}
-            className="gap-2"
-          >
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleRefresh}
-            className="gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Refresh
-          </Button>
-          <Button
-            onClick={onNew}
-            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Risk Assessment
-          </Button>
-        </div>
+        <h1 className="text-2xl font-semibold text-dgxprt-navy">Risk Assessments</h1>
+        <Button
+          onClick={onNew}
+          className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          Risk Assessment
+        </Button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="relative w-1/2">
+        <Input
+          placeholder="Search Risk Assessments..."
+          value={searchTerm}
+          onChange={(e) => onSearch(e.target.value)}
+          className="pl-10"
+        />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+      </div>
+
+      <div className="bg-white rounded-lg shadow">
         <Table>
           <TableHeader>
             <TableRow className="bg-[#F1F0FB] border-b border-gray-200">
@@ -145,10 +96,7 @@ export function RiskAssessmentList({
           </TableHeader>
           <TableBody>
             {riskAssessments?.map((assessment) => (
-              <TableRow 
-                key={assessment.id}
-                className="hover:bg-[#F1F0FB] transition-colors"
-              >
+              <TableRow key={assessment.id}>
                 <TableCell>{assessment.site_register?.location?.full_path}</TableCell>
                 <TableCell>{assessment.site_register?.products?.product_name}</TableCell>
                 <TableCell>
@@ -172,12 +120,12 @@ export function RiskAssessmentList({
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline">
-                    {assessment.evaluation_status?.label}
+                    {assessment.overall_evaluation_status_id}
                   </Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline">
-                    {assessment.approval_status?.label}
+                    {assessment.approval_status_id}
                   </Badge>
                 </TableCell>
                 <TableCell>

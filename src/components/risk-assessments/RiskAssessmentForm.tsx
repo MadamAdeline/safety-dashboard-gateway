@@ -45,7 +45,9 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
 
   const [formData, setFormData] = useState<FormData>({
     site_register_record_id: initialData?.site_register_record_id || "",
-    risk_assessment_date: initialData?.risk_assessment_date || format(new Date(), 'yyyy-MM-dd'),
+    risk_assessment_date: initialData?.risk_assessment_date ? 
+      format(new Date(initialData.risk_assessment_date), 'yyyy-MM-dd') : 
+      format(new Date(), 'yyyy-MM-dd'),
     conducted_by: initialData?.conducted_by || "",
     product_usage: initialData?.product_usage || "",
     overall_likelihood_id: initialData?.overall_likelihood_id || null,
