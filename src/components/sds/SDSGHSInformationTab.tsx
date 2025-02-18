@@ -88,6 +88,10 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
           hazard_class,
           hazard_category,
           signal_word,
+          ghs_code_id,
+          hazard_statement_id,
+          updated_at,
+          updated_by,
           ghs_code:ghs_codes!ghs_code_id(
             ghs_code,
             pictogram_url
