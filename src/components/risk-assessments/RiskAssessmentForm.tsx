@@ -142,6 +142,12 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
   });
 
   useEffect(() => {
+    if (initialData?.site_register_record_id) {
+      setSelectedSiteRegister({ id: initialData.site_register_record_id });
+    }
+  }, [initialData]);
+
+  useEffect(() => {
     const updateRiskScore = async () => {
       if (formData.overall_likelihood_id && formData.overall_consequence_id) {
         const { data, error } = await supabase
@@ -162,14 +168,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
 
     updateRiskScore();
   }, [formData.overall_likelihood_id, formData.overall_consequence_id]);
-
-  const handleSiteRegisterSelect = (siteRegister: any) => {
-    setSelectedSiteRegister(siteRegister);
-    setFormData(prev => ({
-      ...prev,
-      site_register_record_id: siteRegister.id
-    }));
-  };
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -196,9 +194,49 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     }
   });
 
+  const updateMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const { error } = await supabase
+        .from('risk_assessments')
+        .update(data)
+        .eq('id', initialData.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['risk-assessments'] });
+      toast({
+        title: "Success",
+        description: "Risk assessment has been updated"
+      });
+      onClose();
+    },
+    onError: (error) => {
+      console.error('Error updating risk assessment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update risk assessment",
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleSave = () => {
-    createMutation.mutate(formData);
+    if (initialData?.id) {
+      updateMutation.mutate(formData);
+    } else {
+      createMutation.mutate(formData);
+    }
   };
+
+  const handleSiteRegisterSelect = (siteRegister: any) => {
+    setSelectedSiteRegister(siteRegister);
+    setFormData(prev => ({
+      ...prev,
+      site_register_record_id: siteRegister.id
+    }));
+  };
+
+  const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -213,9 +251,9 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
           <Button 
             className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
             onClick={handleSave}
-            disabled={createMutation.isPending}
+            disabled={isPending}
           >
-            {createMutation.isPending ? "Saving..." : "Save"}
+            {isPending ? "Saving..." : (initialData ? "Update" : "Save")}
           </Button>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
