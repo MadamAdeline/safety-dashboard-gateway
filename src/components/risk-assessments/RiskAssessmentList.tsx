@@ -60,7 +60,7 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
   const { data: riskAssessments, isLoading, refetch } = useQuery({
     queryKey: ['risk-assessments', locationHierarchy],
     queryFn: async () => {
-      const query = supabase
+      let query = supabase
         .from('risk_assessments')
         .select(`
           *,
@@ -92,8 +92,11 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
         `)
         .order('risk_assessment_date', { ascending: false });
 
+      // Only apply location filter if we have location hierarchy data
       if (locationHierarchy && locationHierarchy.length > 0) {
-        query.in('site_register.location_id', locationHierarchy);
+        // Extract just the UUIDs from the location hierarchy
+        const locationIds = locationHierarchy.map(loc => loc.id);
+        query = query.in('site_register.location_id', locationIds);
       }
 
       const { data, error } = await query;
