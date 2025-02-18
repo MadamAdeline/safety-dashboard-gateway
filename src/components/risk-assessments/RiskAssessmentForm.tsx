@@ -393,66 +393,40 @@ export function RiskAssessmentForm({
 
   const autoGenerateMutation = useMutation({
     mutationFn: async () => {
-      let riskAssessmentId: string;
-      
+      const updatedData = {
+        ...formData,
+        auto_generate_hazards: true
+      };
+
       if (initialData?.id) {
-        await updateMutation.mutateAsync(formData);
-        riskAssessmentId = initialData.id;
+        await updateMutation.mutateAsync(updatedData);
       } else {
-        const createdData = await createMutation.mutateAsync(formData);
-        riskAssessmentId = createdData.id;
-      }
-
-      const { data: productHazards, error: hazardsError } = await supabase
-        .from('hazards_and_controls')
-        .select(`
-          hazard_control_id,
-          hazard_type,
-          hazard,
-          control,
-          source
-        `)
-        .eq('product_id', siteRegister?.product?.id);
-
-      if (hazardsError) throw hazardsError;
-
-      const { error: deleteError } = await supabase
-        .from('risk_hazards_and_controls')
-        .delete()
-        .eq('risk_assessment_id', riskAssessmentId);
-
-      if (deleteError) throw deleteError;
-
-      if (productHazards && productHazards.length > 0) {
-        const hazardsToInsert = productHazards.map(ph => ({
-          risk_assessment_id: riskAssessmentId,
-          hazard_type_id: ph.hazard_type,
-          hazard: ph.hazard,
-          control: ph.control,
-          source: ph.source || "MANUAL",
-          control_in_place: false,
-          likelihood_id: null,
-          consequence_id: null,
-          risk_score_id: null
-        }));
-
-        const { error: insertError } = await supabase
-          .from('risk_hazards_and_controls')
-          .insert(hazardsToInsert);
-
-        if (insertError) {
-          console.error('Insert error:', insertError);
-          throw insertError;
+        const createdData = await createMutation.mutateAsync(updatedData);
+        if (hazardsControlsRef.current) {
+          await hazardsControlsRef.current.saveHazards(createdData.id);
         }
-
-        return hazardsToInsert;
       }
 
-      return [];
+      queryClient.invalidateQueries({
+        queryKey: ['risk-assessments']
+      });
+
+      toast({
+        title: "Success",
+        description: "Hazards and controls auto-generated successfully"
+      });
+    },
+    onError: (error) => {
+      console.error('Error auto-generating hazards:', error);
+      toast({
+        title: "Error",
+        description: "Failed to auto-generate hazards and controls",
+        variant: "destructive"
+      });
     }
   });
 
-  const handleAutoGenerate = async () => {
+  const handleAutoGenerate = () => {
     if (!siteRegister?.product?.id) {
       toast({
         title: "Error",
@@ -461,30 +435,7 @@ export function RiskAssessmentForm({
       });
       return;
     }
-
-    try {
-      const hazards = await autoGenerateMutation.mutateAsync();
-      
-      if (hazardsControlsRef.current) {
-        hazardsControlsRef.current.populateHazards(hazards);
-      }
-
-      toast({
-        title: "Success",
-        description: `Generated ${hazards.length} hazards and controls from the product`
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['risk-hazards']
-      });
-    } catch (error) {
-      console.error('Error auto-generating hazards:', error);
-      toast({
-        title: "Error",
-        description: "Failed to auto-generate hazards and controls",
-        variant: "destructive"
-      });
-    }
+    autoGenerateMutation.mutate();
   };
 
   const handleSave = async () => {
@@ -634,13 +585,23 @@ export function RiskAssessmentForm({
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold">Hazards and Controls</h2>
-              <Button
-                onClick={() => hazardsControlsRef.current?.handleAdd()}
-                className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Hazard & Control
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleAutoGenerate}
+                  className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+                  disabled={autoGenerateMutation.isPending}
+                >
+                  <Brain className="h-4 w-4 mr-2" />
+                  Auto Generate Hazards & Controls
+                </Button>
+                <Button
+                  onClick={() => hazardsControlsRef.current?.handleAdd()}
+                  className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Hazard & Control
+                </Button>
+              </div>
             </div>
 
             <RiskHazardsAndControls 
