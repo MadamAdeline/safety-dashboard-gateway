@@ -81,6 +81,22 @@ export default function GHSHazards() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">GHS Hazard Classifications</h1>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => setShowCodeForm(true)}
+              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add GHS Codes
+            </Button>
+            <Button
+              onClick={() => setShowHazardForm(true)}
+              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add GHS Classification
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
@@ -109,20 +125,6 @@ export default function GHSHazards() {
             >
               <RefreshCw className="h-4 w-4" />
               Refresh
-            </Button>
-            <Button
-              onClick={() => setShowCodeForm(true)}
-              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Add GHS Codes
-            </Button>
-            <Button
-              onClick={() => setShowHazardForm(true)}
-              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Add GHS Classification
             </Button>
           </div>
         </div>
