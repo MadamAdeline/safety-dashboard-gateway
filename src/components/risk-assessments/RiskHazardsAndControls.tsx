@@ -411,8 +411,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           <TableRow className="border-b">
             <TableHead className="w-[50px]"></TableHead>
             <TableHead className="w-[200px] text-left font-semibold">Type</TableHead>
-            <TableHead className="w-[150px] text-left font-semibold">Hazard</TableHead>
-            <TableHead className="w-[150px] text-left font-semibold">Control</TableHead>
+            <TableHead className="w-[75px] text-left font-semibold">Hazard</TableHead>
+            <TableHead className="w-[75px] text-left font-semibold">Control</TableHead>
             <TableHead className="w-[150px] text-center font-semibold">Risk Level</TableHead>
             {!readOnly && <TableHead className="w-[80px] text-center font-semibold">Actions</TableHead>}
           </TableRow>
@@ -433,10 +433,10 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                   )}
                 </TableCell>
                 <TableCell className="w-[200px]">{hazard.hazard_type?.label || '-'}</TableCell>
-                <TableCell className="w-[150px]">
+                <TableCell className="w-[75px]">
                   <div className="truncate">{hazard.hazard || '-'}</div>
                 </TableCell>
-                <TableCell className="w-[150px]">
+                <TableCell className="w-[75px]">
                   <div className="truncate">{hazard.control || '-'}</div>
                 </TableCell>
                 <TableCell className="w-[150px] text-center">
