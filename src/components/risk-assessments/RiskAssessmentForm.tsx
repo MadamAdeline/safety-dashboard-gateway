@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { FormStep } from "@/components/ui/form";
 import { RiskHazardsAndControls } from "./RiskHazardsAndControls";
 import { SiteRegisterSearch } from "./SiteRegisterSearch";
 import { useRef, useState } from "react";
@@ -70,7 +69,7 @@ export const RiskAssessmentForm: React.FC<RiskAssessmentFormProps> = ({
         <div>
           <SiteRegisterSearch
             onSelect={handleSiteRegisterSelect}
-            initialValue={initialData?.site_register_record_id}
+            selectedSiteRegisterId={initialData?.site_register_record_id}
           />
         </div>
 
