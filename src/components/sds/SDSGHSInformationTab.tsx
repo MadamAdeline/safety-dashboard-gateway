@@ -53,6 +53,10 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
             hazard_class,
             hazard_category,
             signal_word,
+            ghs_code_id,
+            hazard_statement_id,
+            updated_at,
+            updated_by,
             ghs_code:ghs_codes (
               ghs_code,
               pictogram_url
@@ -70,6 +74,8 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
   const { data: searchResults = [] } = useQuery<GHSHazardClassification[]>({
     queryKey: ['ghs-hazards-search', searchTerm],
     queryFn: async () => {
+      if (!searchTerm) return [];
+      
       const { data, error } = await supabase
         .from('ghs_hazard_classifications')
         .select(`
@@ -79,13 +85,8 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
             pictogram_url
           )
         `)
-        .or(`
-          hazard_class.ilike.%${searchTerm}%,
-          hazard_category.ilike.%${searchTerm}%,
-          signal_word.ilike.%${searchTerm}%,
-          ghs_codes.ghs_code.ilike.%${searchTerm}%
-        `)
-        .order('hazard_class', { ascending: true });
+        .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%`)
+        .order('hazard_class');
 
       if (error) throw error;
       return data;
@@ -154,11 +155,11 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
     setShowSearchResults(true);
   };
 
-  const filteredSearchResults = searchResults.filter(
-    result => !sdsGHSClassifications.some(
+  const filteredSearchResults = searchResults?.filter(
+    result => !sdsGHSClassifications?.some(
       existing => existing.hazard_classification_id === result.hazard_classification_id
     )
-  );
+  ) ?? [];
 
   return (
     <div className="space-y-6">
