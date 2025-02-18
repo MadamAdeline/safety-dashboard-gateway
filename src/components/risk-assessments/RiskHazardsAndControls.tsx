@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -187,6 +186,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       // Handle copied hazards - use composite key
       if (copiedHazards.length > 0) {
         const copiedHazardsToSave = copiedHazards.map(h => ({
+          id: h.id, // Keep the existing ID if it exists
           risk_assessment_id: riskAssessmentId,
           hazard_control_id: h.hazard_control_id,
           hazard_type_id: h.hazard_type_id,
@@ -203,9 +203,32 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           source: 'Product'
         }));
 
+        // Get existing hazard records to preserve IDs
+        const { data: existingHazards, error: fetchError } = await supabase
+          .from('risk_hazards_and_controls')
+          .select('id, hazard_control_id')
+          .eq('risk_assessment_id', riskAssessmentId)
+          .not('hazard_control_id', 'is', null);
+
+        if (fetchError) {
+          console.error('Error fetching existing hazards:', fetchError);
+          throw fetchError;
+        }
+
+        // Create a map of hazard_control_id to record id
+        const existingHazardMap = new Map(
+          existingHazards?.map(h => [h.hazard_control_id, h.id]) || []
+        );
+
+        // Update records with existing IDs where available
+        const finalCopiedHazards = copiedHazardsToSave.map(h => ({
+          ...h,
+          id: existingHazardMap.get(h.hazard_control_id) || h.id
+        }));
+
         const { error: copiedError } = await supabase
           .from('risk_hazards_and_controls')
-          .upsert(copiedHazardsToSave, {
+          .upsert(finalCopiedHazards, {
             onConflict: 'risk_assessment_id,hazard_control_id',
             ignoreDuplicates: false
           });
@@ -219,7 +242,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       // Handle manual hazards - use primary key
       if (manualHazards.length > 0) {
         const manualHazardsToSave = manualHazards.map(h => ({
-          id: h.id, // Use the existing ID for manual hazards
+          id: h.id, // Keep the existing ID
           risk_assessment_id: riskAssessmentId,
           hazard_type_id: h.hazard_type_id,
           hazard: h.hazard,
@@ -247,6 +270,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           throw manualError;
         }
       }
+
+      await queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
     }
   });
 
