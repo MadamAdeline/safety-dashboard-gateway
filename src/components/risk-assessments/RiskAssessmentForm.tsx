@@ -398,36 +398,23 @@ export function RiskAssessmentForm({
         auto_generate_hazards: true
       };
 
-      let newRiskAssessmentId = initialData?.id;
-
       if (initialData?.id) {
         await updateMutation.mutateAsync(updatedData);
       } else {
         const createdData = await createMutation.mutateAsync(updatedData);
-        newRiskAssessmentId = createdData.id;
         if (hazardsControlsRef.current) {
           await hazardsControlsRef.current.saveHazards(createdData.id);
         }
       }
 
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: ['risk-assessments']
       });
-      
-      if (newRiskAssessmentId) {
-        await queryClient.invalidateQueries({
-          queryKey: ['risk-assessment-hazards', newRiskAssessmentId]
-        });
-      }
 
       toast({
         title: "Success",
         description: "Hazards and controls auto-generated successfully"
       });
-
-      if (hazardsControlsRef.current && newRiskAssessmentId) {
-        await hazardsControlsRef.current.saveHazards(newRiskAssessmentId);
-      }
     },
     onError: (error) => {
       console.error('Error auto-generating hazards:', error);

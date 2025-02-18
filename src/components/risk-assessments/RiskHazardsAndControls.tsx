@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -204,62 +205,100 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         manualHazards: manualHazards.length
       });
 
+      const { data: existingHazards, error: fetchError } = await supabase
+        .from('risk_hazards_and_controls')
+        .select('*')
+        .eq('risk_assessment_id', riskAssessmentId);
+
+      if (fetchError) {
+        console.error('Error fetching existing hazards:', fetchError);
+        throw fetchError;
+      }
+
+      console.log('Found existing hazards:', existingHazards?.length);
+
+      const existingCopied = existingHazards?.filter(h => h.hazard_control_id) || [];
+      const existingManual = existingHazards?.filter(h => !h.hazard_control_id) || [];
+
+      console.log('Existing hazards breakdown:', {
+        copied: existingCopied.length,
+        manual: existingManual.length
+      });
+
+      const copiedHazardMap = new Map(
+        existingCopied.map(h => [h.hazard_control_id, h])
+      );
+
+      const manualHazardMap = new Map(
+        existingManual.map(h => [h.id, h])
+      );
+
       if (copiedHazards.length > 0) {
-        const copiedHazardsToSave: HazardData[] = copiedHazards.map(h => ({
-          risk_assessment_id: riskAssessmentId,
-          hazard_control_id: h.hazard_control_id,
-          hazard_type_id: h.hazard_type_id,
-          hazard: h.hazard,
-          control: h.control,
-          control_in_place: h.control_in_place,
-          likelihood_id: h.likelihood_id,
-          consequence_id: h.consequence_id,
-          risk_score_id: h.risk_score?.id || null,
-          risk_score_int: h.risk_score?.risk_score || null,
-          risk_level_text: h.risk_score?.risk_label || null,
-          likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name || null,
-          consequence_text: h.consequence_text,
-          source: 'Product'
-        }));
+        const copiedHazardsToSave: HazardData[] = copiedHazards.map(h => {
+          const existing = copiedHazardMap.get(h.hazard_control_id);
+          return {
+            id: existing?.id || h.id,
+            risk_assessment_id: riskAssessmentId,
+            hazard_control_id: h.hazard_control_id,
+            hazard_type_id: h.hazard_type_id,
+            hazard: h.hazard,
+            control: h.control,
+            control_in_place: h.control_in_place,
+            likelihood_id: h.likelihood_id,
+            consequence_id: h.consequence_id,
+            risk_score_id: h.risk_score?.id || null,
+            risk_score_int: h.risk_score?.risk_score || null,
+            risk_level_text: h.risk_score?.risk_label || null,
+            likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name || null,
+            consequence_text: h.consequence_text,
+            source: 'Product'
+          };
+        });
 
-        const { error: deleteError } = await supabase
-          .from('risk_hazards_and_controls')
-          .delete()
-          .eq('risk_assessment_id', riskAssessmentId)
-          .not('hazard_control_id', 'is', null);
+        console.log('Preparing to save copied hazards:', {
+          toSave: copiedHazardsToSave.length,
+          withExistingIds: copiedHazardsToSave.filter(h => copiedHazardMap.has(h.hazard_control_id)).length
+        });
 
-        if (deleteError) {
-          console.error('Error deleting existing copied hazards:', deleteError);
-          throw deleteError;
-        }
+        for (const hazard of copiedHazardsToSave) {
+          const { error } = await supabase
+            .from('risk_hazards_and_controls')
+            .upsert(hazard, {
+              onConflict: 'risk_assessment_id,hazard_control_id'
+            });
 
-        const { error: insertError } = await supabase
-          .from('risk_hazards_and_controls')
-          .insert(copiedHazardsToSave);
-
-        if (insertError) {
-          console.error('Error inserting copied hazards:', insertError);
-          throw insertError;
+          if (error) {
+            console.error('Error saving copied hazard:', error);
+            throw error;
+          }
         }
       }
 
       if (manualHazards.length > 0) {
-        const manualHazardsToSave: HazardData[] = manualHazards.map(h => ({
-          id: h.id,
-          risk_assessment_id: riskAssessmentId,
-          hazard_type_id: h.hazard_type_id,
-          hazard: h.hazard,
-          control: h.control,
-          control_in_place: h.control_in_place,
-          likelihood_id: h.likelihood_id,
-          consequence_id: h.consequence_id,
-          risk_score_id: h.risk_score?.id || null,
-          risk_score_int: h.risk_score?.risk_score || null,
-          risk_level_text: h.risk_score?.risk_label || null,
-          likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name || null,
-          consequence_text: h.consequence_text,
-          source: 'Manual'
-        }));
+        const manualHazardsToSave: HazardData[] = manualHazards.map(h => {
+          const existing = manualHazardMap.get(h.id);
+          return {
+            id: existing?.id || h.id,
+            risk_assessment_id: riskAssessmentId,
+            hazard_type_id: h.hazard_type_id,
+            hazard: h.hazard,
+            control: h.control,
+            control_in_place: h.control_in_place,
+            likelihood_id: h.likelihood_id,
+            consequence_id: h.consequence_id,
+            risk_score_id: h.risk_score?.id || null,
+            risk_score_int: h.risk_score?.risk_score || null,
+            risk_level_text: h.risk_score?.risk_label || null,
+            likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name || null,
+            consequence_text: h.consequence_text,
+            source: 'Manual'
+          };
+        });
+
+        console.log('Preparing to save manual hazards:', {
+          toSave: manualHazardsToSave.length,
+          withExistingIds: manualHazardsToSave.filter(h => manualHazardMap.has(h.id)).length
+        });
 
         for (const hazard of manualHazardsToSave) {
           const { error } = await supabase
