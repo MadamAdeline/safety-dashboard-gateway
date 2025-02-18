@@ -410,15 +410,15 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         <TableHeader>
           <TableRow className="border-b">
             <TableHead className="w-[50px]"></TableHead>
-            <TableHead className="w-[100px] sm:w-[150px] text-left font-semibold">Type</TableHead>
+            <TableHead className="w-[100px] sm:w-[150px] text-left font-semibold whitespace-nowrap overflow-hidden text-ellipsis">Type</TableHead>
             <TableHead 
-              className="w-[125px] sm:w-[175px] text-left font-semibold truncate"
+              className="w-[125px] sm:w-[175px] text-left font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
               title="Hazard Description"
             >
               Hazard Desc.
             </TableHead>
             <TableHead 
-              className="w-[125px] sm:w-[175px] text-left font-semibold truncate"
+              className="w-[125px] sm:w-[175px] text-left font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
               title="Control Description"
             >
               Control Desc.
@@ -453,7 +453,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                 </TableCell>
                 <TableCell className="w-[125px] sm:w-[175px]">
                   <div 
-                    className="truncate max-w-[125px] sm:max-w-[175px]" 
+                    className="max-h-[2.5rem] overflow-hidden text-ellipsis break-words"
                     title={hazard.hazard}
                   >
                     {hazard.hazard || '-'}
@@ -461,7 +461,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                 </TableCell>
                 <TableCell className="w-[125px] sm:w-[175px]">
                   <div 
-                    className="truncate max-w-[125px] sm:max-w-[175px]" 
+                    className="max-h-[2.5rem] overflow-hidden text-ellipsis break-words"
                     title={hazard.control}
                   >
                     {hazard.control || '-'}
