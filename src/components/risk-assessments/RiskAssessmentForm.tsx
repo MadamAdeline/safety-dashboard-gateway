@@ -56,7 +56,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     date_of_next_review: initialData?.date_of_next_review || "",
   });
 
-  // Fetch users for dropdowns
   const { data: users } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
@@ -70,7 +69,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     }
   });
 
-  // Fetch site register details
   const { data: siteRegister } = useQuery({
     queryKey: ['site-register', formData.site_register_record_id],
     queryFn: async () => {
@@ -90,7 +88,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     enabled: !!formData.site_register_record_id
   });
 
-  // Fetch likelihood options
   const { data: likelihoodOptions } = useQuery({
     queryKey: ['likelihood-options'],
     queryFn: async () => {
@@ -103,7 +100,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     }
   });
 
-  // Fetch consequence options
   const { data: consequenceOptions } = useQuery({
     queryKey: ['consequence-options'],
     queryFn: async () => {
@@ -116,7 +112,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     }
   });
 
-  // Fetch evaluation statuses
   const { data: evaluationStatuses } = useQuery({
     queryKey: ['evaluation-statuses'],
     queryFn: async () => {
@@ -131,7 +126,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     }
   });
 
-  // Fetch approval statuses
   const { data: approvalStatuses } = useQuery({
     queryKey: ['approval-statuses'],
     queryFn: async () => {
@@ -146,7 +140,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     }
   });
 
-  // Update risk score when likelihood or consequence changes
   useEffect(() => {
     const updateRiskScore = async () => {
       if (formData.overall_likelihood_id && formData.overall_consequence_id) {
@@ -169,7 +162,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     updateRiskScore();
   }, [formData.overall_likelihood_id, formData.overall_consequence_id]);
 
-  // Handle search selection
   const handleSiteRegisterSelect = (siteRegister: any) => {
     setSelectedSiteRegister(siteRegister);
     setFormData(prev => ({
@@ -178,7 +170,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     }));
   };
 
-  // Handle form submission
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       const { error } = await supabase
@@ -205,7 +196,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
   });
 
   const handleSave = () => {
-    // TODO: Add validation
     createMutation.mutate(formData);
   };
 
@@ -233,7 +223,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
       </div>
 
       <div className="space-y-6">
-        {/* Site Register Search Section */}
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Site Register Information</h2>
           {selectedSiteRegister ? (
@@ -243,7 +232,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
             </div>
           ) : (
             <div>
-              {/* TODO: Implement site register search component */}
               <Input 
                 placeholder="Search for a site register record..."
                 onChange={(e) => console.log(e.target.value)}
@@ -252,7 +240,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
           )}
         </div>
 
-        {/* Risk Assessment Header Fields */}
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label>Risk Assessment Date</Label>
@@ -291,10 +278,9 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
           </div>
         </div>
 
-        {/* Risk Assessment Section */}
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Risk Assessment</h2>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-3 gap-6">
             <div className="space-y-2">
               <Label>Overall Likelihood</Label>
               <Select
@@ -334,9 +320,9 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
             </div>
 
             {riskScore && (
-              <div className="col-span-2">
+              <div className="space-y-2">
                 <Label>Overall Risk Level</Label>
-                <div className="mt-2">
+                <div className="h-10 flex items-center">
                   <Badge
                     style={{
                       backgroundColor: riskScore.risk_color,
@@ -350,13 +336,11 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
             )}
           </div>
 
-          {/* TODO: Add Risk Matrix Image */}
           <div className="bg-gray-100 p-4 rounded-lg mt-4">
             <p className="text-gray-500 text-sm">Risk Matrix will be displayed here</p>
           </div>
         </div>
 
-        {/* Approval Section */}
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Approval</h2>
           <div className="grid grid-cols-2 gap-6">
