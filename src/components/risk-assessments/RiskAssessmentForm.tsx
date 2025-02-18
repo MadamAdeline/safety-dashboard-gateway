@@ -312,7 +312,7 @@ export function RiskAssessmentForm({
       <Tabs defaultValue="details" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="details">Risk Assessment Details</TabsTrigger>
-          <TabsTrigger value="assessment">Risk Assessment</TabsTrigger>
+          <TabsTrigger value="assessment">Hazards & Controls</TabsTrigger>
           <TabsTrigger value="approval">Evaluation & Approval</TabsTrigger>
         </TabsList>
 
@@ -390,7 +390,7 @@ export function RiskAssessmentForm({
             <div className="space-y-4">
               <div className="border-t pt-4">
                 <div className="bg-gray-50 py-2 rounded-md">
-                  <h2 className="text-lg font-semibold">Risk Assessment</h2>
+                  <h2 className="text-lg font-semibold">Overall Risk Assessment</h2>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-6">
