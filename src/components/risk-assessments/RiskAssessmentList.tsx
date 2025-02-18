@@ -59,7 +59,11 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
         `)
         .order('risk_assessment_date', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching risk assessments:', error);
+        throw error;
+      }
+      console.log('Fetched risk assessments:', data);
       return data;
     }
   });
@@ -127,53 +131,60 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
             </TableRow>
           </TableHeader>
           <TableBody>
-            {riskAssessments?.map((assessment) => (
-              <TableRow key={assessment.id}>
-                <TableCell>{assessment.site_register?.location?.full_path}</TableCell>
-                <TableCell>{assessment.site_register?.products?.product_name}</TableCell>
-                <TableCell>
-                  {assessment.risk_assessment_date ? 
-                    format(new Date(assessment.risk_assessment_date), 'dd/MM/yyyy') : 
-                    '-'
-                  }
-                </TableCell>
-                <TableCell>
-                  {`${assessment.assessor?.first_name} ${assessment.assessor?.last_name}`}
-                </TableCell>
-                <TableCell>
-                  {assessment.risk_matrix && (
-                    <Badge
-                      style={{
-                        backgroundColor: assessment.risk_matrix.risk_color,
-                        color: '#FFF'
-                      }}
-                    >
-                      {assessment.risk_matrix.risk_label}
+            {riskAssessments?.map((assessment) => {
+              console.log('Assessment data:', {
+                id: assessment.id,
+                overall_risk_score_id: assessment.overall_risk_score_id,
+                risk_matrix: assessment.risk_matrix
+              });
+              return (
+                <TableRow key={assessment.id}>
+                  <TableCell>{assessment.site_register?.location?.full_path}</TableCell>
+                  <TableCell>{assessment.site_register?.products?.product_name}</TableCell>
+                  <TableCell>
+                    {assessment.risk_assessment_date ? 
+                      format(new Date(assessment.risk_assessment_date), 'dd/MM/yyyy') : 
+                      '-'
+                    }
+                  </TableCell>
+                  <TableCell>
+                    {`${assessment.assessor?.first_name} ${assessment.assessor?.last_name}`}
+                  </TableCell>
+                  <TableCell>
+                    {assessment.risk_matrix && (
+                      <Badge
+                        style={{
+                          backgroundColor: assessment.risk_matrix.risk_color,
+                          color: '#FFF'
+                        }}
+                      >
+                        {assessment.risk_matrix.risk_label}
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">
+                      {assessment.evaluation_status?.label}
                     </Badge>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">
-                    {assessment.evaluation_status?.label}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">
-                    {assessment.approval_status?.label}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className="hover:bg-dgxprt-hover text-dgxprt-navy"
-                    onClick={() => onEdit(assessment)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">
+                      {assessment.approval_status?.label}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="hover:bg-dgxprt-hover text-dgxprt-navy"
+                      onClick={() => onEdit(assessment)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
