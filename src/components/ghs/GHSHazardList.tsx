@@ -69,7 +69,8 @@ export function GHSHazardList({
       item.ghs_code?.ghs_code.toLowerCase().includes(searchTerm) ||
       item.hazard_statement?.hazard_statement_code.toLowerCase().includes(searchTerm) ||
       item.hazard_statement?.hazard_statement_text.toLowerCase().includes(searchTerm) ||
-      item.signal_word.toLowerCase().includes(searchTerm)
+      item.signal_word.toLowerCase().includes(searchTerm) ||
+      (item.source?.toLowerCase().includes(searchTerm) || false)
     );
   });
 
@@ -138,9 +139,11 @@ export function GHSHazardList({
               <TableHead>Hazard Class</TableHead>
               <TableHead>Hazard Category</TableHead>
               <TableHead>GHS Code</TableHead>
+              <TableHead>Pictogram</TableHead>
               <TableHead>Hazard Statement Code</TableHead>
               <TableHead>Hazard Statement Text</TableHead>
               <TableHead>Signal Word</TableHead>
+              <TableHead>Source</TableHead>
               {isAdmin && <TableHead className="w-[100px]">Actions</TableHead>}
             </TableRow>
           </TableHeader>
@@ -150,6 +153,15 @@ export function GHSHazardList({
                 <TableCell>{hazard.hazard_class}</TableCell>
                 <TableCell>{hazard.hazard_category}</TableCell>
                 <TableCell>{hazard.ghs_code?.ghs_code}</TableCell>
+                <TableCell>
+                  {hazard.ghs_code?.pictogram_url && (
+                    <img 
+                      src={hazard.ghs_code.pictogram_url}
+                      alt={`GHS Code ${hazard.ghs_code.ghs_code} pictogram`}
+                      className="w-12 h-12 object-contain"
+                    />
+                  )}
+                </TableCell>
                 <TableCell>{hazard.hazard_statement?.hazard_statement_code}</TableCell>
                 <TableCell>{hazard.hazard_statement?.hazard_statement_text}</TableCell>
                 <TableCell>
@@ -157,6 +169,7 @@ export function GHSHazardList({
                     {hazard.signal_word}
                   </Badge>
                 </TableCell>
+                <TableCell>{hazard.source || '-'}</TableCell>
                 {isAdmin && (
                   <TableCell>
                     <div className="flex space-x-2">
