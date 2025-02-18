@@ -1,3 +1,4 @@
+
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -471,7 +472,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
             <CollapsibleContent className="p-4 pt-0 border-t">
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                {/* First Row: Hazard Type, Hazard, Control, Control in Place */}
+                <div className="grid grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label>Hazard Type</Label>
                     {readOnly ? (
@@ -496,6 +498,39 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                       </Select>
                     )}
                   </div>
+
+                  <div className="space-y-2">
+                    <Label>Hazard</Label>
+                    {readOnly ? (
+                      <div className="p-2 bg-gray-50 rounded border">
+                        {hazard.hazard}
+                      </div>
+                    ) : (
+                      <Textarea
+                        value={hazard.hazard}
+                        onChange={(e) => handleUpdate(hazard.id, 'hazard', e.target.value)}
+                        placeholder="Enter hazard description"
+                        className="h-[38px] min-h-[38px] resize-none"
+                      />
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Control</Label>
+                    {readOnly ? (
+                      <div className="p-2 bg-gray-50 rounded border">
+                        {hazard.control}
+                      </div>
+                    ) : (
+                      <Textarea
+                        value={hazard.control}
+                        onChange={(e) => handleUpdate(hazard.id, 'control', e.target.value)}
+                        placeholder="Enter control measures"
+                        className="h-[38px] min-h-[38px] resize-none"
+                      />
+                    )}
+                  </div>
+
                   <div className="space-y-2">
                     <Label>Control In Place</Label>
                     <div className="flex items-center space-x-2 pt-2">
@@ -517,37 +552,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Hazard</Label>
-                  {readOnly ? (
-                    <div className="p-2 bg-gray-50 rounded border">
-                      {hazard.hazard}
-                    </div>
-                  ) : (
-                    <Textarea
-                      value={hazard.hazard}
-                      onChange={(e) => handleUpdate(hazard.id, 'hazard', e.target.value)}
-                      placeholder="Enter hazard description"
-                    />
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Control</Label>
-                  {readOnly ? (
-                    <div className="p-2 bg-gray-50 rounded border">
-                      {hazard.control}
-                    </div>
-                  ) : (
-                    <Textarea
-                      value={hazard.control}
-                      onChange={(e) => handleUpdate(hazard.id, 'control', e.target.value)}
-                      placeholder="Enter control measures"
-                    />
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
+                {/* Second Row: Likelihood, Consequence, Risk Level */}
+                <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label>Likelihood</Label>
                     {readOnly ? (
@@ -596,6 +602,22 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                         </SelectContent>
                       </Select>
                     )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Risk Level</Label>
+                    <div className="h-[38px] flex items-center">
+                      {hazard.risk_score && (
+                        <Badge
+                          style={{
+                            backgroundColor: hazard.risk_score.risk_color || '#gray-400',
+                            color: '#FFFFFF'
+                          }}
+                        >
+                          {hazard.risk_score.risk_label}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
