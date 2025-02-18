@@ -183,10 +183,34 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       console.log('Saving copied hazards:', copiedHazards.length);
       console.log('Saving manual hazards:', manualHazards.length);
 
-      // Handle copied hazards - use composite key
+      // Step 1: Fetch existing hazards to preserve IDs
+      const { data: existingHazards, error: fetchError } = await supabase
+        .from('risk_hazards_and_controls')
+        .select('id, hazard_control_id')
+        .eq('risk_assessment_id', riskAssessmentId);
+
+      if (fetchError) {
+        console.error('Error fetching existing hazards:', fetchError);
+        throw fetchError;
+      }
+
+      // Create maps to find existing hazards quickly
+      const copiedHazardMap = new Map(
+        existingHazards
+          ?.filter(h => h.hazard_control_id !== null)
+          .map(h => [h.hazard_control_id, h.id]) || []
+      );
+
+      const manualHazardMap = new Map(
+        existingHazards
+          ?.filter(h => h.hazard_control_id === null)
+          .map(h => [h.id, h.id]) || []
+      );
+
+      // Step 2: Handle Copied Hazards
       if (copiedHazards.length > 0) {
         const copiedHazardsToSave = copiedHazards.map(h => ({
-          id: h.id, // Keep the existing ID if it exists
+          id: copiedHazardMap.get(h.hazard_control_id) || h.id,
           risk_assessment_id: riskAssessmentId,
           hazard_control_id: h.hazard_control_id,
           hazard_type_id: h.hazard_type_id,
@@ -203,46 +227,24 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           source: 'Product'
         }));
 
-        // Get existing hazard records to preserve IDs
-        const { data: existingHazards, error: fetchError } = await supabase
-          .from('risk_hazards_and_controls')
-          .select('id, hazard_control_id')
-          .eq('risk_assessment_id', riskAssessmentId)
-          .not('hazard_control_id', 'is', null);
-
-        if (fetchError) {
-          console.error('Error fetching existing hazards:', fetchError);
-          throw fetchError;
-        }
-
-        // Create a map of hazard_control_id to record id
-        const existingHazardMap = new Map(
-          existingHazards?.map(h => [h.hazard_control_id, h.id]) || []
-        );
-
-        // Update records with existing IDs where available
-        const finalCopiedHazards = copiedHazardsToSave.map(h => ({
-          ...h,
-          id: existingHazardMap.get(h.hazard_control_id) || h.id
-        }));
-
         const { error: copiedError } = await supabase
           .from('risk_hazards_and_controls')
-          .upsert(finalCopiedHazards, {
-            onConflict: 'risk_assessment_id,hazard_control_id',
-            ignoreDuplicates: false
+          .upsert(copiedHazardsToSave, {
+            onConflict: ['risk_assessment_id', 'hazard_control_id']
           });
 
         if (copiedError) {
           console.error('Error saving copied hazards:', copiedError);
           throw copiedError;
         }
+
+        console.log(`Upserted ${copiedHazardsToSave.length} copied hazards.`);
       }
 
-      // Handle manual hazards - use primary key
+      // Step 3: Handle Manual Hazards
       if (manualHazards.length > 0) {
         const manualHazardsToSave = manualHazards.map(h => ({
-          id: h.id, // Keep the existing ID
+          id: manualHazardMap.get(h.id) || h.id,
           risk_assessment_id: riskAssessmentId,
           hazard_type_id: h.hazard_type_id,
           hazard: h.hazard,
@@ -261,14 +263,15 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         const { error: manualError } = await supabase
           .from('risk_hazards_and_controls')
           .upsert(manualHazardsToSave, {
-            onConflict: 'id',
-            ignoreDuplicates: false
+            onConflict: ['id']
           });
 
         if (manualError) {
           console.error('Error saving manual hazards:', manualError);
           throw manualError;
         }
+
+        console.log(`Upserted ${manualHazardsToSave.length} manual hazards.`);
       }
 
       await queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
