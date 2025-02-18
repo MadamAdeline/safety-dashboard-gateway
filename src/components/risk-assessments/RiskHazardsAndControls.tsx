@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -317,46 +318,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     }
   });
 
-  const autoGenerateMutation = useMutation({
-    mutationFn: async () => {
-      if (!riskAssessmentId || !siteRegister?.product?.id) {
-        toast({
-          title: "Error",
-          description: "Missing required information",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      try {
-        const { error } = await supabase
-          .from('risk_assessments')
-          .update({ auto_generate_hazards: true })
-          .eq('id', riskAssessmentId);
-
-        if (error) throw error;
-
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        await refetchHazards();
-        
-        toast({
-          title: "Success",
-          description: "Hazards auto-generated successfully",
-        });
-
-      } catch (error) {
-        console.error('Auto-generate failed:', error);
-        toast({
-          title: "Error",
-          description: "Failed to auto-generate hazards",
-          variant: "destructive",
-        });
-        throw error;
-      }
-    }
-  });
-
   useImperativeHandle(ref, () => ({
     handleAdd,
     saveHazards: async (riskAssessmentId: string) => {
@@ -413,7 +374,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       consequence_id: null,
       risk_score_id: null,
       risk_assessment_id: riskAssessmentId,
-      source: "Product"
+      source: "Manual"
     };
 
     setHazards([...hazards, newHazard]);
@@ -507,7 +468,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     <div className="space-y-4">
       <Table>
         <TableHeader>
-          <TableRow className="border-b">
+          <TableRow>
             <TableHead className="w-[50px]"></TableHead>
             <TableHead className="w-[100px] sm:w-[150px] text-left font-semibold whitespace-nowrap overflow-hidden text-ellipsis">Type</TableHead>
             <TableHead 
@@ -767,8 +728,21 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           No hazards and controls added yet.
         </div>
       )}
+
+      {!readOnly && (
+        <div className="flex items-center justify-end">
+          <Button
+            onClick={handleAdd}
+            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Hazard & Control
+          </Button>
+        </div>
+      )}
     </div>
   );
 });
 
 RiskHazardsAndControls.displayName = "RiskHazardsAndControls";
+
