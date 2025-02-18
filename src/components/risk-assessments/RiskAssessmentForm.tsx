@@ -1,22 +1,10 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -25,12 +13,10 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { SiteRegisterSearch } from "./SiteRegisterSearch";
 import { RiskHazardsAndControls } from "./RiskHazardsAndControls";
-
 interface RiskAssessmentFormProps {
   onClose: () => void;
   initialData?: any | null;
 }
-
 interface FormData {
   site_register_record_id: string;
   risk_assessment_date: string;
@@ -45,19 +31,22 @@ interface FormData {
   date_of_next_review: string;
   overall_risk_score_id: number | null;
 }
-
-export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormProps) {
-  const { toast } = useToast();
+export function RiskAssessmentForm({
+  onClose,
+  initialData
+}: RiskAssessmentFormProps) {
+  const {
+    toast
+  } = useToast();
   const queryClient = useQueryClient();
   const [selectedSiteRegister, setSelectedSiteRegister] = useState<any>(null);
   const [riskScore, setRiskScore] = useState<any>(null);
-  const hazardsControlsRef = useRef<{ saveHazards: () => Promise<void> }>(null);
-
+  const hazardsControlsRef = useRef<{
+    saveHazards: () => Promise<void>;
+  }>(null);
   const [formData, setFormData] = useState<FormData>({
     site_register_record_id: initialData?.site_register_record_id || "",
-    risk_assessment_date: initialData?.risk_assessment_date ? 
-      format(new Date(initialData.risk_assessment_date), 'yyyy-MM-dd') : 
-      format(new Date(), 'yyyy-MM-dd'),
+    risk_assessment_date: initialData?.risk_assessment_date ? format(new Date(initialData.risk_assessment_date), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
     conducted_by: initialData?.conducted_by || "",
     product_usage: initialData?.product_usage || "",
     overall_likelihood_id: initialData?.overall_likelihood_id || null,
@@ -67,114 +56,120 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     approval_status_id: initialData?.approval_status_id || "",
     approver: initialData?.approver || "",
     date_of_next_review: initialData?.date_of_next_review || "",
-    overall_risk_score_id: initialData?.overall_risk_score_id || null,
+    overall_risk_score_id: initialData?.overall_risk_score_id || null
   });
-
-  const { data: users } = useQuery({
+  const {
+    data: users
+  } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select('id, first_name, last_name')
-        .eq('active', 'active')
-        .order('first_name', { ascending: true });
+      const {
+        data,
+        error
+      } = await supabase.from('users').select('id, first_name, last_name').eq('active', 'active').order('first_name', {
+        ascending: true
+      });
       if (error) throw error;
       return data;
     }
   });
-
-  const { data: siteRegister } = useQuery({
+  const {
+    data: siteRegister
+  } = useQuery({
     queryKey: ['site-register', formData.site_register_record_id],
     queryFn: async () => {
       if (!formData.site_register_record_id) return null;
-      const { data, error } = await supabase
-        .from('site_registers')
-        .select(`
+      const {
+        data,
+        error
+      } = await supabase.from('site_registers').select(`
           *,
           location:locations (name, full_path),
           product:products (product_name)
-        `)
-        .eq('id', formData.site_register_record_id)
-        .single();
+        `).eq('id', formData.site_register_record_id).single();
       if (error) throw error;
       return data;
     },
     enabled: !!formData.site_register_record_id
   });
-
-  const { data: likelihoodOptions } = useQuery({
+  const {
+    data: likelihoodOptions
+  } = useQuery({
     queryKey: ['likelihood-options'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('likelihood')
-        .select('*')
-        .order('score', { ascending: true });
+      const {
+        data,
+        error
+      } = await supabase.from('likelihood').select('*').order('score', {
+        ascending: true
+      });
       if (error) throw error;
       return data;
     }
   });
-
-  const { data: consequenceOptions } = useQuery({
+  const {
+    data: consequenceOptions
+  } = useQuery({
     queryKey: ['consequence-options'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('consequence')
-        .select('*')
-        .order('score', { ascending: true });
+      const {
+        data,
+        error
+      } = await supabase.from('consequence').select('*').order('score', {
+        ascending: true
+      });
       if (error) throw error;
       return data;
     }
   });
-
-  const { data: evaluationStatuses } = useQuery({
+  const {
+    data: evaluationStatuses
+  } = useQuery({
     queryKey: ['evaluation-statuses'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('master_data')
-        .select('*')
-        .eq('category', 'RISK_OVERALL_STATUS')
-        .eq('status', 'ACTIVE')
-        .order('sort_order', { ascending: true });
+      const {
+        data,
+        error
+      } = await supabase.from('master_data').select('*').eq('category', 'RISK_OVERALL_STATUS').eq('status', 'ACTIVE').order('sort_order', {
+        ascending: true
+      });
       if (error) throw error;
       return data;
     }
   });
-
-  const { data: approvalStatuses } = useQuery({
+  const {
+    data: approvalStatuses
+  } = useQuery({
     queryKey: ['approval-statuses'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('master_data')
-        .select('*')
-        .eq('category', 'RISK_APPROVAL_STATUS')
-        .eq('status', 'ACTIVE')
-        .order('sort_order', { ascending: true });
+      const {
+        data,
+        error
+      } = await supabase.from('master_data').select('*').eq('category', 'RISK_APPROVAL_STATUS').eq('status', 'ACTIVE').order('sort_order', {
+        ascending: true
+      });
       if (error) throw error;
       return data;
     }
   });
-
   useEffect(() => {
     if (initialData?.site_register_record_id) {
-      setSelectedSiteRegister({ id: initialData.site_register_record_id });
+      setSelectedSiteRegister({
+        id: initialData.site_register_record_id
+      });
     }
   }, [initialData]);
-
   useEffect(() => {
     const updateRiskScore = async () => {
       if (formData.overall_likelihood_id && formData.overall_consequence_id) {
-        const { data, error } = await supabase
-          .from('risk_matrix')
-          .select('*')
-          .eq('likelihood_id', formData.overall_likelihood_id)
-          .eq('consequence_id', formData.overall_consequence_id)
-          .single();
-        
+        const {
+          data,
+          error
+        } = await supabase.from('risk_matrix').select('*').eq('likelihood_id', formData.overall_likelihood_id).eq('consequence_id', formData.overall_consequence_id).single();
         if (error) {
           console.error('Error fetching risk score:', error);
           return;
         }
-        
         setRiskScore(data);
         setFormData(prev => ({
           ...prev,
@@ -182,26 +177,26 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
         }));
       }
     };
-
     updateRiskScore();
   }, [formData.overall_likelihood_id, formData.overall_consequence_id]);
-
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
-      const { error } = await supabase
-        .from('risk_assessments')
-        .insert([data]);
+      const {
+        error
+      } = await supabase.from('risk_assessments').insert([data]);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['risk-assessments'] });
+      queryClient.invalidateQueries({
+        queryKey: ['risk-assessments']
+      });
       toast({
         title: "Success",
         description: "Risk assessment has been created"
       });
       onClose();
     },
-    onError: (error) => {
+    onError: error => {
       console.error('Error creating risk assessment:', error);
       toast({
         title: "Error",
@@ -210,24 +205,24 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
       });
     }
   });
-
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      const { error } = await supabase
-        .from('risk_assessments')
-        .update(data)
-        .eq('id', initialData.id);
+      const {
+        error
+      } = await supabase.from('risk_assessments').update(data).eq('id', initialData.id);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['risk-assessments'] });
+      queryClient.invalidateQueries({
+        queryKey: ['risk-assessments']
+      });
       toast({
         title: "Success",
         description: "Risk assessment has been updated"
       });
       onClose();
     },
-    onError: (error) => {
+    onError: error => {
       console.error('Error updating risk assessment:', error);
       toast({
         title: "Error",
@@ -236,20 +231,16 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
       });
     }
   });
-
   const handleSave = async () => {
     try {
       let riskAssessmentId = initialData?.id;
-      
       if (initialData?.id) {
         await updateMutation.mutateAsync(formData);
       } else {
-        const { data, error } = await supabase
-          .from('risk_assessments')
-          .insert([formData])
-          .select()
-          .single();
-          
+        const {
+          data,
+          error
+        } = await supabase.from('risk_assessments').insert([formData]).select().single();
         if (error) throw error;
         riskAssessmentId = data.id;
       }
@@ -258,8 +249,9 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
       if (hazardsControlsRef.current) {
         await hazardsControlsRef.current.saveHazards();
       }
-
-      queryClient.invalidateQueries({ queryKey: ['risk-assessments'] });
+      queryClient.invalidateQueries({
+        queryKey: ['risk-assessments']
+      });
       toast({
         title: "Success",
         description: initialData ? "Risk assessment updated" : "Risk assessment created"
@@ -274,7 +266,6 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
       });
     }
   };
-
   const handleSiteRegisterSelect = (siteRegister: any) => {
     setSelectedSiteRegister(siteRegister);
     setFormData(prev => ({
@@ -282,11 +273,8 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
       site_register_record_id: siteRegister.id
     }));
   };
-
   const isPending = createMutation.isPending || updateMutation.isPending;
-
-  return (
-    <div className="space-y-8">
+  return <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">
           {initialData ? "Edit Risk Assessment" : "New Risk Assessment"}
@@ -295,12 +283,8 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button 
-            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-            onClick={handleSave}
-            disabled={isPending}
-          >
-            {isPending ? "Saving..." : (initialData ? "Update" : "Save")}
+          <Button className="bg-dgxprt-purple hover:bg-dgxprt-purple/90" onClick={handleSave} disabled={isPending}>
+            {isPending ? "Saving..." : initialData ? "Update" : "Save"}
           </Button>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -324,74 +308,59 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
                   <h2 className="text-lg font-semibold">Site Register Information</h2>
                 </div>
               </div>
-              {selectedSiteRegister ? (
-                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+              {selectedSiteRegister ? <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                   <p><strong>Location:</strong> {siteRegister?.location?.full_path}</p>
                   <p><strong>Product:</strong> {siteRegister?.product?.product_name}</p>
-                  {!initialData && (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        setSelectedSiteRegister(null);
-                        setFormData(prev => ({ ...prev, site_register_record_id: "" }));
-                      }}
-                    >
+                  {!initialData && <Button variant="outline" size="sm" onClick={() => {
+                setSelectedSiteRegister(null);
+                setFormData(prev => ({
+                  ...prev,
+                  site_register_record_id: ""
+                }));
+              }}>
                       Change the Site Register's Product
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                !initialData && (
-                  <SiteRegisterSearch 
-                    onSelect={handleSiteRegisterSelect}
-                    className="w-full"
-                  />
-                )
-              )}
+                    </Button>}
+                </div> : !initialData && <SiteRegisterSearch onSelect={handleSiteRegisterSelect} className="w-full" />}
             </div>
 
             <div className="space-y-4">
               <div className="border-t pt-4">
-                <div className="bg-gray-50 py-2 px-4 rounded-md">
+                <div className="bg-gray-50 py-2 rounded-md px-0">
                   <h2 className="text-lg font-semibold">Assessment Details</h2>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label>Risk Assessment Date</Label>
-                  <Input
-                    type="date"
-                    value={formData.risk_assessment_date}
-                    onChange={(e) => setFormData({ ...formData, risk_assessment_date: e.target.value })}
-                  />
+                  <Input type="date" value={formData.risk_assessment_date} onChange={e => setFormData({
+                  ...formData,
+                  risk_assessment_date: e.target.value
+                })} />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Assessed By</Label>
-                  <Select 
-                    value={formData.conducted_by}
-                    onValueChange={(value) => setFormData({ ...formData, conducted_by: value })}
-                  >
+                  <Select value={formData.conducted_by} onValueChange={value => setFormData({
+                  ...formData,
+                  conducted_by: value
+                })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select assessor" />
                     </SelectTrigger>
                     <SelectContent>
-                      {users?.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
+                      {users?.map(user => <SelectItem key={user.id} value={user.id}>
                           {`${user.first_name} ${user.last_name}`}
-                        </SelectItem>
-                      ))}
+                        </SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2 col-span-2">
                   <Label>Product Usage</Label>
-                  <Textarea
-                    value={formData.product_usage}
-                    onChange={(e) => setFormData({ ...formData, product_usage: e.target.value })}
-                  />
+                  <Textarea value={formData.product_usage} onChange={e => setFormData({
+                  ...formData,
+                  product_usage: e.target.value
+                })} />
                 </div>
               </div>
             </div>
@@ -407,11 +376,7 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
                   <h2 className="text-lg font-semibold">Hazards and Controls</h2>
                 </div>
               </div>
-              <RiskHazardsAndControls 
-                riskAssessmentId={initialData?.id || null}
-                readOnly={false}
-                ref={hazardsControlsRef}
-              />
+              <RiskHazardsAndControls riskAssessmentId={initialData?.id || null} readOnly={false} ref={hazardsControlsRef} />
             </div>
 
             <div className="space-y-4">
@@ -423,65 +388,53 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
               <div className="grid grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label>Overall Likelihood</Label>
-                  <Select
-                    value={formData.overall_likelihood_id?.toString() || ""}
-                    onValueChange={(value) => setFormData({ ...formData, overall_likelihood_id: parseInt(value) })}
-                  >
+                  <Select value={formData.overall_likelihood_id?.toString() || ""} onValueChange={value => setFormData({
+                  ...formData,
+                  overall_likelihood_id: parseInt(value)
+                })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select likelihood" />
                     </SelectTrigger>
                     <SelectContent>
-                      {likelihoodOptions?.map((option) => (
-                        <SelectItem key={option.id} value={option.id.toString()}>
+                      {likelihoodOptions?.map(option => <SelectItem key={option.id} value={option.id.toString()}>
                           {option.name}
-                        </SelectItem>
-                      ))}
+                        </SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
                   <Label>Overall Consequence</Label>
-                  <Select
-                    value={formData.overall_consequence_id?.toString() || ""}
-                    onValueChange={(value) => setFormData({ ...formData, overall_consequence_id: parseInt(value) })}
-                  >
+                  <Select value={formData.overall_consequence_id?.toString() || ""} onValueChange={value => setFormData({
+                  ...formData,
+                  overall_consequence_id: parseInt(value)
+                })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select consequence" />
                     </SelectTrigger>
                     <SelectContent>
-                      {consequenceOptions?.map((option) => (
-                        <SelectItem key={option.id} value={option.id.toString()}>
+                      {consequenceOptions?.map(option => <SelectItem key={option.id} value={option.id.toString()}>
                           {option.name}
-                        </SelectItem>
-                      ))}
+                        </SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
 
-                {riskScore && (
-                  <div className="space-y-2">
+                {riskScore && <div className="space-y-2">
                     <Label>Overall Risk Level</Label>
                     <div className="h-10 flex items-center">
-                      <Badge
-                        style={{
-                          backgroundColor: riskScore.risk_color || '#gray-400',
-                          color: '#FFFFFF'
-                        }}
-                      >
+                      <Badge style={{
+                    backgroundColor: riskScore.risk_color || '#gray-400',
+                    color: '#FFFFFF'
+                  }}>
                         {riskScore.risk_label}
                       </Badge>
                     </div>
-                  </div>
-                )}
+                  </div>}
               </div>
 
               <div className="bg-white border rounded-lg p-4 mt-4">
-                <img 
-                  src="/lovable-uploads/2cadd5b5-9f69-4e43-83af-bfc20517cde2.png" 
-                  alt="Risk Assessment Matrix" 
-                  className="w-full max-w-3xl mx-auto"
-                />
+                <img src="/lovable-uploads/2cadd5b5-9f69-4e43-83af-bfc20517cde2.png" alt="Risk Assessment Matrix" className="w-full max-w-3xl mx-auto" />
               </div>
             </div>
           </div>
@@ -498,81 +451,73 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2 col-span-2">
                 <Label>Overall Evaluation</Label>
-                <Textarea
-                  value={formData.overall_evaluation}
-                  onChange={(e) => setFormData({ ...formData, overall_evaluation: e.target.value })}
-                />
+                <Textarea value={formData.overall_evaluation} onChange={e => setFormData({
+                ...formData,
+                overall_evaluation: e.target.value
+              })} />
               </div>
 
               <div className="space-y-2">
                 <Label>Overall Evaluation Status</Label>
-                <Select
-                  value={formData.overall_evaluation_status_id}
-                  onValueChange={(value) => setFormData({ ...formData, overall_evaluation_status_id: value })}
-                >
+                <Select value={formData.overall_evaluation_status_id} onValueChange={value => setFormData({
+                ...formData,
+                overall_evaluation_status_id: value
+              })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    {evaluationStatuses?.map((status) => (
-                      <SelectItem key={status.id} value={status.id}>
+                    {evaluationStatuses?.map(status => <SelectItem key={status.id} value={status.id}>
                         {status.label}
-                      </SelectItem>
-                    ))}
+                      </SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
                 <Label>Approval Status</Label>
-                <Select
-                  value={formData.approval_status_id}
-                  onValueChange={(value) => setFormData({ ...formData, approval_status_id: value })}
-                >
+                <Select value={formData.approval_status_id} onValueChange={value => setFormData({
+                ...formData,
+                approval_status_id: value
+              })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    {approvalStatuses?.map((status) => (
-                      <SelectItem key={status.id} value={status.id}>
+                    {approvalStatuses?.map(status => <SelectItem key={status.id} value={status.id}>
                         {status.label}
-                      </SelectItem>
-                    ))}
+                      </SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
                 <Label>Approver</Label>
-                <Select
-                  value={formData.approver}
-                  onValueChange={(value) => setFormData({ ...formData, approver: value })}
-                >
+                <Select value={formData.approver} onValueChange={value => setFormData({
+                ...formData,
+                approver: value
+              })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select approver" />
                   </SelectTrigger>
                   <SelectContent>
-                    {users?.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
+                    {users?.map(user => <SelectItem key={user.id} value={user.id}>
                         {`${user.first_name} ${user.last_name}`}
-                      </SelectItem>
-                    ))}
+                      </SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
                 <Label>Date of Next Review</Label>
-                <Input
-                  type="date"
-                  value={formData.date_of_next_review}
-                  onChange={(e) => setFormData({ ...formData, date_of_next_review: e.target.value })}
-                />
+                <Input type="date" value={formData.date_of_next_review} onChange={e => setFormData({
+                ...formData,
+                date_of_next_review: e.target.value
+              })} />
               </div>
             </div>
           </div>
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>;
 }
