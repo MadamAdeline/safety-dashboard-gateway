@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useUserRole } from "@/hooks/use-user-role";
 import { SupplierForm } from "@/components/suppliers/SupplierForm";
+import { DashboardLayout } from "@/components/DashboardLayout";
 
 export function SDSSupplierSelect() {
   const { supplier, setSupplier, initialData, status, readOnly } = useSDSForm();
@@ -77,9 +78,9 @@ export function SDSSupplierSelect() {
 
   if (showSupplierForm) {
     return (
-      <div className="fixed inset-0 z-50 bg-background">
+      <DashboardLayout>
         <SupplierForm onClose={handleSupplierFormClose} />
-      </div>
+      </DashboardLayout>
     );
   }
 
