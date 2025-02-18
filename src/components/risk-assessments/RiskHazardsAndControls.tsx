@@ -83,6 +83,12 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
           hazard_type:master_data!risk_hazards_and_controls_hazard_type_id_fkey (
             id,
             label
+          ),
+          product_hazard:hazards_and_controls!risk_hazards_and_controls_hazard_control_id_fkey (
+            hazard_control_id,
+            hazard,
+            control,
+            hazard_type
           )
         `)
         .eq('risk_assessment_id', riskAssessmentId);
@@ -115,6 +121,67 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     enabled: !!riskAssessmentId
   });
 
+  const autoGenerateMutation = useMutation({
+    mutationFn: async () => {
+      if (!riskAssessmentId) return;
+
+      // Get existing hazards for this risk assessment
+      const { data: existingHazards } = await supabase
+        .from('risk_hazards_and_controls')
+        .select('hazard_control_id')
+        .eq('risk_assessment_id', riskAssessmentId);
+
+      const existingHazardIds = existingHazards?.map(h => h.hazard_control_id) || [];
+
+      // Get all product hazards
+      const { data: productHazards, error: hazardsError } = await supabase
+        .from('hazards_and_controls')
+        .select(`
+          hazard_control_id,
+          hazard_type,
+          hazard,
+          control,
+          source
+        `)
+        .eq('product_id', siteRegister?.product?.id);
+
+      if (hazardsError) throw hazardsError;
+
+      // Filter out already existing hazards
+      const newHazards = productHazards?.filter(
+        ph => !existingHazardIds.includes(ph.hazard_control_id)
+      );
+
+      if (newHazards && newHazards.length > 0) {
+        const hazardsToInsert = newHazards.map(ph => ({
+          risk_assessment_id: riskAssessmentId,
+          hazard_type_id: ph.hazard_type,
+          hazard: ph.hazard,
+          control: ph.control,
+          source: "Product",
+          hazard_control_id: ph.hazard_control_id,
+          control_in_place: false,
+          likelihood_id: null,
+          consequence_id: null,
+          risk_score_id: null
+        }));
+
+        const { error: insertError } = await supabase
+          .from('risk_hazards_and_controls')
+          .insert(hazardsToInsert);
+
+        if (insertError) {
+          console.error('Insert error:', insertError);
+          throw insertError;
+        }
+
+        return hazardsToInsert;
+      }
+
+      return [];
+    }
+  });
+
   const saveMutation = useMutation({
     mutationFn: async (hazardsData: any[]) => {
       if (!riskAssessmentId) return;
@@ -139,7 +206,8 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
             risk_score_int: h.risk_score?.risk_score,
             risk_level_text: h.risk_score?.risk_label,
             likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
-            consequence_text: h.consequence_text
+            consequence_text: h.consequence_text,
+            hazard_control_id: h.hazard_control_id
           };
         });
 
@@ -171,7 +239,8 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
           risk_score_int: h.risk_score?.risk_score,
           risk_level_text: h.risk_score?.risk_label,
           likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
-          consequence_text: h.consequence_text
+          consequence_text: h.consequence_text,
+          hazard_control_id: h.hazard_control_id
         }));
 
         const { error } = await supabase
@@ -229,7 +298,8 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
       likelihood_id: null,
       consequence_id: null,
       risk_score_id: null,
-      risk_assessment_id: riskAssessmentId
+      risk_assessment_id: riskAssessmentId,
+      source: "Product"
     };
 
     setHazards([...hazards, newHazard]);
