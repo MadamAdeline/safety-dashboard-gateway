@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit2, Plus, Search, Download, RotateCw } from "lucide-react";
+import { Edit2, Plus, Search, Download, RotateCw, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -120,6 +120,11 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
     setSelectedLocation(location);
   };
 
+  const handleClearLocation = () => {
+    setSelectedLocation(null);
+    refetch();
+  };
+
   const filteredAssessments = riskAssessments?.filter(assessment => {
     if (!searchTerm) return true;
     
@@ -152,12 +157,24 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
                   className="bg-gray-100 text-gray-600"
                 />
               ) : (
-                <LocationSearch
-                  selectedLocationId={selectedLocation?.id || null}
-                  initialLocation={selectedLocation}
-                  onLocationSelect={handleLocationSelect}
-                  className="w-full"
-                />
+                <>
+                  <LocationSearch
+                    selectedLocationId={selectedLocation?.id || null}
+                    initialLocation={selectedLocation}
+                    onLocationSelect={handleLocationSelect}
+                    className="w-full"
+                  />
+                  {selectedLocation && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2"
+                      onClick={handleClearLocation}
+                    >
+                      <X className="h-4 w-4 text-gray-500" />
+                    </Button>
+                  )}
+                </>
               )}
             </div>
             {selectedLocation?.full_path && (
