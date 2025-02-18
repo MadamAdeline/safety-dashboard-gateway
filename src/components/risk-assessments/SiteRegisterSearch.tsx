@@ -14,20 +14,25 @@ export function SiteRegisterSearch({ onSelect, className }: SiteRegisterSearchPr
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const { data: siteRegisters } = useQuery({
+  const { data: siteRegisters, isLoading } = useQuery({
     queryKey: ['site-registers', 'search', searchTerm],
     queryFn: async () => {
+      console.log('Fetching site registers...');
       const { data, error } = await supabase
         .from('site_registers')
         .select(`
           id,
-          location:locations (name, full_path),
-          product:products (product_name, product_code)
+          location:locations (id, name, full_path),
+          product:products (id, product_name, product_code)
         `)
-        .filter('status_id', 'eq', 16) // Active status
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching site registers:', error);
+        throw error;
+      }
+      
+      console.log('Fetched site registers:', data);
       return data;
     }
   });
@@ -66,7 +71,7 @@ export function SiteRegisterSearch({ onSelect, className }: SiteRegisterSearchPr
         />
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         
-        {isDropdownOpen && filteredSiteRegisters && (
+        {isDropdownOpen && !isLoading && filteredSiteRegisters && (
           <div className="absolute w-full bg-white mt-1 border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
             {filteredSiteRegisters.length > 0 ? (
               filteredSiteRegisters.map(record => (
@@ -95,6 +100,11 @@ export function SiteRegisterSearch({ onSelect, className }: SiteRegisterSearchPr
                 No site registers found
               </div>
             )}
+          </div>
+        )}
+        {isLoading && (
+          <div className="absolute w-full bg-white mt-1 border rounded-md shadow-lg z-50 p-2 text-center">
+            Loading...
           </div>
         )}
       </div>
