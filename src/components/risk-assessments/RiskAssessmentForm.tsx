@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,9 +47,12 @@ export function RiskAssessmentForm({
     saveHazards: (newRiskAssessmentId: string) => Promise<void>;
     populateHazards: (hazards: any[]) => void;
   }>(null);
+  
   const [formData, setFormData] = useState<FormData>({
     site_register_record_id: initialData?.site_register_record_id || "",
-    risk_assessment_date: initialData?.risk_assessment_date ? format(new Date(initialData.risk_assessment_date), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+    risk_assessment_date: initialData?.risk_assessment_date 
+      ? format(new Date(initialData.risk_assessment_date), 'yyyy-MM-dd') 
+      : format(new Date(), 'yyyy-MM-dd'),
     conducted_by: initialData?.conducted_by || "",
     product_usage: initialData?.product_usage || "",
     overall_likelihood_id: initialData?.overall_likelihood_id || null,
@@ -57,7 +61,7 @@ export function RiskAssessmentForm({
     overall_evaluation_status_id: initialData?.overall_evaluation_status_id || "",
     approval_status_id: initialData?.approval_status_id || "",
     approver: initialData?.approver || "",
-    date_of_next_review: initialData?.date_of_next_review || "",
+    date_of_next_review: initialData?.date_of_next_review || format(new Date(), 'yyyy-MM-dd'),
     overall_risk_score_id: initialData?.overall_risk_score_id || null
   });
 
@@ -287,16 +291,20 @@ export function RiskAssessmentForm({
 
   const createMutation = useMutation({
     mutationFn: async (data: FormData) => {
+      const preparedData = {
+        ...data,
+        site_register_record_id: data.site_register_record_id || null,
+        conducted_by: data.conducted_by || null,
+        approver: data.approver || null,
+        overall_evaluation_status_id: data.overall_evaluation_status_id || null,
+        approval_status_id: data.approval_status_id || null,
+        risk_assessment_date: data.risk_assessment_date || format(new Date(), 'yyyy-MM-dd'),
+        date_of_next_review: data.date_of_next_review || null
+      };
+
       const { data: createdData, error } = await supabase
         .from('risk_assessments')
-        .insert([{
-          ...data,
-          site_register_record_id: data.site_register_record_id || null,
-          conducted_by: data.conducted_by || null,
-          approver: data.approver || null,
-          overall_evaluation_status_id: data.overall_evaluation_status_id || null,
-          approval_status_id: data.approval_status_id || null
-        }])
+        .insert([preparedData])
         .select()
         .single();
 
@@ -307,18 +315,22 @@ export function RiskAssessmentForm({
 
   const updateMutation = useMutation({
     mutationFn: async (data: FormData) => {
+      const preparedData = {
+        ...data,
+        site_register_record_id: data.site_register_record_id || null,
+        conducted_by: data.conducted_by || null,
+        approver: data.approver || null,
+        overall_evaluation_status_id: data.overall_evaluation_status_id || null,
+        approval_status_id: data.approval_status_id || null,
+        risk_assessment_date: data.risk_assessment_date || format(new Date(), 'yyyy-MM-dd'),
+        date_of_next_review: data.date_of_next_review || null
+      };
+
       const { error } = await supabase
         .from('risk_assessments')
-        .update({
-          ...data,
-          site_register_record_id: data.site_register_record_id || null,
-          conducted_by: data.conducted_by || null,
-          approver: data.approver || null,
-          overall_evaluation_status_id: data.overall_evaluation_status_id || null,
-          approval_status_id: data.approval_status_id || null
-        })
+        .update(preparedData)
         .eq('id', initialData.id);
-      
+
       if (error) throw error;
     }
   });
