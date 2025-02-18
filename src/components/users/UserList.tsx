@@ -163,7 +163,7 @@ export function UserList({ onEdit, searchTerm, onNewUser }: UserListProps) {
                         : "bg-red-100 text-red-800"
                     }
                   >
-                    {user.active.toUpperCase()}
+                    {(user.active || 'inactive').toUpperCase()}
                   </Badge>
                 </TableCell>
                 <TableCell>
