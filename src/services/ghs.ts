@@ -6,9 +6,19 @@ export async function getGHSHazardClassifications() {
   const { data, error } = await supabase
     .from('ghs_hazard_classifications')
     .select(`
-      *,
-      ghs_code:ghs_codes(ghs_code),
-      hazard_statement:hazard_statements(
+      hazard_classification_id,
+      hazard_class,
+      hazard_category,
+      signal_word,
+      ghs_code_id,
+      hazard_statement_id,
+      updated_at,
+      updated_by,
+      ghs_codes (
+        ghs_code,
+        pictogram_url
+      ),
+      hazard_statements (
         hazard_statement_code,
         hazard_statement_text
       )
@@ -16,7 +26,15 @@ export async function getGHSHazardClassifications() {
     .order('hazard_class', { ascending: true });
 
   if (error) throw error;
-  return data as GHSHazardClassification[];
+  
+  // Transform the data to match the GHSHazardClassification type
+  const transformedData = data.map(item => ({
+    ...item,
+    ghs_code: item.ghs_codes,
+    hazard_statement: item.hazard_statements,
+  }));
+  
+  return transformedData as GHSHazardClassification[];
 }
 
 export async function createGHSHazardClassification(data: Omit<GHSHazardClassification, 'hazard_classification_id' | 'updated_at'>) {
@@ -24,9 +42,19 @@ export async function createGHSHazardClassification(data: Omit<GHSHazardClassifi
     .from('ghs_hazard_classifications')
     .insert([data])
     .select(`
-      *,
-      ghs_code:ghs_codes(ghs_code),
-      hazard_statement:hazard_statements(
+      hazard_classification_id,
+      hazard_class,
+      hazard_category,
+      signal_word,
+      ghs_code_id,
+      hazard_statement_id,
+      updated_at,
+      updated_by,
+      ghs_codes (
+        ghs_code,
+        pictogram_url
+      ),
+      hazard_statements (
         hazard_statement_code,
         hazard_statement_text
       )
@@ -34,7 +62,15 @@ export async function createGHSHazardClassification(data: Omit<GHSHazardClassifi
     .single();
 
   if (error) throw error;
-  return created as GHSHazardClassification;
+
+  // Transform the data to match the GHSHazardClassification type
+  const transformedData = {
+    ...created,
+    ghs_code: created.ghs_codes,
+    hazard_statement: created.hazard_statements,
+  };
+
+  return transformedData as GHSHazardClassification;
 }
 
 export async function updateGHSHazardClassification(
@@ -46,9 +82,19 @@ export async function updateGHSHazardClassification(
     .update(data)
     .eq('hazard_classification_id', id)
     .select(`
-      *,
-      ghs_code:ghs_codes(ghs_code),
-      hazard_statement:hazard_statements(
+      hazard_classification_id,
+      hazard_class,
+      hazard_category,
+      signal_word,
+      ghs_code_id,
+      hazard_statement_id,
+      updated_at,
+      updated_by,
+      ghs_codes (
+        ghs_code,
+        pictogram_url
+      ),
+      hazard_statements (
         hazard_statement_code,
         hazard_statement_text
       )
@@ -56,7 +102,15 @@ export async function updateGHSHazardClassification(
     .single();
 
   if (error) throw error;
-  return updated as GHSHazardClassification;
+
+  // Transform the data to match the GHSHazardClassification type
+  const transformedData = {
+    ...updated,
+    ghs_code: updated.ghs_codes,
+    hazard_statement: updated.hazard_statements,
+  };
+
+  return transformedData as GHSHazardClassification;
 }
 
 export async function deleteGHSHazardClassification(id: string) {
