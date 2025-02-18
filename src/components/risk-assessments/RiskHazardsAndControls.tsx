@@ -106,6 +106,7 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
         })
       );
 
+      console.log('Loaded hazards with risk scores:', hazardsWithRiskScores);
       setHazards(hazardsWithRiskScores);
       return hazardsWithRiskScores;
     },
@@ -122,24 +123,28 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
         .eq('risk_assessment_id', riskAssessmentId);
 
       if (hazardsData.length > 0) {
+        const dataToSave = hazardsData.map(h => {
+          console.log('Saving hazard data:', h);
+          return {
+            risk_assessment_id: riskAssessmentId,
+            hazard_type_id: h.hazard_type_id,
+            hazard: h.hazard,
+            control: h.control,
+            control_in_place: h.control_in_place,
+            likelihood_id: h.likelihood_id,
+            consequence_id: h.consequence_id,
+            risk_score_id: h.risk_score?.id,
+            risk_score_int: h.risk_score?.risk_score,
+            risk_level_text: h.risk_score?.risk_label,
+            likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
+            consequence_text: consequenceOptions?.find(c => c.id === h.consequence_id)?.name
+          };
+        });
+
+        console.log('Data being saved to database:', dataToSave);
         const { error } = await supabase
           .from('risk_hazards_and_controls')
-          .insert(
-            hazardsData.map(h => ({
-              risk_assessment_id: riskAssessmentId,
-              hazard_type_id: h.hazard_type_id,
-              hazard: h.hazard,
-              control: h.control,
-              control_in_place: h.control_in_place,
-              likelihood_id: h.likelihood_id,
-              consequence_id: h.consequence_id,
-              risk_score_id: h.risk_score?.id,
-              risk_score_int: h.risk_score?.risk_score,
-              risk_level_text: h.risk_score?.risk_label,
-              likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
-              consequence_text: consequenceOptions?.find(c => c.id === h.consequence_id)?.name
-            }))
-          );
+          .insert(dataToSave);
         
         if (error) {
           console.error('Error saving hazards:', error);
@@ -184,6 +189,7 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
         const updatedHazard = { ...h, [field]: value };
         
         if (field === 'likelihood_id' || field === 'consequence_id') {
+          console.log('Triggering risk score update for:', updatedHazard);
           updateRiskScore(updatedHazard);
         }
         
@@ -195,7 +201,10 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
   };
 
   const updateRiskScore = async (hazard: any) => {
-    console.log('Updating risk score for hazard:', hazard);
+    console.log('Updating risk score for hazard:', {
+      likelihood_id: hazard.likelihood_id,
+      consequence_id: hazard.consequence_id
+    });
     
     if (hazard.likelihood_id && hazard.consequence_id) {
       const { data, error } = await supabase
@@ -212,7 +221,9 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
           if (h.id === hazard.id) {
             return {
               ...h,
-              risk_score: data
+              risk_score: data,
+              risk_score_id: data.id,
+              risk_level_text: data.risk_label
             };
           }
           return h;
