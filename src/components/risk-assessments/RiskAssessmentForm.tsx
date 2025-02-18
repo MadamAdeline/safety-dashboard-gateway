@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { SiteRegisterSearch } from "./SiteRegisterSearch";
+import { RiskHazardsAndControls } from "./RiskHazardsAndControls";
 
 interface RiskAssessmentFormProps {
   onClose: () => void;
@@ -336,6 +337,11 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
             />
           </div>
         </div>
+
+        <RiskHazardsAndControls 
+          riskAssessmentId={initialData?.id || null}
+          readOnly={false}
+        />
 
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Risk Assessment</h2>
