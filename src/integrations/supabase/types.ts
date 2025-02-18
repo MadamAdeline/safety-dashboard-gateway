@@ -169,6 +169,61 @@ export type Database = {
           },
         ]
       }
+      hazards_and_controls: {
+        Row: {
+          control: string
+          created_at: string | null
+          hazard: string
+          hazard_control_id: string
+          hazard_type: string
+          product_id: string
+          source: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          control: string
+          created_at?: string | null
+          hazard: string
+          hazard_control_id?: string
+          hazard_type: string
+          product_id: string
+          source?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          control?: string
+          created_at?: string | null
+          hazard?: string
+          hazard_control_id?: string
+          hazard_type?: string
+          product_id?: string
+          source?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hazards_and_controls_hazard_type_fkey"
+            columns: ["hazard_type"]
+            isOneToOne: false
+            referencedRelation: "master_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hazards_and_controls_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hazards_and_controls_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       locations: {
         Row: {
           coordinates: Json | null
