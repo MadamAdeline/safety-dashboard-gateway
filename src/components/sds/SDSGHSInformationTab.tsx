@@ -84,17 +84,20 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
       const { data, error } = await supabase
         .from('ghs_hazard_classifications')
         .select(`
-          *,
-          ghs_code:ghs_codes (
+          hazard_classification_id,
+          hazard_class,
+          hazard_category,
+          signal_word,
+          ghs_code:ghs_codes!ghs_code_id(
             ghs_code,
             pictogram_url
           ),
-          hazard_statement:hazard_statements (
+          hazard_statement:hazard_statements!hazard_statement_id(
             hazard_statement_code,
             hazard_statement_text
           )
         `)
-        .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%`)
+        .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%,ghs_codes.ghs_code.ilike.%${searchTerm}%,hazard_statements.hazard_statement_code.ilike.%${searchTerm}%`)
         .order('hazard_class');
 
       if (error) {
@@ -102,7 +105,6 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
         throw error;
       }
 
-      // Log the results for debugging
       console.log('Search results:', data);
       
       return data as GHSHazardClassification[];
