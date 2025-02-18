@@ -172,6 +172,47 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     enabled: !!riskAssessmentId
   });
 
+  const saveMutation = useMutation({
+    mutationFn: async (hazardsData: any[]) => {
+      if (!riskAssessmentId) return;
+
+      if (hazardsData.length > 0) {
+        const dataToSave = hazardsData.map(h => {
+          console.log('Saving hazard data:', h);
+          return {
+            id: h.id,
+            risk_assessment_id: riskAssessmentId,
+            hazard_type_id: h.hazard_type_id,
+            hazard: h.hazard,
+            control: h.control,
+            control_in_place: h.control_in_place,
+            likelihood_id: h.likelihood_id,
+            consequence_id: h.consequence_id,
+            risk_score_id: h.risk_score?.id,
+            risk_score_int: h.risk_score?.risk_score,
+            risk_level_text: h.risk_score?.risk_label,
+            likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
+            consequence_text: h.consequence_text,
+            hazard_control_id: h.hazard_control_id
+          };
+        });
+
+        console.log('Data being saved to database:', dataToSave);
+        const { error } = await supabase
+          .from('risk_hazards_and_controls')
+          .upsert(dataToSave, { 
+            onConflict: 'id',
+            ignoreDuplicates: false 
+          });
+        
+        if (error) {
+          console.error('Error saving hazards:', error);
+          throw error;
+        }
+      }
+    }
+  });
+
   const autoGenerateMutation = useMutation({
     mutationFn: async () => {
       if (!riskAssessmentId || !siteRegister?.product?.id) {
@@ -259,48 +300,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           description: "No new hazards to add",
         });
         return [];
-      }
-    }
-  });
-
-  const saveMutation = useMutation({
-    mutationFn: async (hazardsData: any[]) => {
-      if (!riskAssessmentId) return;
-
-      await supabase
-        .from('risk_hazards_and_controls')
-        .delete()
-        .eq('risk_assessment_id', riskAssessmentId);
-
-      if (hazardsData.length > 0) {
-        const dataToSave = hazardsData.map(h => {
-          console.log('Saving hazard data:', h);
-          return {
-            risk_assessment_id: riskAssessmentId,
-            hazard_type_id: h.hazard_type_id,
-            hazard: h.hazard,
-            control: h.control,
-            control_in_place: h.control_in_place,
-            likelihood_id: h.likelihood_id,
-            consequence_id: h.consequence_id,
-            risk_score_id: h.risk_score?.id,
-            risk_score_int: h.risk_score?.risk_score,
-            risk_level_text: h.risk_score?.risk_label,
-            likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
-            consequence_text: h.consequence_text,
-            hazard_control_id: h.hazard_control_id
-          };
-        });
-
-        console.log('Data being saved to database:', dataToSave);
-        const { error } = await supabase
-          .from('risk_hazards_and_controls')
-          .insert(dataToSave);
-        
-        if (error) {
-          console.error('Error saving hazards:', error);
-          throw error;
-        }
       }
     }
   });
