@@ -81,41 +81,46 @@ export function RiskAssessmentForm({
     overall_risk_score_id: initialData?.overall_risk_score_id || null
   });
 
-  const { data: defaultStatuses } = useQuery({
-    queryKey: ['defaultStatuses'],
+  const { data: evaluationStatus } = useQuery({
+    queryKey: ['evaluationStatus'],
     queryFn: async () => {
-      const [{ data: evaluationStatuses }, { data: approvalStatuses }] = await Promise.all([
-        supabase
-          .from('master_data')
-          .select('id')
-          .eq('category', 'RISK_OVERALL_STATUS')
-          .eq('code', 'IN_PROGRESS')
-          .single(),
-        supabase
-          .from('master_data')
-          .select('id')
-          .eq('category', 'RISK_APPROVAL_STATUS')
-          .eq('code', 'UNDER_REVIEW')
-          .single()
-      ]);
+      const { data, error } = await supabase
+        .from('master_data')
+        .select('id')
+        .eq('category', 'RISK_OVERALL_STATUS')
+        .eq('code', 'IN_PROGRESS')
+        .single();
       
-      return {
-        evaluationStatusId: evaluationStatuses?.id,
-        approvalStatusId: approvalStatuses?.id
-      };
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const { data: approvalStatus } = useQuery({
+    queryKey: ['approvalStatus'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('master_data')
+        .select('id')
+        .eq('category', 'RISK_APPROVAL_STATUS')
+        .eq('code', 'UNDER_REVIEW')
+        .single();
+      
+      if (error) throw error;
+      return data;
     }
   });
 
   useEffect(() => {
-    if (!initialData && defaultStatuses && currentUser) {
+    if (!initialData && evaluationStatus && approvalStatus && currentUser) {
       setFormData(prev => ({
         ...prev,
-        overall_evaluation_status_id: defaultStatuses.evaluationStatusId || prev.overall_evaluation_status_id,
-        approval_status_id: defaultStatuses.approvalStatusId || prev.approval_status_id,
+        overall_evaluation_status_id: evaluationStatus.id || prev.overall_evaluation_status_id,
+        approval_status_id: approvalStatus.id || prev.approval_status_id,
         conducted_by: currentUser.id || prev.conducted_by
       }));
     }
-  }, [defaultStatuses, currentUser, initialData]);
+  }, [evaluationStatus, approvalStatus, currentUser, initialData]);
 
   const {
     data: users
