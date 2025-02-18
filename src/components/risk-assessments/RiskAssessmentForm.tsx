@@ -287,9 +287,19 @@ export function RiskAssessmentForm({
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
-      const {
-        error
-      } = await supabase.from('risk_assessments').insert([data]);
+      const cleanedData = {
+        ...data,
+        site_register_record_id: data.site_register_record_id || null,
+        conducted_by: data.conducted_by || null,
+        approver: data.approver || null,
+        overall_evaluation_status_id: data.overall_evaluation_status_id || null,
+        approval_status_id: data.approval_status_id || null
+      };
+
+      const { error } = await supabase
+        .from('risk_assessments')
+        .insert([cleanedData]);
+      
       if (error) throw error;
     },
     onSuccess: () => {
@@ -314,9 +324,20 @@ export function RiskAssessmentForm({
 
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      const {
-        error
-      } = await supabase.from('risk_assessments').update(data).eq('id', initialData.id);
+      const cleanedData = {
+        ...data,
+        site_register_record_id: data.site_register_record_id || null,
+        conducted_by: data.conducted_by || null,
+        approver: data.approver || null,
+        overall_evaluation_status_id: data.overall_evaluation_status_id || null,
+        approval_status_id: data.approval_status_id || null
+      };
+
+      const { error } = await supabase
+        .from('risk_assessments')
+        .update(cleanedData)
+        .eq('id', initialData.id);
+      
       if (error) throw error;
     },
     onSuccess: () => {
