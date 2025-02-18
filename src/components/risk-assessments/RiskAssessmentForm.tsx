@@ -533,7 +533,8 @@ export function RiskAssessmentForm({
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  return <div className="space-y-8">
+  return (
+    <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">
           {initialData ? "Edit Risk Assessment" : "New Risk Assessment"}
@@ -562,7 +563,7 @@ export function RiskAssessmentForm({
           <TabsTrigger value="approval">Evaluation & Approval</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="details" className="space-y-6">
+        <TabsContent value="details">
           <div className="space-y-6">
             <div className="space-y-4">
               <div className="border-t pt-4">
@@ -633,23 +634,13 @@ export function RiskAssessmentForm({
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold">Hazards and Controls</h2>
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleAutoGenerate}
-                  className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-                  disabled={autoGenerateMutation.isPending}
-                >
-                  <Brain className="h-4 w-4 mr-2" />
-                  Auto Generate Hazards and Controls
-                </Button>
-                <Button
-                  onClick={() => hazardsControlsRef.current?.handleAdd()}
-                  className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Hazard & Control
-                </Button>
-              </div>
+              <Button
+                onClick={() => hazardsControlsRef.current?.handleAdd()}
+                className="bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Hazard & Control
+              </Button>
             </div>
 
             <RiskHazardsAndControls 
@@ -792,5 +783,6 @@ export function RiskAssessmentForm({
           </div>
         </TabsContent>
       </Tabs>
-    </div>;
+    </div>
+  );
 }
