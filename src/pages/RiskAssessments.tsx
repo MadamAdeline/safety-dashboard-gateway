@@ -37,18 +37,12 @@ export default function RiskAssessments() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-dgxprt-navy">Risk Assessments</h1>
-        </div>
-        
-        <RiskAssessmentList
-          onEdit={handleEdit}
-          onNew={handleNew}
-          searchTerm={searchTerm}
-          onSearch={setSearchTerm}
-        />
-      </div>
+      <RiskAssessmentList
+        onEdit={handleEdit}
+        onNew={handleNew}
+        searchTerm={searchTerm}
+        onSearch={setSearchTerm}
+      />
     </DashboardLayout>
   );
 }

@@ -82,7 +82,7 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow flex items-center gap-4">
-        <div className="relative flex-1">
+        <div className="relative w-1/2">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search Risk Assessments..."
@@ -91,22 +91,24 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
             className="pl-10"
           />
         </div>
-        <Button
-          variant="outline"
-          onClick={handleExport}
-          className="gap-2"
-        >
-          <Download className="h-4 w-4" />
-          Export
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => refetch()}
-          className="gap-2"
-        >
-          <RotateCw className="h-4 w-4" />
-          Refresh
-        </Button>
+        <div className="flex gap-2 ml-auto">
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            className="gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => refetch()}
+            className="gap-2"
+          >
+            <RotateCw className="h-4 w-4" />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow">
