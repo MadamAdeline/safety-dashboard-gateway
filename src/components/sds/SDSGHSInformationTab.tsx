@@ -92,16 +92,30 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
           hazard_statement_id,
           updated_at,
           updated_by,
-          ghs_code:ghs_codes!ghs_code_id (
+          ghs_codes!ghs_code_id (
             ghs_code,
             pictogram_url
           ),
-          hazard_statement:hazard_statements!hazard_statement_id (
+          hazard_statements!hazard_statement_id (
             hazard_statement_code,
             hazard_statement_text
           )
         `)
-        .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%,ghs_codes.ghs_code.ilike.%${searchTerm}%,hazard_statements.hazard_statement_code.ilike.%${searchTerm}%`)
+        .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%`)
+        .or(`ghs_code_id.in.(${
+          supabase
+            .from('ghs_codes')
+            .select('ghs_code_id')
+            .ilike('ghs_code', `%${searchTerm}%`)
+            .query()
+        })`)
+        .or(`hazard_statement_id.in.(${
+          supabase
+            .from('hazard_statements')
+            .select('hazard_statement_id')
+            .ilike('hazard_statement_code', `%${searchTerm}%`)
+            .query()
+        })`)
         .order('hazard_class');
 
       if (error) {
