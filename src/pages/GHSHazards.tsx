@@ -18,6 +18,7 @@ export default function GHSHazards() {
   const [selectedHazard, setSelectedHazard] = useState<GHSHazardClassification | null>(null);
   const [showHazardForm, setShowHazardForm] = useState(false);
   const [showCodeForm, setShowCodeForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
 
   const { data = [], isLoading, refetch } = useQuery({
@@ -137,6 +138,8 @@ export default function GHSHazards() {
             filters={{ search }}
             onEdit={handleEdit}
             onRefresh={() => refetch()}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
           />
         )}
       </div>
