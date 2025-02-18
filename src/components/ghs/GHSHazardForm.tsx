@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X } from "lucide-react";
+import { X, Plus, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -20,7 +21,7 @@ import {
 } from "@/services/ghs";
 import type { GHSHazardClassification } from "@/types/ghs";
 import { SIGNAL_WORDS } from "@/types/ghs";
-import { Plus, Edit } from "lucide-react";
+import { GHSCodeForm } from "./GHSCodeForm";
 
 interface GHSHazardFormProps {
   onClose: () => void;
