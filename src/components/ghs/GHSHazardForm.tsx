@@ -20,6 +20,7 @@ import {
 } from "@/services/ghs";
 import type { GHSHazardClassification } from "@/types/ghs";
 import { SIGNAL_WORDS } from "@/types/ghs";
+import { Plus, Edit } from "lucide-react";
 
 interface GHSHazardFormProps {
   onClose: () => void;
@@ -36,17 +37,17 @@ export function GHSHazardForm({ onClose, initialData }: GHSHazardFormProps) {
       signal_word: "",
     }
   );
+  const [showGHSCodeForm, setShowGHSCodeForm] = useState(false);
+  const [selectedGHSCodeForEdit, setSelectedGHSCodeForEdit] = useState<any>(null);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch GHS Codes
   const { data: ghsCodes = [] } = useQuery({
     queryKey: ['ghs-codes'],
     queryFn: getGHSCodes
   });
 
-  // Fetch Hazard Statements
   const { data: hazardStatements = [] } = useQuery({
     queryKey: ['hazard-statements'],
     queryFn: getHazardStatements
@@ -123,6 +124,18 @@ export function GHSHazardForm({ onClose, initialData }: GHSHazardFormProps) {
 
   const selectedGHSCode = ghsCodes.find(code => code.ghs_code_id === formData.ghs_code_id);
 
+  if (showGHSCodeForm) {
+    return (
+      <GHSCodeForm 
+        onClose={() => {
+          setShowGHSCodeForm(false);
+          setSelectedGHSCodeForEdit(null);
+        }}
+        initialData={selectedGHSCodeForEdit}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -173,21 +186,48 @@ export function GHSHazardForm({ onClose, initialData }: GHSHazardFormProps) {
           <Label htmlFor="ghs_code" className="after:content-['*'] after:ml-0.5 after:text-red-500">
             GHS Code
           </Label>
-          <Select
-            value={formData.ghs_code_id || ""}
-            onValueChange={(value) => setFormData({ ...formData, ghs_code_id: value })}
-          >
-            <SelectTrigger id="ghs_code">
-              <SelectValue placeholder="Select GHS code" />
-            </SelectTrigger>
-            <SelectContent>
-              {ghsCodes.map((code) => (
-                <SelectItem key={code.ghs_code_id} value={code.ghs_code_id}>
-                  {code.ghs_code}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <Select
+                value={formData.ghs_code_id || ""}
+                onValueChange={(value) => setFormData({ ...formData, ghs_code_id: value })}
+              >
+                <SelectTrigger id="ghs_code">
+                  <SelectValue placeholder="Select GHS code" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ghsCodes.map((code) => (
+                    <SelectItem key={code.ghs_code_id} value={code.ghs_code_id}>
+                      {code.ghs_code}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                setSelectedGHSCodeForEdit(null);
+                setShowGHSCodeForm(true);
+              }}
+              title="Add new GHS Code"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                setSelectedGHSCodeForEdit(selectedGHSCode);
+                setShowGHSCodeForm(true);
+              }}
+              disabled={!selectedGHSCode}
+              title="Edit selected GHS Code"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+          </div>
           {selectedGHSCode?.pictogram_url && (
             <div className="mt-2">
               <img 

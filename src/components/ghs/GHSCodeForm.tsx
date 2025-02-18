@@ -10,15 +10,20 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface GHSCodeFormProps {
   onClose: () => void;
+  initialData?: {
+    ghs_code_id: string;
+    ghs_code: string;
+    pictogram_url: string | null;
+  } | null;
 }
 
-export function GHSCodeForm({ onClose }: GHSCodeFormProps) {
+export function GHSCodeForm({ onClose, initialData }: GHSCodeFormProps) {
   const [formData, setFormData] = useState({
-    ghs_code: "",
+    ghs_code: initialData?.ghs_code || "",
     pictogram_image: null as File | null,
-    pictogram_url: "",
+    pictogram_url: initialData?.pictogram_url || "",
   });
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(initialData?.pictogram_url || null);
   const [isUploading, setIsUploading] = useState(false);
   
   const { toast } = useToast();
@@ -26,7 +31,7 @@ export function GHSCodeForm({ onClose }: GHSCodeFormProps) {
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      let pictogram_url = "";
+      let pictogram_url = data.pictogram_url;
       
       if (data.pictogram_image) {
         const fileExt = data.pictogram_image.name.split('.').pop();
@@ -45,31 +50,46 @@ export function GHSCodeForm({ onClose }: GHSCodeFormProps) {
         pictogram_url = urlData.publicUrl;
       }
 
-      const { data: created, error } = await supabase
-        .from('ghs_codes')
-        .insert([{
-          ghs_code: data.ghs_code,
-          pictogram_url
-        }])
-        .select()
-        .single();
+      if (initialData?.ghs_code_id) {
+        const { data: updated, error } = await supabase
+          .from('ghs_codes')
+          .update({
+            ghs_code: data.ghs_code,
+            pictogram_url
+          })
+          .eq('ghs_code_id', initialData.ghs_code_id)
+          .select()
+          .single();
 
-      if (error) throw error;
-      return created;
+        if (error) throw error;
+        return updated;
+      } else {
+        const { data: created, error } = await supabase
+          .from('ghs_codes')
+          .insert([{
+            ghs_code: data.ghs_code,
+            pictogram_url
+          }])
+          .select()
+          .single();
+
+        if (error) throw error;
+        return created;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ghs-codes'] });
       toast({
         title: "Success",
-        description: "GHS Code created successfully"
+        description: `GHS Code ${initialData ? 'updated' : 'created'} successfully`
       });
       onClose();
     },
     onError: (error) => {
-      console.error('Error creating GHS Code:', error);
+      console.error('Error saving GHS Code:', error);
       toast({
         title: "Error",
-        description: "Failed to create GHS Code",
+        description: `Failed to ${initialData ? 'update' : 'create'} GHS Code`,
         variant: "destructive"
       });
     }
@@ -83,11 +103,9 @@ export function GHSCodeForm({ onClose }: GHSCodeFormProps) {
         pictogram_image: file
       }));
       
-      // Create preview URL
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
       
-      // Clean up preview URL when component unmounts
       return () => URL.revokeObjectURL(objectUrl);
     }
   };
@@ -113,7 +131,7 @@ export function GHSCodeForm({ onClose }: GHSCodeFormProps) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">New GHS Code</h2>
+        <h2 className="text-2xl font-bold">{initialData ? 'Edit' : 'New'} GHS Code</h2>
         <div className="flex gap-2">
           <Button variant="outline" onClick={onClose}>
             Cancel
