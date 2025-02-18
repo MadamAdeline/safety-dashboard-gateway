@@ -194,7 +194,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       return hazardsWithRiskScores;
     },
     staleTime: 0,
-    cacheTime: 0,
+    gcTime: 0,
     enabled: !!riskAssessmentId
   });
 
@@ -429,8 +429,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         // Step 6: Refetch data and update UI
         await queryClient.invalidateQueries({
           queryKey: ['risk-hazards', riskAssessmentId],
-          refetchActive: true,
-          refetchInactive: true
+          type: 'all'
         });
         
         toast({
