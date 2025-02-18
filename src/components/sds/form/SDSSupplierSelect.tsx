@@ -76,7 +76,11 @@ export function SDSSupplierSelect() {
   };
 
   if (showSupplierForm) {
-    return <SupplierForm onClose={handleSupplierFormClose} />;
+    return (
+      <div className="max-w-full">
+        <SupplierForm onClose={handleSupplierFormClose} />
+      </div>
+    );
   }
 
   return (
