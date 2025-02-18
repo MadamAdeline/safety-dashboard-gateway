@@ -173,7 +173,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       console.log('Found hazards:', hazardsData?.length);
 
       const hazardsWithRiskScores = await Promise.all(
-        hazardsData.map(async (hazard) => {
+        (hazardsData || []).map(async (hazard) => {
           if (hazard.likelihood_id && hazard.consequence_id) {
             const { data: riskScore } = await supabase
               .from('risk_matrix')
@@ -191,20 +191,29 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         })
       );
 
-      // Merge with existing hazards to ensure we don't lose any data
-      setHazards(prevHazards => {
-        const entries: [string, any][] = [
-          ...prevHazards.map(h => [h.id, h] as [string, any]),
-          ...hazardsWithRiskScores.map(h => [h.id, h] as [string, any])
-        ];
-        const hazardMap = new Map(entries);
-        return Array.from(hazardMap.values());
-      });
-
       return hazardsWithRiskScores;
     },
     enabled: !!riskAssessmentId
   });
+
+  useEffect(() => {
+    if (hazardsData) {
+      setHazards(prevHazards => {
+        const existingHazardsMap = new Map(
+          prevHazards.map(h => [h.id, h] as [string, any])
+        );
+
+        hazardsData.forEach(newHazard => {
+          existingHazardsMap.set(newHazard.id, {
+            ...existingHazardsMap.get(newHazard.id),
+            ...newHazard
+          });
+        });
+
+        return Array.from(existingHazardsMap.values());
+      });
+    }
+  }, [hazardsData]);
 
   const saveMutation = useMutation({
     mutationFn: async (hazardsData: any[]) => {
@@ -366,7 +375,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         }
 
         const existingHazardIds = new Set(
-          existingHazards.map(h => h.hazard_control_id)
+          existingHazards?.map(h => h.hazard_control_id) || []
         );
 
         console.log('Existing hazard control IDs:', Array.from(existingHazardIds));
@@ -383,7 +392,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         }
 
         // Step 3: Filter out existing hazards
-        const newHazards = productHazards.filter(
+        const newHazards = (productHazards || []).filter(
           ph => ph.hazard_control_id && !existingHazardIds.has(ph.hazard_control_id)
         );
 
@@ -426,20 +435,12 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         }
 
         // Step 6: Refetch data and update UI
-        try {
-          await refetchHazards();
-          toast({
-            title: "Success",
-            description: `Added ${hazardsToInsert.length} new hazards and controls`,
-          });
-        } catch (refetchError) {
-          console.error('Error refetching hazards:', refetchError);
-          toast({
-            title: "Warning",
-            description: "Hazards were added but the display may need to be refreshed",
-            variant: "destructive",
-          });
-        }
+        await queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
+        
+        toast({
+          title: "Success",
+          description: `Added ${hazardsToInsert.length} new hazards and controls`,
+        });
 
         return hazardsToInsert;
       } catch (error) {
