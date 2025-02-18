@@ -71,44 +71,42 @@ export function RiskAssessmentList({ searchTerm, onEdit, onNew, onSearch }: Risk
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-dgxprt-navy">Risk Assessments</h1>
+        <h1 className="text-2xl font-bold">Risk Assessments</h1>
         <Button
           onClick={onNew}
-          className="bg-dgxprt-purple hover:bg-dgxprt-purple/90 gap-2"
+          className="bg-purple-600 hover:bg-purple-500 text-white"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-4 w-4 mr-2" />
           New Risk Assessment
         </Button>
       </div>
 
-      <div className="flex justify-between items-center gap-4">
+      <div className="bg-white p-4 rounded-lg shadow flex items-center gap-4">
         <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search Risk Assessments..."
             value={searchTerm}
             onChange={(e) => onSearch(e.target.value)}
             className="pl-10"
           />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleExport}
-            className="hover:bg-dgxprt-hover text-dgxprt-navy"
-          >
-            <Download className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => refetch()}
-            className="hover:bg-dgxprt-hover text-dgxprt-navy"
-          >
-            <RotateCw className="h-4 w-4" />
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          onClick={handleExport}
+          className="gap-2"
+        >
+          <Download className="h-4 w-4" />
+          Export
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => refetch()}
+          className="gap-2"
+        >
+          <RotateCw className="h-4 w-4" />
+          Refresh
+        </Button>
       </div>
 
       <div className="bg-white rounded-lg shadow">
