@@ -118,7 +118,11 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
               control_in_place: h.control_in_place,
               likelihood_id: h.likelihood_id,
               consequence_id: h.consequence_id,
-              risk_score_id: h.risk_score_id
+              risk_score_id: h.risk_score?.id, // Fix: Use the risk_score.id
+              risk_score_int: h.risk_score?.risk_score, // Add risk score value
+              risk_level_text: h.risk_score?.risk_label, // Add risk level text
+              likelihood_text: likelihoodOptions?.find(l => l.id === h.likelihood_id)?.name,
+              consequence_text: consequenceOptions?.find(c => c.id === h.consequence_id)?.name
             }))
           );
         
@@ -230,7 +234,7 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
               className="flex items-start justify-between p-4 cursor-pointer hover:bg-gray-50"
               onClick={() => toggleItem(hazard.id)}
             >
-              <div className="flex-1 grid grid-cols-[auto,1fr,1fr] gap-4 items-start">
+              <div className="flex-1 grid grid-cols-[auto,1fr,1fr,1fr,auto] gap-4 items-start">
                 <CollapsibleTrigger className="flex items-center pt-1">
                   {openItems.includes(hazard.id) ? (
                     <ChevronDown className="h-4 w-4" />
@@ -242,6 +246,16 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
                 <div>
                   <div className="font-medium text-sm text-gray-500">Type</div>
                   <div className="font-medium">{hazard.hazard_type?.label}</div>
+                </div>
+
+                <div className="truncate">
+                  <div className="font-medium text-sm text-gray-500">Hazard</div>
+                  <div className="font-medium truncate">{hazard.hazard || '-'}</div>
+                </div>
+
+                <div className="truncate">
+                  <div className="font-medium text-sm text-gray-500">Control</div>
+                  <div className="font-medium truncate">{hazard.control || '-'}</div>
                 </div>
 
                 {hazard.risk_score && (
