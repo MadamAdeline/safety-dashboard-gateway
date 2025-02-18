@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,6 +44,7 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
   const queryClient = useQueryClient();
   const [selectedSiteRegister, setSelectedSiteRegister] = useState<any>(null);
   const [riskScore, setRiskScore] = useState<any>(null);
+  const hazardsControlsRef = useRef<{ saveHazards: () => Promise<void> }>(null);
 
   const [formData, setFormData] = useState<FormData>({
     site_register_record_id: initialData?.site_register_record_id || "",
@@ -229,11 +230,41 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     }
   });
 
-  const handleSave = () => {
-    if (initialData?.id) {
-      updateMutation.mutate(formData);
-    } else {
-      createMutation.mutate(formData);
+  const handleSave = async () => {
+    try {
+      let riskAssessmentId = initialData?.id;
+      
+      if (initialData?.id) {
+        await updateMutation.mutateAsync(formData);
+      } else {
+        const { data, error } = await supabase
+          .from('risk_assessments')
+          .insert([formData])
+          .select()
+          .single();
+          
+        if (error) throw error;
+        riskAssessmentId = data.id;
+      }
+
+      // Save hazards and controls
+      if (hazardsControlsRef.current) {
+        await hazardsControlsRef.current.saveHazards();
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['risk-assessments'] });
+      toast({
+        title: "Success",
+        description: initialData ? "Risk assessment updated" : "Risk assessment created"
+      });
+      onClose();
+    } catch (error) {
+      console.error('Error saving risk assessment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save risk assessment",
+        variant: "destructive"
+      });
     }
   };
 

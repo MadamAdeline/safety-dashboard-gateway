@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -20,13 +19,15 @@ import {
 } from "@/components/ui/collapsible";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { forwardRef, useImperativeHandle } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 interface RiskHazardsAndControlsProps {
   riskAssessmentId: string | null;
   readOnly?: boolean;
 }
 
-export function RiskHazardsAndControls({ riskAssessmentId, readOnly }: RiskHazardsAndControlsProps) {
+export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }: RiskHazardsAndControlsProps, ref) => {
   const [hazards, setHazards] = useState<any[]>([]);
   const [openItems, setOpenItems] = useState<string[]>([]);
 
@@ -92,6 +93,46 @@ export function RiskHazardsAndControls({ riskAssessmentId, readOnly }: RiskHazar
     },
     enabled: !!riskAssessmentId
   });
+
+  const saveMutation = useMutation({
+    mutationFn: async (hazardsData: any[]) => {
+      if (!riskAssessmentId) return;
+
+      // First delete existing records
+      await supabase
+        .from('risk_hazards_and_controls')
+        .delete()
+        .eq('risk_assessment_id', riskAssessmentId);
+
+      // Then insert new records
+      if (hazardsData.length > 0) {
+        const { error } = await supabase
+          .from('risk_hazards_and_controls')
+          .insert(
+            hazardsData.map(h => ({
+              risk_assessment_id: riskAssessmentId,
+              hazard_type_id: h.hazard_type_id,
+              hazard: h.hazard,
+              control: h.control,
+              control_in_place: h.control_in_place,
+              likelihood_id: h.likelihood_id,
+              consequence_id: h.consequence_id,
+              risk_score_id: h.risk_score_id
+            }))
+          );
+        
+        if (error) throw error;
+      }
+    }
+  });
+
+  useImperativeHandle(ref, () => ({
+    saveHazards: async () => {
+      if (hazards.length > 0) {
+        await saveMutation.mutateAsync(hazards);
+      }
+    }
+  }));
 
   const handleAdd = async () => {
     if (!hazardTypes?.length) return;
@@ -373,4 +414,4 @@ export function RiskHazardsAndControls({ riskAssessmentId, readOnly }: RiskHazar
       </div>
     </div>
   );
-}
+});
