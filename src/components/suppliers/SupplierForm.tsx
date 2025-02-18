@@ -1,5 +1,4 @@
 
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -104,8 +103,8 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
   };
 
   return (
-    <DashboardLayout>
-      <div className="max-w-full">
+    <div className="w-full h-full p-6">
+      <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">
             {initialData ? "Edit Supplier" : "New Supplier"}
@@ -199,6 +198,6 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }
