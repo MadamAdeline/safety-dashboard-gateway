@@ -385,14 +385,7 @@ export function RiskAssessmentForm({
 
         <TabsContent value="assessment" className="space-y-6">
           <div className="space-y-6">
-            <div className="space-y-4">
-              <div className="border-t pt-4">
-                <div className="bg-gray-50 py-2 rounded-md">
-                  <h2 className="text-lg font-semibold">Hazards and Controls</h2>
-                </div>
-              </div>
-              <RiskHazardsAndControls riskAssessmentId={initialData?.id || null} readOnly={false} ref={hazardsControlsRef} />
-            </div>
+            <RiskHazardsAndControls riskAssessmentId={initialData?.id || null} readOnly={false} ref={hazardsControlsRef} />
 
             <div className="space-y-4">
               <div className="border-t pt-4">
