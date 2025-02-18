@@ -407,14 +407,24 @@ export function RiskAssessmentForm({
         }
       }
 
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: ['risk-assessments']
       });
+      
+      if (initialData?.id) {
+        await queryClient.invalidateQueries({
+          queryKey: ['risk-assessment-hazards', initialData.id]
+        });
+      }
 
       toast({
         title: "Success",
         description: "Hazards and controls auto-generated successfully"
       });
+
+      if (hazardsControlsRef.current) {
+        await hazardsControlsRef.current.saveHazards(initialData?.id || createdData.id);
+      }
     },
     onError: (error) => {
       console.error('Error auto-generating hazards:', error);
