@@ -40,7 +40,7 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
   const queryClient = useQueryClient();
 
   // Fetch existing GHS classifications for this SDS
-  const { data: sdsGHSClassifications = [] } = useQuery<SDSGHSClassification[]>({
+  const { data: sdsGHSClassifications = [] } = useQuery({
     queryKey: ['sds-ghs-classifications', sds.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -54,6 +54,10 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
             hazard_class,
             hazard_category,
             signal_word,
+            ghs_code_id,
+            hazard_statement_id,
+            updated_at,
+            updated_by,
             ghs_code:ghs_codes (
               ghs_code,
               pictogram_url
@@ -67,17 +71,17 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
         .eq('sds_id', sds.id);
 
       if (error) throw error;
-      return data;
+      return data as SDSGHSClassification[];
     }
   });
 
   // Fetch available GHS classifications for search
-  const { data: searchResults = [] } = useQuery<GHSHazardClassification[]>({
+  const { data: searchResults = [] } = useQuery({
     queryKey: ['ghs-hazards-search', searchTerm],
     queryFn: async () => {
       if (!searchTerm) return [];
       
-      const { data, error } = await supabase
+      const query = supabase
         .from('ghs_hazard_classifications')
         .select(`
           *,
@@ -90,11 +94,18 @@ export function SDSGHSInformationTab({ sds, readOnly }: SDSGHSInformationTabProp
             hazard_statement_text
           )
         `)
-        .or(`hazard_class.ilike.%${searchTerm}%,hazard_category.ilike.%${searchTerm}%,ghs_code.ghs_code.ilike.%${searchTerm}%,hazard_statement.hazard_statement_code.ilike.%${searchTerm}%,signal_word.ilike.%${searchTerm}%`)
         .order('hazard_class');
 
+      // Add OR conditions one by one
+      query
+        .or(`hazard_class.ilike.%${searchTerm}%`)
+        .or(`hazard_category.ilike.%${searchTerm}%`)
+        .or(`signal_word.ilike.%${searchTerm}%`);
+
+      const { data, error } = await query;
+
       if (error) throw error;
-      return data;
+      return data as GHSHazardClassification[];
     },
     enabled: searchTerm.length > 0
   });
