@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,19 +22,33 @@ interface RiskAssessmentFormProps {
   initialData?: any | null;
 }
 
+interface FormData {
+  site_register_record_id: string;
+  risk_assessment_date: string;
+  conducted_by: string;
+  product_usage: string;
+  overall_likelihood_id: number | null;
+  overall_consequence_id: number | null;
+  overall_evaluation: string;
+  overall_evaluation_status_id: string;
+  approval_status_id: string;
+  approver: string;
+  date_of_next_review: string;
+}
+
 export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedSiteRegister, setSelectedSiteRegister] = useState<any>(null);
   const [riskScore, setRiskScore] = useState<any>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     site_register_record_id: initialData?.site_register_record_id || "",
     risk_assessment_date: initialData?.risk_assessment_date || format(new Date(), 'yyyy-MM-dd'),
     conducted_by: initialData?.conducted_by || "",
     product_usage: initialData?.product_usage || "",
-    overall_likelihood_id: initialData?.overall_likelihood_id || "",
-    overall_consequence_id: initialData?.overall_consequence_id || "",
+    overall_likelihood_id: initialData?.overall_likelihood_id || null,
+    overall_consequence_id: initialData?.overall_consequence_id || null,
     overall_evaluation: initialData?.overall_evaluation || "",
     overall_evaluation_status_id: initialData?.overall_evaluation_status_id || "",
     approval_status_id: initialData?.approval_status_id || "",
@@ -285,15 +298,15 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
             <div className="space-y-2">
               <Label>Overall Likelihood</Label>
               <Select
-                value={formData.overall_likelihood_id}
-                onValueChange={(value) => setFormData({ ...formData, overall_likelihood_id: value })}
+                value={formData.overall_likelihood_id?.toString() || ""}
+                onValueChange={(value) => setFormData({ ...formData, overall_likelihood_id: parseInt(value) })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select likelihood" />
                 </SelectTrigger>
                 <SelectContent>
                   {likelihoodOptions?.map((option) => (
-                    <SelectItem key={option.id} value={option.id}>
+                    <SelectItem key={option.id} value={option.id.toString()}>
                       {option.name}
                     </SelectItem>
                   ))}
@@ -304,15 +317,15 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
             <div className="space-y-2">
               <Label>Overall Consequence</Label>
               <Select
-                value={formData.overall_consequence_id}
-                onValueChange={(value) => setFormData({ ...formData, overall_consequence_id: value })}
+                value={formData.overall_consequence_id?.toString() || ""}
+                onValueChange={(value) => setFormData({ ...formData, overall_consequence_id: parseInt(value) })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select consequence" />
                 </SelectTrigger>
                 <SelectContent>
                   {consequenceOptions?.map((option) => (
-                    <SelectItem key={option.id} value={option.id}>
+                    <SelectItem key={option.id} value={option.id.toString()}>
                       {option.name}
                     </SelectItem>
                   ))}
