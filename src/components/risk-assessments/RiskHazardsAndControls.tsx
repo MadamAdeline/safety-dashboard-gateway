@@ -317,7 +317,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     };
 
     setHazards([...hazards, newHazard]);
-    setOpenItems([...openItems, newHazard.id]);
+    setOpenItems([newHazard.id]);
   };
 
   const handleUpdate = async (id: string, field: string, value: any) => {
