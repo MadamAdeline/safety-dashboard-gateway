@@ -1,4 +1,3 @@
-
 export interface Product {
   id: string;
   name: string;
@@ -61,4 +60,19 @@ export interface ProductFilters {
   status: string[];
   dgClass: string[];
   isDG: boolean | null;
+}
+
+export interface HazardAndControl {
+  hazard_control_id: string;
+  product_id: string;
+  hazard_type: string;
+  hazard: string;
+  control: string;
+  source?: string;
+  created_at?: string;
+  updated_by?: string;
+  hazardType?: {
+    id: string;
+    label: string;
+  };
 }

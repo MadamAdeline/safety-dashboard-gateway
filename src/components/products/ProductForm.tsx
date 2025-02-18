@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
@@ -8,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductFormHeader } from "./ProductFormHeader";
 import { ProductDetailsTab } from "./ProductDetailsTab";
 import { ProductSDSTab } from "./ProductSDSTab";
+import { ProductHazardsTab } from "./ProductHazardsTab";
 
 interface ProductFormProps {
   onClose: () => void;
@@ -151,7 +151,6 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         throw error;
       }
 
-      // If we found a product and it's not the one we're editing
       if (data && (!initialData?.id || data.id !== initialData.id)) {
         toast({
           title: "Duplicate Product",
@@ -170,7 +169,6 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
   const handleSave = async () => {
     try {
-      // Validate required fields
       const missingFields = validateForm();
       if (missingFields.length > 0) {
         toast({
@@ -181,7 +179,6 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         return;
       }
 
-      // Check for duplicates before saving
       const isDuplicate = await checkForDuplicate();
       if (isDuplicate) return;
 
@@ -226,7 +223,6 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
     } catch (error: any) {
       console.error('Error saving product:', error);
       
-      // Handle duplicate key error specifically
       if (error?.code === '23505') {
         toast({
           title: "Duplicate Product",
@@ -236,7 +232,6 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
         return;
       }
 
-      // Handle other errors
       toast({
         title: "Error",
         description: "Failed to save product. Please try again.",
@@ -268,9 +263,10 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
 
       <div className="bg-white rounded-lg shadow p-6">
         <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="details">Product Details</TabsTrigger>
             <TabsTrigger value="sds">SDS Information</TabsTrigger>
+            <TabsTrigger value="hazards">Hazards & Controls</TabsTrigger>
           </TabsList>
 
           <TabsContent value="details">
@@ -286,6 +282,12 @@ export function ProductForm({ onClose, onSave, initialData }: ProductFormProps) 
             <ProductSDSTab
               sdsId={formData.sdsId}
               onSDSSelect={handleSDSSelect}
+            />
+          </TabsContent>
+
+          <TabsContent value="hazards">
+            <ProductHazardsTab
+              productId={initialData?.id || ""}
             />
           </TabsContent>
         </Tabs>

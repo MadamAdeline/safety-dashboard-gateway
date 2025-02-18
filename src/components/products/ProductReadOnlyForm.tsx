@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -7,6 +6,7 @@ import type { SDS } from "@/types/sds";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { SDSPreview } from "@/components/sds/SDSPreview";
+import { ProductHazardsTab } from "./ProductHazardsTab";
 
 interface ProductReadOnlyFormProps {
   onClose: () => void;
@@ -101,9 +101,10 @@ export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps)
 
       <div className="bg-white rounded-lg shadow p-6">
         <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="details">Product Details</TabsTrigger>
             <TabsTrigger value="sds">SDS Information</TabsTrigger>
+            <TabsTrigger value="hazards">Hazards & Controls</TabsTrigger>
           </TabsList>
 
           <TabsContent value="details">
@@ -267,6 +268,13 @@ export function ProductReadOnlyForm({ onClose, data }: ProductReadOnlyFormProps)
                 />
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="hazards">
+            <ProductHazardsTab
+              productId={data.id}
+              readOnly
+            />
           </TabsContent>
         </Tabs>
       </div>
