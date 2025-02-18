@@ -13,10 +13,12 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { SiteRegisterSearch } from "./SiteRegisterSearch";
 import { RiskHazardsAndControls } from "./RiskHazardsAndControls";
+
 interface RiskAssessmentFormProps {
   onClose: () => void;
   initialData?: any | null;
 }
+
 interface FormData {
   site_register_record_id: string;
   risk_assessment_date: string;
@@ -31,6 +33,7 @@ interface FormData {
   date_of_next_review: string;
   overall_risk_score_id: number | null;
 }
+
 export function RiskAssessmentForm({
   onClose,
   initialData
@@ -58,6 +61,7 @@ export function RiskAssessmentForm({
     date_of_next_review: initialData?.date_of_next_review || "",
     overall_risk_score_id: initialData?.overall_risk_score_id || null
   });
+
   const {
     data: users
   } = useQuery({
@@ -73,6 +77,7 @@ export function RiskAssessmentForm({
       return data;
     }
   });
+
   const {
     data: siteRegister
   } = useQuery({
@@ -92,6 +97,7 @@ export function RiskAssessmentForm({
     },
     enabled: !!formData.site_register_record_id
   });
+
   const {
     data: likelihoodOptions
   } = useQuery({
@@ -107,6 +113,7 @@ export function RiskAssessmentForm({
       return data;
     }
   });
+
   const {
     data: consequenceOptions
   } = useQuery({
@@ -122,6 +129,7 @@ export function RiskAssessmentForm({
       return data;
     }
   });
+
   const {
     data: evaluationStatuses
   } = useQuery({
@@ -137,6 +145,7 @@ export function RiskAssessmentForm({
       return data;
     }
   });
+
   const {
     data: approvalStatuses
   } = useQuery({
@@ -152,6 +161,7 @@ export function RiskAssessmentForm({
       return data;
     }
   });
+
   useEffect(() => {
     if (initialData?.site_register_record_id) {
       setSelectedSiteRegister({
@@ -159,6 +169,7 @@ export function RiskAssessmentForm({
       });
     }
   }, [initialData]);
+
   useEffect(() => {
     const updateRiskScore = async () => {
       if (formData.overall_likelihood_id && formData.overall_consequence_id) {
@@ -179,6 +190,7 @@ export function RiskAssessmentForm({
     };
     updateRiskScore();
   }, [formData.overall_likelihood_id, formData.overall_consequence_id]);
+
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       const {
@@ -205,6 +217,7 @@ export function RiskAssessmentForm({
       });
     }
   });
+
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
       const {
@@ -231,6 +244,7 @@ export function RiskAssessmentForm({
       });
     }
   });
+
   const handleSave = async () => {
     try {
       let riskAssessmentId = initialData?.id;
@@ -266,6 +280,7 @@ export function RiskAssessmentForm({
       });
     }
   };
+
   const handleSiteRegisterSelect = (siteRegister: any) => {
     setSelectedSiteRegister(siteRegister);
     setFormData(prev => ({
@@ -273,7 +288,9 @@ export function RiskAssessmentForm({
       site_register_record_id: siteRegister.id
     }));
   };
+
   const isPending = createMutation.isPending || updateMutation.isPending;
+
   return <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">
@@ -299,7 +316,6 @@ export function RiskAssessmentForm({
           <TabsTrigger value="approval">Evaluation & Approval</TabsTrigger>
         </TabsList>
 
-        {/* Tab 1: Risk Assessment Details */}
         <TabsContent value="details" className="space-y-6">
           <div className="space-y-6">
             <div className="space-y-4">
@@ -325,7 +341,7 @@ export function RiskAssessmentForm({
 
             <div className="space-y-4">
               <div className="border-t pt-4">
-                <div className="bg-gray-50 py-2 rounded-md px-0">
+                <div className="bg-gray-50 py-2 rounded-md">
                   <h2 className="text-lg font-semibold">Assessment Details</h2>
                 </div>
               </div>
@@ -367,7 +383,6 @@ export function RiskAssessmentForm({
           </div>
         </TabsContent>
 
-        {/* Tab 2: Risk Assessment */}
         <TabsContent value="assessment" className="space-y-6">
           <div className="space-y-6">
             <div className="space-y-4">
@@ -440,7 +455,6 @@ export function RiskAssessmentForm({
           </div>
         </TabsContent>
 
-        {/* Tab 3: Evaluation & Approval */}
         <TabsContent value="approval" className="space-y-6">
           <div className="space-y-4">
             <div className="border-t pt-4">
