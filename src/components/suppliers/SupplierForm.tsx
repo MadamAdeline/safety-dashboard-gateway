@@ -103,98 +103,96 @@ export function SupplierForm({ onClose, initialData }: SupplierFormProps) {
   };
 
   return (
-    <div className="absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg w-[900px] p-6">
-        <div className="flex justify-between items-center mb-6 border-b pb-4">
-          <h1 className="text-2xl font-bold">
-            {initialData ? "Edit Supplier" : "New Supplier"}
-          </h1>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button 
-              className="bg-dgxprt-purple hover:bg-dgxprt-purple/90" 
-              onClick={handleSave}
-              disabled={createMutation.isPending || updateMutation.isPending}
-            >
-              {createMutation.isPending || updateMutation.isPending ? "Saving..." : "Save"}
-            </Button>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+    <div className="bg-background">
+      <div className="flex justify-between items-center mb-6 px-6 pt-6">
+        <h1 className="text-2xl font-bold">
+          {initialData ? "Edit Supplier" : "New Supplier"}
+        </h1>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button 
+            className="bg-dgxprt-purple hover:bg-dgxprt-purple/90" 
+            onClick={handleSave}
+            disabled={createMutation.isPending || updateMutation.isPending}
+          >
+            {createMutation.isPending || updateMutation.isPending ? "Saving..." : "Save"}
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
         </div>
+      </div>
 
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="supplier_name" className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                Supplier Name
-              </Label>
-              <Input
-                id="supplier_name"
-                value={formData.supplier_name}
-                onChange={(e) => setFormData({ ...formData, supplier_name: e.target.value })}
-              />
-            </div>
+      <div className="px-6 pb-6 space-y-6">
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="supplier_name" className="after:content-['*'] after:ml-0.5 after:text-red-500">
+              Supplier Name
+            </Label>
+            <Input
+              id="supplier_name"
+              value={formData.supplier_name}
+              onChange={(e) => setFormData({ ...formData, supplier_name: e.target.value })}
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="contact_person" className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                Contact Person
-              </Label>
-              <Input
-                id="contact_person"
-                value={formData.contact_person}
-                onChange={(e) => setFormData({ ...formData, contact_person: e.target.value })}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="contact_person" className="after:content-['*'] after:ml-0.5 after:text-red-500">
+              Contact Person
+            </Label>
+            <Input
+              id="contact_person"
+              value={formData.contact_person}
+              onChange={(e) => setFormData({ ...formData, contact_person: e.target.value })}
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email" className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                Email Address
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="after:content-['*'] after:ml-0.5 after:text-red-500">
+              Email Address
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="phone_number">Phone Number</Label>
-              <Input
-                id="phone_number"
-                value={formData.phone_number}
-                onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone_number">Phone Number</Label>
+            <Input
+              id="phone_number"
+              value={formData.phone_number}
+              onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="address">Address</Label>
+            <Input
+              id="address"
+              value={formData.address}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => setFormData({ ...formData, status: value as "ACTIVE" | "INACTIVE" })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ACTIVE">Active</SelectItem>
-                  <SelectItem value="INACTIVE">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label>Status</Label>
+            <Select
+              value={formData.status}
+              onValueChange={(value) => setFormData({ ...formData, status: value as "ACTIVE" | "INACTIVE" })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ACTIVE">Active</SelectItem>
+                <SelectItem value="INACTIVE">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
