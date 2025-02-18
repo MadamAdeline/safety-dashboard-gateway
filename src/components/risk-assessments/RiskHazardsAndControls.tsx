@@ -127,8 +127,9 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
             hazard_type
           )
         `)
-        .eq('risk_assessment_id', riskAssessmentId);
-      
+        .eq('risk_assessment_id', riskAssessmentId)
+        .order('product_name', { ascending: true });
+
       if (error) throw error;
 
       const hazardsWithRiskScores = await Promise.all(
@@ -150,9 +151,15 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         })
       );
 
-      console.log('Loaded hazards with risk scores:', hazardsWithRiskScores);
-      setHazards(hazardsWithRiskScores);
-      return hazardsWithRiskScores;
+      const sortedHazards = hazardsWithRiskScores.sort((a, b) => {
+        const nameA = a.product_name || '';
+        const nameB = b.product_name || '';
+        return nameA.localeCompare(nameB);
+      });
+
+      console.log('Loaded hazards with risk scores:', sortedHazards);
+      setHazards(sortedHazards);
+      return sortedHazards;
     },
     enabled: !!riskAssessmentId
   });
