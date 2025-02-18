@@ -100,7 +100,7 @@ export function RiskAssessmentForm({
             description,
             uses,
             other_names,
-            status
+            product_status_id
           )
         `).eq('id', formData.site_register_record_id).single();
       if (error) throw error;
