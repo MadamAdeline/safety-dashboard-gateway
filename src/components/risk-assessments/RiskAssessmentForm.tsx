@@ -35,6 +35,7 @@ interface FormData {
   approval_status_id: string;
   approver: string;
   date_of_next_review: string;
+  overall_risk_score_id: number | null;
 }
 
 export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormProps) {
@@ -57,6 +58,7 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
     approval_status_id: initialData?.approval_status_id || "",
     approver: initialData?.approver || "",
     date_of_next_review: initialData?.date_of_next_review || "",
+    overall_risk_score_id: initialData?.overall_risk_score_id || null,
   });
 
   const { data: users } = useQuery({
@@ -165,6 +167,10 @@ export function RiskAssessmentForm({ onClose, initialData }: RiskAssessmentFormP
         }
         
         setRiskScore(data);
+        setFormData(prev => ({
+          ...prev,
+          overall_risk_score_id: data.id
+        }));
       }
     };
 
