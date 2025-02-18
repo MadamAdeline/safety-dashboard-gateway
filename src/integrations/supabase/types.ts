@@ -81,6 +81,7 @@ export type Database = {
           hazard_class: string
           hazard_classification_id: string
           hazard_statement_id: string | null
+          notes: string | null
           signal_word: string | null
           updated_at: string | null
           updated_by: string | null
@@ -92,6 +93,7 @@ export type Database = {
           hazard_class: string
           hazard_classification_id?: string
           hazard_statement_id?: string | null
+          notes?: string | null
           signal_word?: string | null
           updated_at?: string | null
           updated_by?: string | null
@@ -103,6 +105,7 @@ export type Database = {
           hazard_class?: string
           hazard_classification_id?: string
           hazard_statement_id?: string | null
+          notes?: string | null
           signal_word?: string | null
           updated_at?: string | null
           updated_by?: string | null

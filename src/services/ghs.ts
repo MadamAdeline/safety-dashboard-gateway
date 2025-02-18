@@ -77,6 +77,8 @@ export async function updateGHSHazardClassification(
   id: string,
   data: Partial<Omit<GHSHazardClassification, 'hazard_classification_id' | 'updated_at'>>
 ) {
+  console.log('Updating GHS classification:', id, data);
+  
   const { data: updated, error } = await supabase
     .from('ghs_hazard_classifications')
     .update(data)
@@ -101,7 +103,12 @@ export async function updateGHSHazardClassification(
     `)
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error updating GHS classification:', error);
+    throw error;
+  }
+  
+  console.log('Updated GHS classification:', updated);
   
   // Transform the response to match our type
   const transformedData = {
