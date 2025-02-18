@@ -425,13 +425,14 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
         <TableBody>
           {hazards.map((hazard) => (
-            <React.Fragment key={hazard.id}>
-              <TableRow 
-                className="cursor-pointer hover:bg-gray-50" 
-                onClick={() => toggleItem(hazard.id)}
-              >
+            <Collapsible
+              key={hazard.id}
+              open={openItems.includes(hazard.id)}
+              onOpenChange={() => toggleItem(hazard.id)}
+            >
+              <TableRow className="cursor-pointer hover:bg-gray-50">
                 <TableCell className="p-2 text-center">
-                  <CollapsibleTrigger>
+                  <CollapsibleTrigger className="flex items-center">
                     {openItems.includes(hazard.id) ? (
                       <ChevronDown className="h-4 w-4" />
                     ) : (
@@ -474,7 +475,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                 )}
               </TableRow>
 
-              {openItems.includes(hazard.id) && (
+              <CollapsibleContent>
                 <TableRow>
                   <TableCell colSpan={6} className="p-4 border-t bg-gray-50">
                     <div className="grid grid-cols-4 gap-4">
@@ -623,8 +624,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                     </div>
                   </TableCell>
                 </TableRow>
-              )}
-            </React.Fragment>
+              </CollapsibleContent>
+            </Collapsible>
           ))}
         </TableBody>
       </Table>
