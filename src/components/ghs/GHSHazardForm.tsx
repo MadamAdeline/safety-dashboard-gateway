@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -36,6 +37,8 @@ export function GHSHazardForm({ onClose, initialData }: GHSHazardFormProps) {
       ghs_code_id: null,
       hazard_statement_id: null,
       signal_word: "",
+      notes: "",
+      source: "",
     }
   );
   const [showGHSCodeForm, setShowGHSCodeForm] = useState(false);
@@ -280,6 +283,31 @@ export function GHSHazardForm({ onClose, initialData }: GHSHazardFormProps) {
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="source">
+            Source
+          </Label>
+          <Input
+            id="source"
+            value={formData.source || ""}
+            onChange={(e) => setFormData({ ...formData, source: e.target.value })}
+            placeholder="Enter source"
+          />
+        </div>
+
+        <div className="col-span-2 space-y-2">
+          <Label htmlFor="notes">
+            Notes
+          </Label>
+          <Textarea
+            id="notes"
+            value={formData.notes || ""}
+            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+            placeholder="Enter notes"
+            className="min-h-[100px]"
+          />
         </div>
       </div>
     </div>

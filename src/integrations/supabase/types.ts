@@ -83,6 +83,7 @@ export type Database = {
           hazard_statement_id: string | null
           notes: string | null
           signal_word: string | null
+          source: string | null
           updated_at: string | null
           updated_by: string | null
         }
@@ -95,6 +96,7 @@ export type Database = {
           hazard_statement_id?: string | null
           notes?: string | null
           signal_word?: string | null
+          source?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -107,6 +109,7 @@ export type Database = {
           hazard_statement_id?: string | null
           notes?: string | null
           signal_word?: string | null
+          source?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
