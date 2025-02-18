@@ -1,16 +1,22 @@
 
+import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useSDSForm } from "./SDSFormContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useUserRole } from "@/hooks/use-user-role";
+import { SupplierForm } from "@/components/suppliers/SupplierForm";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export function SDSSupplierSelect() {
   const { supplier, setSupplier, initialData, status, readOnly } = useSDSForm();
   const { toast } = useToast();
+  const { data: userRole } = useUserRole();
+  const [showSupplierForm, setShowSupplierForm] = useState(false);
   
   console.log("SDSSupplierSelect - Initial supplier:", supplier);
   console.log("SDSSupplierSelect - Initial data:", initialData);
@@ -18,8 +24,9 @@ export function SDSSupplierSelect() {
   const isGlobalLibrary = initialData?.sdsSource === "Global Library";
   const isRequested = status === "REQUESTED";
   const isReadOnly = isGlobalLibrary || isRequested || readOnly;
+  const isAdmin = userRole?.role?.toLowerCase() === 'administrator';
 
-  const { data: suppliers = [] } = useQuery({
+  const { data: suppliers = [], refetch: refetchSuppliers } = useQuery({
     queryKey: ['suppliers'],
     queryFn: async () => {
       console.log('Fetching suppliers from Supabase');
@@ -64,6 +71,11 @@ export function SDSSupplierSelect() {
     }
   };
 
+  const handleSupplierFormClose = () => {
+    setShowSupplierForm(false);
+    refetchSuppliers();
+  };
+
   return (
     <div className="space-y-2">
       <Label htmlFor="supplier" className="after:content-['*'] after:ml-0.5 after:text-red-500">
@@ -90,15 +102,24 @@ export function SDSSupplierSelect() {
             ))}
           </SelectContent>
         </Select>
-        <Button 
-          variant="outline" 
-          size="icon" 
-          disabled={isReadOnly}
-          className={isReadOnly ? "opacity-50 cursor-not-allowed" : ""}
-        >
-          <Search className="h-4 w-4" />
-        </Button>
+        
+        {isAdmin && !isReadOnly && (
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={() => setShowSupplierForm(true)}
+            title="Add New Supplier"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        )}
       </div>
+
+      <Dialog open={showSupplierForm} onOpenChange={setShowSupplierForm}>
+        <DialogContent className="max-w-4xl">
+          <SupplierForm onClose={handleSupplierFormClose} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
