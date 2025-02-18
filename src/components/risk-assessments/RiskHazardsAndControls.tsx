@@ -17,10 +17,10 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { forwardRef, useImperativeHandle } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
 
 interface RiskHazardsAndControlsProps {
   riskAssessmentId: string | null;
@@ -28,6 +28,8 @@ interface RiskHazardsAndControlsProps {
 }
 
 export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }: RiskHazardsAndControlsProps, ref) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [hazards, setHazards] = useState<any[]>([]);
   const [openItems, setOpenItems] = useState<string[]>([]);
 
@@ -184,6 +186,37 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     }
   }));
 
+  const deleteMutation = useMutation({
+    mutationFn: async (hazardId: string) => {
+      if (!riskAssessmentId) return;
+
+      const { error } = await supabase
+        .from('risk_hazards_and_controls')
+        .delete()
+        .eq('id', hazardId);
+
+      if (error) {
+        console.error('Error deleting hazard:', error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
+      toast({
+        title: "Success",
+        description: "Hazard and control deleted successfully",
+      });
+    },
+    onError: (error) => {
+      console.error('Delete mutation error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete hazard and control",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleAdd = async () => {
     if (!hazardTypes?.length) return;
 
@@ -265,9 +298,12 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
     }
   };
 
-  const handleDelete = (id: string) => {
-    setHazards(hazards.filter(h => h.id !== id));
-    setOpenItems(openItems.filter(item => item !== id));
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this hazard and control?')) {
+      await deleteMutation.mutate(id);
+      setHazards(hazards.filter(h => h.id !== id));
+      setOpenItems(openItems.filter(item => item !== id));
+    }
   };
 
   const toggleItem = (id: string) => {
@@ -342,6 +378,7 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
                     e.stopPropagation();
                     handleDelete(hazard.id);
                   }}
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -488,6 +525,15 @@ export const RiskHazardsAndControls = forwardRef(({ riskAssessmentId, readOnly }
           </div>
         )}
       </div>
+
+      {!readOnly && (
+        <Button
+          onClick={handleAdd}
+          className="w-full bg-dgxprt-purple hover:bg-dgxprt-purple/90"
+        >
+          <Plus className="h-4 w-4 mr-2" /> Add Hazard & Control
+        </Button>
+      )}
     </div>
   );
 });
