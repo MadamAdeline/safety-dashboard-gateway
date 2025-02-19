@@ -14,12 +14,6 @@ import { Badge } from "@/components/ui/badge";
 import { SiteRegisterSearch } from "./SiteRegisterSearch";
 import { RiskHazardsAndControls, RiskHazardsAndControlsRef } from "./RiskHazardsAndControls";
 
-interface RiskHazardsAndControlsRef {
-  handleAdd: () => void;
-  saveHazards: (riskAssessmentId: string) => Promise<void>;
-  populateHazards: (hazards: any[]) => void;
-}
-
 interface RiskAssessmentFormProps {
   onClose: () => void;
   initialData?: any | null;

@@ -425,7 +425,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       setHazards(newHazards);
       setOpenItems(newHazards.map(h => h.id));
     },
-    onSaveSuccess: undefined // Initialize as undefined
+    onSaveSuccess: undefined
   }));
 
   const deleteMutation = useMutation({
