@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, forwardRef, useImperativeHandle, useCallback } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Trash2, GripVertical } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Accordion,
   AccordionContent,
@@ -440,7 +442,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                         </SelectItem>
                       ))}
                     </SelectContent>
-                  </div>
+                  </Select>
                   {validationErrors[hazard.id]?.includes("Hazard type is required") && (
                     <p className="text-red-500 text-sm">Hazard type is required</p>
                   )}
@@ -483,7 +485,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                 <div className="space-y-2">
                   <Label>Likelihood</Label>
                   <Select 
-                    value={hazard.likelihood_id || ""} 
+                    value={hazard.likelihood_id?.toString() || ""} 
                     onValueChange={(value) => {
                       handleFieldChange(hazard.id, "likelihood_id", parseInt(value));
                       handleRiskScoreChange(hazard.id, parseInt(value), hazard.consequence_id);
@@ -495,7 +497,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                     </SelectTrigger>
                     <SelectContent>
                       {likelihoodOptions?.map(option => (
-                        <SelectItem key={option.id} value={option.id}>
+                        <SelectItem key={option.id} value={option.id.toString()}>
                           {option.name}
                         </SelectItem>
                       ))}
@@ -509,7 +511,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                 <div className="space-y-2">
                   <Label>Consequence</Label>
                   <Select 
-                    value={hazard.consequence_id || ""} 
+                    value={hazard.consequence_id?.toString() || ""} 
                     onValueChange={(value) => {
                       handleFieldChange(hazard.id, "consequence_id", parseInt(value));
                       handleRiskScoreChange(hazard.id, hazard.likelihood_id, parseInt(value));
@@ -521,7 +523,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                     </SelectTrigger>
                     <SelectContent>
                       {consequenceOptions?.map(option => (
-                        <SelectItem key={option.id} value={option.id}>
+                        <SelectItem key={option.id} value={option.id.toString()}>
                           {option.name}
                         </SelectItem>
                       ))}
