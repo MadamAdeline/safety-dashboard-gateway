@@ -285,6 +285,39 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     }
   });
 
+  useEffect(() => {
+    if (!riskAssessmentId) return;
+
+    console.log('Setting up realtime subscription for risk assessment:', riskAssessmentId);
+    
+    const channel = supabase
+      .channel('risk_hazards_channel')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'risk_hazards_and_controls',
+          filter: `risk_assessment_id=eq.${riskAssessmentId}`
+        },
+        async (payload) => {
+          console.log("New hazard added:", payload);
+          await refetchHazards();
+          
+          // Open the newly added hazard
+          if (payload.new && payload.new.id) {
+            setOpenItems(current => [...current, payload.new.id]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('Cleaning up realtime subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [riskAssessmentId, refetchHazards]);
+
   const autoGenerateMutation = useMutation({
     mutationFn: async () => {
       if (!riskAssessmentId || !siteRegister?.product?.id) {
@@ -303,14 +336,10 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           .eq('id', riskAssessmentId);
 
         if (error) throw error;
-
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        await refetchHazards();
         
         toast({
           title: "Success",
-          description: "Hazards auto-generated successfully",
+          description: "Hazards auto-generation started",
         });
 
       } catch (error) {
