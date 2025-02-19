@@ -13,9 +13,6 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { SiteRegisterSearch } from "./SiteRegisterSearch";
 import { RiskHazardsAndControls } from "./RiskHazardsAndControls";
-import { UserFormFields } from "./UserFormFields";
-import { UserFormActions } from "./UserFormActions";
-import { useUserMutations } from "@/hooks/use-user-mutations";
 
 interface RiskHazardsAndControlsRef {
   handleAdd: () => void;
