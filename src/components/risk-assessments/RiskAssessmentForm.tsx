@@ -12,13 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { SiteRegisterSearch } from "./SiteRegisterSearch";
-import { RiskHazardsAndControls } from "./RiskHazardsAndControls";
-
-interface RiskHazardsAndControlsRef {
-  handleAdd: () => void;
-  saveHazards: (riskAssessmentId: string) => Promise<void>;
-  populateHazards: (hazards: any[]) => void;
-}
+import { RiskHazardsAndControls, RiskHazardsAndControlsRef } from "./RiskHazardsAndControls";
 
 interface RiskAssessmentFormProps {
   onClose: () => void;
@@ -46,8 +40,6 @@ export function RiskAssessmentForm({
 }: RiskAssessmentFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedSiteRegister, setSelectedSiteRegister] = useState<any>(null);
-  const [riskScore, setRiskScore] = useState<any>(null);
   const hazardsControlsRef = useRef<RiskHazardsAndControlsRef>(null);
 
   const { data: currentUser } = useQuery({
@@ -482,6 +474,34 @@ export function RiskAssessmentForm({
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
+  const { data: riskAssessmentData, refetch: refetchRiskAssessment } = useQuery({
+    queryKey: ['risk-assessment', initialData?.id],
+    queryFn: async () => {
+      if (!initialData?.id) return null;
+      const { data } = await supabase.from("risk_assessments").select("*").eq("id", initialData.id).single();
+      return data;
+    },
+    enabled: !!initialData?.id
+  });
+
+  const handleRiskAssessmentRefresh = async () => {
+    console.log('Refreshing risk assessment...');
+    if (initialData?.id) {
+      // await refetchHazards();
+      await refetchRiskAssessment();
+      await queryClient.invalidateQueries({
+        queryKey: ['risk-assessment', initialData.id]
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (hazardsControlsRef.current) {
+      console.log('Setting up onSaveSuccess callback');
+      hazardsControlsRef.current.onSaveSuccess = handleRiskAssessmentRefresh;
+    }
+  }, []);
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
@@ -607,65 +627,6 @@ export function RiskAssessmentForm({
               readOnly={false} 
               ref={hazardsControlsRef} 
             />
-
-            <div className="space-y-4">
-              <div className="border-t pt-4">
-                <div className="bg-gray-50 py-2 rounded-md">
-                  <h2 className="text-lg font-semibold">Overall Risk Assessment</h2>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <Label>Overall Likelihood</Label>
-                  <Select value={formData.overall_likelihood_id?.toString() || ""} onValueChange={value => setFormData({
-                  ...formData,
-                  overall_likelihood_id: parseInt(value)
-                })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select likelihood" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {likelihoodOptions?.map(option => <SelectItem key={option.id} value={option.id.toString()}>
-                          {option.name}
-                        </SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Overall Consequence</Label>
-                  <Select value={formData.overall_consequence_id?.toString() || ""} onValueChange={value => setFormData({
-                  ...formData,
-                  overall_consequence_id: parseInt(value)
-                })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select consequence" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {consequenceOptions?.map(option => <SelectItem key={option.id} value={option.id.toString()}>
-                          {option.name}
-                        </SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {riskScore && <div className="space-y-2">
-                    <Label>Overall Risk Level</Label>
-                    <div className="h-10 flex items-center">
-                      <Badge style={{
-                    backgroundColor: riskScore.risk_color || '#gray-400',
-                    color: '#FFFFFF'
-                  }}>
-                        {riskScore.risk_label}
-                      </Badge>
-                    </div>
-                  </div>}
-              </div>
-
-              <div className="bg-white border rounded-lg p-4 mt-4">
-                <img src="/lovable-uploads/2cadd5b5-9f69-4e43-83af-bfc20517cde2.png" alt="Risk Assessment Matrix" className="w-full max-w-3xl mx-auto" />
-              </div>
-            </div>
           </div>
         </TabsContent>
 

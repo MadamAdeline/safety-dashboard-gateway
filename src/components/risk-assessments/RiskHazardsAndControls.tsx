@@ -61,9 +61,11 @@ export interface RiskHazardsAndControlsRef {
   handleAdd: () => void;
   saveHazards: (riskAssessmentId: string) => Promise<void>;
   populateHazards: (hazards: any[]) => void;
+  onSaveSuccess?: () => Promise<void>;
 }
 
-export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, RiskHazardsAndControlsProps>(({ riskAssessmentId, readOnly }, ref) => {
+export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, RiskHazardsAndControlsProps>(
+  ({ riskAssessmentId, readOnly }, ref) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [hazards, setHazards] = useState<any[]>([]);
@@ -326,61 +328,30 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
       await updateOverallRiskAssessment([...manualHazards, ...copiedHazards]);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      console.log('Save mutation successful, invalidating queries');
+      
+      await queryClient.invalidateQueries({
         queryKey: ['risk-hazards', riskAssessmentId]
       });
+      
+      console.log('Queries invalidated, calling onSaveSuccess');
+      if (ref && 'current' in ref && ref.current?.onSaveSuccess) {
+        await ref.current.onSaveSuccess();
+      }
+      
       toast({
         title: "Success",
         description: "Hazards and controls saved successfully"
       });
     },
     onError: (error: Error) => {
+      console.error('Save mutation error:', error);
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive"
       });
-    }
-  });
-
-  const autoGenerateMutation = useMutation({
-    mutationFn: async () => {
-      if (!riskAssessmentId || !siteRegister?.product?.id) {
-        toast({
-          title: "Error",
-          description: "Missing required information",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      try {
-        const { error } = await supabase
-          .from('risk_assessments')
-          .update({ auto_generate_hazards: true })
-          .eq('id', riskAssessmentId);
-
-        if (error) throw error;
-
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        await refetchHazards();
-        
-        toast({
-          title: "Success",
-          description: "Hazards auto-generated successfully",
-        });
-
-      } catch (error) {
-        console.error('Auto-generate failed:', error);
-        toast({
-          title: "Error",
-          description: "Failed to auto-generate hazards",
-          variant: "destructive",
-        });
-        throw error;
-      }
     }
   });
 
@@ -392,7 +363,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     populateHazards: (newHazards: any[]) => {
       setHazards(newHazards);
       setOpenItems(newHazards.map(h => h.id));
-    }
+    },
+    onSaveSuccess: undefined
   }));
 
   const deleteMutation = useMutation({
