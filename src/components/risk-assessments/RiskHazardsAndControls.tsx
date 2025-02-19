@@ -49,7 +49,7 @@ interface HazardData {
   risk_level_text: string | null;
   likelihood_text: string | null;
   consequence_text: string | null;
-  source: 'Manual' | 'Product';
+  source: 'Manual' | 'Product' | 'Custom';
 }
 
 interface RiskHazardsAndControlsProps {
@@ -70,6 +70,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
   const [openItems, setOpenItems] = useState<string[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [hazardToDelete, setHazardToDelete] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<{ [key: string]: string[] }>({});
 
   const { data: hazardTypes } = useQuery({
     queryKey: ['hazardTypes'],
@@ -191,18 +192,50 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     }
   }, [hazardsData]);
 
+  const validateHazard = (hazard: HazardData): string[] => {
+    const errors: string[] = [];
+    
+    if (!hazard.hazard_type_id) {
+      errors.push('Hazard Type is required');
+    }
+    if (!hazard.hazard || hazard.hazard.trim() === '') {
+      errors.push('Hazard Description is required');
+    }
+    if (!hazard.control || hazard.control.trim() === '') {
+      errors.push('Control Description is required');
+    }
+    if (!hazard.likelihood_id) {
+      errors.push('Likelihood is required');
+    }
+    if (!hazard.consequence_id) {
+      errors.push('Consequence is required');
+    }
+
+    return errors;
+  };
+
   const saveMutation = useMutation({
     mutationFn: async (hazardsData: any[]) => {
       if (!riskAssessmentId) return;
 
+      const allErrors: { [key: string]: string[] } = {};
+      let hasErrors = false;
+
+      hazardsData.forEach(hazard => {
+        const hazardErrors = validateHazard(hazard);
+        if (hazardErrors.length > 0) {
+          allErrors[hazard.id] = hazardErrors;
+          hasErrors = true;
+        }
+      });
+
+      if (hasErrors) {
+        setValidationErrors(allErrors);
+        throw new Error('Please fill in all required fields for each hazard');
+      }
+
       const copiedHazards = hazardsData.filter(h => h.hazard_control_id);
       const manualHazards = hazardsData.filter(h => !h.hazard_control_id);
-
-      console.log('Starting save operation with:', {
-        totalHazards: hazardsData.length,
-        copiedHazards: copiedHazards.length,
-        manualHazards: manualHazards.length
-      });
 
       if (copiedHazards.length > 0) {
         const { data: existingHazards, error: fetchError } = await supabase
@@ -282,6 +315,13 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       }
 
       await queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Validation Error",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   });
 
@@ -381,7 +421,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       consequence_id: null,
       risk_score_id: null,
       risk_assessment_id: riskAssessmentId,
-      source: "Product"
+      source: "Custom" as const
     };
 
     setHazards([...hazards, newHazard]);
@@ -389,8 +429,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
   };
 
   const handleUpdate = async (id: string, field: string, value: any) => {
-    console.log('Updating field:', field, 'with value:', value);
-    
     const updatedHazards = hazards.map(h => {
       if (h.id === id) {
         const updatedHazard = { 
@@ -404,8 +442,16 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           } : {})
         };
         
+        if (validationErrors[id]) {
+          const newErrors = { ...validationErrors };
+          newErrors[id] = newErrors[id].filter(error => !error.toLowerCase().includes(field.toLowerCase()));
+          if (newErrors[id].length === 0) {
+            delete newErrors[id];
+          }
+          setValidationErrors(newErrors);
+        }
+        
         if (field === 'likelihood_id' || field === 'consequence_id') {
-          console.log('Triggering risk score update for:', updatedHazard);
           updateRiskScore(updatedHazard);
         }
         
@@ -417,11 +463,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
   };
 
   const updateRiskScore = async (hazard: any) => {
-    console.log('Updating risk score for hazard:', {
-      likelihood_id: hazard.likelihood_id,
-      consequence_id: hazard.consequence_id
-    });
-    
     if (hazard.likelihood_id && hazard.consequence_id) {
       const { data, error } = await supabase
         .from('risk_matrix')
@@ -431,8 +472,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         .single();
       
       if (!error && data) {
-        console.log('Retrieved risk score:', data);
-        
         const updatedHazards = hazards.map(h => {
           if (h.id === hazard.id) {
             return {
@@ -573,6 +612,16 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
                 <TableRow className="bg-gray-50 border-t">
                   <TableCell colSpan={readOnly ? 5 : 6} className="p-4">
                     <div className="grid grid-cols-12 gap-6">
+                      {validationErrors[hazard.id] && validationErrors[hazard.id].length > 0 && (
+                        <div className="col-span-12 bg-red-50 border border-red-200 rounded p-2">
+                          <ul className="text-red-600 text-sm list-disc pl-4">
+                            {validationErrors[hazard.id].map((error, index) => (
+                              <li key={index}>{error}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
                       <div className="col-span-2 space-y-2">
                         <Label>Hazard Type</Label>
                         {readOnly ? (
