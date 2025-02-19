@@ -209,39 +209,45 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
     console.log('Setting up realtime subscription for risk assessment:', riskAssessmentId);
     
-    const channel = supabase
-      .channel('risk_hazards_channel')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'risk_hazards_and_controls',
-          filter: `risk_assessment_id=eq.${riskAssessmentId}`
-        },
-        async (payload) => {
-          console.log("New hazard added:", payload);
-          await refetchHazards();
-          setHasNewHazards(true);
-          setIsGenerationComplete(true);
-          setProcessingDialogOpen(true);
-        }
-      )
-      .subscribe((status) => {
-        console.log('Subscription status:', status);
-        
-        if (status === 'SUBSCRIBED') {
-          console.log('Successfully subscribed to changes');
-        } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-          console.error('Subscription error or closed:', status);
+    const setupChannel = () => {
+      console.log('Creating new channel instance');
+      return supabase
+        .channel('risk_hazards_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'risk_hazards_and_controls',
+            filter: `risk_assessment_id=eq.${riskAssessmentId}`
+          },
+          async (payload) => {
+            console.log("New hazard added:", payload);
+            await refetchHazards();
+            setHasNewHazards(true);
+            setIsGenerationComplete(true);
+            setProcessingDialogOpen(true);
+          }
+        )
+        .subscribe((status) => {
+          console.log('Subscription status:', status);
           
-          // Attempt to resubscribe after a short delay
-          setTimeout(() => {
-            console.log('Attempting to resubscribe...');
-            channel.subscribe();
-          }, 2000);
-        }
-      });
+          if (status === 'SUBSCRIBED') {
+            console.log('Successfully subscribed to changes');
+          } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+            console.error('Subscription error or closed:', status);
+            
+            supabase.removeChannel(channel);
+            
+            setTimeout(() => {
+              console.log('Creating new subscription...');
+              channel = setupChannel();
+            }, 2000);
+          }
+        });
+    };
+
+    let channel = setupChannel();
 
     return () => {
       console.log('Cleaning up realtime subscription');
