@@ -1,21 +1,10 @@
-
-import React, { useState, useEffect, forwardRef, useImperativeHandle, useCallback } from "react";
-import { v4 as uuidv4 } from 'uuid';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, GripVertical } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
+import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,13 +14,47 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface HazardData {
+  id: string;
+  risk_assessment_id: string;
+  hazard_control_id?: string;
+  hazard_type_id: string;
+  hazard: string;
+  control: string;
+  control_in_place: boolean;
+  likelihood_id: number | null;
+  consequence_id: number | null;
+  risk_score_id: number | null;
+  risk_score_int: number | null;
+  risk_level_text: string | null;
+  likelihood_text: string | null;
+  consequence_text: string | null;
+  source: 'Manual' | 'Product' | 'Custom';
+}
 
 interface RiskHazardsAndControlsProps {
   riskAssessmentId: string | null;
   readOnly?: boolean;
-  onSaveSuccess?: () => Promise<void>;
 }
 
 export interface RiskHazardsAndControlsRef {
@@ -40,8 +63,7 @@ export interface RiskHazardsAndControlsRef {
   populateHazards: (hazards: any[]) => void;
 }
 
-export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, RiskHazardsAndControlsProps>(
-  ({ riskAssessmentId, readOnly, onSaveSuccess }, ref) => {
+export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, RiskHazardsAndControlsProps>(({ riskAssessmentId, readOnly }, ref) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [hazards, setHazards] = useState<any[]>([]);
@@ -50,92 +72,68 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
   const [hazardToDelete, setHazardToDelete] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<{ [key: string]: string[] }>({});
 
-  const {
-    data: hazardTypes
-  } = useQuery({
-    queryKey: ['hazard-types'],
+  const { data: hazardTypes } = useQuery({
+    queryKey: ['hazardTypes'],
     queryFn: async () => {
-      const {
-        data,
-        error
-      } = await supabase.from('master_data').select('*').eq('category', 'HAZARD_TYPE').eq('status', 'ACTIVE').order('sort_order', {
-        ascending: true
-      });
+      const { data, error } = await supabase
+        .from('master_data')
+        .select('*')
+        .eq('category', 'HAZARD_TYPE')
+        .eq('status', 'ACTIVE')
+        .order('sort_order', { ascending: true });
       if (error) throw error;
       return data;
     }
   });
 
-  const {
-    data: likelihoodOptions
-  } = useQuery({
+  const { data: likelihoodOptions } = useQuery({
     queryKey: ['likelihood-options'],
     queryFn: async () => {
-      const {
-        data,
-        error
-      } = await supabase.from('likelihood').select('*').order('score', {
-        ascending: true
-      });
+      const { data, error } = await supabase
+        .from('likelihood')
+        .select('*')
+        .order('score', { ascending: true });
       if (error) throw error;
       return data;
     }
   });
 
-  const {
-    data: consequenceOptions
-  } = useQuery({
+  const { data: consequenceOptions } = useQuery({
     queryKey: ['consequence-options'],
     queryFn: async () => {
-      const {
-        data,
-        error
-      } = await supabase.from('consequence').select('*').order('score', {
-        ascending: true
-      });
+      const { data, error } = await supabase
+        .from('consequence')
+        .select('*')
+        .order('score', { ascending: true });
       if (error) throw error;
       return data;
     }
   });
 
-  const {
-    data: riskMatrix,
-    refetch: refetchRiskMatrix
-  } = useQuery({
-    queryKey: ['risk-matrix'],
-    queryFn: async () => {
-      const {
-        data,
-        error
-      } = await supabase.from('risk_matrix').select('*');
-      if (error) throw error;
-      return data;
-    }
-  });
-
-  const {
-    data: riskHazards,
-    refetch: refetchRiskHazards
-  } = useQuery({
-    queryKey: ['risk-hazards', riskAssessmentId],
+  const { data: siteRegister } = useQuery({
+    queryKey: ['site-register', riskAssessmentId],
     queryFn: async () => {
       if (!riskAssessmentId) return null;
       
+      const { data: riskAssessment } = await supabase
+        .from('risk_assessments')
+        .select('site_register_record_id')
+        .eq('id', riskAssessmentId)
+        .single();
+
+      if (!riskAssessment?.site_register_record_id) return null;
+
       const { data, error } = await supabase
-        .from('risk_assessment_hazards')
+        .from('site_registers')
         .select(`
-          id,
-          risk_assessment_id,
-          hazard_type_id,
-          hazard,
-          control,
-          source,
-          likelihood_id,
-          consequence_id,
-          risk_score_id,
-          control_in_place
+          *,
+          product:products (
+            id,
+            product_name
+          )
         `)
-        .eq('risk_assessment_id', riskAssessmentId);
+        .eq('id', riskAssessment.site_register_record_id)
+        .single();
 
       if (error) throw error;
       return data;
@@ -143,136 +141,110 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     enabled: !!riskAssessmentId
   });
 
-  useEffect(() => {
-    if (riskHazards) {
-      setHazards(riskHazards);
-      setOpenItems(riskHazards.map(h => h.id));
-    }
-  }, [riskHazards]);
+  const { data: hazardsData, refetch: refetchHazards } = useQuery({
+    queryKey: ['risk-hazards', riskAssessmentId],
+    queryFn: async () => {
+      if (!riskAssessmentId) return [];
+      
+      console.log('Fetching hazards for risk assessment:', riskAssessmentId);
+      
+      const { data: hazardsData, error } = await supabase
+        .from('risk_hazards_and_controls')
+        .select(`
+          *,
+          hazard_type:master_data!risk_hazards_and_controls_hazard_type_id_fkey (
+            id,
+            label
+          ),
+          product_hazard:hazards_and_controls!risk_hazards_and_controls_hazard_control_id_fkey (
+            hazard_control_id,
+            hazard,
+            control,
+            hazard_type
+          )
+        `)
+        .eq('risk_assessment_id', riskAssessmentId)
+        .order('created_at', { ascending: true });
+      
+      if (error) throw error;
 
-  const handleAdd = () => {
-    const newHazard = {
-      id: uuidv4(),
-      hazard_type_id: null,
-      hazard: "",
-      control: "",
-      source: "",
-      likelihood_id: null,
-      consequence_id: null,
-      risk_score_id: null,
-      control_in_place: false,
-      isNew: true
-    };
-    setHazards(prev => [...prev, newHazard]);
-    setOpenItems(prev => [...prev, newHazard.id]);
-  };
-
-  const handleRemove = (id: string) => {
-    setHazardToDelete(id);
-    setDeleteDialogOpen(true);
-  };
-
-  const confirmRemove = async () => {
-    if (!hazardToDelete) return;
-
-    setDeleteDialogOpen(false);
-
-    // Optimistically update the UI
-    setHazards(prev => prev.filter(h => h.id !== hazardToDelete));
-    setOpenItems(prev => prev.filter(item => item !== hazardToDelete));
-
-    try {
-      // If the hazard was already saved to the database, delete it
-      const existingHazard = riskHazards?.find(h => h.id === hazardToDelete);
-      if (existingHazard) {
-        const { error } = await supabase
-          .from('risk_assessment_hazards')
-          .delete()
-          .eq('id', existingHazard.id);
-
-        if (error) {
-          console.error("Error deleting hazard:", error);
-          toast({
-            title: "Error",
-            description: "Failed to delete hazard",
-            variant: "destructive"
-          });
-          // Revert the UI update
-          setHazards(prev => [...prev, existingHazard]);
-          setOpenItems(prev => [...prev, hazardToDelete]);
-          return;
+      return Promise.all((hazardsData || []).map(async (hazard) => {
+        if (hazard.likelihood_id && hazard.consequence_id) {
+          const { data: riskScore } = await supabase
+            .from('risk_matrix')
+            .select('*')
+            .eq('likelihood_id', hazard.likelihood_id)
+            .eq('consequence_id', hazard.consequence_id)
+            .single();
+          
+          return { ...hazard, risk_score: riskScore };
         }
-      }
+        return hazard;
+      }));
+    },
+    enabled: !!riskAssessmentId
+  });
 
-      toast({
-        title: "Success",
-        description: "Hazard removed successfully"
-      });
-    } catch (error) {
-      console.error("Error deleting hazard:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete hazard",
-        variant: "destructive"
-      });
-      // Revert the UI update
-      // If you have access to the original data, you can revert it here
-      // setHazards(prev => [...prev, originalHazard]);
-      // setOpenItems(prev => [...prev, hazardToDelete]);
-    } finally {
-      setHazardToDelete(null);
+  useEffect(() => {
+    if (hazardsData) {
+      console.log('Setting hazards state:', hazardsData.length, 'records');
+      setHazards(hazardsData);
     }
+  }, [hazardsData]);
+
+  const validateHazard = (hazard: HazardData): string[] => {
+    const errors: string[] = [];
+    
+    if (!hazard.hazard_type_id) {
+      errors.push('Hazard Type is required');
+    }
+    if (!hazard.hazard || hazard.hazard.trim() === '') {
+      errors.push('Hazard Description is required');
+    }
+    if (!hazard.control || hazard.control.trim() === '') {
+      errors.push('Control Description is required');
+    }
+    if (!hazard.likelihood_id) {
+      errors.push('Likelihood is required');
+    }
+    if (!hazard.consequence_id) {
+      errors.push('Consequence is required');
+    }
+
+    return errors;
   };
 
-  const handleFieldChange = (id: string, field: string, value: any) => {
-    setHazards(prev =>
-      prev.map(hazard =>
-        hazard.id === id ? { ...hazard, [field]: value } : hazard
-      )
-    );
-  };
-
-  const handleRiskScoreChange = useCallback(async (id: string, likelihoodId: number | null, consequenceId: number | null) => {
-    if (!likelihoodId || !consequenceId) {
-      setHazards(prev => prev.map(hazard => hazard.id === id ? { ...hazard, likelihood_id: likelihoodId, consequence_id: consequenceId, risk_score_id: null } : hazard));
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from('risk_matrix')
-      .select('*')
-      .eq('likelihood_id', likelihoodId)
-      .eq('consequence_id', consequenceId)
-      .single();
-
-    if (error) {
-      console.error('Error fetching risk score:', error);
-      return;
-    }
-
-    setHazards(prev => prev.map(hazard => hazard.id === id ? { ...hazard, likelihood_id: likelihoodId, consequence_id: consequenceId, risk_score_id: data.id } : hazard));
-  }, []);
-
-  const updateOverallRiskAssessment = async (hazards: any[]) => {
+  const updateOverallRiskAssessment = async (hazardsData: any[]) => {
     if (!riskAssessmentId) return;
 
-    let highestRiskScore = null;
+    const highestRiskHazard = hazardsData.reduce((prev, current) => {
+      const prevScore = prev.risk_score_int || 0;
+      const currentScore = current.risk_score_int || 0;
+      return currentScore > prevScore ? current : prev;
+    }, hazardsData[0]);
 
-    for (const hazard of hazards) {
-      if (hazard.risk_score_id) {
-        if (!highestRiskScore || hazard.risk_score_id > highestRiskScore) {
-          highestRiskScore = hazard.risk_score_id;
-        }
+    if (highestRiskHazard) {
+      const { data, error } = await supabase
+        .from('risk_assessments')
+        .update({
+          overall_likelihood_id: highestRiskHazard.likelihood_id,
+          overall_consequence_id: highestRiskHazard.consequence_id,
+          overall_risk_score_id: highestRiskHazard.risk_score_id,
+          overall_risk_score_int: highestRiskHazard.risk_score_int,
+          overall_likelihood_text: highestRiskHazard.likelihood_text,
+          overall_consequence_text: highestRiskHazard.consequence_text,
+          overall_risk_level_text: highestRiskHazard.risk_level_text
+        })
+        .eq('id', riskAssessmentId);
+
+      if (error) {
+        console.error('Error updating overall risk assessment:', error);
+        throw error;
       }
-    }
 
-    const { error } = await supabase
-      .from('risk_assessments')
-      .update({ overall_risk_score_id: highestRiskScore })
-      .eq('id', riskAssessmentId);
-
-    if (error) {
-      console.error('Error updating overall risk assessment:', error);
+      queryClient.invalidateQueries({
+        queryKey: ['risk-assessments']
+      });
     }
   };
 
@@ -280,114 +252,135 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     mutationFn: async (hazardsData: any[]) => {
       if (!riskAssessmentId) return;
 
-      console.log('Starting save mutation with hazards:', hazardsData);
-
       const allErrors: { [key: string]: string[] } = {};
       let hasErrors = false;
 
-      const manualHazards = [];
-      const copiedHazards = [];
-
-      for (const hazard of hazardsData) {
-        const errors: string[] = [];
-        if (!hazard.hazard_type_id) {
-          errors.push("Hazard type is required");
+      hazardsData.forEach(hazard => {
+        const hazardErrors = validateHazard(hazard);
+        if (hazardErrors.length > 0) {
+          allErrors[hazard.id] = hazardErrors;
           hasErrors = true;
         }
-        if (!hazard.hazard) {
-          errors.push("Hazard description is required");
-          hasErrors = true;
-        }
-        if (!hazard.control) {
-          errors.push("Control measure is required");
-          hasErrors = true;
-        }
-        if (!hazard.likelihood_id) {
-          errors.push("Likelihood is required");
-          hasErrors = true;
-        }
-        if (!hazard.consequence_id) {
-          errors.push("Consequence is required");
-          hasErrors = true;
-        }
-
-        allErrors[hazard.id] = errors;
-
-        if (!hazard.isNew) {
-          manualHazards.push(hazard);
-        } else {
-          copiedHazards.push(hazard);
-        }
-      }
-
-      setValidationErrors(allErrors);
+      });
 
       if (hasErrors) {
-        throw new Error("Please correct the validation errors before saving.");
+        setValidationErrors(allErrors);
+        throw new Error('Please fill in all required fields for each hazard');
       }
 
-      // First, update existing hazards
-      const updates = manualHazards.map(async (hazard) => {
-        const { id, ...updates } = hazard;
-        const { data, error } = await supabase
-          .from('risk_assessment_hazards')
-          .update(updates)
-          .eq('id', id)
-          .select();
+      const copiedHazards = hazardsData.filter(h => h.hazard_control_id);
+      const manualHazards = hazardsData.filter(h => !h.hazard_control_id);
 
-        if (error) {
-          console.error("Error updating hazard:", error);
-          throw new Error(`Failed to update hazard: ${error.message}`);
-        }
+      if (manualHazards.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('risk_hazards_and_controls')
+          .delete()
+          .eq('risk_assessment_id', riskAssessmentId)
+          .is('hazard_control_id', null);
 
-        return data;
-      });
+        if (deleteError) throw deleteError;
+      }
 
-      // Then, insert new hazards
-      const inserts = copiedHazards.map(async (hazard) => {
-        const { id, isNew, ...insert } = hazard;
-        const { data, error } = await supabase
-          .from('risk_assessment_hazards')
-          .insert([{ ...insert, risk_assessment_id: riskAssessmentId }])
-          .select();
+      if (manualHazards.length > 0) {
+        const { error: insertError } = await supabase
+          .from('risk_hazards_and_controls')
+          .insert(manualHazards.map(h => ({
+            risk_assessment_id: riskAssessmentId,
+            hazard_type_id: h.hazard_type_id,
+            hazard: h.hazard,
+            control: h.control,
+            control_in_place: h.control_in_place,
+            likelihood_id: h.likelihood_id,
+            consequence_id: h.consequence_id,
+            risk_score_id: h.risk_score_id,
+            risk_score_int: h.risk_score_int,
+            likelihood_text: h.likelihood_text,
+            consequence_text: h.consequence_text,
+            risk_level_text: h.risk_level_text,
+            source: h.source || 'Custom'
+          })));
 
-        if (error) {
-          console.error("Error inserting hazard:", error);
-          throw new Error(`Failed to insert hazard: ${error.message}`);
-        }
+        if (insertError) throw insertError;
+      }
 
-        return data;
-      });
+      for (const hazard of copiedHazards) {
+        const { error: updateError } = await supabase
+          .from('risk_hazards_and_controls')
+          .update({
+            hazard_type_id: hazard.hazard_type_id,
+            hazard: hazard.hazard,
+            control: hazard.control,
+            control_in_place: hazard.control_in_place,
+            likelihood_id: hazard.likelihood_id,
+            consequence_id: hazard.consequence_id,
+            risk_score_id: hazard.risk_score_id,
+            risk_score_int: hazard.risk_score_int,
+            likelihood_text: hazard.likelihood_text,
+            consequence_text: hazard.consequence_text,
+            risk_level_text: hazard.risk_level_text
+          })
+          .eq('id', hazard.id);
 
-      await Promise.all([...updates, ...inserts]);
+        if (updateError) throw updateError;
+      }
 
-      // Update overall risk assessment with highest risk score
       await updateOverallRiskAssessment([...manualHazards, ...copiedHazards]);
     },
-    onSuccess: async () => {
-      console.log('Save mutation successful, invalidating queries');
-      
-      await queryClient.invalidateQueries({
+    onSuccess: () => {
+      queryClient.invalidateQueries({
         queryKey: ['risk-hazards', riskAssessmentId]
       });
-      
-      console.log('Queries invalidated, calling onSaveSuccess');
-      if (onSaveSuccess) {
-        await onSaveSuccess();
-      }
-      
       toast({
         title: "Success",
         description: "Hazards and controls saved successfully"
       });
     },
     onError: (error: Error) => {
-      console.error('Save mutation error:', error);
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive"
       });
+    }
+  });
+
+  const autoGenerateMutation = useMutation({
+    mutationFn: async () => {
+      if (!riskAssessmentId || !siteRegister?.product?.id) {
+        toast({
+          title: "Error",
+          description: "Missing required information",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      try {
+        const { error } = await supabase
+          .from('risk_assessments')
+          .update({ auto_generate_hazards: true })
+          .eq('id', riskAssessmentId);
+
+        if (error) throw error;
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        await refetchHazards();
+        
+        toast({
+          title: "Success",
+          description: "Hazards auto-generated successfully",
+        });
+
+      } catch (error) {
+        console.error('Auto-generate failed:', error);
+        toast({
+          title: "Error",
+          description: "Failed to auto-generate hazards",
+          variant: "destructive",
+        });
+        throw error;
+      }
     }
   });
 
@@ -402,157 +395,419 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     }
   }));
 
+  const deleteMutation = useMutation({
+    mutationFn: async (hazardId: string) => {
+      const { error } = await supabase
+        .from('risk_hazards_and_controls')
+        .delete()
+        .eq('id', hazardId);
+
+      if (error) throw error;
+    },
+    onSuccess: async (_, hazardId) => {
+      setHazards(current => current.filter(h => h.id !== hazardId));
+      await refetchHazards();
+      
+      toast({
+        title: "Success",
+        description: "Hazard deleted successfully",
+      });
+      setDeleteDialogOpen(false);
+      setHazardToDelete(null);
+    },
+    onError: (error) => {
+      console.error('Delete error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete hazard",
+        variant: "destructive",
+      });
+      setDeleteDialogOpen(false);
+      setHazardToDelete(null);
+    }
+  });
+
+  const handleAdd = () => {
+    if (!hazardTypes?.length) return;
+
+    const newHazard = {
+      id: crypto.randomUUID(),
+      hazard_type_id: hazardTypes[0].id,
+      hazard: "",
+      control: "",
+      control_in_place: false,
+      likelihood_id: null,
+      consequence_id: null,
+      risk_score_id: null,
+      risk_assessment_id: riskAssessmentId,
+      source: "Custom" as const
+    };
+
+    setHazards([...hazards, newHazard]);
+    setOpenItems([newHazard.id]);
+  };
+
+  const handleUpdate = async (id: string, field: string, value: any) => {
+    const updatedHazards = hazards.map(h => {
+      if (h.id === id) {
+        const updatedHazard = { 
+          ...h, 
+          [field]: value,
+          ...(field === 'likelihood_id' ? {
+            likelihood_text: likelihoodOptions?.find(l => l.id === value)?.name
+          } : {}),
+          ...(field === 'consequence_id' ? {
+            consequence_text: consequenceOptions?.find(c => c.id === value)?.name
+          } : {})
+        };
+        
+        if (validationErrors[id]) {
+          const newErrors = { ...validationErrors };
+          newErrors[id] = newErrors[id].filter(error => !error.toLowerCase().includes(field.toLowerCase()));
+          if (newErrors[id].length === 0) {
+            delete newErrors[id];
+          }
+          setValidationErrors(newErrors);
+        }
+        
+        if (field === 'likelihood_id' || field === 'consequence_id') {
+          updateRiskScore(updatedHazard);
+        }
+        
+        return updatedHazard;
+      }
+      return h;
+    });
+    setHazards(updatedHazards);
+  };
+
+  const updateRiskScore = async (hazard: any) => {
+    if (hazard.likelihood_id && hazard.consequence_id) {
+      const { data, error } = await supabase
+        .from('risk_matrix')
+        .select('*')
+        .eq('likelihood_id', hazard.likelihood_id)
+        .eq('consequence_id', hazard.consequence_id)
+        .single();
+      
+      if (!error && data) {
+        const updatedHazards = hazards.map(h => {
+          if (h.id === hazard.id) {
+            return {
+              ...h,
+              likelihood_id: hazard.likelihood_id,
+              likelihood_text: likelihoodOptions?.find(l => l.id === hazard.likelihood_id)?.name,
+              consequence_id: hazard.consequence_id,
+              consequence_text: consequenceOptions?.find(c => c.id === hazard.consequence_id)?.name,
+              risk_score: data,
+              risk_score_id: data.id,
+              risk_score_int: data.risk_score,
+              risk_level_text: data.risk_label
+            };
+          }
+          return h;
+        });
+        
+        setHazards(updatedHazards);
+      }
+    }
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setHazardToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (hazardToDelete) {
+      await deleteMutation.mutateAsync(hazardToDelete);
+    }
+  };
+
+  const toggleItem = (id: string) => {
+    setOpenItems(prev => 
+      prev.includes(id) ? [] : [id]
+    );
+  };
+
+  if (readOnly && !hazards.length) {
+    return null;
+  }
+
   return (
     <div className="space-y-4">
-      {hazards.map((hazard, index) => (
-        <Accordion type="multiple" key={hazard.id} defaultValue={openItems} className="w-full">
-          <AccordionItem value={hazard.id}>
-            <AccordionTrigger>
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center">
-                  <GripVertical className="mr-2 h-4 w-4 text-gray-500 cursor-grab active:cursor-grabbing" />
-                  <span>Hazard {index + 1}: {hazard.hazard || "New Hazard"}</span>
-                </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[50px]"></TableHead>
+            <TableHead className="w-[100px] sm:w-[150px] text-left font-semibold whitespace-nowrap overflow-hidden text-ellipsis">Type</TableHead>
+            <TableHead 
+              className="w-[125px] sm:w-[175px] text-left font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
+              title="Hazard Description"
+            >
+              Hazard Desc.
+            </TableHead>
+            <TableHead 
+              className="w-[125px] sm:w-[175px] text-left font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
+              title="Control Description"
+            >
+              Control Desc.
+            </TableHead>
+            <TableHead className="w-[120px] sm:w-[150px] text-center font-semibold">Risk Level</TableHead>
+            {!readOnly && (
+              <TableHead className="w-[60px] sm:w-[80px] text-center font-semibold">
+                Actions
+              </TableHead>
+            )}
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          {hazards.map((hazard) => (
+            <React.Fragment key={hazard.id}>
+              <TableRow 
+                className="hover:bg-gray-50 cursor-pointer" 
+                onClick={() => toggleItem(hazard.id)}
+              >
+                <TableCell className="w-[50px] text-center">
+                  {openItems.includes(hazard.id) ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </TableCell>
+                <TableCell className="w-[100px] sm:w-[150px]">
+                  <div className="truncate" title={hazard.hazard_type?.label}>
+                    {hazard.hazard_type?.label || '-'}
+                  </div>
+                </TableCell>
+                <TableCell className="w-[125px] sm:w-[175px]">
+                  <div 
+                    className="max-h-[2.5rem] overflow-hidden text-ellipsis break-words"
+                    title={hazard.hazard}
+                  >
+                    {hazard.hazard || '-'}
+                  </div>
+                </TableCell>
+                <TableCell className="w-[125px] sm:w-[175px]">
+                  <div 
+                    className="max-h-[2.5rem] overflow-hidden text-ellipsis break-words"
+                    title={hazard.control}
+                  >
+                    {hazard.control || '-'}
+                  </div>
+                </TableCell>
+                <TableCell className="w-[120px] sm:w-[150px] text-center">
+                  {hazard.risk_score && (
+                    <Badge
+                      style={{
+                        backgroundColor: hazard.risk_score.risk_color || '#gray-400',
+                        color: '#FFFFFF'
+                      }}
+                      className="px-2 py-1 text-sm font-semibold rounded"
+                    >
+                      {hazard.risk_score.risk_label}
+                    </Badge>
+                  )}
+                </TableCell>
                 {!readOnly && (
-                  <Button variant="ghost" size="icon" onClick={(e) => {
-                    e.stopPropagation(); // Prevent accordion from opening/closing
-                    handleRemove(hazard.id);
-                  }}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <TableCell className="w-[60px] sm:w-[80px] text-center">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(hazard.id);
+                      }}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
                 )}
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label>Hazard Type</Label>
-                  <Select 
-                    value={hazard.hazard_type_id || ""} 
-                    onValueChange={(value) => handleFieldChange(hazard.id, "hazard_type_id", value)}
-                    disabled={readOnly}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select hazard type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {hazardTypes?.map(type => (
-                        <SelectItem key={type.id} value={type.id}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {validationErrors[hazard.id]?.includes("Hazard type is required") && (
-                    <p className="text-red-500 text-sm">Hazard type is required</p>
-                  )}
-                </div>
+              </TableRow>
 
-                <div className="space-y-2">
-                  <Label>Source</Label>
-                  <Input 
-                    type="text" 
-                    value={hazard.source || ""} 
-                    onChange={(e) => handleFieldChange(hazard.id, "source", e.target.value)}
-                    disabled={readOnly}
-                  />
-                </div>
+              {openItems.includes(hazard.id) && (
+                <TableRow className="bg-gray-50 border-t">
+                  <TableCell colSpan={readOnly ? 5 : 6} className="p-4">
+                    <div className="grid grid-cols-12 gap-6">
+                      {validationErrors[hazard.id] && validationErrors[hazard.id].length > 0 && (
+                        <div className="col-span-12 bg-red-50 border border-red-200 rounded p-2">
+                          <ul className="text-red-600 text-sm list-disc pl-4">
+                            {validationErrors[hazard.id].map((error, index) => (
+                              <li key={index}>{error}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      <div className="col-span-2 space-y-2">
+                        <Label>Hazard Type</Label>
+                        {readOnly ? (
+                          <div className="p-2 bg-white rounded border">
+                            {hazard.hazard_type?.label || '-'}
+                          </div>
+                        ) : (
+                          <Select
+                            value={hazard.hazard_type_id}
+                            onValueChange={(value) => handleUpdate(hazard.id, 'hazard_type_id', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select hazard type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {hazardTypes?.map((type) => (
+                                <SelectItem key={type.id} value={type.id}>
+                                  {type.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
 
-                <div className="space-y-2 col-span-2">
-                  <Label>Hazard Description</Label>
-                  <Textarea
-                    value={hazard.hazard || ""}
-                    onChange={(e) => handleFieldChange(hazard.id, "hazard", e.target.value)}
-                    disabled={readOnly}
-                  />
-                  {validationErrors[hazard.id]?.includes("Hazard description is required") && (
-                    <p className="text-red-500 text-sm">Hazard description is required</p>
-                  )}
-                </div>
+                      <div className="col-span-3 space-y-2">
+                        <Label>Hazard Description</Label>
+                        {readOnly ? (
+                          <div className="p-2 bg-white rounded border min-h-[80px]">
+                            {hazard.hazard}
+                          </div>
+                        ) : (
+                          <Textarea
+                            value={hazard.hazard}
+                            onChange={(e) => handleUpdate(hazard.id, 'hazard', e.target.value)}
+                            placeholder="Enter hazard description"
+                            className="min-h-[80px]"
+                          />
+                        )}
+                      </div>
 
-                <div className="space-y-2 col-span-2">
-                  <Label>Control Measure</Label>
-                  <Textarea
-                    value={hazard.control || ""}
-                    onChange={(e) => handleFieldChange(hazard.id, "control", e.target.value)}
-                    disabled={readOnly}
-                  />
-                  {validationErrors[hazard.id]?.includes("Control measure is required") && (
-                    <p className="text-red-500 text-sm">Control measure is required</p>
-                  )}
-                </div>
+                      <div className="col-span-3 space-y-2">
+                        <Label>Control Measures</Label>
+                        {readOnly ? (
+                          <div className="p-2 bg-white rounded border min-h-[80px]">
+                            {hazard.control}
+                          </div>
+                        ) : (
+                          <Textarea
+                            value={hazard.control}
+                            onChange={(e) => handleUpdate(hazard.id, 'control', e.target.value)}
+                            placeholder="Enter control measures"
+                            className="min-h-[80px]"
+                          />
+                        )}
+                      </div>
 
-                <div className="space-y-2">
-                  <Label>Likelihood</Label>
-                  <Select 
-                    value={hazard.likelihood_id?.toString() || ""} 
-                    onValueChange={(value) => {
-                      handleFieldChange(hazard.id, "likelihood_id", parseInt(value));
-                      handleRiskScoreChange(hazard.id, parseInt(value), hazard.consequence_id);
-                    }}
-                    disabled={readOnly}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select likelihood" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {likelihoodOptions?.map(option => (
-                        <SelectItem key={option.id} value={option.id.toString()}>
-                          {option.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {validationErrors[hazard.id]?.includes("Likelihood is required") && (
-                    <p className="text-red-500 text-sm">Likelihood is required</p>
-                  )}
-                </div>
+                      <div className="col-span-1 space-y-2">
+                        <Label>Control In Place</Label>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`control-in-place-${hazard.id}`}
+                            checked={hazard.control_in_place}
+                            onCheckedChange={(checked) => handleUpdate(hazard.id, 'control_in_place', checked)}
+                            disabled={readOnly}
+                          />
+                          <Label htmlFor={`control-in-place-${hazard.id}`} className="text-sm">
+                            Yes
+                          </Label>
+                        </div>
+                      </div>
 
-                <div className="space-y-2">
-                  <Label>Consequence</Label>
-                  <Select 
-                    value={hazard.consequence_id?.toString() || ""} 
-                    onValueChange={(value) => {
-                      handleFieldChange(hazard.id, "consequence_id", parseInt(value));
-                      handleRiskScoreChange(hazard.id, hazard.likelihood_id, parseInt(value));
-                    }}
-                    disabled={readOnly}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select consequence" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {consequenceOptions?.map(option => (
-                        <SelectItem key={option.id} value={option.id.toString()}>
-                          {option.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {validationErrors[hazard.id]?.includes("Consequence is required") && (
-                    <p className="text-red-500 text-sm">Consequence is required</p>
-                  )}
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      ))}
+                      <div className="col-span-1 space-y-2">
+                        <Label>Likelihood</Label>
+                        {readOnly ? (
+                          <div className="p-2 bg-white rounded border">
+                            {likelihoodOptions?.find(l => l.id === hazard.likelihood_id)?.name || '-'}
+                          </div>
+                        ) : (
+                          <Select
+                            value={hazard.likelihood_id?.toString()}
+                            onValueChange={(value) => handleUpdate(hazard.id, 'likelihood_id', parseInt(value))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select likelihood" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {likelihoodOptions?.map((option) => (
+                                <SelectItem key={option.id} value={option.id.toString()}>
+                                  {option.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
+
+                      <div className="col-span-1 space-y-2">
+                        <Label>Consequence</Label>
+                        {readOnly ? (
+                          <div className="p-2 bg-white rounded border">
+                            {consequenceOptions?.find(c => c.id === hazard.consequence_id)?.name || '-'}
+                          </div>
+                        ) : (
+                          <Select
+                            value={hazard.consequence_id?.toString()}
+                            onValueChange={(value) => handleUpdate(hazard.id, 'consequence_id', parseInt(value))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select consequence" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {consequenceOptions?.map((option) => (
+                                <SelectItem key={option.id} value={option.id.toString()}>
+                                  {option.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
+
+                      <div className="col-span-1 space-y-2">
+                        <Label>Risk Level</Label>
+                        <div className="h-[38px] flex items-center">
+                          {hazard.risk_score && (
+                            <Badge
+                              style={{
+                                backgroundColor: hazard.risk_score.risk_color || '#gray-400',
+                                color: '#FFFFFF'
+                              }}
+                              className="px-3 py-1"
+                            >
+                              {hazard.risk_score.risk_label}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </React.Fragment>
+          ))}
+        </TableBody>
+      </Table>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Hazard & Control</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. Are you sure you want to remove this hazard?
+              Are you sure you want to delete this hazard and control? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setHazardToDelete(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmRemove}>Remove</AlertDialogAction>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {hazards.length === 0 && !readOnly && (
+        <div className="text-center py-6 text-gray-500">
+          No hazards and controls added yet.
+        </div>
+      )}
     </div>
   );
 });

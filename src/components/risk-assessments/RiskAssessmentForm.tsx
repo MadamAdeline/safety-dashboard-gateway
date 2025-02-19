@@ -12,7 +12,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { SiteRegisterSearch } from "./SiteRegisterSearch";
-import { RiskHazardsAndControls, RiskHazardsAndControlsRef } from "./RiskHazardsAndControls";
+import { RiskHazardsAndControls } from "./RiskHazardsAndControls";
+
+interface RiskHazardsAndControlsRef {
+  handleAdd: () => void;
+  saveHazards: (riskAssessmentId: string) => Promise<void>;
+  populateHazards: (hazards: any[]) => void;
+}
 
 interface RiskAssessmentFormProps {
   onClose: () => void;
@@ -301,76 +307,26 @@ export function RiskAssessmentForm({
     }
   }, [initialData]);
 
-  const {
-    data: riskAssessment,
-    refetch: refetchRiskAssessment
-  } = useQuery({
-    queryKey: ['risk-assessment', initialData?.id],
-    queryFn: async () => {
-      if (!initialData?.id) return null;
-      
-      const { data, error } = await supabase
-        .from('risk_assessments')
-        .select('*')
-        .eq('id', initialData.id)
-        .single();
-        
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!initialData?.id
-  });
-
   useEffect(() => {
-    if (riskAssessment) {
-      setFormData(prev => ({
-        ...prev,
-        overall_likelihood_id: riskAssessment.overall_likelihood_id,
-        overall_consequence_id: riskAssessment.overall_consequence_id,
-        overall_risk_score_id: riskAssessment.overall_risk_score_id,
-        overall_evaluation: riskAssessment.overall_evaluation || prev.overall_evaluation,
-        overall_evaluation_status_id: riskAssessment.overall_evaluation_status_id || prev.overall_evaluation_status_id,
-        approval_status_id: riskAssessment.approval_status_id || prev.approval_status_id,
-      }));
-
-      if (riskAssessment.overall_likelihood_id && riskAssessment.overall_consequence_id) {
-        updateRiskScore(riskAssessment.overall_likelihood_id, riskAssessment.overall_consequence_id);
+    const updateRiskScore = async () => {
+      if (formData.overall_likelihood_id && formData.overall_consequence_id) {
+        const {
+          data,
+          error
+        } = await supabase.from('risk_matrix').select('*').eq('likelihood_id', formData.overall_likelihood_id).eq('consequence_id', formData.overall_consequence_id).single();
+        if (error) {
+          console.error('Error fetching risk score:', error);
+          return;
+        }
+        setRiskScore(data);
+        setFormData(prev => ({
+          ...prev,
+          overall_risk_score_id: data.id
+        }));
       }
-    }
-  }, [riskAssessment]);
-
-  const updateRiskScore = async (likelihoodId: number, consequenceId: number) => {
-    const {
-      data,
-      error
-    } = await supabase.from('risk_matrix').select('*').eq('likelihood_id', likelihoodId).eq('consequence_id', consequenceId).single();
-    if (error) {
-      console.error('Error fetching risk score:', error);
-      return;
-    }
-    setRiskScore(data);
-    setFormData(prev => ({
-      ...prev,
-      overall_risk_score_id: data.id
-    }));
-  };
-
-  const handleRiskAssessmentRefresh = async () => {
-    console.log('Refreshing risk assessment...');
-    if (initialData?.id) {
-      await refetchRiskAssessment();
-      await queryClient.invalidateQueries({
-        queryKey: ['risk-assessment', initialData.id]
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (hazardsControlsRef.current) {
-      console.log('Setting up onSaveSuccess callback');
-      hazardsControlsRef.current.onSaveSuccess = handleRiskAssessmentRefresh;
-    }
-  }, []);
+    };
+    updateRiskScore();
+  }, [formData.overall_likelihood_id, formData.overall_consequence_id]);
 
   useEffect(() => {
     if (productHazards && hazardsControlsRef.current && !initialData) {
@@ -649,8 +605,7 @@ export function RiskAssessmentForm({
             <RiskHazardsAndControls 
               riskAssessmentId={initialData?.id || null} 
               readOnly={false} 
-              ref={hazardsControlsRef}
-              onSaveSuccess={handleRiskAssessmentRefresh}
+              ref={hazardsControlsRef} 
             />
 
             <div className="space-y-4">
