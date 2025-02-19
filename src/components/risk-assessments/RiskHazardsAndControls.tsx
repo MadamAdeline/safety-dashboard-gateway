@@ -296,13 +296,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     }
   });
 
-  const handleProcessingDialogClose = () => {
-    console.log("Closing processing dialog");
-    setProcessingDialogOpen(false);
-    setIsGenerationComplete(false);
-    setHasNewHazards(false);
-  };
-
   const saveMutation = useMutation({
     mutationFn: async (hazardsToSave: any[]) => {
       if (!riskAssessmentId) return;
