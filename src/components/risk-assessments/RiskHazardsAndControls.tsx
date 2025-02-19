@@ -178,6 +178,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       
       if (error) throw error;
 
+      console.log('Fetched hazards data:', hazardsData);
+
       return Promise.all((hazardsData || []).map(async (hazard) => {
         if (hazard.likelihood_id && hazard.consequence_id) {
           const { data: riskScore } = await supabase
@@ -202,100 +204,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     }
   }, [hazardsData]);
 
-  const saveMutation = useMutation({
-    mutationFn: async (hazardsData: any[]) => {
-      if (!riskAssessmentId) return;
-
-      const copiedHazards = hazardsData.filter(h => h.hazard_control_id);
-      const manualHazards = hazardsData.filter(h => !h.hazard_control_id);
-
-      console.log('Starting save operation with:', {
-        totalHazards: hazardsData.length,
-        copiedHazards: copiedHazards.length,
-        manualHazards: manualHazards.length
-      });
-
-      if (copiedHazards.length > 0) {
-        const { data: existingHazards, error: fetchError } = await supabase
-          .from('risk_hazards_and_controls')
-          .select('id, hazard_control_id')
-          .eq('risk_assessment_id', riskAssessmentId)
-          .not('hazard_control_id', 'is', null);
-
-        if (fetchError) throw fetchError;
-
-        const existingMap = new Map(
-          (existingHazards || []).map(h => [h.hazard_control_id, h.id])
-        );
-
-        for (const hazard of copiedHazards) {
-          const hazardData = {
-            risk_assessment_id: riskAssessmentId,
-            hazard_control_id: hazard.hazard_control_id,
-            hazard_type_id: hazard.hazard_type_id,
-            hazard: hazard.hazard,
-            control: hazard.control,
-            control_in_place: hazard.control_in_place,
-            likelihood_id: hazard.likelihood_id,
-            consequence_id: hazard.consequence_id,
-            risk_score_id: hazard.risk_score?.id || null,
-            risk_score_int: hazard.risk_score?.risk_score || null,
-            risk_level_text: hazard.risk_score?.risk_label || null,
-            likelihood_text: likelihoodOptions?.find(l => l.id === hazard.likelihood_id)?.name || null,
-            consequence_text: hazard.consequence_text,
-            source: 'Product'
-          };
-
-          const existingId = existingMap.get(hazard.hazard_control_id);
-          
-          if (existingId) {
-            const { error } = await supabase
-              .from('risk_hazards_and_controls')
-              .update(hazardData)
-              .eq('id', existingId);
-
-            if (error) throw error;
-          } else {
-            const { error } = await supabase
-              .from('risk_hazards_and_controls')
-              .insert(hazardData);
-
-            if (error) throw error;
-          }
-        }
-      }
-
-      if (manualHazards.length > 0) {
-        for (const hazard of manualHazards) {
-          const { error } = await supabase
-            .from('risk_hazards_and_controls')
-            .upsert({
-              id: hazard.id,
-              risk_assessment_id: riskAssessmentId,
-              hazard_type_id: hazard.hazard_type_id,
-              hazard: hazard.hazard,
-              control: hazard.control,
-              control_in_place: hazard.control_in_place,
-              likelihood_id: hazard.likelihood_id,
-              consequence_id: hazard.consequence_id,
-              risk_score_id: hazard.risk_score?.id || null,
-              risk_score_int: hazard.risk_score?.risk_score || null,
-              risk_level_text: hazard.risk_score?.risk_label || null,
-              likelihood_text: likelihoodOptions?.find(l => l.id === hazard.likelihood_id)?.name || null,
-              consequence_text: hazard.consequence_text,
-              source: 'Manual'
-            }, {
-              onConflict: 'id'
-            });
-
-          if (error) throw error;
-        }
-      }
-
-      await queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
-    }
-  });
-
   useEffect(() => {
     if (!riskAssessmentId) return;
 
@@ -313,11 +221,16 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         },
         async (payload) => {
           console.log("New hazard added:", payload);
+
+          // Ensure hazards refresh properly
           await refetchHazards();
+
+          // Ensure dialog updates properly
           setHasNewHazards(true);
           setIsGenerationComplete(true);
-          
-          // Open the newly added hazard
+          setProcessingDialogOpen(true);
+
+          // Auto-expand new hazard
           if (payload.new && payload.new.id) {
             setOpenItems(current => [...current, payload.new.id]);
           }
@@ -343,10 +256,14 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       }
 
       try {
+        // Set initial states
         setProcessingDialogOpen(true);
         setIsGenerationComplete(false);
         setHasNewHazards(false);
 
+        console.log("Starting auto-generation process...");
+
+        // Trigger auto-generation
         const { error } = await supabase
           .from('risk_assessments')
           .update({ auto_generate_hazards: true })
@@ -354,10 +271,15 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
         if (error) throw error;
 
-        // Start a timeout to show completion even if no hazards were generated
-        setTimeout(() => {
+        console.log("Auto-generate triggered... waiting for realtime update");
+
+        // Ensure UI updates in case realtime doesn't fire
+        setTimeout(async () => {
           if (!hasNewHazards) {
+            console.log("No hazards detected after timeout, forcing refresh...");
+            await refetchHazards();
             setIsGenerationComplete(true);
+            setProcessingDialogOpen(true);
           }
         }, 5000);
 
@@ -375,6 +297,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
   });
 
   const handleProcessingDialogClose = () => {
+    console.log("Closing processing dialog");
     setProcessingDialogOpen(false);
     setIsGenerationComplete(false);
     setHasNewHazards(false);
@@ -793,6 +716,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       <Dialog 
         open={processingDialogOpen} 
         onOpenChange={(open) => {
+          console.log("Dialog onOpenChange:", { open, isGenerationComplete });
           if (!open && isGenerationComplete) {
             handleProcessingDialogClose();
           }
