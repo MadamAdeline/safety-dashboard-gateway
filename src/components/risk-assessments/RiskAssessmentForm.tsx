@@ -13,6 +13,9 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { SiteRegisterSearch } from "./SiteRegisterSearch";
 import { RiskHazardsAndControls } from "./RiskHazardsAndControls";
+import { UserFormFields } from "./UserFormFields";
+import { UserFormActions } from "./UserFormActions";
+import { useUserMutations } from "@/hooks/use-user-mutations";
 
 interface RiskHazardsAndControlsRef {
   handleAdd: () => void;
@@ -462,8 +465,6 @@ export function RiskAssessmentForm({
         title: "Success",
         description: initialData ? "Risk assessment updated" : "Risk assessment created"
       });
-      
-      onClose();
     } catch (error) {
       console.error('Error saving risk assessment:', error);
       toast({
