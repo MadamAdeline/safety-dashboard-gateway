@@ -214,6 +214,40 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     return errors;
   };
 
+  const updateOverallRiskAssessment = async (hazardsData: any[]) => {
+    if (!riskAssessmentId) return;
+
+    const highestRiskHazard = hazardsData.reduce((prev, current) => {
+      const prevScore = prev.risk_score_int || 0;
+      const currentScore = current.risk_score_int || 0;
+      return currentScore > prevScore ? current : prev;
+    }, hazardsData[0]);
+
+    if (highestRiskHazard) {
+      const { data, error } = await supabase
+        .from('risk_assessments')
+        .update({
+          overall_likelihood_id: highestRiskHazard.likelihood_id,
+          overall_consequence_id: highestRiskHazard.consequence_id,
+          overall_risk_score_id: highestRiskHazard.risk_score_id,
+          overall_risk_score_int: highestRiskHazard.risk_score_int,
+          overall_likelihood_text: highestRiskHazard.likelihood_text,
+          overall_consequence_text: highestRiskHazard.consequence_text,
+          overall_risk_level_text: highestRiskHazard.risk_level_text
+        })
+        .eq('id', riskAssessmentId);
+
+      if (error) {
+        console.error('Error updating overall risk assessment:', error);
+        throw error;
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: ['risk-assessments']
+      });
+    }
+  };
+
   const saveMutation = useMutation({
     mutationFn: async (hazardsData: any[]) => {
       if (!riskAssessmentId) return;
@@ -237,90 +271,75 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       const copiedHazards = hazardsData.filter(h => h.hazard_control_id);
       const manualHazards = hazardsData.filter(h => !h.hazard_control_id);
 
-      if (copiedHazards.length > 0) {
-        const { data: existingHazards, error: fetchError } = await supabase
+      if (manualHazards.length > 0) {
+        const { error: deleteError } = await supabase
           .from('risk_hazards_and_controls')
-          .select('id, hazard_control_id')
+          .delete()
           .eq('risk_assessment_id', riskAssessmentId)
-          .not('hazard_control_id', 'is', null);
+          .is('hazard_control_id', null);
 
-        if (fetchError) throw fetchError;
+        if (deleteError) throw deleteError;
+      }
 
-        const existingMap = new Map(
-          (existingHazards || []).map(h => [h.hazard_control_id, h.id])
-        );
-
-        for (const hazard of copiedHazards) {
-          const hazardData = {
+      if (manualHazards.length > 0) {
+        const { error: insertError } = await supabase
+          .from('risk_hazards_and_controls')
+          .insert(manualHazards.map(h => ({
             risk_assessment_id: riskAssessmentId,
-            hazard_control_id: hazard.hazard_control_id,
+            hazard_type_id: h.hazard_type_id,
+            hazard: h.hazard,
+            control: h.control,
+            control_in_place: h.control_in_place,
+            likelihood_id: h.likelihood_id,
+            consequence_id: h.consequence_id,
+            risk_score_id: h.risk_score_id,
+            risk_score_int: h.risk_score_int,
+            likelihood_text: h.likelihood_text,
+            consequence_text: h.consequence_text,
+            risk_level_text: h.risk_level_text,
+            source: h.source || 'Custom'
+          })));
+
+        if (insertError) throw insertError;
+      }
+
+      for (const hazard of copiedHazards) {
+        const { error: updateError } = await supabase
+          .from('risk_hazards_and_controls')
+          .update({
             hazard_type_id: hazard.hazard_type_id,
             hazard: hazard.hazard,
             control: hazard.control,
             control_in_place: hazard.control_in_place,
             likelihood_id: hazard.likelihood_id,
             consequence_id: hazard.consequence_id,
-            risk_score_id: hazard.risk_score?.id || null,
-            risk_score_int: hazard.risk_score?.risk_score || null,
-            risk_level_text: hazard.risk_score?.risk_label || null,
-            likelihood_text: likelihoodOptions?.find(l => l.id === hazard.likelihood_id)?.name || null,
+            risk_score_id: hazard.risk_score_id,
+            risk_score_int: hazard.risk_score_int,
+            likelihood_text: hazard.likelihood_text,
             consequence_text: hazard.consequence_text,
-            source: 'Product'
-          };
+            risk_level_text: hazard.risk_level_text
+          })
+          .eq('id', hazard.id);
 
-          const existingId = existingMap.get(hazard.hazard_control_id);
-          
-          if (existingId) {
-            const { error } = await supabase
-              .from('risk_hazards_and_controls')
-              .update(hazardData)
-              .eq('id', existingId);
-
-            if (error) throw error;
-          } else {
-            const { error } = await supabase
-              .from('risk_hazards_and_controls')
-              .insert(hazardData);
-
-            if (error) throw error;
-          }
-        }
+        if (updateError) throw updateError;
       }
 
-      if (manualHazards.length > 0) {
-        for (const hazard of manualHazards) {
-          const { error } = await supabase
-            .from('risk_hazards_and_controls')
-            .upsert({
-              id: hazard.id,
-              risk_assessment_id: riskAssessmentId,
-              hazard_type_id: hazard.hazard_type_id,
-              hazard: hazard.hazard,
-              control: hazard.control,
-              control_in_place: hazard.control_in_place,
-              likelihood_id: hazard.likelihood_id,
-              consequence_id: hazard.consequence_id,
-              risk_score_id: hazard.risk_score?.id || null,
-              risk_score_int: hazard.risk_score?.risk_score || null,
-              risk_level_text: hazard.risk_score?.risk_label || null,
-              likelihood_text: likelihoodOptions?.find(l => l.id === hazard.likelihood_id)?.name || null,
-              consequence_text: hazard.consequence_text,
-              source: 'Manual'
-            }, {
-              onConflict: 'id'
-            });
-
-          if (error) throw error;
-        }
-      }
-
-      await queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
+      await updateOverallRiskAssessment([...manualHazards, ...copiedHazards]);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['risk-hazards', riskAssessmentId]
+      });
+      toast({
+        title: "Success",
+        description: "Hazards and controls saved successfully"
+      });
     },
     onError: (error: Error) => {
       toast({
-        title: "Validation Error",
+        title: "Error",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   });
