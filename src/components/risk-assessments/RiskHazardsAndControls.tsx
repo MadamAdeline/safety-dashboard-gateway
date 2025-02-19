@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -210,7 +209,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
     console.log('Setting up realtime subscription for risk assessment:', riskAssessmentId);
     
-    let channel = supabase
+    const channel = supabase
       .channel('risk_hazards_channel')
       .on(
         'postgres_changes',
@@ -228,38 +227,25 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           setProcessingDialogOpen(true);
         }
       )
-      .subscribe();
-
-    // Handle subscription errors
-    channel.onError((error) => {
-      console.error("Realtime subscription error:", error);
-      // Try to resubscribe
-      channel = supabase
-        .channel('risk_hazards_channel')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'risk_hazards_and_controls',
-            filter: `risk_assessment_id=eq.${riskAssessmentId}`
-          },
-          async (payload) => {
-            console.log("New hazard added (resubscribed):", payload);
-            await refetchHazards();
-            setHasNewHazards(true);
-            setIsGenerationComplete(true);
-            setProcessingDialogOpen(true);
-          }
-        )
-        .subscribe();
-    });
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+        
+        if (status === 'SUBSCRIBED') {
+          console.log('Successfully subscribed to changes');
+        } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+          console.error('Subscription error or closed:', status);
+          
+          // Attempt to resubscribe after a short delay
+          setTimeout(() => {
+            console.log('Attempting to resubscribe...');
+            channel.subscribe();
+          }, 2000);
+        }
+      });
 
     return () => {
       console.log('Cleaning up realtime subscription');
-      if (channel) {
-        supabase.removeChannel(channel);
-      }
+      supabase.removeChannel(channel);
     };
   }, [riskAssessmentId, refetchHazards]);
 
