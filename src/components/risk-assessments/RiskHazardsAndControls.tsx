@@ -798,7 +798,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           }
         }}
       >
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
               {isGenerationComplete ? "Auto-Generation Complete" : "Auto-Generation in Progress"}
