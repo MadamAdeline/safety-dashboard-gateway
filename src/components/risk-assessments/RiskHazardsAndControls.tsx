@@ -396,6 +396,9 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         const updatedHazard = { 
           ...h, 
           [field]: value,
+          ...(field === 'likelihood_id' ? {
+            likelihood_text: likelihoodOptions?.find(l => l.id === value)?.name
+          } : {}),
           ...(field === 'consequence_id' ? {
             consequence_text: consequenceOptions?.find(c => c.id === value)?.name
           } : {})
@@ -434,6 +437,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           if (h.id === hazard.id) {
             return {
               ...h,
+              likelihood_id: hazard.likelihood_id,
+              likelihood_text: likelihoodOptions?.find(l => l.id === hazard.likelihood_id)?.name,
               consequence_id: hazard.consequence_id,
               consequence_text: consequenceOptions?.find(c => c.id === hazard.consequence_id)?.name,
               risk_score: data,
