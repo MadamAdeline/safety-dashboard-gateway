@@ -6,6 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -70,6 +78,9 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
   const [openItems, setOpenItems] = useState<string[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [hazardToDelete, setHazardToDelete] = useState<string | null>(null);
+  const [processingDialogOpen, setProcessingDialogOpen] = useState(false);
+  const [isGenerationComplete, setIsGenerationComplete] = useState(false);
+  const [hasNewHazards, setHasNewHazards] = useState(false);
 
   const { data: hazardTypes } = useQuery({
     queryKey: ['hazardTypes'],
@@ -303,6 +314,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         async (payload) => {
           console.log("New hazard added:", payload);
           await refetchHazards();
+          setHasNewHazards(true);
+          setIsGenerationComplete(true);
           
           // Open the newly added hazard
           if (payload.new && payload.new.id) {
@@ -330,20 +343,27 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       }
 
       try {
+        setProcessingDialogOpen(true);
+        setIsGenerationComplete(false);
+        setHasNewHazards(false);
+
         const { error } = await supabase
           .from('risk_assessments')
           .update({ auto_generate_hazards: true })
           .eq('id', riskAssessmentId);
 
         if (error) throw error;
-        
-        toast({
-          title: "Success",
-          description: "Hazards auto-generation started",
-        });
+
+        // Start a timeout to show completion even if no hazards were generated
+        setTimeout(() => {
+          if (!hasNewHazards) {
+            setIsGenerationComplete(true);
+          }
+        }, 5000);
 
       } catch (error) {
         console.error('Auto-generate failed:', error);
+        setProcessingDialogOpen(false);
         toast({
           title: "Error",
           description: "Failed to auto-generate hazards",
@@ -353,6 +373,12 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       }
     }
   });
+
+  const handleProcessingDialogClose = () => {
+    setProcessingDialogOpen(false);
+    setIsGenerationComplete(false);
+    setHasNewHazards(false);
+  };
 
   useImperativeHandle(ref, () => ({
     handleAdd,
@@ -763,6 +789,28 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={processingDialogOpen} onOpenChange={setProcessingDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {isGenerationComplete ? "Auto-Generation Complete" : "Auto-Generation in Progress"}
+            </DialogTitle>
+            <DialogDescription>
+              {isGenerationComplete 
+                ? hasNewHazards 
+                  ? "Hazards and controls have been successfully generated. Click OK to continue."
+                  : "No new hazards were generated. This could mean all relevant hazards already exist."
+                : "Your auto-generation is in progress. The records will refresh once done."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            {isGenerationComplete && (
+              <Button onClick={handleProcessingDialogClose}>OK</Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {hazards.length === 0 && !readOnly && (
         <div className="text-center py-6 text-gray-500">
