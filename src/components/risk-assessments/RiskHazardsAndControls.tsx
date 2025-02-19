@@ -209,10 +209,30 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
     console.log('Setting up realtime subscription for risk assessment:', riskAssessmentId);
     
+    let retryCount = 0;
+    const MAX_RETRIES = 3;
+    let channel: any = null;
+
     const setupChannel = () => {
-      console.log('Creating new channel instance');
-      return supabase
-        .channel('risk_hazards_channel')
+      if (retryCount >= MAX_RETRIES) {
+        console.log('Max retry attempts reached, stopping reconnection attempts');
+        toast({
+          title: "Warning",
+          description: "Real-time updates may be unavailable. Please refresh the page if needed.",
+          variant: "destructive",
+        });
+        return null;
+      }
+
+      console.log(`Creating new channel instance (attempt ${retryCount + 1}/${MAX_RETRIES})`);
+      
+      if (channel) {
+        console.log('Removing existing channel before creating new one');
+        supabase.removeChannel(channel);
+      }
+
+      const newChannel = supabase
+        .channel(`risk_hazards_channel_${Date.now()}`) // Unique channel name
         .on(
           'postgres_changes',
           {
@@ -234,24 +254,30 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           
           if (status === 'SUBSCRIBED') {
             console.log('Successfully subscribed to changes');
+            retryCount = 0; // Reset retry count on successful subscription
           } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
             console.error('Subscription error or closed:', status);
+            retryCount++;
             
-            supabase.removeChannel(channel);
-            
-            setTimeout(() => {
-              console.log('Creating new subscription...');
-              channel = setupChannel();
-            }, 2000);
+            if (retryCount < MAX_RETRIES) {
+              console.log(`Attempting to reconnect in 2 seconds... (attempt ${retryCount + 1}/${MAX_RETRIES})`);
+              setTimeout(() => {
+                channel = setupChannel();
+              }, 2000);
+            }
           }
         });
+
+      return newChannel;
     };
 
-    let channel = setupChannel();
+    channel = setupChannel();
 
     return () => {
       console.log('Cleaning up realtime subscription');
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, [riskAssessmentId, refetchHazards]);
 
