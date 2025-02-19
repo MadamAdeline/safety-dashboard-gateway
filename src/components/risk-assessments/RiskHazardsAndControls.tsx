@@ -790,7 +790,14 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={processingDialogOpen} onOpenChange={setProcessingDialogOpen}>
+      <Dialog 
+        open={processingDialogOpen} 
+        onOpenChange={(open) => {
+          if (!open && isGenerationComplete) {
+            handleProcessingDialogClose();
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
