@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -62,6 +61,7 @@ export interface RiskHazardsAndControlsRef {
   handleAdd: () => void;
   saveHazards: (riskAssessmentId: string) => Promise<void>;
   populateHazards: (hazards: any[]) => void;
+  onSaveSuccess?: () => Promise<void>;
 }
 
 export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, RiskHazardsAndControlsProps>(({ riskAssessmentId, readOnly }, ref) => {
@@ -350,10 +350,16 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       // Update overall risk assessment with highest risk score
       await updateOverallRiskAssessment([...manualHazards, ...copiedHazards]);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({
         queryKey: ['risk-hazards', riskAssessmentId]
       });
+      
+      // Call the onSaveSuccess handler if provided
+      if (ref && 'current' in ref && ref.current?.onSaveSuccess) {
+        await ref.current.onSaveSuccess();
+      }
+      
       toast({
         title: "Success",
         description: "Hazards and controls saved successfully"

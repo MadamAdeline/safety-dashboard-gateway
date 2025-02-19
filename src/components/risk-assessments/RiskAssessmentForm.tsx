@@ -307,26 +307,71 @@ export function RiskAssessmentForm({
     }
   }, [initialData]);
 
+  const {
+    data: riskAssessment,
+    refetch: refetchRiskAssessment
+  } = useQuery({
+    queryKey: ['risk-assessment', initialData?.id],
+    queryFn: async () => {
+      if (!initialData?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('risk_assessments')
+        .select('*')
+        .eq('id', initialData.id)
+        .single();
+        
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!initialData?.id
+  });
+
   useEffect(() => {
-    const updateRiskScore = async () => {
-      if (formData.overall_likelihood_id && formData.overall_consequence_id) {
-        const {
-          data,
-          error
-        } = await supabase.from('risk_matrix').select('*').eq('likelihood_id', formData.overall_likelihood_id).eq('consequence_id', formData.overall_consequence_id).single();
-        if (error) {
-          console.error('Error fetching risk score:', error);
-          return;
-        }
-        setRiskScore(data);
-        setFormData(prev => ({
-          ...prev,
-          overall_risk_score_id: data.id
-        }));
+    if (riskAssessment) {
+      setFormData(prev => ({
+        ...prev,
+        overall_likelihood_id: riskAssessment.overall_likelihood_id,
+        overall_consequence_id: riskAssessment.overall_consequence_id,
+        overall_risk_score_id: riskAssessment.overall_risk_score_id,
+        overall_evaluation: riskAssessment.overall_evaluation || prev.overall_evaluation,
+        overall_evaluation_status_id: riskAssessment.overall_evaluation_status_id || prev.overall_evaluation_status_id,
+        approval_status_id: riskAssessment.approval_status_id || prev.approval_status_id,
+      }));
+
+      if (riskAssessment.overall_likelihood_id && riskAssessment.overall_consequence_id) {
+        updateRiskScore(riskAssessment.overall_likelihood_id, riskAssessment.overall_consequence_id);
       }
-    };
-    updateRiskScore();
-  }, [formData.overall_likelihood_id, formData.overall_consequence_id]);
+    }
+  }, [riskAssessment]);
+
+  const updateRiskScore = async (likelihoodId: number, consequenceId: number) => {
+    const {
+      data,
+      error
+    } = await supabase.from('risk_matrix').select('*').eq('likelihood_id', likelihoodId).eq('consequence_id', consequenceId).single();
+    if (error) {
+      console.error('Error fetching risk score:', error);
+      return;
+    }
+    setRiskScore(data);
+    setFormData(prev => ({
+      ...prev,
+      overall_risk_score_id: data.id
+    }));
+  };
+
+  const handleRiskAssessmentRefresh = async () => {
+    if (initialData?.id) {
+      await refetchRiskAssessment();
+    }
+  };
+
+  useEffect(() => {
+    if (hazardsControlsRef.current) {
+      hazardsControlsRef.current.onSaveSuccess = handleRiskAssessmentRefresh;
+    }
+  }, []);
 
   useEffect(() => {
     if (productHazards && hazardsControlsRef.current && !initialData) {
