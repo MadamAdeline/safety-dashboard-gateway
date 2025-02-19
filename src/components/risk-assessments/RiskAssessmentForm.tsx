@@ -42,22 +42,8 @@ export function RiskAssessmentForm({
   const queryClient = useQueryClient();
   const hazardsControlsRef = useRef<RiskHazardsAndControlsRef>(null);
 
-  const { data: currentUser } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: async () => {
-      const userEmail = localStorage.getItem('userEmail');
-      if (!userEmail) return null;
-      
-      const { data, error } = await supabase
-        .from('users')
-        .select('id, email')
-        .eq('email', userEmail)
-        .single();
-        
-      if (error) throw error;
-      return data;
-    }
-  });
+  const [selectedSiteRegister, setSelectedSiteRegister] = useState<any | null>(null);
+  const [riskScore, setRiskScore] = useState<any | null>(null);
 
   const [formData, setFormData] = useState<FormData>({
     site_register_record_id: initialData?.site_register_record_id || "",
@@ -107,15 +93,15 @@ export function RiskAssessmentForm({
   });
 
   useEffect(() => {
-    if (!initialData && evaluationStatus && approvalStatus && currentUser) {
+    if (!initialData && evaluationStatus && approvalStatus) {
       setFormData(prev => ({
         ...prev,
         overall_evaluation_status_id: evaluationStatus.id || prev.overall_evaluation_status_id,
         approval_status_id: approvalStatus.id || prev.approval_status_id,
-        conducted_by: currentUser.id || prev.conducted_by
+        conducted_by: prev.conducted_by
       }));
     }
-  }, [evaluationStatus, approvalStatus, currentUser, initialData]);
+  }, [evaluationStatus, approvalStatus, initialData]);
 
   const {
     data: users
@@ -302,10 +288,13 @@ export function RiskAssessmentForm({
   useEffect(() => {
     const updateRiskScore = async () => {
       if (formData.overall_likelihood_id && formData.overall_consequence_id) {
-        const {
-          data,
-          error
-        } = await supabase.from('risk_matrix').select('*').eq('likelihood_id', formData.overall_likelihood_id).eq('consequence_id', formData.overall_consequence_id).single();
+        const { data, error } = await supabase
+          .from('risk_matrix')
+          .select('*')
+          .eq('likelihood_id', formData.overall_likelihood_id)
+          .eq('consequence_id', formData.overall_consequence_id)
+          .single();
+        
         if (error) {
           console.error('Error fetching risk score:', error);
           return;
@@ -487,7 +476,6 @@ export function RiskAssessmentForm({
   const handleRiskAssessmentRefresh = async () => {
     console.log('Refreshing risk assessment...');
     if (initialData?.id) {
-      // await refetchHazards();
       await refetchRiskAssessment();
       await queryClient.invalidateQueries({
         queryKey: ['risk-assessment', initialData.id]
@@ -540,19 +528,29 @@ export function RiskAssessmentForm({
                   <h2 className="text-lg font-semibold">Site Register Information</h2>
                 </div>
               </div>
-              {selectedSiteRegister ? <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+              {selectedSiteRegister ? (
+                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                   <p><strong>Location:</strong> {siteRegister?.location?.full_path}</p>
                   <p><strong>Product:</strong> {siteRegister?.product?.product_name}</p>
-                  {!initialData && <Button variant="outline" size="sm" onClick={() => {
-                setSelectedSiteRegister(null);
-                setFormData(prev => ({
-                  ...prev,
-                  site_register_record_id: ""
-                }));
-              }}>
+                  {!initialData && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => {
+                        setSelectedSiteRegister(null);
+                        setFormData(prev => ({
+                          ...prev,
+                          site_register_record_id: ""
+                        }));
+                      }}
+                    >
                       Change the Site Register's Product
-                    </Button>}
-                </div> : !initialData && <SiteRegisterSearch onSelect={handleSiteRegisterSelect} className="w-full" />}
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                !initialData && <SiteRegisterSearch onSelect={handleSiteRegisterSelect} className="w-full" />
+              )}
             </div>
 
             <div className="space-y-4">
