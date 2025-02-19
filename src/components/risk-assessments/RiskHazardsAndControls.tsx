@@ -6,14 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -78,9 +70,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
   const [openItems, setOpenItems] = useState<string[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [hazardToDelete, setHazardToDelete] = useState<string | null>(null);
-  const [processingDialogOpen, setProcessingDialogOpen] = useState(false);
-  const [isGenerationComplete, setIsGenerationComplete] = useState(false);
-  const [hasNewHazards, setHasNewHazards] = useState(false);
 
   const { data: hazardTypes } = useQuery({
     queryKey: ['hazardTypes'],
@@ -178,8 +167,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       
       if (error) throw error;
 
-      console.log('Fetched hazards data:', hazardsData);
-
       return Promise.all((hazardsData || []).map(async (hazard) => {
         if (hazard.likelihood_id && hazard.consequence_id) {
           const { data: riskScore } = await supabase
@@ -204,89 +191,99 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     }
   }, [hazardsData]);
 
-  useEffect(() => {
-    if (!riskAssessmentId) return;
+  const saveMutation = useMutation({
+    mutationFn: async (hazardsData: any[]) => {
+      if (!riskAssessmentId) return;
 
-    console.log('Setting up realtime subscription for risk assessment:', riskAssessmentId);
-    
-    let retryCount = 0;
-    const MAX_RETRIES = 3;
-    let channel: any = null;
+      const copiedHazards = hazardsData.filter(h => h.hazard_control_id);
+      const manualHazards = hazardsData.filter(h => !h.hazard_control_id);
 
-    const setupChannel = () => {
-      if (retryCount >= MAX_RETRIES) {
-        console.log('Max retry attempts reached, stopping reconnection attempts');
-        toast({
-          title: "Warning",
-          description: "Real-time updates may be unavailable. Please refresh the page if needed.",
-          variant: "destructive",
-        });
-        return null;
-      }
+      console.log('Starting save operation with:', {
+        totalHazards: hazardsData.length,
+        copiedHazards: copiedHazards.length,
+        manualHazards: manualHazards.length
+      });
 
-      console.log(`Creating new channel instance (attempt ${retryCount + 1}/${MAX_RETRIES})`);
-      
-      if (channel) {
-        console.log('Removing existing channel before creating new one');
-        supabase.removeChannel(channel);
-      }
+      if (copiedHazards.length > 0) {
+        const { data: existingHazards, error: fetchError } = await supabase
+          .from('risk_hazards_and_controls')
+          .select('id, hazard_control_id')
+          .eq('risk_assessment_id', riskAssessmentId)
+          .not('hazard_control_id', 'is', null);
 
-      const newChannel = supabase
-        .channel(`risk_hazards_channel_${Date.now()}`) // Unique channel name
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'risk_hazards_and_controls',
-            filter: `risk_assessment_id=eq.${riskAssessmentId}`
-          },
-          async (payload) => {
-            console.log("New hazard added:", payload);
-            await refetchHazards();
-            setHasNewHazards(true);
-            setIsGenerationComplete(true);
-            setProcessingDialogOpen(true);
-          }
-        )
-        .subscribe((status) => {
-          console.log('Subscription status:', status);
+        if (fetchError) throw fetchError;
+
+        const existingMap = new Map(
+          (existingHazards || []).map(h => [h.hazard_control_id, h.id])
+        );
+
+        for (const hazard of copiedHazards) {
+          const hazardData = {
+            risk_assessment_id: riskAssessmentId,
+            hazard_control_id: hazard.hazard_control_id,
+            hazard_type_id: hazard.hazard_type_id,
+            hazard: hazard.hazard,
+            control: hazard.control,
+            control_in_place: hazard.control_in_place,
+            likelihood_id: hazard.likelihood_id,
+            consequence_id: hazard.consequence_id,
+            risk_score_id: hazard.risk_score?.id || null,
+            risk_score_int: hazard.risk_score?.risk_score || null,
+            risk_level_text: hazard.risk_score?.risk_label || null,
+            likelihood_text: likelihoodOptions?.find(l => l.id === hazard.likelihood_id)?.name || null,
+            consequence_text: hazard.consequence_text,
+            source: 'Product'
+          };
+
+          const existingId = existingMap.get(hazard.hazard_control_id);
           
-          if (status === 'SUBSCRIBED') {
-            console.log('Successfully subscribed to changes');
-            retryCount = 0; // Reset retry count on successful subscription
-          } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-            console.error('Subscription error or closed:', status);
-            retryCount++;
-            
-            if (retryCount < MAX_RETRIES) {
-              console.log(`Attempting to reconnect in 2 seconds... (attempt ${retryCount + 1}/${MAX_RETRIES})`);
-              setTimeout(() => {
-                channel = setupChannel();
-              }, 2000);
-            }
+          if (existingId) {
+            const { error } = await supabase
+              .from('risk_hazards_and_controls')
+              .update(hazardData)
+              .eq('id', existingId);
+
+            if (error) throw error;
+          } else {
+            const { error } = await supabase
+              .from('risk_hazards_and_controls')
+              .insert(hazardData);
+
+            if (error) throw error;
           }
-        });
-
-      return newChannel;
-    };
-
-    channel = setupChannel();
-
-    return () => {
-      console.log('Cleaning up realtime subscription');
-      if (channel) {
-        supabase.removeChannel(channel);
+        }
       }
-    };
-  }, [riskAssessmentId, refetchHazards]);
 
-  const handleProcessingDialogClose = () => {
-    console.log("Closing processing dialog");
-    setProcessingDialogOpen(false);
-    setIsGenerationComplete(false);
-    setHasNewHazards(false);
-  };
+      if (manualHazards.length > 0) {
+        for (const hazard of manualHazards) {
+          const { error } = await supabase
+            .from('risk_hazards_and_controls')
+            .upsert({
+              id: hazard.id,
+              risk_assessment_id: riskAssessmentId,
+              hazard_type_id: hazard.hazard_type_id,
+              hazard: hazard.hazard,
+              control: hazard.control,
+              control_in_place: hazard.control_in_place,
+              likelihood_id: hazard.likelihood_id,
+              consequence_id: hazard.consequence_id,
+              risk_score_id: hazard.risk_score?.id || null,
+              risk_score_int: hazard.risk_score?.risk_score || null,
+              risk_level_text: hazard.risk_score?.risk_label || null,
+              likelihood_text: likelihoodOptions?.find(l => l.id === hazard.likelihood_id)?.name || null,
+              consequence_text: hazard.consequence_text,
+              source: 'Manual'
+            }, {
+              onConflict: 'id'
+            });
+
+          if (error) throw error;
+        }
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
+    }
+  });
 
   const autoGenerateMutation = useMutation({
     mutationFn: async () => {
@@ -300,12 +297,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       }
 
       try {
-        setProcessingDialogOpen(true);
-        setIsGenerationComplete(false);
-        setHasNewHazards(false);
-
-        console.log("Starting auto-generation process...");
-
         const { error } = await supabase
           .from('risk_assessments')
           .update({ auto_generate_hazards: true })
@@ -313,21 +304,17 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
         if (error) throw error;
 
-        console.log("Auto-generate triggered... waiting for realtime update");
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-        // Fallback in case realtime doesn't trigger
-        setTimeout(async () => {
-          if (!hasNewHazards) {
-            console.log("No hazards detected after timeout, forcing refresh...");
-            await refetchHazards();
-            setIsGenerationComplete(true);
-            setProcessingDialogOpen(true);
-          }
-        }, 5000);
+        await refetchHazards();
+        
+        toast({
+          title: "Success",
+          description: "Hazards auto-generated successfully",
+        });
 
       } catch (error) {
         console.error('Auto-generate failed:', error);
-        setProcessingDialogOpen(false);
         toast({
           title: "Error",
           description: "Failed to auto-generate hazards",
@@ -335,38 +322,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         });
         throw error;
       }
-    }
-  });
-
-  const saveMutation = useMutation({
-    mutationFn: async (hazardsToSave: any[]) => {
-      if (!riskAssessmentId) return;
-
-      const { error } = await supabase
-        .from('risk_hazards_and_controls')
-        .upsert(
-          hazardsToSave.map(hazard => ({
-            ...hazard,
-            risk_assessment_id: riskAssessmentId
-          }))
-        );
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
-      toast({
-        title: "Success",
-        description: "Hazards and controls saved successfully"
-      });
-    },
-    onError: (error) => {
-      console.error('Error saving hazards:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save hazards and controls",
-        variant: "destructive"
-      });
     }
   });
 
@@ -779,36 +734,6 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <Dialog 
-        open={processingDialogOpen} 
-        onOpenChange={(open) => {
-          console.log("Dialog onOpenChange:", { open, isGenerationComplete });
-          if (!open && isGenerationComplete) {
-            handleProcessingDialogClose();
-          }
-        }}
-      >
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>
-              {isGenerationComplete ? "Auto-Generation Complete" : "Auto-Generation in Progress"}
-            </DialogTitle>
-            <DialogDescription>
-              {isGenerationComplete 
-                ? hasNewHazards 
-                  ? "Hazards and controls have been successfully generated. Click OK to continue."
-                  : "No new hazards were generated. This could mean all relevant hazards already exist."
-                : "Your auto-generation is in progress. The records will refresh once done."}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            {isGenerationComplete && (
-              <Button onClick={handleProcessingDialogClose}>OK</Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {hazards.length === 0 && !readOnly && (
         <div className="text-center py-6 text-gray-500">
