@@ -356,6 +356,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         queryKey: ['risk-hazards', riskAssessmentId]
       });
       
+      console.log('Save successful, calling onSaveSuccess callback');
       // Call the onSaveSuccess handler if provided
       if (ref && 'current' in ref && ref.current?.onSaveSuccess) {
         await ref.current.onSaveSuccess();

@@ -356,13 +356,18 @@ export function RiskAssessmentForm({
   };
 
   const handleRiskAssessmentRefresh = async () => {
+    console.log('Refreshing risk assessment...');
     if (initialData?.id) {
       await refetchRiskAssessment();
+      await queryClient.invalidateQueries({
+        queryKey: ['risk-assessment', initialData.id]
+      });
     }
   };
 
   useEffect(() => {
     if (hazardsControlsRef.current) {
+      console.log('Setting up onSaveSuccess callback');
       hazardsControlsRef.current.onSaveSuccess = handleRiskAssessmentRefresh;
     }
   }, []);
