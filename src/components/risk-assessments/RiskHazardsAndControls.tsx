@@ -322,6 +322,19 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         });
         throw error;
       }
+    },
+    onSuccess: async () => {
+      await refetchHazards();
+      
+      const { data: newHazards } = await supabase
+        .from('risk_hazards_and_controls')
+        .select('id')
+        .eq('risk_assessment_id', riskAssessmentId)
+        .order('created_at', { ascending: true });
+        
+      if (newHazards) {
+        setOpenItems(newHazards.map(h => h.id));
+      }
     }
   });
 
