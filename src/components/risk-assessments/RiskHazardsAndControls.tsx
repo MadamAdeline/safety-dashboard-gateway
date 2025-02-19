@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -209,7 +210,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
     console.log('Setting up realtime subscription for risk assessment:', riskAssessmentId);
     
-    const channel = supabase
+    let channel = supabase
       .channel('risk_hazards_channel')
       .on(
         'postgres_changes',
@@ -221,28 +222,53 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         },
         async (payload) => {
           console.log("New hazard added:", payload);
-
-          // Ensure hazards refresh properly
           await refetchHazards();
-
-          // Ensure dialog updates properly
           setHasNewHazards(true);
           setIsGenerationComplete(true);
           setProcessingDialogOpen(true);
-
-          // Auto-expand new hazard
-          if (payload.new && payload.new.id) {
-            setOpenItems(current => [...current, payload.new.id]);
-          }
         }
       )
       .subscribe();
 
+    // Handle subscription errors
+    channel.onError((error) => {
+      console.error("Realtime subscription error:", error);
+      // Try to resubscribe
+      channel = supabase
+        .channel('risk_hazards_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'risk_hazards_and_controls',
+            filter: `risk_assessment_id=eq.${riskAssessmentId}`
+          },
+          async (payload) => {
+            console.log("New hazard added (resubscribed):", payload);
+            await refetchHazards();
+            setHasNewHazards(true);
+            setIsGenerationComplete(true);
+            setProcessingDialogOpen(true);
+          }
+        )
+        .subscribe();
+    });
+
     return () => {
       console.log('Cleaning up realtime subscription');
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, [riskAssessmentId, refetchHazards]);
+
+  const handleProcessingDialogClose = () => {
+    console.log("Closing processing dialog");
+    setProcessingDialogOpen(false);
+    setIsGenerationComplete(false);
+    setHasNewHazards(false);
+  };
 
   const autoGenerateMutation = useMutation({
     mutationFn: async () => {
@@ -256,14 +282,12 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       }
 
       try {
-        // Set initial states
         setProcessingDialogOpen(true);
         setIsGenerationComplete(false);
         setHasNewHazards(false);
 
         console.log("Starting auto-generation process...");
 
-        // Trigger auto-generation
         const { error } = await supabase
           .from('risk_assessments')
           .update({ auto_generate_hazards: true })
@@ -273,7 +297,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
         console.log("Auto-generate triggered... waiting for realtime update");
 
-        // Ensure UI updates in case realtime doesn't fire
+        // Fallback in case realtime doesn't trigger
         setTimeout(async () => {
           if (!hasNewHazards) {
             console.log("No hazards detected after timeout, forcing refresh...");
