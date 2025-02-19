@@ -303,6 +303,38 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     setHasNewHazards(false);
   };
 
+  const saveMutation = useMutation({
+    mutationFn: async (hazardsToSave: any[]) => {
+      if (!riskAssessmentId) return;
+
+      const { error } = await supabase
+        .from('risk_hazards_and_controls')
+        .upsert(
+          hazardsToSave.map(hazard => ({
+            ...hazard,
+            risk_assessment_id: riskAssessmentId
+          }))
+        );
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['risk-hazards', riskAssessmentId] });
+      toast({
+        title: "Success",
+        description: "Hazards and controls saved successfully"
+      });
+    },
+    onError: (error) => {
+      console.error('Error saving hazards:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save hazards and controls",
+        variant: "destructive"
+      });
+    }
+  });
+
   useImperativeHandle(ref, () => ({
     handleAdd,
     saveHazards: async (riskAssessmentId: string) => {
