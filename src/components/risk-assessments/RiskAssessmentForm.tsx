@@ -649,7 +649,8 @@ export function RiskAssessmentForm({
             <RiskHazardsAndControls 
               riskAssessmentId={initialData?.id || null} 
               readOnly={false} 
-              ref={hazardsControlsRef} 
+              ref={hazardsControlsRef}
+              onSaveSuccess={handleRiskAssessmentRefresh}
             />
 
             <div className="space-y-4">
