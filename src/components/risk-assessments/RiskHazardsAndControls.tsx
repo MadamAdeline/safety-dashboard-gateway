@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -215,33 +216,50 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
   };
 
   const updateOverallRiskAssessment = async (hazardsData: any[]) => {
-    if (!riskAssessmentId) return;
+    if (!riskAssessmentId) {
+      console.log('No risk assessment ID provided');
+      return;
+    }
 
+    console.log('Updating overall risk assessment with hazards:', hazardsData);
+
+    // Find the hazard with the highest risk score
     const highestRiskHazard = hazardsData.reduce((prev, current) => {
       const prevScore = prev.risk_score_int || 0;
       const currentScore = current.risk_score_int || 0;
+      console.log(`Comparing scores: prev=${prevScore}, current=${currentScore}`);
       return currentScore > prevScore ? current : prev;
     }, hazardsData[0]);
 
+    console.log('Highest risk hazard:', highestRiskHazard);
+
     if (highestRiskHazard) {
+      const updateData = {
+        overall_likelihood_id: highestRiskHazard.likelihood_id,
+        overall_consequence_id: highestRiskHazard.consequence_id,
+        overall_risk_score_id: highestRiskHazard.risk_score_id,
+        overall_risk_score_int: highestRiskHazard.risk_score_int,
+        overall_likelihood_text: highestRiskHazard.likelihood_text,
+        overall_consequence_text: highestRiskHazard.consequence_text,
+        overall_risk_level_text: highestRiskHazard.risk_level_text
+      };
+
+      console.log('Updating risk assessment with:', updateData);
+
       const { data, error } = await supabase
         .from('risk_assessments')
-        .update({
-          overall_likelihood_id: highestRiskHazard.likelihood_id,
-          overall_consequence_id: highestRiskHazard.consequence_id,
-          overall_risk_score_id: highestRiskHazard.risk_score_id,
-          overall_risk_score_int: highestRiskHazard.risk_score_int,
-          overall_likelihood_text: highestRiskHazard.likelihood_text,
-          overall_consequence_text: highestRiskHazard.consequence_text,
-          overall_risk_level_text: highestRiskHazard.risk_level_text
-        })
-        .eq('id', riskAssessmentId);
+        .update(updateData)
+        .eq('id', riskAssessmentId)
+        .select();
 
       if (error) {
         console.error('Error updating overall risk assessment:', error);
         throw error;
       }
 
+      console.log('Successfully updated risk assessment:', data);
+
+      // Invalidate the risk assessment query to refresh the data
       queryClient.invalidateQueries({
         queryKey: ['risk-assessments']
       });
@@ -251,6 +269,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
   const saveMutation = useMutation({
     mutationFn: async (hazardsData: any[]) => {
       if (!riskAssessmentId) return;
+
+      console.log('Starting save mutation with hazards:', hazardsData);
 
       const allErrors: { [key: string]: string[] } = {};
       let hasErrors = false;
@@ -270,6 +290,9 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
 
       const copiedHazards = hazardsData.filter(h => h.hazard_control_id);
       const manualHazards = hazardsData.filter(h => !h.hazard_control_id);
+
+      console.log('Copied hazards:', copiedHazards);
+      console.log('Manual hazards:', manualHazards);
 
       if (manualHazards.length > 0) {
         const { error: deleteError } = await supabase
@@ -324,6 +347,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
         if (updateError) throw updateError;
       }
 
+      // Update overall risk assessment with highest risk score
       await updateOverallRiskAssessment([...manualHazards, ...copiedHazards]);
     },
     onSuccess: () => {
@@ -336,6 +360,7 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
       });
     },
     onError: (error: Error) => {
+      console.error('Save mutation error:', error);
       toast({
         title: "Error",
         description: error.message,
@@ -541,23 +566,11 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
           <TableRow>
             <TableHead className="w-[50px]"></TableHead>
             <TableHead className="w-[100px] sm:w-[150px] text-left font-semibold whitespace-nowrap overflow-hidden text-ellipsis">Type</TableHead>
-            <TableHead 
-              className="w-[125px] sm:w-[175px] text-left font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
-              title="Hazard Description"
-            >
-              Hazard Desc.
-            </TableHead>
-            <TableHead 
-              className="w-[125px] sm:w-[175px] text-left font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
-              title="Control Description"
-            >
-              Control Desc.
-            </TableHead>
+            <TableHead className="w-[125px] sm:w-[175px] text-left font-semibold whitespace-nowrap overflow-hidden text-ellipsis">Hazard Desc.</TableHead>
+            <TableHead className="w-[125px] sm:w-[175px] text-left font-semibold whitespace-nowrap overflow-hidden text-ellipsis">Control Desc.</TableHead>
             <TableHead className="w-[120px] sm:w-[150px] text-center font-semibold">Risk Level</TableHead>
             {!readOnly && (
-              <TableHead className="w-[60px] sm:w-[80px] text-center font-semibold">
-                Actions
-              </TableHead>
+              <TableHead className="w-[60px] sm:w-[80px] text-center font-semibold">Actions</TableHead>
             )}
           </TableRow>
         </TableHeader>
