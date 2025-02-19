@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { SiteRegisterSearch } from "./SiteRegisterSearch";
-import { RiskHazardsAndControls } from "./RiskHazardsAndControls";
+import { RiskHazardsAndControls, RiskHazardsAndControlsRef } from "./RiskHazardsAndControls";
 
 interface RiskHazardsAndControlsRef {
   handleAdd: () => void;

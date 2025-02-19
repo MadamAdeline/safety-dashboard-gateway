@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
@@ -423,7 +424,8 @@ export const RiskHazardsAndControls = forwardRef<RiskHazardsAndControlsRef, Risk
     populateHazards: (newHazards: any[]) => {
       setHazards(newHazards);
       setOpenItems(newHazards.map(h => h.id));
-    }
+    },
+    onSaveSuccess: undefined // Initialize as undefined
   }));
 
   const deleteMutation = useMutation({
